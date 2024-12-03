@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Habits</title>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full">
+    <div class="min-h-full flex flex-col py-6 sm:px-4 lg:px-4">
+        <!-- Header with Welcome Message and Logout Button -->
+        <div class="flex justify-between items-center px-6 mb-4">
+            <h1 class="text-left text-3xl font-bold tracking-tight text-gray-900">
+                👋 {{ .User.FirstName }}
+            </h1>
+            <div class="flex items-center space-x-4">
+                <!-- Settings Button -->
+                <a href="/settings" 
+                    class="rounded-md bg-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                    Settings ⚙️
+                </a>
+                <!-- Logout Button -->
+                <form action="/logout" method="POST">
+                    <button type="submit" 
+                        class="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
+                        Logout 👋
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Monthly Grid -->
+        <div class="mb-8 flex items-center justify-center min-h-[50vh]">
+            <div class="w-auto">
+                <div class="bg-white p-8 shadow sm:rounded-lg">
+                    <!-- Header with title and legend -->
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-semibold">🗓️ December 2024</h2>
+                        
+                        <!-- Legend -->
+                        <div class="flex gap-6">
+                            <div class="flex items-center gap-2">
+                                <div class="w-5 h-5 rounded-sm" style="background-color: #2da44e;"></div>
+                                <span class="text-sm text-gray-600">Done</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-5 h-5 rounded-sm" style="background-color: #E3211a;"></div>
+                                <span class="text-sm text-gray-600">Missed</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-5 h-5 rounded-sm" style="background-color: #00a0d2;"></div>
+                                <span class="text-sm text-gray-600">Skipped</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="w-5 h-5 rounded-sm" style="background-color: #ebedf0;"></div>
+                                <span class="text-sm text-gray-600">No Data</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Grid -->
+                    <div class="flex flex-col">
+                        <div class="grid" style="gap: 3px; grid-template-columns: 150px repeat(31, 35px);">
+                            <!-- Header row with day numbers -->
+                            <div class="h-8"></div>
+                            {{ range $i := 31 | times }}
+                                <div class="text-sm text-center text-gray-600" style="width: 35px;">{{ add $i 1 }}</div>
+                            {{ end }}
+                            
+                            <!-- Example habit row -->
+                            <div class="h-8 flex items-center font-medium text-sm text-gray-700 pr-4" style="width: 150px;">
+                                Example Habit
+                            </div>
+                            {{ range $i := 31 | times }}
+                                <div class="h-8 flex items-center justify-center" style="width: 35px;">
+                                    <div class="w-7 h-7 rounded-sm" style="background-color: #ebedf0;"></div>
+                                </div>
+                            {{ end }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
