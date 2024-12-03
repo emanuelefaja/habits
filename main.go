@@ -119,6 +119,27 @@ func main() {
 		}
 	})))
 
+	// Logout route
+	http.Handle("/logout", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		// Destroy the session
+		err := middleware.SessionManager.Destroy(r.Context())
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		// Set flash message
+		middleware.SetFlash(r, "You have been logged out successfully!")
+
+		// Redirect to login page
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+	})))
+
 	// Start server
 	log.Println("Server started at :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
