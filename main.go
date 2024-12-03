@@ -20,7 +20,7 @@ type TemplateData struct {
 
 func main() {
 	// Initialize database
-	db, err := sql.Open("sqlite3", "./users.db")
+	db, err := sql.Open("sqlite3", "./habits.db")
 	if err != nil {
 		log.Fatal(err)
 	}
