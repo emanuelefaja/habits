@@ -203,6 +203,67 @@
                     this.showFlash = true;
                     setTimeout(() => this.showFlash = false, 3000);
                 }
+            },
+
+            // Add new data for suggestions
+            showSuggestions: false,
+            selectedSuggestions: [],
+            habitSuggestions: [
+                { emoji: '💪', name: 'Pushups' },
+                { emoji: '🏃‍♂️', name: 'Running' },
+                { emoji: '🧘', name: 'Meditation' },
+                { emoji: '📚', name: 'Reading' },
+                { emoji: '💧', name: 'Drink Water' },
+                { emoji: '😴', name: '8h Sleep' },
+                { emoji: '🥗', name: 'Healthy Meal' },
+                { emoji: '📝', name: 'Journaling' },
+                { emoji: '🌅', name: 'Morning Routine' },
+                { emoji: '🎯', name: 'Practice Skill' }
+            ],
+
+            async addSelectedHabits() {
+                if (this.selectedSuggestions.length === 0) return;
+                console.log('Selected habits:', this.selectedSuggestions);
+                
+                try {
+                    const requestBody = this.selectedSuggestions.map(name => ({ name }));
+                    console.log('Sending request:', requestBody);
+                    
+                    const response = await fetch('/api/habits/bulk', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(requestBody)
+                    });
+                    
+                    console.log('Response status:', response.status);
+                    const result = await response.json();
+                    console.log('Response data:', result);
+                    
+                    if (result.success) {
+                        // Fetch habits instead of full page reload
+                        const habitsResponse = await fetch('/api/habits');
+                        const habitsResult = await habitsResponse.json();
+                        if (habitsResult.success) {
+                            this.habits = habitsResult.data || [];
+                            this.selectedSuggestions = [];
+                            this.flashMessage = 'Habits added successfully';
+                            this.showFlash = true;
+                            setTimeout(() => this.showFlash = false, 3000);
+                            await this.loadMonthLogs(); // Reload logs for new habits
+                        }
+                    } else {
+                        this.flashMessage = 'Error adding habits';
+                        this.showFlash = true;
+                        setTimeout(() => this.showFlash = false, 3000);
+                    }
+                } catch (error) {
+                    console.error('Error adding habits:', error);
+                    this.flashMessage = 'Error adding habits';
+                    this.showFlash = true;
+                    setTimeout(() => this.showFlash = false, 3000);
+                }
             }
          }"
          @click.away="if (showAddForm) { showAddForm = false; newHabitName = ''; }">
@@ -241,140 +302,179 @@
             </div>
         </div>
 
+        <!-- First Time User View -->
+        <template x-if="habits.length === 0">
+            <div class="flex-grow flex items-center justify-center mb-8">
+                <div class="max-w-3xl mx-auto px-4 py-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">🎯 Get Started with Habit Tracking!</h2>
+                    <p class="text-gray-600 mb-8">Choose some habits you'd like to track. You can always add more later.</p>
+                    
+                    <div class="flex flex-wrap gap-3 mb-8">
+                        <template x-for="suggestion in habitSuggestions" :key="suggestion.name">
+                            <button 
+                                @click="selectedSuggestions.includes(suggestion.name) ? 
+                                    selectedSuggestions = selectedSuggestions.filter(s => s !== suggestion.name) : 
+                                    selectedSuggestions.push(suggestion.name)"
+                                :class="{
+                                    'bg-indigo-100 border-indigo-500': selectedSuggestions.includes(suggestion.name),
+                                    'bg-white border-gray-300 hover:border-gray-400': !selectedSuggestions.includes(suggestion.name)
+                                }"
+                                class="px-4 py-2 rounded-full border transition-colors duration-200"
+                            >
+                                <span x-text="suggestion.emoji"></span>
+                                <span x-text="suggestion.name" class="ml-2"></span>
+                            </button>
+                        </template>
+                    </div>
+
+                    <button 
+                        @click="addSelectedHabits()"
+                        :disabled="selectedSuggestions.length === 0"
+                        :class="{'opacity-50 cursor-not-allowed': selectedSuggestions.length === 0}"
+                        class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors duration-200"
+                    >
+                        Add <span x-text="selectedSuggestions.length"></span> Habits
+                    </button>
+                </div>
+            </div>
+        </template>
+
         <!-- Monthly Grid -->
-        <div class="mb-8 flex items-center justify-center min-h-[50vh]">
-            <div class="w-auto">
-                <div class="bg-white p-8 shadow sm:rounded-lg">
-                    <!-- Header with title and legend -->
-                    <div class="flex justify-between items-center mb-6">
-                        <div class="flex items-center gap-3">
-                            <span class="isolate inline-flex rounded-md shadow-sm">
-                                <button type="button" 
-                                        @click="
-                                            if (currentMonth === 1) {
-                                                currentMonth = 12;
-                                                currentYear--;
-                                            } else {
-                                                currentMonth--;
-                                            }
-                                            loadMonthLogs();
-                                        "
-                                        class="relative inline-flex items-center rounded-l-md bg-white px-1.5 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10">
-                                    <span class="sr-only">Previous</span>
-                                    <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                        <path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
-                                    </svg>
-                                </button>
-                                <button type="button"
-                                        @click="
-                                            if (currentMonth === 12) {
-                                                currentMonth = 1;
-                                                currentYear++;
-                                            } else {
-                                                currentMonth++;
-                                            }
-                                            loadMonthLogs();
-                                        "
-                                        class="relative -ml-px inline-flex items-center rounded-r-md bg-white px-1.5 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10">
-                                    <span class="sr-only">Next</span>
-                                    <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                        <path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
-                                    </svg>
-                                </button>
-                            </span>
-                            <h2 class="text-2xl font-semibold" x-text="`🗓️ ${monthNames[currentMonth-1]} ${currentYear}`"></h2>
+        <template x-if="habits.length > 0">
+            <div class="flex-grow flex items-center justify-center mb-8">
+                <div class="w-auto">
+                    <div class="bg-white p-8 shadow sm:rounded-lg">
+                        <!-- Header with title and legend -->
+                        <div class="flex justify-between items-center mb-6">
+                            <div class="flex items-center gap-3">
+                                <span class="isolate inline-flex rounded-md shadow-sm">
+                                    <button type="button" 
+                                            @click="
+                                                if (currentMonth === 1) {
+                                                    currentMonth = 12;
+                                                    currentYear--;
+                                                } else {
+                                                    currentMonth--;
+                                                }
+                                                loadMonthLogs();
+                                            "
+                                            class="relative inline-flex items-center rounded-l-md bg-white px-1.5 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10">
+                                        <span class="sr-only">Previous</span>
+                                        <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                    <button type="button"
+                                            @click="
+                                                if (currentMonth === 12) {
+                                                    currentMonth = 1;
+                                                    currentYear++;
+                                                } else {
+                                                    currentMonth++;
+                                                }
+                                                loadMonthLogs();
+                                            "
+                                            class="relative -ml-px inline-flex items-center rounded-r-md bg-white px-1.5 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10">
+                                        <span class="sr-only">Next</span>
+                                        <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                                        </svg>
+                                    </button>
+                                </span>
+                                <h2 class="text-2xl font-semibold" x-text="`🗓️ ${monthNames[currentMonth-1]} ${currentYear}`"></h2>
+                            </div>
+                            
+                            <!-- Legend -->
+                            <div class="flex gap-6">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-5 h-5 rounded-sm" style="background-color: #2da44e;"></div>
+                                    <span class="text-sm text-gray-600">Done</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-5 h-5 rounded-sm" style="background-color: #E3211a;"></div>
+                                    <span class="text-sm text-gray-600">Missed</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-5 h-5 rounded-sm" style="background-color: #00a0d2;"></div>
+                                    <span class="text-sm text-gray-600">Skipped</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-5 h-5 rounded-sm" style="background-color: #ebedf0;"></div>
+                                    <span class="text-sm text-gray-600">No Data</span>
+                                </div>
+                            </div>
                         </div>
                         
-                        <!-- Legend -->
-                        <div class="flex gap-6">
-                            <div class="flex items-center gap-2">
-                                <div class="w-5 h-5 rounded-sm" style="background-color: #2da44e;"></div>
-                                <span class="text-sm text-gray-600">Done</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <div class="w-5 h-5 rounded-sm" style="background-color: #E3211a;"></div>
-                                <span class="text-sm text-gray-600">Missed</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <div class="w-5 h-5 rounded-sm" style="background-color: #00a0d2;"></div>
-                                <span class="text-sm text-gray-600">Skipped</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <div class="w-5 h-5 rounded-sm" style="background-color: #ebedf0;"></div>
-                                <span class="text-sm text-gray-600">No Data</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Grid -->
-                    <div class="flex flex-col">
-                        <div class="grid" style="gap: 3px; grid-template-columns: 150px repeat(31, 35px)">
-                            <!-- Header row with day numbers -->
-                            <div class="h-8"></div>
-                            <template x-for="day in 31" :key="day">
-                                <div class="text-sm text-center text-gray-600" 
-                                     style="width: 35px;" 
-                                     :class="{ 'invisible': day > getDaysInMonth() }"
-                                     x-text="day">
-                                </div>
-                            </template>
-                            
-                            <!-- Habit rows -->
-                            <template x-for="habit in habits">
-                                <div class="contents">
-                                    <div class="h-8 flex items-center font-medium text-sm text-gray-700 pr-4" style="width: 150px;" x-text="habit.name"></div>
-                                    <template x-for="day in 31" :key="day">
-                                        <div class="h-8 flex items-center justify-center" 
-                                             style="width: 35px;"
-                                             :class="{ 'invisible': day > getDaysInMonth() }">
-                                            <div class="w-7 h-7 rounded-sm cursor-pointer"
-                                                 @click="day <= getDaysInMonth() && handleSquareClick(habit.id, formatDate(day))"
-                                                 :style="{ 
-                                                     backgroundColor: day <= getDaysInMonth() ? getStatusColor(getStatus(habit.id, formatDate(day))) : '#ebedf0',
-                                                     cursor: day <= getDaysInMonth() ? 'pointer' : 'default'
-                                                 }">
-                                            </div>
-                                        </div>
-                                    </template>
-                                </div>
-                            </template>
-                            
-                            <!-- Add Habit Button/Form -->
-                            <div class="h-8 flex items-center col-span-full"
-                                 x-data="{ 
-                                    handleClickOutside() {
-                                        if (this.showAddForm) {
-                                            this.showAddForm = false;
-                                            this.newHabitName = '';
-                                        }
-                                    }
-                                 }"
-                                 @click.outside="handleClickOutside">
-                                <!-- Button -->
-                                <button x-show="!showAddForm"
-                                        @click.stop="toggleForm()"
-                                        class="text-sm text-gray-500 hover:text-gray-700">
-                                    + Add Habit
-                                </button>
+                        <!-- Grid -->
+                        <div class="flex flex-col">
+                            <div class="grid" style="gap: 3px; grid-template-columns: 150px repeat(31, 35px)">
+                                <!-- Header row with day numbers -->
+                                <div class="h-8"></div>
+                                <template x-for="day in 31" :key="day">
+                                    <div class="text-sm text-center text-gray-600" 
+                                         style="width: 35px;" 
+                                         :class="{ 'invisible': day > getDaysInMonth() }"
+                                         x-text="day">
+                                    </div>
+                                </template>
                                 
-                                <!-- Form -->
-                                <form x-show="showAddForm"
-                                      @submit.prevent="submitHabit()"
-                                      @click.stop
-                                      class="w-[150px]">
-                                    <input type="text"
-                                           x-ref="habitInput"
-                                           x-model="newHabitName"
-                                           @keydown.escape="showAddForm = false; newHabitName = ''"
-                                           placeholder="New habit name"
-                                           class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:border-blue-500">
-                                </form>
+                                <!-- Habit rows -->
+                                <template x-for="habit in habits">
+                                    <div class="contents">
+                                        <div class="h-8 flex items-center font-medium text-sm text-gray-700 pr-4" style="width: 150px;" x-text="habit.name"></div>
+                                        <template x-for="day in 31" :key="day">
+                                            <div class="h-8 flex items-center justify-center" 
+                                                 style="width: 35px;"
+                                                 :class="{ 'invisible': day > getDaysInMonth() }">
+                                                <div class="w-7 h-7 rounded-sm cursor-pointer"
+                                                     @click="day <= getDaysInMonth() && handleSquareClick(habit.id, formatDate(day))"
+                                                     :style="{ 
+                                                         backgroundColor: day <= getDaysInMonth() ? getStatusColor(getStatus(habit.id, formatDate(day))) : '#ebedf0',
+                                                         cursor: day <= getDaysInMonth() ? 'pointer' : 'default'
+                                                     }">
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                                
+                                <!-- Add Habit Button/Form -->
+                                <div class="h-8 flex items-center col-span-full"
+                                     x-data="{ 
+                                        handleClickOutside() {
+                                            if (this.showAddForm) {
+                                                this.showAddForm = false;
+                                                this.newHabitName = '';
+                                            }
+                                        }
+                                     }"
+                                     @click.outside="handleClickOutside">
+                                    <!-- Button -->
+                                    <button x-show="!showAddForm"
+                                            @click.stop="toggleForm()"
+                                            class="text-sm text-gray-500 hover:text-gray-700">
+                                        + Add Habit
+                                    </button>
+                                    
+                                    <!-- Form -->
+                                    <form x-show="showAddForm"
+                                          @submit.prevent="submitHabit()"
+                                          @click.stop
+                                          class="w-[150px]">
+                                        <input type="text"
+                                               x-ref="habitInput"
+                                               x-model="newHabitName"
+                                               @keydown.escape="showAddForm = false; newHabitName = ''"
+                                               placeholder="New habit name"
+                                               class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:border-blue-500">
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </template>
     </div>
 </body>
 </html>

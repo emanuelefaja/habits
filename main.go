@@ -162,6 +162,8 @@ func main() {
 	// Habits API routes
 	http.Handle("/api/habits", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
+		case http.MethodGet:
+			api.GetHabitsHandler(db)(w, r)
 		case http.MethodPost:
 			api.CreateHabitHandler(db)(w, r)
 		default:
@@ -176,6 +178,16 @@ func main() {
 			api.GetHabitLogsHandler(db)(w, r)
 		case http.MethodPost:
 			api.CreateOrUpdateHabitLogHandler(db)(w, r)
+		default:
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		}
+	}))))
+
+	// Habits API routes
+	http.Handle("/api/habits/bulk", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			api.BulkCreateHabitsHandler(db)(w, r)
 		default:
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		}

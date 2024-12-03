@@ -3,6 +3,7 @@ package api
 import (
 	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -16,6 +17,11 @@ type APIResponse struct {
 	Success bool        `json:"success"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data,omitempty"`
+}
+
+// BulkHabitRequest represents a request to create multiple habits
+type BulkHabitRequest struct {
+	Name string `json:"name"`
 }
 
 // CreateHabitHandler handles the creation of a new habit
@@ -309,6 +315,88 @@ func GetHabitLogsHandler(db *sql.DB) http.HandlerFunc {
 		json.NewEncoder(w).Encode(APIResponse{
 			Success: true,
 			Data:    logs,
+		})
+	}
+}
+
+// BulkCreateHabitsHandler handles creating multiple habits at once
+func BulkCreateHabitsHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("BulkCreateHabitsHandler: Method %s", r.Method)
+		userID := middleware.GetUserID(r)
+		log.Printf("BulkCreateHabitsHandler: UserID %d", userID)
+
+		if userID == 0 {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		var habits []BulkHabitRequest
+		if err := json.NewDecoder(r.Body).Decode(&habits); err != nil {
+			log.Printf("BulkCreateHabitsHandler: Error decoding request: %v", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		log.Printf("BulkCreateHabitsHandler: Received habits: %+v", habits)
+
+		for _, habit := range habits {
+			exists, err := models.HabitExists(db, habit.Name, userID)
+			if err != nil {
+				log.Printf("BulkCreateHabitsHandler: Error checking habit existence: %v", err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			if exists {
+				log.Printf("BulkCreateHabitsHandler: Habit already exists: %s", habit.Name)
+				continue
+			}
+
+			newHabit := &models.Habit{
+				UserID:    userID,
+				Name:      habit.Name,
+				HabitType: "binary",
+				IsDefault: false,
+			}
+			if err := newHabit.Create(db); err != nil {
+				log.Printf("BulkCreateHabitsHandler: Error creating habit: %v", err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			log.Printf("BulkCreateHabitsHandler: Created habit: %s", habit.Name)
+		}
+
+		log.Printf("BulkCreateHabitsHandler: Successfully created all habits")
+		json.NewEncoder(w).Encode(map[string]bool{"success": true})
+	}
+}
+
+// GetHabitsHandler retrieves all habits for a user
+func GetHabitsHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		userID := middleware.GetUserID(r)
+		if userID == 0 {
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "User not authenticated",
+			})
+			return
+		}
+
+		habits, err := models.GetHabitsByUserID(db, userID)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Error retrieving habits",
+			})
+			return
+		}
+
+		json.NewEncoder(w).Encode(APIResponse{
+			Success: true,
+			Data:    habits,
 		})
 	}
 }
