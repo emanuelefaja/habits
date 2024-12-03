@@ -108,7 +108,7 @@ func ValidatePassword(db *sql.DB, email, password string) (bool, error) {
 }
 
 // InitializeDB creates the users table if it doesn't exist
-func InitializeDB(db *sql.DB) error {
+func InitializeUsersDB(db *sql.DB) error {
 	_, err := db.Exec(`
 		CREATE TABLE IF NOT EXISTS users (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
