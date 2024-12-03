@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Habits</title>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-full" x-data="{ 
+    password: '',
+    showPassword: false,
+    email: '',
+    emailValid: true,
+    emailTimer: null,
+    checks: {
+        length: false,
+        uppercase: false,
+        lowercase: false,
+        number: false,
+        special: false
+    },
+    validatePassword() {
+        this.checks.length = this.password.length >= 8;
+        this.checks.uppercase = /[A-Z]/.test(this.password);
+        this.checks.lowercase = /[a-z]/.test(this.password);
+        this.checks.number = /[0-9]/.test(this.password);
+        this.checks.special = /[^A-Za-z0-9]/.test(this.password);
+    },
+    validateEmail() {
+        clearTimeout(this.emailTimer);
+        this.emailTimer = setTimeout(() => {
+            if (this.email === '') {
+                this.emailValid = true;
+                return;
+            }
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            this.emailValid = emailPattern.test(this.email);
+        }, 500);
+    }
+}">
+    <div class="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div class="sm:mx-auto sm:w-full sm:max-w-md">
+            <h2 class="mt-6 text-center text-2xl/9 font-bold tracking-tight text-gray-900">Create your account</h2>
+        </div>
+
+        <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-[480px]">
+            <div class="bg-white px-6 py-12 shadow sm:rounded-lg sm:px-12">
+                <form class="space-y-6" action="/register" method="POST">
+                    {{ if .Error }}
+                    <div class="rounded-md bg-red-50 p-4">
+                        <div class="flex">
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-red-800">{{ .Error }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    {{ end }}
+                    <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2">
+                        <!-- First Name -->
+                        <div>
+                            <label for="first_name" class="block text-sm/6 font-medium text-gray-900">👋First name</label>
+                            <div class="mt-2">
+                                <input id="first_name" name="first_name" type="text" required 
+                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
+                            </div>
+                        </div>
+
+                        <!-- Last Name -->
+                        <div>
+                            <label for="last_name" class="block text-sm/6 font-medium text-gray-900">👤 Last name</label>
+                            <div class="mt-2">
+                                <input id="last_name" name="last_name" type="text" required 
+                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Email with validation -->
+                    <div>
+                        <label for="email" class="block text-sm/6 font-medium text-gray-900">✉️ Email address</label>
+                        <div class="mt-2">
+                            <input id="email" name="email" type="email" autocomplete="email" required 
+                                x-model="email"
+                                @input="validateEmail"
+                                :class="{'outline-red-500': !emailValid, 'outline-gray-300': emailValid}"
+                                class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
+                        </div>
+                        <p x-show="!emailValid" class="mt-2 text-sm text-red-600">‼ Please enter a valid email address.</p>
+                    </div>
+
+                    <!-- Password field with toggle -->
+                    <div>
+                        <label for="password" class="block text-sm/6 font-medium text-gray-900">🔑 Password</label>
+                        <div class="mt-2 relative">
+                            <input :type="showPassword ? 'text' : 'password'" id="password" name="password" required 
+                                x-model="password"
+                                @input="validatePassword"
+                                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
+                            <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
+                                <span x-show="!showPassword">🔒</span>
+                                <span x-show="showPassword">👀</span>
+                            </button>
+                        </div>
+                        <!-- Password Requirements Checklist -->
+                        <div class="mt-2 space-y-2">
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li x-text="checks.length ? '✅ At least 8 characters' : '❌ At least 8 characters'"></li>
+                                <li x-text="checks.uppercase ? '✅ At least one uppercase letter' : '❌ At least one uppercase letter'"></li>
+                                <li x-text="checks.lowercase ? '✅ At least one lowercase letter' : '❌ At least one lowercase letter'"></li>
+                                <li x-text="checks.number ? '✅ At least one number' : '❌ At least one number'"></li>
+                                <li x-text="checks.special ? '✅ At least one special character' : '❌ At least one special character'"></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div>
+                        <button type="submit" 
+                            class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                            Register
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <p class="mt-10 text-center text-sm/6 text-gray-500">
+                👋 Already have an account?
+            </p>
+            <p class="text-center">
+                <a href="/login" class="text-sm/6 font-semibold text-indigo-600 hover:text-indigo-500">✨ Sign in and start tracking! ✨</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
