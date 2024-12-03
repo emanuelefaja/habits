@@ -17,6 +17,28 @@
             flashMessage: '',
             showFlash: false,
 
+            // Month navigation state
+            currentMonth: new Date().getMonth() + 1,
+            currentYear: new Date().getFullYear(),
+            monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 
+                        'July', 'August', 'September', 'October', 'November', 'December'],
+            isLoading: false,
+
+            // Get days in current month
+            getDaysInMonth() {
+                return new Date(this.currentYear, this.currentMonth, 0).getDate();
+            },
+
+            // Generate array of days for current month
+            get daysArray() {
+                return Array.from({ length: this.getDaysInMonth() }, (_, i) => i + 1);
+            },
+
+            // Format date string
+            formatDate(day) {
+                return `${this.currentYear}-${String(this.currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            },
+
             // Status cycling
             statusColors: {
                 'none': '#ebedf0',
@@ -24,26 +46,28 @@
                 'missed': '#E3211a',
                 'skipped': '#00a0d2'
             },
-
             statusCycle: ['none', 'done', 'missed', 'skipped'],
 
-            // Initialize habit logs
+            // Initialize with current month's logs
             async init() {
-                await this.loadHabitLogs();
+                await this.loadMonthLogs();
             },
 
-            // Load habit logs for the month
-            async loadHabitLogs() {
+            // Load habit logs for the current month
+            async loadMonthLogs() {
+                this.isLoading = true;
                 try {
-                    const startDate = '2024-12-01';
-                    const endDate = '2024-12-31';
+                    const startDate = this.formatDate(1);
+                    const endDate = this.formatDate(this.getDaysInMonth());
+
+                    // Clear existing logs for the month
+                    this.habitLogs = {};
 
                     for (const habit of this.habits) {
                         const response = await fetch(`/api/habits/logs?habit_id=${habit.id}&start_date=${startDate}&end_date=${endDate}`);
                         const result = await response.json();
                         
                         if (result.success) {
-                            // Store logs in a map for easy lookup
                             result.data.forEach(log => {
                                 const key = `${log.habit_id}_${log.date.split('T')[0]}`;
                                 this.habitLogs[key] = log;
@@ -52,6 +76,8 @@
                     }
                 } catch (error) {
                     console.error('Error loading habit logs:', error);
+                } finally {
+                    this.isLoading = false;
                 }
             },
 
@@ -221,7 +247,43 @@
                 <div class="bg-white p-8 shadow sm:rounded-lg">
                     <!-- Header with title and legend -->
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-semibold">🗓️ December 2024</h2>
+                        <div class="flex items-center gap-3">
+                            <span class="isolate inline-flex rounded-md shadow-sm">
+                                <button type="button" 
+                                        @click="
+                                            if (currentMonth === 1) {
+                                                currentMonth = 12;
+                                                currentYear--;
+                                            } else {
+                                                currentMonth--;
+                                            }
+                                            loadMonthLogs();
+                                        "
+                                        class="relative inline-flex items-center rounded-l-md bg-white px-1.5 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10">
+                                    <span class="sr-only">Previous</span>
+                                    <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                                <button type="button"
+                                        @click="
+                                            if (currentMonth === 12) {
+                                                currentMonth = 1;
+                                                currentYear++;
+                                            } else {
+                                                currentMonth++;
+                                            }
+                                            loadMonthLogs();
+                                        "
+                                        class="relative -ml-px inline-flex items-center rounded-r-md bg-white px-1.5 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10">
+                                    <span class="sr-only">Next</span>
+                                    <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                        <path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </span>
+                            <h2 class="text-2xl font-semibold" x-text="`🗓️ ${monthNames[currentMonth-1]} ${currentYear}`"></h2>
+                        </div>
                         
                         <!-- Legend -->
                         <div class="flex gap-6">
@@ -246,27 +308,25 @@
                     
                     <!-- Grid -->
                     <div class="flex flex-col">
-                        <div class="grid" style="gap: 3px; grid-template-columns: 150px repeat(31, 35px);">
+                        <div class="grid" :style="{ gap: '3px', 'grid-template-columns': `150px repeat(${getDaysInMonth()}, 35px)` }">
                             <!-- Header row with day numbers -->
                             <div class="h-8"></div>
-                            {{ range $i := 31 | times }}
-                                <div class="text-sm text-center text-gray-600" style="width: 35px;">{{ add $i 1 }}</div>
-                            {{ end }}
+                            <template x-for="day in daysArray" :key="day">
+                                <div class="text-sm text-center text-gray-600" style="width: 35px;" x-text="day"></div>
+                            </template>
                             
                             <!-- Habit rows -->
                             <template x-for="habit in habits">
                                 <div class="contents">
                                     <div class="h-8 flex items-center font-medium text-sm text-gray-700 pr-4" style="width: 150px;" x-text="habit.name"></div>
-                                    {{ range $i := 31 | times }}
-                                        {{ $day := add $i 1 }}
-                                        {{ $formattedDay := printf "%02d" $day }}
+                                    <template x-for="day in daysArray" :key="day">
                                         <div class="h-8 flex items-center justify-center" style="width: 35px;">
                                             <div class="w-7 h-7 rounded-sm cursor-pointer"
-                                                 @click="handleSquareClick(habit.id, '2024-12-{{ $formattedDay }}')"
-                                                 :style="{ backgroundColor: getStatusColor(getStatus(habit.id, '2024-12-{{ $formattedDay }}')) }">
+                                                 @click="handleSquareClick(habit.id, formatDate(day))"
+                                                 :style="{ backgroundColor: getStatusColor(getStatus(habit.id, formatDate(day))) }">
                                             </div>
                                         </div>
-                                    {{ end }}
+                                    </template>
                                 </div>
                             </template>
                             
