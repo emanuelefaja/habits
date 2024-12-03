@@ -69,13 +69,15 @@
                             {{ end }}
                             
                             <!-- Example habit row -->
-                            <div class="h-8 flex items-center font-medium text-sm text-gray-700 pr-4" style="width: 150px;">
-                                Example Habit
-                            </div>
-                            {{ range $i := 31 | times }}
-                                <div class="h-8 flex items-center justify-center" style="width: 35px;">
-                                    <div class="w-7 h-7 rounded-sm" style="background-color: #ebedf0;"></div>
+                            {{ range .Habits }}
+                                <div class="h-8 flex items-center font-medium text-sm text-gray-700 pr-4" style="width: 150px;">
+                                    {{ .Name }}
                                 </div>
+                                {{ range $i := 31 | times }}
+                                    <div class="h-8 flex items-center justify-center" style="width: 35px;">
+                                        <div class="w-7 h-7 rounded-sm" style="background-color: #ebedf0;"></div>
+                                    </div>
+                                {{ end }}
                             {{ end }}
                         </div>
                     </div>

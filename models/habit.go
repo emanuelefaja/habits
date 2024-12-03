@@ -15,7 +15,7 @@ type Habit struct {
 }
 
 // InitializeDB creates the habits table if it doesn't exist
-func InitializeDB(db *sql.DB) error {
+func InitializeHabitsDB(db *sql.DB) error {
 	_, err := db.Exec(`
         CREATE TABLE IF NOT EXISTS habits (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -81,4 +81,29 @@ func (h *Habit) Update(db *sql.DB) error {
 func (h *Habit) Delete(db *sql.DB) error {
 	_, err := db.Exec("DELETE FROM habits WHERE id = ?", h.ID)
 	return err
+}
+
+// GetHabitsByUserID retrieves all habits for a given user
+func GetHabitsByUserID(db *sql.DB, userID int) ([]Habit, error) {
+	habits := []Habit{}
+	rows, err := db.Query(`
+		SELECT id, user_id, name, habit_type, is_default, created_at 
+		FROM habits 
+		WHERE user_id = ?
+		ORDER BY created_at ASC
+	`, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var habit Habit
+		err := rows.Scan(&habit.ID, &habit.UserID, &habit.Name, &habit.HabitType, &habit.IsDefault, &habit.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		habits = append(habits, habit)
+	}
+	return habits, nil
 }

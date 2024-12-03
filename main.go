@@ -26,8 +26,8 @@ func main() {
 	}
 	defer db.Close()
 
-	// Initialize users table
-	err = models.InitializeDB(db)
+	// Initialize habits table
+	err = models.InitializeHabitsDB(db)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -78,12 +78,22 @@ func main() {
 		}
 		log.Printf("Home handler: Successfully retrieved user: %s %s", user.FirstName, user.LastName)
 
+		// Get the habits
+		habits, err := models.GetHabitsByUserID(db, userID)
+		if err != nil {
+			log.Printf("Home handler: Error getting habits: %v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
 		data := struct {
-			User  *models.User
-			Flash string
+			User   *models.User
+			Habits []models.Habit
+			Flash  string
 		}{
-			User:  user,
-			Flash: middleware.GetFlash(r),
+			User:   user,
+			Habits: habits,
+			Flash:  middleware.GetFlash(r),
 		}
 
 		err = templates.ExecuteTemplate(w, "home.html", data)
