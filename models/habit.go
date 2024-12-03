@@ -17,16 +17,17 @@ type Habit struct {
 // InitializeDB creates the habits table if it doesn't exist
 func InitializeDB(db *sql.DB) error {
 	_, err := db.Exec(`
-		CREATE TABLE IF NOT EXISTS habits (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			user_id INTEGER NOT NULL,
-			name TEXT NOT NULL,
-			habit_type TEXT NOT NULL,
-			is_default BOOLEAN NOT NULL,
-			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-			FOREIGN KEY(user_id) REFERENCES users(id)
-		)
-	`)
+        CREATE TABLE IF NOT EXISTS habits (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            habit_type TEXT NOT NULL,
+            is_default BOOLEAN NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(user_id) REFERENCES users(id),
+            UNIQUE(user_id, name)
+        )
+    `)
 	return err
 }
 
