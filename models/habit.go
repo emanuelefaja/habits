@@ -83,6 +83,18 @@ func (h *Habit) Delete(db *sql.DB) error {
 	return err
 }
 
+// HabitExists checks if a habit with the given name already exists for the user
+func HabitExists(db *sql.DB, name string, userID int) (bool, error) {
+	var exists bool
+	err := db.QueryRow(`
+		SELECT EXISTS(
+			SELECT 1 FROM habits 
+			WHERE user_id = ? AND LOWER(name) = LOWER(?)
+		)
+	`, userID, name).Scan(&exists)
+	return exists, err
+}
+
 // GetHabitsByUserID retrieves all habits for a given user
 func GetHabitsByUserID(db *sql.DB, userID int) ([]Habit, error) {
 	habits := []Habit{}
@@ -90,7 +102,7 @@ func GetHabitsByUserID(db *sql.DB, userID int) ([]Habit, error) {
 		SELECT id, user_id, name, habit_type, is_default, created_at 
 		FROM habits 
 		WHERE user_id = ?
-		ORDER BY created_at ASC
+		ORDER BY LOWER(name) ASC
 	`, userID)
 	if err != nil {
 		return nil, err

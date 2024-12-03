@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"html/template"
 	"log"
 	"net/http"
@@ -86,14 +87,22 @@ func main() {
 			return
 		}
 
+		// JSON encode the habits
+		habitsJSON, err := json.Marshal(habits)
+		if err != nil {
+			log.Printf("Home handler: Error encoding habits to JSON: %v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
 		data := struct {
-			User   *models.User
-			Habits []models.Habit
-			Flash  string
+			User       *models.User
+			HabitsJSON template.JS // Use template.JS to safely inject JSON into JavaScript
+			Flash      string
 		}{
-			User:   user,
-			Habits: habits,
-			Flash:  middleware.GetFlash(r),
+			User:       user,
+			HabitsJSON: template.JS(habitsJSON),
+			Flash:      middleware.GetFlash(r),
 		}
 
 		err = templates.ExecuteTemplate(w, "home.html", data)
