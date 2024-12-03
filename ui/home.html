@@ -8,7 +8,76 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="h-full">
-    <div class="min-h-full flex flex-col py-6 sm:px-4 lg:px-4">
+    <div class="min-h-full flex flex-col py-6 sm:px-4 lg:px-4" 
+         x-data="{ 
+            showAddForm: false, 
+            newHabitName: '',
+            habits: {{ .HabitsJSON }},
+            flashMessage: '',
+            showFlash: false,
+            
+            toggleForm() {
+                this.showAddForm = !this.showAddForm;
+                if (this.showAddForm) {
+                    this.$nextTick(() => this.$refs.habitInput.focus());
+                }
+            },
+            
+            async submitHabit() {
+                if (!this.newHabitName.trim()) return;
+                
+                try {
+                    const response = await fetch('/api/habits', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ name: this.newHabitName.trim() })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Add new habit to the list and sort alphabetically
+                        this.habits.push(result.data);
+                        this.habits.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+                        
+                        // Reset form
+                        this.newHabitName = '';
+                        this.showAddForm = false;
+                        
+                        // Show success message
+                        this.flashMessage = result.message;
+                        this.showFlash = true;
+                        setTimeout(() => this.showFlash = false, 3000);
+                    } else {
+                        // Show error message
+                        this.flashMessage = result.message;
+                        this.showFlash = true;
+                        setTimeout(() => this.showFlash = false, 3000);
+                    }
+                } catch (error) {
+                    this.flashMessage = 'Error creating habit';
+                    this.showFlash = true;
+                    setTimeout(() => this.showFlash = false, 3000);
+                }
+            }
+         }"
+         @click.away="if (showAddForm) { showAddForm = false; newHabitName = ''; }">
+
+        <!-- Flash Message -->
+        <div x-show="showFlash" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 transform -translate-y-2"
+             x-transition:enter-end="opacity-100 transform translate-y-0"
+             x-transition:leave="transition ease-in duration-300"
+             x-transition:leave-start="opacity-100 transform translate-y-0"
+             x-transition:leave-end="opacity-0 transform -translate-y-2"
+             class="fixed top-4 right-4 px-4 py-2 rounded-md text-white"
+             :class="flashMessage.includes('successfully') ? 'bg-green-500' : 'bg-red-500'"
+             x-text="flashMessage">
+        </div>
+
         <!-- Header with Welcome Message and Logout Button -->
         <div class="flex justify-between items-center px-6 mb-4">
             <h1 class="text-left text-3xl font-bold tracking-tight text-gray-900">
@@ -68,17 +137,49 @@
                                 <div class="text-sm text-center text-gray-600" style="width: 35px;">{{ add $i 1 }}</div>
                             {{ end }}
                             
-                            <!-- Example habit row -->
-                            {{ range .Habits }}
-                                <div class="h-8 flex items-center font-medium text-sm text-gray-700 pr-4" style="width: 150px;">
-                                    {{ .Name }}
+                            <!-- Habit rows -->
+                            <template x-for="habit in habits">
+                                <div class="contents">
+                                    <div class="h-8 flex items-center font-medium text-sm text-gray-700 pr-4" style="width: 150px;" x-text="habit.name"></div>
+                                    {{ range $i := 31 | times }}
+                                        <div class="h-8 flex items-center justify-center" style="width: 35px;">
+                                            <div class="w-7 h-7 rounded-sm" style="background-color: #ebedf0;"></div>
+                                        </div>
+                                    {{ end }}
                                 </div>
-                                {{ range $i := 31 | times }}
-                                    <div class="h-8 flex items-center justify-center" style="width: 35px;">
-                                        <div class="w-7 h-7 rounded-sm" style="background-color: #ebedf0;"></div>
-                                    </div>
-                                {{ end }}
-                            {{ end }}
+                            </template>
+                            
+                            <!-- Add Habit Button/Form -->
+                            <div class="h-8 flex items-center col-span-full"
+                                 x-data="{ 
+                                    handleClickOutside() {
+                                        if (this.showAddForm) {
+                                            this.showAddForm = false;
+                                            this.newHabitName = '';
+                                        }
+                                    }
+                                 }"
+                                 @click.outside="handleClickOutside">
+                                <!-- Button -->
+                                <button x-show="!showAddForm"
+                                        @click.stop="toggleForm()"
+                                        class="text-sm text-gray-500 hover:text-gray-700">
+                                    + Add Habit
+                                </button>
+                                
+                                <!-- Form -->
+                                <form x-show="showAddForm"
+                                      @submit.prevent="submitHabit()"
+                                      @click.stop
+                                      class="w-[150px]">
+                                    <input type="text"
+                                           x-ref="habitInput"
+                                           x-model="newHabitName"
+                                           @keydown.escape="showAddForm = false; newHabitName = ''"
+                                           placeholder="New habit name"
+                                           class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:border-blue-500">
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
