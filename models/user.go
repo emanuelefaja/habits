@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"log"
+	"strings"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -50,6 +51,9 @@ func GetUserByEmail(db *sql.DB, email string) (*User, error) {
 func (u *User) Create(db *sql.DB, passwordHash string) error {
 	log.Println("Attempting to create user:", u.Email)
 
+	// Convert email to lowercase before saving
+	u.Email = strings.ToLower(u.Email)
+
 	result, err := db.Exec(`
 		INSERT INTO users (first_name, last_name, email, password_hash, created_at) 
 		VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
@@ -90,6 +94,9 @@ func (u *User) Delete(db *sql.DB) error {
 
 // ValidatePassword checks if the provided password matches the stored hash
 func ValidatePassword(db *sql.DB, email, password string) (bool, error) {
+	// Convert email to lowercase before checking
+	email = strings.ToLower(email)
+
 	var storedHash string
 	err := db.QueryRow("SELECT password_hash FROM users WHERE email = ?", email).Scan(&storedHash)
 	if err != nil {
