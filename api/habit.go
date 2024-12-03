@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"time"
 
 	"mad/middleware"
 	"mad/models"
@@ -145,5 +146,169 @@ func DeleteHabitHandler(db *sql.DB) http.HandlerFunc {
 		}
 
 		w.WriteHeader(http.StatusNoContent)
+	}
+}
+
+// CreateOrUpdateHabitLogHandler handles creating or updating a habit log
+func CreateOrUpdateHabitLogHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		// Parse request body
+		var request struct {
+			HabitID int         `json:"habit_id"`
+			Date    string      `json:"date"`
+			Status  string      `json:"status"`
+			Value   interface{} `json:"value,omitempty"`
+		}
+
+		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Invalid request format",
+			})
+			return
+		}
+
+		// Parse date
+		date, err := time.Parse("2006-01-02", request.Date)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Invalid date format. Use YYYY-MM-DD",
+			})
+			return
+		}
+
+		// Verify habit belongs to user
+		userID := middleware.GetUserID(r)
+		var habitUserID int
+		err = db.QueryRow("SELECT user_id FROM habits WHERE id = ?", request.HabitID).Scan(&habitUserID)
+		if err != nil || habitUserID != userID {
+			w.WriteHeader(http.StatusForbidden)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Unauthorized access to habit",
+			})
+			return
+		}
+
+		// Create habit log
+		habitLog := &models.HabitLog{
+			HabitID: request.HabitID,
+			Date:    date,
+			Status:  request.Status,
+		}
+
+		// Set value if provided
+		if request.Value != nil {
+			if err := habitLog.SetValue(request.Value); err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(APIResponse{
+					Success: false,
+					Message: "Invalid value format",
+				})
+				return
+			}
+		}
+
+		// Validate value format
+		if err := habitLog.ValidateValue(db); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: err.Error(),
+			})
+			return
+		}
+
+		// Create or update the log
+		if err := habitLog.CreateOrUpdate(db); err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Error saving habit log",
+			})
+			return
+		}
+
+		// Return success response
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(APIResponse{
+			Success: true,
+			Message: "Habit log saved successfully",
+			Data:    habitLog,
+		})
+	}
+}
+
+// GetHabitLogsHandler retrieves habit logs for a date range
+func GetHabitLogsHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		// Get query parameters
+		habitID, err := strconv.Atoi(r.URL.Query().Get("habit_id"))
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Invalid habit ID",
+			})
+			return
+		}
+
+		startDate, err := time.Parse("2006-01-02", r.URL.Query().Get("start_date"))
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Invalid start date format. Use YYYY-MM-DD",
+			})
+			return
+		}
+
+		endDate, err := time.Parse("2006-01-02", r.URL.Query().Get("end_date"))
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Invalid end date format. Use YYYY-MM-DD",
+			})
+			return
+		}
+
+		// Verify habit belongs to user
+		userID := middleware.GetUserID(r)
+		var habitUserID int
+		err = db.QueryRow("SELECT user_id FROM habits WHERE id = ?", habitID).Scan(&habitUserID)
+		if err != nil || habitUserID != userID {
+			w.WriteHeader(http.StatusForbidden)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Unauthorized access to habit",
+			})
+			return
+		}
+
+		// Get logs
+		logs, err := models.GetHabitLogsByDateRange(db, habitID, startDate, endDate)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Error retrieving habit logs",
+			})
+			return
+		}
+
+		// Return success response
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(APIResponse{
+			Success: true,
+			Data:    logs,
+		})
 	}
 }

@@ -13,9 +13,125 @@
             showAddForm: false, 
             newHabitName: '',
             habits: {{ .HabitsJSON }},
+            habitLogs: {},
             flashMessage: '',
             showFlash: false,
-            
+
+            // Status cycling
+            statusColors: {
+                'none': '#ebedf0',
+                'done': '#2da44e',
+                'missed': '#E3211a',
+                'skipped': '#00a0d2'
+            },
+
+            statusCycle: ['none', 'done', 'missed', 'skipped'],
+
+            // Initialize habit logs
+            async init() {
+                await this.loadHabitLogs();
+            },
+
+            // Load habit logs for the month
+            async loadHabitLogs() {
+                try {
+                    const startDate = '2024-12-01';
+                    const endDate = '2024-12-31';
+
+                    for (const habit of this.habits) {
+                        const response = await fetch(`/api/habits/logs?habit_id=${habit.id}&start_date=${startDate}&end_date=${endDate}`);
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            // Store logs in a map for easy lookup
+                            result.data.forEach(log => {
+                                const key = `${log.habit_id}_${log.date.split('T')[0]}`;
+                                this.habitLogs[key] = log;
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error loading habit logs:', error);
+                }
+            },
+
+            // Get status for a habit on a specific date
+            getStatus(habitId, date) {
+                const key = `${habitId}_${date}`;
+                return this.habitLogs[key]?.status || 'none';
+            },
+
+            // Get color for a status
+            getStatusColor(status) {
+                return this.statusColors[status];
+            },
+
+            // Get next status in cycle
+            getNextStatus(currentStatus) {
+                const currentIndex = this.statusCycle.indexOf(currentStatus);
+                return this.statusCycle[(currentIndex + 1) % this.statusCycle.length];
+            },
+
+            // Handle square click
+            async handleSquareClick(habitId, date) {
+                const key = `${habitId}_${date}`;
+                const currentStatus = this.getStatus(habitId, date);
+                const newStatus = this.getNextStatus(currentStatus);
+                const originalStatus = currentStatus;
+
+                // Optimistically update UI
+                if (newStatus === 'none') {
+                    delete this.habitLogs[key];
+                } else {
+                    this.habitLogs[key] = {
+                        habit_id: habitId,
+                        date: date,
+                        status: newStatus
+                    };
+                }
+
+                // Send API request
+                try {
+                    const response = await fetch('/api/habits/logs', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            habit_id: habitId,
+                            date: date,
+                            status: newStatus
+                        })
+                    });
+
+                    const result = await response.json();
+                    if (!result.success) {
+                        // Revert on failure
+                        if (originalStatus === 'none') {
+                            delete this.habitLogs[key];
+                        } else {
+                            this.habitLogs[key] = {
+                                habit_id: habitId,
+                                date: date,
+                                status: originalStatus
+                            };
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error updating habit log:', error);
+                    // Revert on error
+                    if (originalStatus === 'none') {
+                        delete this.habitLogs[key];
+                    } else {
+                        this.habitLogs[key] = {
+                            habit_id: habitId,
+                            date: date,
+                            status: originalStatus
+                        };
+                    }
+                }
+            },
+
             toggleForm() {
                 this.showAddForm = !this.showAddForm;
                 if (this.showAddForm) {
@@ -142,8 +258,13 @@
                                 <div class="contents">
                                     <div class="h-8 flex items-center font-medium text-sm text-gray-700 pr-4" style="width: 150px;" x-text="habit.name"></div>
                                     {{ range $i := 31 | times }}
+                                        {{ $day := add $i 1 }}
+                                        {{ $formattedDay := printf "%02d" $day }}
                                         <div class="h-8 flex items-center justify-center" style="width: 35px;">
-                                            <div class="w-7 h-7 rounded-sm" style="background-color: #ebedf0;"></div>
+                                            <div class="w-7 h-7 rounded-sm cursor-pointer"
+                                                 @click="handleSquareClick(habit.id, '2024-12-{{ $formattedDay }}')"
+                                                 :style="{ backgroundColor: getStatusColor(getStatus(habit.id, '2024-12-{{ $formattedDay }}')) }">
+                                            </div>
                                         </div>
                                     {{ end }}
                                 </div>
