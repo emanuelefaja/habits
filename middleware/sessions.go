@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"database/sql"
+	"log"
 	"net/http"
 	"time"
 
@@ -51,7 +52,9 @@ func GetFlash(r *http.Request) string {
 
 // Authentication helpers
 func IsAuthenticated(r *http.Request) bool {
-	return SessionManager.Exists(r.Context(), "userID")
+	exists := SessionManager.Exists(r.Context(), "userID")
+	log.Printf("IsAuthenticated: Session check result: %v", exists)
+	return exists
 }
 
 func SetUserID(r *http.Request, userID int) {
@@ -60,8 +63,9 @@ func SetUserID(r *http.Request, userID int) {
 
 func GetUserID(r *http.Request) int {
 	userID, ok := SessionManager.Get(r.Context(), "userID").(int)
+	log.Printf("GetUserID: Retrieved userID: %v, ok: %v", userID, ok)
 	if !ok {
-		return 0 // or handle the error appropriately
+		return 0
 	}
 	return userID
 }
