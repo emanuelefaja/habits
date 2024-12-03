@@ -38,12 +38,62 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Create templates
-	templates := template.Must(template.ParseGlob("ui/*.html"))
+	// Create templates with custom functions
+	templates := template.Must(template.New("").Funcs(template.FuncMap{
+		"times": func(n int) []int {
+			var result []int
+			for i := 0; i < n; i++ {
+				result = append(result, i)
+			}
+			return result
+		},
+		"add": func(a, b int) int {
+			return a + b
+		},
+	}).ParseGlob("ui/*.html"))
 
 	// Handle static files
 	fs := http.FileServer(http.Dir("static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
+
+	// Home route with session middleware and authentication check
+	http.Handle("/", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("Home handler: Received request for path: %s", r.URL.Path)
+
+		if r.URL.Path != "/" {
+			log.Printf("Home handler: Not root path, returning 404")
+			http.NotFound(w, r)
+			return
+		}
+
+		// Get current user
+		userID := middleware.GetUserID(r)
+		log.Printf("Home handler: Got userID: %d", userID)
+
+		user, err := models.GetUserByID(db, int64(userID))
+		if err != nil {
+			log.Printf("Home handler: Error getting user: %v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		log.Printf("Home handler: Successfully retrieved user: %s %s", user.FirstName, user.LastName)
+
+		data := struct {
+			User  *models.User
+			Flash string
+		}{
+			User:  user,
+			Flash: middleware.GetFlash(r),
+		}
+
+		err = templates.ExecuteTemplate(w, "home.html", data)
+		if err != nil {
+			log.Printf("Home handler: Error executing template: %v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		log.Printf("Home handler: Successfully rendered home page")
+	}))))
 
 	// Register routes with session middleware
 	http.Handle("/register", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
