@@ -308,22 +308,31 @@
                     
                     <!-- Grid -->
                     <div class="flex flex-col">
-                        <div class="grid" :style="{ gap: '3px', 'grid-template-columns': `150px repeat(${getDaysInMonth()}, 35px)` }">
+                        <div class="grid" style="gap: 3px; grid-template-columns: 150px repeat(31, 35px)">
                             <!-- Header row with day numbers -->
                             <div class="h-8"></div>
-                            <template x-for="day in daysArray" :key="day">
-                                <div class="text-sm text-center text-gray-600" style="width: 35px;" x-text="day"></div>
+                            <template x-for="day in 31" :key="day">
+                                <div class="text-sm text-center text-gray-600" 
+                                     style="width: 35px;" 
+                                     :class="{ 'invisible': day > getDaysInMonth() }"
+                                     x-text="day">
+                                </div>
                             </template>
                             
                             <!-- Habit rows -->
                             <template x-for="habit in habits">
                                 <div class="contents">
                                     <div class="h-8 flex items-center font-medium text-sm text-gray-700 pr-4" style="width: 150px;" x-text="habit.name"></div>
-                                    <template x-for="day in daysArray" :key="day">
-                                        <div class="h-8 flex items-center justify-center" style="width: 35px;">
+                                    <template x-for="day in 31" :key="day">
+                                        <div class="h-8 flex items-center justify-center" 
+                                             style="width: 35px;"
+                                             :class="{ 'invisible': day > getDaysInMonth() }">
                                             <div class="w-7 h-7 rounded-sm cursor-pointer"
-                                                 @click="handleSquareClick(habit.id, formatDate(day))"
-                                                 :style="{ backgroundColor: getStatusColor(getStatus(habit.id, formatDate(day))) }">
+                                                 @click="day <= getDaysInMonth() && handleSquareClick(habit.id, formatDate(day))"
+                                                 :style="{ 
+                                                     backgroundColor: day <= getDaysInMonth() ? getStatusColor(getStatus(habit.id, formatDate(day))) : '#ebedf0',
+                                                     cursor: day <= getDaysInMonth() ? 'pointer' : 'default'
+                                                 }">
                                             </div>
                                         </div>
                                     </template>
