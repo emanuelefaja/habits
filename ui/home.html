@@ -11,7 +11,9 @@
     </style>
 </head>
 <body class="h-full">
-    <div class="min-h-full flex flex-col py-6 sm:px-4 lg:px-4" 
+    {{ template "header" dict "User" .User "Page" "home" }}
+    
+    <div class="min-h-full flex flex-col" 
          x-data="{ 
             habits: {{ .HabitsJSON }},
             habitLogs: {},
@@ -360,9 +362,6 @@
              :class="flashMessage.includes('successfully') ? 'bg-green-500' : 'bg-red-500'"
              x-text="flashMessage">
         </div>
-
-        <!-- Header with Welcome Message, Title and Buttons -->
-        {{ template "header" dict "User" .User "Page" "home" }}
 
         <!-- Logout Button (Fixed at bottom center) -->
         <div class="fixed bottom-8 left-1/2 transform -translate-x-1/2">
