@@ -1,8 +1,10 @@
 package api
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"strconv"
@@ -22,12 +24,14 @@ type APIResponse struct {
 // CreateHabitRequest represents a request to create a new habit
 type CreateHabitRequest struct {
 	Name      string           `json:"name"`
+	Emoji     string           `json:"emoji"`
 	HabitType models.HabitType `json:"habit_type"`
 }
 
 // BulkHabitRequest represents a request to create multiple habits
 type BulkHabitRequest struct {
 	Name      string           `json:"name"`
+	Emoji     string           `json:"emoji"`
 	HabitType models.HabitType `json:"habit_type"`
 }
 
@@ -67,9 +71,19 @@ func CreateHabitHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
+		if request.Emoji == "" {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Emoji is required",
+			})
+			return
+		}
+
 		habit := models.Habit{
 			UserID:    userID,
 			Name:      request.Name,
+			Emoji:     request.Emoji,
 			HabitType: request.HabitType,
 			IsDefault: false,
 		}
@@ -378,10 +392,11 @@ func BulkCreateHabitsHandler(db *sql.DB) http.HandlerFunc {
 		userID := middleware.GetUserID(r)
 		log.Printf("BulkCreateHabitsHandler: UserID %d", userID)
 
-		if userID == 0 {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
+		// Log raw request body
+		var rawBody []byte
+		rawBody, _ = io.ReadAll(r.Body)
+		r.Body = io.NopCloser(bytes.NewBuffer(rawBody))
+		log.Printf("BulkCreateHabitsHandler: Raw request body: %s", string(rawBody))
 
 		var habits []BulkHabitRequest
 		if err := json.NewDecoder(r.Body).Decode(&habits); err != nil {
@@ -389,7 +404,12 @@ func BulkCreateHabitsHandler(db *sql.DB) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		log.Printf("BulkCreateHabitsHandler: Received habits: %+v", habits)
+
+		// Log each habit request
+		for i, habit := range habits {
+			log.Printf("BulkCreateHabitsHandler: Habit %d - Name: %s, Emoji: %s, Type: %s",
+				i, habit.Name, habit.Emoji, habit.HabitType)
+		}
 
 		for _, habit := range habits {
 			exists, err := models.HabitExists(db, habit.Name, userID)
@@ -406,15 +426,21 @@ func BulkCreateHabitsHandler(db *sql.DB) http.HandlerFunc {
 			newHabit := &models.Habit{
 				UserID:    userID,
 				Name:      habit.Name,
+				Emoji:     habit.Emoji,
 				HabitType: habit.HabitType,
 				IsDefault: false,
 			}
+
+			// Log the habit being created
+			log.Printf("BulkCreateHabitsHandler: Creating habit - Name: %s, Emoji: %s, Type: %s",
+				newHabit.Name, newHabit.Emoji, newHabit.HabitType)
+
 			if err := newHabit.Create(db); err != nil {
 				log.Printf("BulkCreateHabitsHandler: Error creating habit: %v", err)
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			log.Printf("BulkCreateHabitsHandler: Created habit: %s", habit.Name)
+			log.Printf("BulkCreateHabitsHandler: Successfully created habit: %s", habit.Name)
 		}
 
 		log.Printf("BulkCreateHabitsHandler: Successfully created all habits")

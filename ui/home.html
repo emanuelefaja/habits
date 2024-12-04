@@ -18,6 +18,7 @@
               selectedHabit: null, 
               customHabit: { 
                   name: '', 
+                  emoji: '',
                   type: null 
               } 
           },
@@ -237,11 +238,17 @@
                 try {
                     const requestBody = this.selectedSuggestions.map(name => {
                         const suggestion = this.habitSuggestions.find(s => s.name === name);
-                        return {
+                        console.log('Found suggestion:', suggestion);
+                        const payload = {
                             name: suggestion.name,
+                            emoji: suggestion.emoji,
                             habit_type: suggestion.type
                         };
+                        console.log('Created payload:', payload);
+                        return payload;
                     });
+                    
+                    console.log('Full request body:', requestBody);
                     
                     const response = await fetch('/api/habits/bulk', {
                         method: 'POST',
@@ -286,6 +293,7 @@
                 this.modalState.view = 'suggestions';
                 this.modalState.selectedHabit = null;
                 this.modalState.customHabit.name = '';
+                this.modalState.customHabit.emoji = '';
                 this.modalState.customHabit.type = null;
             },
 
@@ -299,6 +307,7 @@
                     },
                     body: JSON.stringify({
                         name: this.modalState.customHabit.name,
+                        emoji: this.modalState.customHabit.emoji,
                         habit_type: this.modalState.customHabit.type
                     })
                 })
@@ -461,10 +470,10 @@
                             <div class="flex justify-end">
                                 <button 
                                     @click="createCustomHabit()"
-                                    :disabled="!modalState.customHabit.name || !modalState.customHabit.type"
+                                    :disabled="!modalState.customHabit.name || !modalState.customHabit.type || !modalState.customHabit.emoji"
                                     :class="{
-                                        'opacity-50 cursor-not-allowed': !modalState.customHabit.name || !modalState.customHabit.type,
-                                        'hover:bg-[#2c974b]': modalState.customHabit.name && modalState.customHabit.type
+                                        'opacity-50 cursor-not-allowed': !modalState.customHabit.name || !modalState.customHabit.type || !modalState.customHabit.emoji,
+                                        'hover:bg-[#2c974b]': modalState.customHabit.name && modalState.customHabit.type && modalState.customHabit.emoji
                                     }"
                                     class="px-4 py-2 rounded-md bg-[#2da44e] text-white transition-colors duration-200">
                                     Create Habit ✨
@@ -589,7 +598,10 @@
                                 <!-- Habit rows -->
                                 <template x-for="habit in habits">
                                     <div class="contents">
-                                        <div class="h-8 flex items-center font-medium text-sm text-gray-700 pr-4" style="width: 150px;" x-text="habit.name"></div>
+                                        <div class="h-8 flex items-center font-medium text-sm text-gray-700 pr-4" style="width: 150px;">
+                                            <span class="mr-2" x-text="habit.emoji"></span>
+                                            <span x-text="habit.name"></span>
+                                        </div>
                                         <template x-for="day in 31" :key="day">
                                             <div class="h-8 flex items-center justify-center relative" 
                                                  style="width: 35px;"
@@ -743,6 +755,7 @@
                                             },
                                             body: JSON.stringify({
                                                 name: suggestion.name,
+                                                emoji: suggestion.emoji,
                                                 habit_type: suggestion.type
                                             })
                                         })
@@ -779,6 +792,22 @@
 
                 <!-- Custom Habit View -->
                 <div x-show="modalState.view === 'custom'" class="space-y-6">
+                    <!-- Emoji Selector -->
+                    <div>
+                        <label for="habitEmoji" class="block text-sm font-medium text-gray-700 mb-2">Choose an Emoji</label>
+                        <div class="grid grid-cols-8 gap-2">
+                            <template x-for="emoji in ['💪', '🏃‍♂️', '🧘', '📚', '💧', '😴', '🥗', '📝', '🌅', '🎯', '🎨', '🎸', '🏊‍♂️', '🚴‍♂️', '🧠', '💻']">
+                                <button 
+                                    type="button"
+                                    @click="modalState.customHabit.emoji = emoji"
+                                    :class="{'ring-2 ring-[#2da44e]': modalState.customHabit.emoji === emoji}"
+                                    class="p-2 text-xl border rounded hover:bg-gray-50">
+                                    <span x-text="emoji"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </div>
+
                     <!-- Name Input -->
                     <div>
                         <label for="habitName" class="block text-sm font-medium text-gray-700 mb-2">Habit Name</label>
@@ -835,8 +864,8 @@
                             </button>
                             <button 
                                 @click="createCustomHabit()"
-                                :disabled="!modalState.customHabit.name || !modalState.customHabit.type"
-                                :class="{'opacity-50 cursor-not-allowed': !modalState.customHabit.name || !modalState.customHabit.type}"
+                                :disabled="!modalState.customHabit.name || !modalState.customHabit.type || !modalState.customHabit.emoji"
+                                :class="{'opacity-50 cursor-not-allowed': !modalState.customHabit.name || !modalState.customHabit.type || !modalState.customHabit.emoji}"
                                 class="px-4 py-2 rounded-md bg-[#2da44e] text-white hover:bg-[#2c974b] transition-colors duration-200">
                                 Create Habit ✨
                             </button>

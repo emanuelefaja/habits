@@ -18,6 +18,7 @@ type Habit struct {
 	ID        int       `json:"id"`         // Unique identifier for the habit
 	UserID    int       `json:"user_id"`    // ID of the user who owns this habit
 	Name      string    `json:"name"`       // Name of the habit
+	Emoji     string    `json:"emoji"`      // Emoji for the habit
 	CreatedAt time.Time `json:"created_at"` // Timestamp of when the habit was created
 	HabitType HabitType `json:"habit_type"` // Type of habit (e.g., "binary", "numeric", etc.)
 	IsDefault bool      `json:"is_default"` // Flag to indicate if it's a default habit
@@ -40,6 +41,7 @@ func InitializeHabitsDB(db *sql.DB) error {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             name TEXT NOT NULL,
+            emoji TEXT NOT NULL,
             habit_type TEXT NOT NULL CHECK(habit_type IN ('binary', 'numeric')),
             is_default BOOLEAN NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -169,9 +171,9 @@ func GetHabitLogsByDateRange(db *sql.DB, habitID int, startDate, endDate time.Ti
 // Create inserts a new habit into the database
 func (h *Habit) Create(db *sql.DB) error {
 	result, err := db.Exec(`
-		INSERT INTO habits (user_id, name, habit_type, is_default, created_at) 
-		VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
-	`, h.UserID, h.Name, h.HabitType, h.IsDefault)
+		INSERT INTO habits (user_id, name, emoji, habit_type, is_default, created_at) 
+		VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+	`, h.UserID, h.Name, h.Emoji, h.HabitType, h.IsDefault)
 
 	if err != nil {
 		return err
@@ -190,10 +192,10 @@ func (h *Habit) Create(db *sql.DB) error {
 func GetHabitByID(db *sql.DB, id int) (*Habit, error) {
 	habit := &Habit{}
 	err := db.QueryRow(`
-		SELECT id, user_id, name, habit_type, is_default, created_at 
+		SELECT id, user_id, name, emoji, habit_type, is_default, created_at 
 		FROM habits 
 		WHERE id = ?
-	`, id).Scan(&habit.ID, &habit.UserID, &habit.Name, &habit.HabitType, &habit.IsDefault, &habit.CreatedAt)
+	`, id).Scan(&habit.ID, &habit.UserID, &habit.Name, &habit.Emoji, &habit.HabitType, &habit.IsDefault, &habit.CreatedAt)
 
 	if err != nil {
 		return nil, err
@@ -205,9 +207,9 @@ func GetHabitByID(db *sql.DB, id int) (*Habit, error) {
 func (h *Habit) Update(db *sql.DB) error {
 	_, err := db.Exec(`
 		UPDATE habits 
-		SET name = ?, habit_type = ?, is_default = ? 
+		SET name = ?, emoji = ?, habit_type = ?, is_default = ? 
 		WHERE id = ?
-	`, h.Name, h.HabitType, h.IsDefault, h.ID)
+	`, h.Name, h.Emoji, h.HabitType, h.IsDefault, h.ID)
 
 	return err
 }
@@ -234,7 +236,7 @@ func HabitExists(db *sql.DB, name string, userID int) (bool, error) {
 func GetHabitsByUserID(db *sql.DB, userID int) ([]Habit, error) {
 	habits := []Habit{}
 	rows, err := db.Query(`
-		SELECT id, user_id, name, habit_type, is_default, created_at 
+		SELECT id, user_id, name, emoji, habit_type, is_default, created_at 
 		FROM habits 
 		WHERE user_id = ?
 		ORDER BY LOWER(name) ASC
@@ -246,7 +248,7 @@ func GetHabitsByUserID(db *sql.DB, userID int) ([]Habit, error) {
 
 	for rows.Next() {
 		var habit Habit
-		err := rows.Scan(&habit.ID, &habit.UserID, &habit.Name, &habit.HabitType, &habit.IsDefault, &habit.CreatedAt)
+		err := rows.Scan(&habit.ID, &habit.UserID, &habit.Name, &habit.Emoji, &habit.HabitType, &habit.IsDefault, &habit.CreatedAt)
 		if err != nil {
 			return nil, err
 		}
