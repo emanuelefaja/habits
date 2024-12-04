@@ -121,3 +121,59 @@ func InitializeUsersDB(db *sql.DB) error {
 	`)
 	return err
 }
+
+// UpdatePassword updates the user's password hash in the database
+func UpdatePassword(db *sql.DB, userID int64, currentPassword, newPassword string) error {
+	// First verify the current password
+	var storedHash string
+	err := db.QueryRow("SELECT password_hash FROM users WHERE id = ?", userID).Scan(&storedHash)
+	if err != nil {
+		return err
+	}
+
+	// Check if current password matches
+	if err := bcrypt.CompareHashAndPassword([]byte(storedHash), []byte(currentPassword)); err != nil {
+		return err
+	}
+
+	// Generate new password hash
+	newHash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	// Update the password
+	_, err = db.Exec("UPDATE users SET password_hash = ? WHERE id = ?", newHash, userID)
+	return err
+}
+
+// DeleteUserAndData deletes the user and all associated data
+func DeleteUserAndData(db *sql.DB, userID int64) error {
+	// Start a transaction
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	// Delete habit logs first (due to foreign key constraints)
+	_, err = tx.Exec("DELETE FROM habit_logs WHERE habit_id IN (SELECT id FROM habits WHERE user_id = ?)", userID)
+	if err != nil {
+		return err
+	}
+
+	// Delete habits
+	_, err = tx.Exec("DELETE FROM habits WHERE user_id = ?", userID)
+	if err != nil {
+		return err
+	}
+
+	// Delete user
+	_, err = tx.Exec("DELETE FROM users WHERE id = ?", userID)
+	if err != nil {
+		return err
+	}
+
+	// Commit transaction
+	return tx.Commit()
+}

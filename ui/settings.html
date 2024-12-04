@@ -10,240 +10,246 @@
         [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="h-full" x-data="{ 
-    showDeleteModal: false,
-    deleteConfirmName: '',
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
-    showCurrentPassword: false,
-    showNewPassword: false,
-    showConfirmPassword: false,
-    flashMessage: '',
-    showFlash: false,
-    email: '{{ .User.Email }}',
-    emailValid: true,
-    emailTimer: null,
-    checks: {
-        length: false,
-        uppercase: false,
-        lowercase: false,
-        number: false,
-        special: false
-    },
-    validatePassword() {
-        this.checks.length = this.newPassword.length >= 8;
-        this.checks.uppercase = /[A-Z]/.test(this.newPassword);
-        this.checks.lowercase = /[a-z]/.test(this.newPassword);
-        this.checks.number = /[0-9]/.test(this.newPassword);
-        this.checks.special = /[^A-Za-z0-9]/.test(this.newPassword);
-    },
-    validateEmail() {
-        clearTimeout(this.emailTimer);
-        this.emailTimer = setTimeout(() => {
-            if (this.email === '') {
-                this.emailValid = true;
-                return;
-            }
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            this.emailValid = emailPattern.test(this.email);
-        }, 500);
-    }
-}">
-    <!-- Header from home.html -->
-    {{ template "header" dict "User" .User "Page" "settings" }}
-
+<body class="h-full">
     <!-- Flash Message -->
-    <div x-show="showFlash" 
-         x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0 transform -translate-y-2"
-         x-transition:enter-end="opacity-100 transform translate-y-0"
-         x-transition:leave="transition ease-in duration-300"
-         x-transition:leave-start="opacity-100 transform translate-y-0"
-         x-transition:leave-end="opacity-0 transform -translate-y-2"
-         class="fixed top-4 right-4 px-4 py-2 rounded-md text-white"
-         :class="flashMessage.includes('successfully') ? 'bg-green-500' : 'bg-red-500'"
-         x-text="flashMessage">
+    <div x-data="{ show: false }" 
+         x-init="
+            {{ if .Flash }}
+                show = true;
+                setTimeout(() => show = false, 5000);
+            {{ end }}
+         "
+         x-show="show"
+         class="fixed top-4 right-4 px-4 py-3 rounded border"
+         :class="'{{ .Flash }}'.includes('successfully') || '{{ .Flash }}'.includes('✨') ? 
+                 'bg-green-100 border-green-400 text-green-700' : 
+                 'bg-red-100 border-red-400 text-red-700'"
+         style="display: none;">
+        {{ .Flash }}
     </div>
 
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <!-- Personal Information Section -->
-        <div class="bg-white shadow sm:rounded-lg mb-8">
-            <div class="px-4 py-5 sm:p-6">
-                <h3 class="text-lg font-medium leading-6 text-gray-900">👤 Personal Information</h3>
-                <div class="mt-2 max-w-xl text-sm text-gray-500">
-                    <p>Update your personal details.</p>
-                </div>
-                <form action="/api/user/profile" method="POST" class="mt-5 space-y-6">
-                    <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2">
-                        <div>
-                            <label for="first_name" class="block text-sm font-medium text-gray-700">👋 First name</label>
-                            <input type="text" name="first_name" id="first_name" value="{{ .User.FirstName }}"
-                                class="mt-1 block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6">
+    <div x-data="{ 
+        showDeleteModal: false,
+        deleteConfirmName: '',
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+        showCurrentPassword: false,
+        showNewPassword: false,
+        showConfirmPassword: false,
+        flashMessage: '',
+        showFlash: false,
+        email: '{{ .User.Email }}',
+        emailValid: true,
+        emailTimer: null,
+        checks: {
+            length: false,
+            uppercase: false,
+            lowercase: false,
+            number: false,
+            special: false
+        },
+        validatePassword() {
+            this.checks.length = this.newPassword.length >= 8;
+            this.checks.uppercase = /[A-Z]/.test(this.newPassword);
+            this.checks.lowercase = /[a-z]/.test(this.newPassword);
+            this.checks.number = /[0-9]/.test(this.newPassword);
+            this.checks.special = /[^A-Za-z0-9]/.test(this.newPassword);
+        },
+        validateEmail() {
+            clearTimeout(this.emailTimer);
+            this.emailTimer = setTimeout(() => {
+                if (this.email === '') {
+                    this.emailValid = true;
+                    return;
+                }
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                this.emailValid = emailPattern.test(this.email);
+            }, 500);
+        }
+    }">
+        <!-- Header from home.html -->
+        {{ template "header" dict "User" .User "Page" "settings" }}
+
+        <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <!-- Personal Information Section -->
+            <div class="bg-white shadow sm:rounded-lg mb-8">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg font-medium leading-6 text-gray-900">👤 Personal Information</h3>
+                    <div class="mt-2 max-w-xl text-sm text-gray-500">
+                        <p>Update your personal details.</p>
+                    </div>
+                    <form action="/api/user/profile" method="POST" class="mt-5 space-y-6">
+                        <div class="grid grid-cols-1 gap-x-6 gap-y-6 sm:grid-cols-2">
+                            <div>
+                                <label for="first_name" class="block text-sm font-medium text-gray-700">👋 First name</label>
+                                <input type="text" name="first_name" id="first_name" value="{{ .User.FirstName }}"
+                                    class="mt-1 block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6">
+                            </div>
+
+                            <div>
+                                <label for="last_name" class="block text-sm font-medium text-gray-700">👤 Last name</label>
+                                <input type="text" name="last_name" id="last_name" value="{{ .User.LastName }}"
+                                    class="mt-1 block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6">
+                            </div>
                         </div>
 
                         <div>
-                            <label for="last_name" class="block text-sm font-medium text-gray-700">👤 Last name</label>
-                            <input type="text" name="last_name" id="last_name" value="{{ .User.LastName }}"
-                                class="mt-1 block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6">
+                            <label for="email" class="block text-sm font-medium text-gray-700">✉️ Email address</label>
+                            <input type="email" name="email" id="email" x-model="email" @input="validateEmail"
+                                :class="{'outline-red-500': !emailValid, 'outline-gray-300': emailValid}"
+                                class="mt-1 block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6">
+                            <p x-show="!emailValid" class="mt-2 text-sm text-red-600">‼ Please enter a valid email address.</p>
                         </div>
-                    </div>
 
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700">✉️ Email address</label>
-                        <input type="email" name="email" id="email" x-model="email" @input="validateEmail"
-                            :class="{'outline-red-500': !emailValid, 'outline-gray-300': emailValid}"
-                            class="mt-1 block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6">
-                        <p x-show="!emailValid" class="mt-2 text-sm text-red-600">‼ Please enter a valid email address.</p>
-                    </div>
+                        <div class="flex justify-end">
+                            <button type="submit" 
+                                class="rounded-md bg-[#2da44e] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#2c974b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2da44e]">
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
-                    <div class="flex justify-end">
-                        <button type="submit" 
-                            class="rounded-md bg-[#2da44e] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#2c974b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2da44e]">
-                            Save Changes
+            <!-- Password Change Section -->
+            <div class="bg-white shadow sm:rounded-lg mb-8">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg font-medium leading-6 text-gray-900">🔑 Change Password</h3>
+                    <div class="mt-2 max-w-xl text-sm text-gray-500">
+                        <p>Ensure your account is using a secure password.</p>
+                    </div>
+                    <form action="/api/user/password" method="POST" class="mt-5 space-y-6">
+                        <div>
+                            <label for="current_password" class="block text-sm font-medium text-gray-700">Current Password</label>
+                            <div class="mt-1 relative">
+                                <input :type="showCurrentPassword ? 'text' : 'password'" 
+                                    name="current_password" 
+                                    id="current_password"
+                                    x-model="currentPassword"
+                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6">
+                                <button type="button" @click="showCurrentPassword = !showCurrentPassword" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
+                                    <span x-show="!showCurrentPassword">🔒</span>
+                                    <span x-show="showCurrentPassword">👀</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="new_password" class="block text-sm font-medium text-gray-700">New Password</label>
+                            <div class="mt-1 relative">
+                                <input :type="showNewPassword ? 'text' : 'password'" 
+                                    name="new_password" 
+                                    id="new_password"
+                                    x-model="newPassword"
+                                    @input="validatePassword"
+                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6">
+                                <button type="button" @click="showNewPassword = !showNewPassword" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
+                                    <span x-show="!showNewPassword">🔒</span>
+                                    <span x-show="showNewPassword">👀</span>
+                                </button>
+                            </div>
+                            <!-- Password Requirements Checklist -->
+                            <div class="mt-2 space-y-2">
+                                <ul class="text-sm text-gray-600 space-y-1">
+                                    <li x-text="checks.length ? '✅ At least 8 characters' : '❌ At least 8 characters'"></li>
+                                    <li x-text="checks.uppercase ? '✅ At least one uppercase letter' : '❌ At least one uppercase letter'"></li>
+                                    <li x-text="checks.lowercase ? '✅ At least one lowercase letter' : '❌ At least one lowercase letter'"></li>
+                                    <li x-text="checks.number ? '✅ At least one number' : '❌ At least one number'"></li>
+                                    <li x-text="checks.special ? '✅ At least one special character' : '❌ At least one special character'"></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="confirm_password" class="block text-sm font-medium text-gray-700">Confirm New Password</label>
+                            <div class="mt-1 relative">
+                                <input :type="showConfirmPassword ? 'text' : 'password'" 
+                                    name="confirm_password" 
+                                    id="confirm_password"
+                                    x-model="confirmPassword"
+                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6">
+                                <button type="button" @click="showConfirmPassword = !showConfirmPassword" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
+                                    <span x-show="!showConfirmPassword">🔒</span>
+                                    <span x-show="showConfirmPassword">👀</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="submit" 
+                                class="rounded-md bg-[#2da44e] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#2c974b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2da44e]">
+                                Update Password
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Delete Account Section -->
+            <div class="shadow sm:rounded-lg border-2 border-red-500 bg-red-50">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg font-medium leading-6 text-gray-900">❌ Delete Account</h3>
+                    <div class="mt-2 max-w-xl text-sm text-gray-500">
+                        <p>Once you delete your account, all of your data will be permanently removed. <br><b>This action cannot be undone.</b></p>
+                    </div>
+                    <div class="mt-5">
+                        <button type="button" @click="showDeleteModal = true"
+                            class="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
+                            Delete Account
                         </button>
                     </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Password Change Section -->
-        <div class="bg-white shadow sm:rounded-lg mb-8">
-            <div class="px-4 py-5 sm:p-6">
-                <h3 class="text-lg font-medium leading-6 text-gray-900">🔑 Change Password</h3>
-                <div class="mt-2 max-w-xl text-sm text-gray-500">
-                    <p>Ensure your account is using a secure password.</p>
-                </div>
-                <form action="/api/user/password" method="POST" class="mt-5 space-y-6">
-                    <div>
-                        <label for="current_password" class="block text-sm font-medium text-gray-700">Current Password</label>
-                        <div class="mt-1 relative">
-                            <input :type="showCurrentPassword ? 'text' : 'password'" 
-                                name="current_password" 
-                                id="current_password"
-                                x-model="currentPassword"
-                                class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6">
-                            <button type="button" @click="showCurrentPassword = !showCurrentPassword" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
-                                <span x-show="!showCurrentPassword">🔒</span>
-                                <span x-show="showCurrentPassword">👀</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label for="new_password" class="block text-sm font-medium text-gray-700">New Password</label>
-                        <div class="mt-1 relative">
-                            <input :type="showNewPassword ? 'text' : 'password'" 
-                                name="new_password" 
-                                id="new_password"
-                                x-model="newPassword"
-                                @input="validatePassword"
-                                class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6">
-                            <button type="button" @click="showNewPassword = !showNewPassword" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
-                                <span x-show="!showNewPassword">🔒</span>
-                                <span x-show="showNewPassword">👀</span>
-                            </button>
-                        </div>
-                        <!-- Password Requirements Checklist -->
-                        <div class="mt-2 space-y-2">
-                            <ul class="text-sm text-gray-600 space-y-1">
-                                <li x-text="checks.length ? '✅ At least 8 characters' : '❌ At least 8 characters'"></li>
-                                <li x-text="checks.uppercase ? '✅ At least one uppercase letter' : '❌ At least one uppercase letter'"></li>
-                                <li x-text="checks.lowercase ? '✅ At least one lowercase letter' : '❌ At least one lowercase letter'"></li>
-                                <li x-text="checks.number ? '✅ At least one number' : '❌ At least one number'"></li>
-                                <li x-text="checks.special ? '✅ At least one special character' : '❌ At least one special character'"></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label for="confirm_password" class="block text-sm font-medium text-gray-700">Confirm New Password</label>
-                        <div class="mt-1 relative">
-                            <input :type="showConfirmPassword ? 'text' : 'password'" 
-                                name="confirm_password" 
-                                id="confirm_password"
-                                x-model="confirmPassword"
-                                class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6">
-                            <button type="button" @click="showConfirmPassword = !showConfirmPassword" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
-                                <span x-show="!showConfirmPassword">🔒</span>
-                                <span x-show="showConfirmPassword">👀</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-end">
-                        <button type="submit" 
-                            class="rounded-md bg-[#2da44e] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#2c974b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2da44e]">
-                            Update Password
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        <!-- Delete Account Section -->
-        <div class="shadow sm:rounded-lg border-2 border-red-500 bg-red-50">
-            <div class="px-4 py-5 sm:p-6">
-                <h3 class="text-lg font-medium leading-6 text-gray-900">❌ Delete Account</h3>
-                <div class="mt-2 max-w-xl text-sm text-gray-500">
-                    <p>Once you delete your account, all of your data will be permanently removed. <br><b>This action cannot be undone.</b></p>
-                </div>
-                <div class="mt-5">
-                    <button type="button" @click="showDeleteModal = true"
-                        class="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
-                        Delete Account
-                    </button>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Delete Account Modal -->
-    <div x-show="showDeleteModal" 
-         class="relative z-10" 
-         aria-labelledby="modal-title" 
-         role="dialog" 
-         aria-modal="true"
-         x-cloak>
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+        <!-- Delete Account Modal -->
+        <div x-show="showDeleteModal" 
+             class="relative z-10" 
+             aria-labelledby="modal-title" 
+             role="dialog" 
+             aria-modal="true"
+             x-cloak>
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
 
-        <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
-            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                <div class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                            <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                            </svg>
-                        </div>
-                        <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
-                            <h3 class="text-base font-semibold leading-6 text-gray-900" id="modal-title">Delete account</h3>
-                            <div class="mt-2">
-                                <p class="text-sm text-gray-500">Are you sure you want to delete your account? All of your data will be permanently removed. This action cannot be undone.</p>
-                                <div class="mt-4">
-                                    <label for="confirm_name" class="block text-sm font-medium text-gray-700">Please type your first name to confirm:</label>
-                                    <input type="text" 
-                                        id="confirm_name" 
-                                        x-model="deleteConfirmName"
-                                        class="mt-1 block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-red-500 sm:text-sm/6">
+            <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+                <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                    <div class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                        <div class="sm:flex sm:items-start">
+                            <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                                <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                                </svg>
+                            </div>
+                            <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                                <h3 class="text-base font-semibold leading-6 text-gray-900" id="modal-title">Delete account</h3>
+                                <div class="mt-2">
+                                    <p class="text-sm text-gray-500">Are you sure you want to delete your account? All of your data will be permanently removed. This action cannot be undone.</p>
+                                    <div class="mt-4">
+                                        <label for="confirm_name" class="block text-sm font-medium text-gray-700">Please type your first name to confirm:</label>
+                                        <input type="text" 
+                                            id="confirm_name" 
+                                            x-model="deleteConfirmName"
+                                            class="mt-1 block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-red-500 sm:text-sm/6">
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                        <form action="/api/user/delete" method="POST">
-                            <button type="submit"
-                                :disabled="deleteConfirmName !== '{{ .User.FirstName }}'"
-                                :class="{'opacity-50 cursor-not-allowed': deleteConfirmName !== '{{ .User.FirstName }}'}"
-                                class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto">
-                                Delete Account
+                        <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                            <form action="/api/user/delete" method="POST">
+                                <button type="submit"
+                                    :disabled="deleteConfirmName !== '{{ .User.FirstName }}'"
+                                    :class="{'opacity-50 cursor-not-allowed': deleteConfirmName !== '{{ .User.FirstName }}'}"
+                                    class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto">
+                                    Delete Account
+                                </button>
+                            </form>
+                            <button type="button" 
+                                @click="showDeleteModal = false"
+                                class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">
+                                Cancel
                             </button>
-                        </form>
-                        <button type="button" 
-                            @click="showDeleteModal = false"
-                            class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">
-                            Cancel
-                        </button>
+                        </div>
                     </div>
                 </div>
             </div>

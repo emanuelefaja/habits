@@ -69,3 +69,8 @@ func GetUserID(r *http.Request) int {
 	}
 	return userID
 }
+
+// ClearSession destroys the current session
+func ClearSession(r *http.Request) error {
+	return SessionManager.Destroy(r.Context())
+}

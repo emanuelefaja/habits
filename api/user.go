@@ -117,3 +117,122 @@ type TemplateData struct {
 	Flash string
 	Error string
 }
+
+// UpdateProfileHandler handles updating user profile information
+func UpdateProfileHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		// Get user ID from session
+		userID := middleware.GetUserID(r)
+		if userID == 0 {
+			middleware.SetFlash(r, "Session expired. Please login again.")
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+
+		// Get current user
+		user, err := models.GetUserByID(db, int64(userID))
+		if err != nil {
+			middleware.SetFlash(r, "Error finding user.")
+			http.Redirect(w, r, "/settings", http.StatusSeeOther)
+			return
+		}
+
+		// Update user information
+		user.FirstName = r.FormValue("first_name")
+		user.LastName = r.FormValue("last_name")
+		user.Email = r.FormValue("email")
+
+		if err := user.Update(db); err != nil {
+			// Check if error is due to duplicate email
+			if err.Error() == "UNIQUE constraint failed: users.email" {
+				middleware.SetFlash(r, "Email already in use by another account.")
+				http.Redirect(w, r, "/settings", http.StatusSeeOther)
+				return
+			}
+			middleware.SetFlash(r, "Error updating profile.")
+			http.Redirect(w, r, "/settings", http.StatusSeeOther)
+			return
+		}
+
+		middleware.SetFlash(r, "Profile updated successfully! ✨")
+		http.Redirect(w, r, "/settings", http.StatusSeeOther)
+	}
+}
+
+// UpdatePasswordHandler handles password updates
+func UpdatePasswordHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		userID := middleware.GetUserID(r)
+		if userID == 0 {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		currentPassword := r.FormValue("current_password")
+		newPassword := r.FormValue("new_password")
+		confirmPassword := r.FormValue("confirm_password")
+
+		// Validate passwords match
+		if newPassword != confirmPassword {
+			middleware.SetFlash(r, "New passwords do not match")
+			http.Redirect(w, r, "/settings", http.StatusSeeOther)
+			return
+		}
+
+		// Update password
+		err := models.UpdatePassword(db, int64(userID), currentPassword, newPassword)
+		if err != nil {
+			if err == bcrypt.ErrMismatchedHashAndPassword {
+				middleware.SetFlash(r, "Current password is incorrect")
+			} else {
+				middleware.SetFlash(r, "Error updating password")
+			}
+			http.Redirect(w, r, "/settings", http.StatusSeeOther)
+			return
+		}
+
+		middleware.SetFlash(r, "Password updated successfully!")
+		http.Redirect(w, r, "/settings", http.StatusSeeOther)
+	}
+}
+
+// DeleteAccountHandler handles account deletion
+func DeleteAccountHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		userID := middleware.GetUserID(r)
+		if userID == 0 {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		// Delete user and all associated data
+		err := models.DeleteUserAndData(db, int64(userID))
+		if err != nil {
+			middleware.SetFlash(r, "Error deleting account")
+			http.Redirect(w, r, "/settings", http.StatusSeeOther)
+			return
+		}
+
+		// Clear the session
+		middleware.ClearSession(r)
+
+		// Redirect to login page with success message
+		middleware.SetFlash(r, "Account deleted successfully")
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+	}
+}

@@ -181,7 +181,7 @@ func main() {
 		}
 
 		// Destroy the session
-		err := middleware.SessionManager.Destroy(r.Context())
+		err := middleware.ClearSession(r)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
@@ -227,6 +227,11 @@ func main() {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		}
 	}))))
+
+	// User API routes
+	http.Handle("/api/user/profile", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(api.UpdateProfileHandler(db))))
+	http.Handle("/api/user/password", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(api.UpdatePasswordHandler(db))))
+	http.Handle("/api/user/delete", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(api.DeleteAccountHandler(db))))
 
 	// Start server
 	log.Println("Server started at :8080")
