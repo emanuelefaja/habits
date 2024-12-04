@@ -518,7 +518,43 @@
                             Cancel ❌
                         </button>
                         <button 
-                            @click="createCustomHabit()"
+                            @click="
+                                if (modalState.selectedHabit) {
+                                    const suggestion = habitSuggestions.find(s => s.name === modalState.selectedHabit);
+                                    if (suggestion) {
+                                        fetch('/api/habits', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                            },
+                                            body: JSON.stringify({
+                                                name: suggestion.name,
+                                                habit_type: suggestion.type
+                                            })
+                                        })
+                                        .then(response => response.json())
+                                        .then(result => {
+                                            if (result.success) {
+                                                habits.push(result.data);
+                                                habits.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+                                                closeModal();
+                                                flashMessage = result.message;
+                                                showFlash = true;
+                                                setTimeout(() => showFlash = false, 3000);
+                                            } else {
+                                                flashMessage = result.message;
+                                                showFlash = true;
+                                                setTimeout(() => showFlash = false, 3000);
+                                            }
+                                        })
+                                        .catch(error => {
+                                            flashMessage = 'Error creating habit';
+                                            showFlash = true;
+                                            setTimeout(() => showFlash = false, 3000);
+                                        });
+                                    }
+                                }
+                            "
                             :disabled="!modalState.selectedHabit"
                             :class="{'opacity-50 cursor-not-allowed': !modalState.selectedHabit}"
                             class="px-4 py-2 rounded-md bg-[#2da44e] text-white hover:bg-[#2c974b] transition-colors duration-200">
