@@ -9,6 +9,31 @@
     <style>
         [x-cloak] { display: none !important; }
     </style>
+    <script src="https://unpkg.com/@emoji-mart/data@latest/sets/14/native.json"></script>
+    <script src="https://unpkg.com/emoji-mart@latest/dist/browser.js"></script>
+    <script>
+        // Initialize emoji-mart and create global search function
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Initialize emoji-mart
+                await EmojiMart.init({ data: await fetch('https://unpkg.com/@emoji-mart/data@latest/sets/14/native.json').then(r => r.json()) })
+                
+                // Create a global Alpine store for emoji functionality
+                document.dispatchEvent(new CustomEvent('emoji-ready', {
+                    detail: {
+                        search: async (value) => {
+                            if (!value) return []
+                            const results = await EmojiMart.SearchIndex.search(value)
+                            console.log('Search results:', results) // Debug log
+                            return results
+                        }
+                    }
+                }))
+            } catch (error) {
+                console.error('Error initializing emoji-mart:', error)
+            }
+        })
+    </script>
 </head>
 <body class="h-full" 
       x-data="{ 
@@ -31,6 +56,28 @@
                       Math.floor(value/100)/10 + 'k';
               }
               return value;
+          },
+          emojiSearch: '',
+          emojiResults: [],
+          emojiSearchFn: null,
+          
+          // Initialize emoji search function when ready
+          init() {
+              document.addEventListener('emoji-ready', (e) => {
+                  this.emojiSearchFn = e.detail.search
+                  console.log('Emoji search initialized')
+              })
+          },
+          
+          // Modified search method
+          async searchEmojis() {
+              if (!this.emojiSearch || !this.emojiSearchFn) {
+                  this.emojiResults = [];
+                  return;
+              }
+              console.log('Searching for:', this.emojiSearch) // Debug log
+              this.emojiResults = await this.emojiSearchFn(this.emojiSearch);
+              console.log('Updated results:', this.emojiResults) // Debug log
           }
       }">
     {{ template "header" dict "User" .User "Page" "home" }}
@@ -367,7 +414,6 @@
                 });
             }
          }"
-         @click.away="if (showAddForm) { showAddForm = false; newHabitName = ''; }"
          @keydown.escape="closeModal()">
 
         <!-- Flash Message -->
@@ -700,16 +746,41 @@
                     <!-- Emoji Selector -->
                     <div>
                         <label for="habitEmoji" class="block text-sm font-medium text-gray-700 mb-2">Choose an Emoji</label>
-                        <div class="grid grid-cols-8 gap-2">
-                            <template x-for="emoji in ['💪', '🏃‍♂️', '🧘', '📚', '💧', '😴', '🥗', '📝', '🌅', '🎯', '🎨', '🎸', '🏊‍♂️', '🚴‍♂️', '🧠', '💻']">
-                                <button 
-                                    type="button"
-                                    @click="modalState.customHabit.emoji = emoji"
-                                    :class="{'ring-2 ring-[#2da44e]': modalState.customHabit.emoji === emoji}"
-                                    class="p-2 text-xl border rounded hover:bg-gray-50">
-                                    <span x-text="emoji"></span>
-                                </button>
-                            </template>
+                        <div class="relative">
+                            <!-- Search Input -->
+                            <input 
+                                type="text"
+                                x-model="emojiSearch"
+                                @input="searchEmojis()"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                                placeholder="Search for an emoji..."
+                            >
+                            
+                            <!-- Selected Emoji Preview - Only show if an emoji is selected -->
+                            <div class="mt-2 flex items-center gap-2" x-show="modalState.customHabit.emoji">
+                                <div class="text-2xl" x-text="modalState.customHabit.emoji"></div>
+                                <span class="text-sm text-gray-500">← Selected emoji</span>
+                            </div>
+
+                            <!-- Results Grid -->
+                            <div 
+                                x-show="emojiResults.length > 0"
+                                class="absolute z-50 mt-0.5 w-full bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
+                                <div class="grid grid-cols-8 gap-1 p-2">
+                                    <template x-for="emoji in emojiResults" :key="emoji.id">
+                                        <button 
+                                            @click="
+                                                modalState.customHabit.emoji = emoji.skins[0].native;
+                                                emojiResults = [];
+                                                emojiSearch = '';
+                                            "
+                                            class="p-2 text-xl hover:bg-gray-100 rounded-md"
+                                            :title="emoji.name">
+                                            <span x-text="emoji.skins[0].native"></span>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
