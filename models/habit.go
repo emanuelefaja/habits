@@ -7,12 +7,19 @@ import (
 	"time"
 )
 
+type HabitType string
+
+const (
+	BinaryHabit  HabitType = "binary"
+	NumericHabit HabitType = "numeric"
+)
+
 type Habit struct {
 	ID        int       `json:"id"`         // Unique identifier for the habit
 	UserID    int       `json:"user_id"`    // ID of the user who owns this habit
 	Name      string    `json:"name"`       // Name of the habit
 	CreatedAt time.Time `json:"created_at"` // Timestamp of when the habit was created
-	HabitType string    `json:"habit_type"` // Type of habit (e.g., "binary", "numeric", etc.)
+	HabitType HabitType `json:"habit_type"` // Type of habit (e.g., "binary", "numeric", etc.)
 	IsDefault bool      `json:"is_default"` // Flag to indicate if it's a default habit
 }
 
@@ -33,7 +40,7 @@ func InitializeHabitsDB(db *sql.DB) error {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             name TEXT NOT NULL,
-            habit_type TEXT NOT NULL,
+            habit_type TEXT NOT NULL CHECK(habit_type IN ('binary', 'numeric')),
             is_default BOOLEAN NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY(user_id) REFERENCES users(id),
@@ -72,13 +79,14 @@ func InitializeHabitsDB(db *sql.DB) error {
 // CreateOrUpdate creates or updates a habit log based on habit type
 func (hl *HabitLog) CreateOrUpdate(db *sql.DB) error {
 	// Get the habit type
-	var habitType string
+	var habitType HabitType
 	err := db.QueryRow("SELECT habit_type FROM habits WHERE id = ?", hl.HabitID).Scan(&habitType)
 	if err != nil {
 		return err
 	}
 
-	if habitType == "binary" {
+	switch habitType {
+	case BinaryHabit:
 		// For binary habits, delete any existing log first
 		_, err = db.Exec("DELETE FROM habit_logs WHERE habit_id = ? AND date = ?", hl.HabitID, hl.Date)
 		if err != nil {
@@ -102,12 +110,19 @@ func (hl *HabitLog) CreateOrUpdate(db *sql.DB) error {
 			}
 			hl.ID = int(id)
 		}
-	} else {
-		// For non-binary habits, always create a new log entry
+
+	case NumericHabit:
+		// For numeric habits, replace any existing log for this date
+		_, err = db.Exec("DELETE FROM habit_logs WHERE habit_id = ? AND date = ?", hl.HabitID, hl.Date)
+		if err != nil {
+			return err
+		}
+
+		// Insert new log with the latest value
 		result, err := db.Exec(`
 			INSERT INTO habit_logs (habit_id, date, status, value, created_at) 
-			VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
-		`, hl.HabitID, hl.Date, hl.Status, hl.Value)
+			VALUES (?, ?, 'done', ?, CURRENT_TIMESTAMP)
+		`, hl.HabitID, hl.Date, hl.Value)
 
 		if err != nil {
 			return err
@@ -118,6 +133,9 @@ func (hl *HabitLog) CreateOrUpdate(db *sql.DB) error {
 			return err
 		}
 		hl.ID = int(id)
+
+	default:
+		return fmt.Errorf("unknown habit type: %s", habitType)
 	}
 
 	return nil

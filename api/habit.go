@@ -19,9 +19,16 @@ type APIResponse struct {
 	Data    interface{} `json:"data,omitempty"`
 }
 
+// CreateHabitRequest represents a request to create a new habit
+type CreateHabitRequest struct {
+	Name      string           `json:"name"`
+	HabitType models.HabitType `json:"habit_type"`
+}
+
 // BulkHabitRequest represents a request to create multiple habits
 type BulkHabitRequest struct {
-	Name string `json:"name"`
+	Name      string           `json:"name"`
+	HabitType models.HabitType `json:"habit_type"`
 }
 
 // CreateHabitHandler handles the creation of a new habit
@@ -40,8 +47,8 @@ func CreateHabitHandler(db *sql.DB) http.HandlerFunc {
 		}
 
 		// Decode request body
-		var habit models.Habit
-		if err := json.NewDecoder(r.Body).Decode(&habit); err != nil {
+		var request CreateHabitRequest
+		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(APIResponse{
 				Success: false,
@@ -50,8 +57,22 @@ func CreateHabitHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Set the user ID from the session
-		habit.UserID = userID
+		// Validate habit type
+		if request.HabitType != models.BinaryHabit && request.HabitType != models.NumericHabit {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Invalid habit type. Must be 'binary' or 'numeric'",
+			})
+			return
+		}
+
+		habit := models.Habit{
+			UserID:    userID,
+			Name:      request.Name,
+			HabitType: request.HabitType,
+			IsDefault: false,
+		}
 
 		// Check if habit already exists
 		exists, err := models.HabitExists(db, habit.Name, userID)
@@ -71,10 +92,6 @@ func CreateHabitHandler(db *sql.DB) http.HandlerFunc {
 			})
 			return
 		}
-
-		// Set default values
-		habit.HabitType = "binary"
-		habit.IsDefault = false
 
 		// Create the habit
 		if err := habit.Create(db); err != nil {
@@ -164,8 +181,8 @@ func CreateOrUpdateHabitLogHandler(db *sql.DB) http.HandlerFunc {
 		var request struct {
 			HabitID int         `json:"habit_id"`
 			Date    string      `json:"date"`
-			Status  string      `json:"status"`
-			Value   interface{} `json:"value,omitempty"`
+			Status  string      `json:"status,omitempty"` // Optional for numeric habits
+			Value   interface{} `json:"value,omitempty"`  // Required for numeric habits
 		}
 
 		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -201,20 +218,50 @@ func CreateOrUpdateHabitLogHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Create habit log
+		// Get habit type first
+		var habitType models.HabitType
+		err = db.QueryRow("SELECT habit_type FROM habits WHERE id = ?", request.HabitID).Scan(&habitType)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Error retrieving habit type",
+			})
+			return
+		}
+
+		// Validate input based on habit type
 		habitLog := &models.HabitLog{
 			HabitID: request.HabitID,
 			Date:    date,
-			Status:  request.Status,
 		}
 
-		// Set value if provided
-		if request.Value != nil {
+		if habitType == models.BinaryHabit {
+			if request.Status == "" {
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(APIResponse{
+					Success: false,
+					Message: "Status is required for binary habits",
+				})
+				return
+			}
+			habitLog.Status = request.Status
+		} else {
+			// For numeric habits
+			if request.Value == nil {
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(APIResponse{
+					Success: false,
+					Message: "Value is required for numeric habits",
+				})
+				return
+			}
+			habitLog.Status = "done"
 			if err := habitLog.SetValue(request.Value); err != nil {
 				w.WriteHeader(http.StatusBadRequest)
 				json.NewEncoder(w).Encode(APIResponse{
 					Success: false,
-					Message: "Invalid value format",
+					Message: "Invalid numeric value",
 				})
 				return
 			}
@@ -354,7 +401,7 @@ func BulkCreateHabitsHandler(db *sql.DB) http.HandlerFunc {
 			newHabit := &models.Habit{
 				UserID:    userID,
 				Name:      habit.Name,
-				HabitType: "binary",
+				HabitType: habit.HabitType,
 				IsDefault: false,
 			}
 			if err := newHabit.Create(db); err != nil {
