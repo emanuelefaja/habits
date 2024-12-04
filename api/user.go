@@ -2,9 +2,13 @@ package api
 
 import (
 	"database/sql"
+	"encoding/csv"
+	"encoding/json"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
+	"time"
 
 	"mad/middleware"
 	"mad/models"
@@ -239,5 +243,81 @@ func DeleteAccountHandler(db *sql.DB) http.HandlerFunc {
 		// Redirect to login page with success message
 		middleware.SetFlash(r, "Account deleted successfully")
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
+	}
+}
+
+// ExportDataHandler generates and serves a CSV file of the user's habits and logs
+func ExportDataHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID := middleware.GetUserID(r)
+		if userID == 0 {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		// Set headers for CSV download
+		filename := fmt.Sprintf("habits_export_%s.csv", time.Now().Format("2006-01-02"))
+		w.Header().Set("Content-Type", "text/csv")
+		w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
+
+		// Create CSV writer
+		csvWriter := csv.NewWriter(w)
+		defer csvWriter.Flush()
+
+		// Write headers
+		headers := []string{"Habit Name", "Emoji", "Type", "Date", "Status", "Value"}
+		if err := csvWriter.Write(headers); err != nil {
+			http.Error(w, "Error writing CSV headers", http.StatusInternalServerError)
+			return
+		}
+
+		// Get all habits for the user
+		habits, err := models.GetHabitsByUserID(db, userID)
+		if err != nil {
+			http.Error(w, "Error fetching habits", http.StatusInternalServerError)
+			return
+		}
+
+		// For each habit, get its logs
+		for _, habit := range habits {
+			// Get logs for the past year
+			endDate := time.Now()
+			startDate := endDate.AddDate(-1, 0, 0)
+			logs, err := models.GetHabitLogsByDateRange(db, habit.ID, startDate, endDate)
+			if err != nil {
+				continue // Skip this habit if there's an error
+			}
+
+			// Write habit logs
+			for _, log := range logs {
+				var value string
+				if log.Value.Valid {
+					if habit.HabitType == models.NumericHabit {
+						// For numeric habits, extract just the number
+						var valueMap map[string]interface{}
+						if err := json.Unmarshal([]byte(log.Value.String), &valueMap); err == nil {
+							if numValue, ok := valueMap["value"]; ok {
+								value = fmt.Sprintf("%v", numValue)
+							}
+						}
+					} else {
+						// For other habit types, keep the full JSON
+						value = log.Value.String
+					}
+				}
+
+				row := []string{
+					habit.Name,
+					habit.Emoji,
+					string(habit.HabitType),
+					log.Date.Format("2006-01-02"),
+					log.Status,
+					value,
+				}
+				if err := csvWriter.Write(row); err != nil {
+					continue // Skip this row if there's an error
+				}
+			}
+		}
 	}
 }
