@@ -10,7 +10,18 @@
         [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="h-full">
+<body class="h-full" 
+      x-data="{ 
+          modalState: { 
+              isOpen: false, 
+              view: 'suggestions', 
+              selectedHabit: null, 
+              customHabit: { 
+                  name: '', 
+                  type: null 
+              } 
+          } 
+      }">
     {{ template "header" dict "User" .User "Page" "home" }}
     
     <div class="min-h-full flex flex-col" 
@@ -256,16 +267,6 @@
                     this.flashMessage = 'Error adding habits';
                     this.showFlash = true;
                     setTimeout(() => this.showFlash = false, 3000);
-                }
-            },
-
-            modalState: {
-                isOpen: false,
-                view: 'suggestions',
-                selectedHabit: null,
-                customHabit: {
-                    name: '',
-                    type: null
                 }
             },
 
