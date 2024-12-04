@@ -427,6 +427,22 @@
                          x-transition:enter-end="opacity-100 transform translate-y-0"
                          class="mb-8">
                         <div class="space-y-6">
+                            <!-- Emoji Selector -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Choose an Emoji</label>
+                                <div class="grid grid-cols-8 gap-2">
+                                    <template x-for="emoji in ['💪', '🏃‍♂️', '🧘', '📚', '💧', '😴', '🥗', '📝', '🌅', '🎯', '🎨', '🎸', '🏊‍♂️', '🚴‍♂️', '🧠', '💻']">
+                                        <button 
+                                            type="button"
+                                            @click="modalState.customHabit.emoji = emoji"
+                                            :class="{'ring-2 ring-[#2da44e]': modalState.customHabit.emoji === emoji}"
+                                            class="p-2 text-xl border rounded hover:bg-gray-50">
+                                            <span x-text="emoji"></span>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+
                             <!-- Name Input -->
                             <div>
                                 <label for="habitName" class="block text-sm font-medium text-gray-700 mb-2">Habit Name</label>
