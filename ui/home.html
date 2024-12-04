@@ -362,27 +362,7 @@
         </div>
 
         <!-- Header with Welcome Message, Title and Buttons -->
-        <div class="flex justify-between items-center px-6 mb-4">
-            <h1 class="text-left text-3xl font-bold tracking-tight text-gray-900">
-                👋 {{ .User.FirstName }}
-            </h1>
-            <h1 class="text-2xl font-bold text-gray-800">
-                Mindful Action Daily
-            </h1>
-            <div class="flex items-center space-x-4">
-                <!-- Create Habit Button -->
-                <button 
-                    @click="modalState.isOpen = true"
-                    class="rounded-md bg-[#2da44e] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#2c974b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2da44e]">
-                    Create Habit ✨
-                </button>
-                <!-- Settings Button -->
-                <a href="/settings" 
-                    class="rounded-md bg-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
-                    Settings ⚙️
-                </a>
-            </div>
-        </div>
+        {{ template "header" dict "User" .User "Page" "home" }}
 
         <!-- Logout Button (Fixed at bottom center) -->
         <div class="fixed bottom-8 left-1/2 transform -translate-x-1/2">
