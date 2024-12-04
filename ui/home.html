@@ -13,8 +13,6 @@
 <body class="h-full">
     <div class="min-h-full flex flex-col py-6 sm:px-4 lg:px-4" 
          x-data="{ 
-            showAddForm: false, 
-            newHabitName: '',
             habits: {{ .HabitsJSON }},
             habitLogs: {},
             flashMessage: '',
@@ -158,53 +156,6 @@
                             status: originalStatus
                         };
                     }
-                }
-            },
-
-            toggleForm() {
-                this.showAddForm = !this.showAddForm;
-                if (this.showAddForm) {
-                    this.$nextTick(() => this.$refs.habitInput.focus());
-                }
-            },
-            
-            async submitHabit() {
-                if (!this.newHabitName.trim()) return;
-                
-                try {
-                    const response = await fetch('/api/habits', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ name: this.newHabitName.trim() })
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        // Add new habit to the list and sort alphabetically
-                        this.habits.push(result.data);
-                        this.habits.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
-                        
-                        // Reset form
-                        this.newHabitName = '';
-                        this.showAddForm = false;
-                        
-                        // Show success message
-                        this.flashMessage = result.message;
-                        this.showFlash = true;
-                        setTimeout(() => this.showFlash = false, 3000);
-                    } else {
-                        // Show error message
-                        this.flashMessage = result.message;
-                        this.showFlash = true;
-                        setTimeout(() => this.showFlash = false, 3000);
-                    }
-                } catch (error) {
-                    this.flashMessage = 'Error creating habit';
-                    this.showFlash = true;
-                    setTimeout(() => this.showFlash = false, 3000);
                 }
             },
 
@@ -509,38 +460,6 @@
                                         </template>
                                     </div>
                                 </template>
-                                
-                                <!-- Add Habit Button/Form -->
-                                <div class="h-8 flex items-center col-span-full"
-                                     x-data="{ 
-                                        handleClickOutside() {
-                                            if (this.showAddForm) {
-                                                this.showAddForm = false;
-                                                this.newHabitName = '';
-                                            }
-                                        }
-                                     }"
-                                     @click.outside="handleClickOutside">
-                                    <!-- Button -->
-                                    <button x-show="!showAddForm"
-                                            @click.stop="toggleForm()"
-                                            class="text-sm text-gray-500 hover:text-gray-700">
-                                        + Add Habit
-                                    </button>
-                                    
-                                    <!-- Form -->
-                                    <form x-show="showAddForm"
-                                          @submit.prevent="submitHabit()"
-                                          @click.stop
-                                          class="w-[150px]">
-                                        <input type="text"
-                                               x-ref="habitInput"
-                                               x-model="newHabitName"
-                                               @keydown.escape="showAddForm = false; newHabitName = ''"
-                                               placeholder="New habit name"
-                                               class="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:border-blue-500">
-                                    </form>
-                                </div>
                             </div>
                         </div>
                     </div>
