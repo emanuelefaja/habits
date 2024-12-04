@@ -124,6 +124,31 @@ func main() {
 		log.Printf("Home handler: Successfully rendered home page")
 	}))))
 
+	// Settings route with session middleware and authentication check
+	http.Handle("/settings", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Get current user
+		userID := middleware.GetUserID(r)
+		user, err := models.GetUserByID(db, int64(userID))
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		data := struct {
+			User  *models.User
+			Flash string
+		}{
+			User:  user,
+			Flash: middleware.GetFlash(r),
+		}
+
+		err = templates.ExecuteTemplate(w, "settings.html", data)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+	}))))
+
 	// Register routes with session middleware
 	http.Handle("/register", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
