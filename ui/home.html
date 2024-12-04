@@ -449,12 +449,18 @@
                                             <div class="h-8 flex items-center justify-center" 
                                                  style="width: 35px;"
                                                  :class="{ 'invisible': day > getDaysInMonth() }">
-                                                <div class="w-7 h-7 rounded-sm cursor-pointer"
+                                                <div class="w-7 h-7 rounded-sm cursor-pointer flex items-center justify-center text-sm"
                                                      @click="day <= getDaysInMonth() && handleSquareClick(habit.id, formatDate(day))"
                                                      :style="{ 
                                                          backgroundColor: day <= getDaysInMonth() ? getStatusColor(getStatus(habit.id, formatDate(day))) : '#ebedf0',
                                                          cursor: day <= getDaysInMonth() ? 'pointer' : 'default'
                                                      }">
+                                                    <!-- Show numeric value if habit is numeric and has a value -->
+                                                    <template x-if="habit.habit_type === 'numeric' && habitLogs[`${habit.id}_${formatDate(day)}`]?.value?.Valid">
+                                                        <span class="text-white" 
+                                                              x-text="JSON.parse(habitLogs[`${habit.id}_${formatDate(day)}`].value.String).value">
+                                                        </span>
+                                                    </template>
                                                 </div>
                                             </div>
                                         </template>

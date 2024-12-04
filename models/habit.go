@@ -334,8 +334,8 @@ func (hl *HabitLog) ValidateValue(db *sql.DB) error {
 
 	switch habitType {
 	case "numeric":
-		if _, ok := valueMap["count"]; !ok {
-			return fmt.Errorf("numeric habits must have a 'count' field")
+		if _, ok := valueMap["value"]; !ok {
+			return fmt.Errorf("numeric habits must have a 'value' field")
 		}
 	case "time":
 		if _, ok := valueMap["minutes"]; !ok {
