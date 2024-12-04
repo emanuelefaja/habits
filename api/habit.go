@@ -256,7 +256,12 @@ func CreateOrUpdateHabitLogHandler(db *sql.DB) http.HandlerFunc {
 				})
 				return
 			}
-			habitLog.Status = "done"
+			// Use the provided status or default to "done"
+			if request.Status != "" {
+				habitLog.Status = request.Status
+			} else {
+				habitLog.Status = "done"
+			}
 			if err := habitLog.SetValue(request.Value); err != nil {
 				w.WriteHeader(http.StatusBadRequest)
 				json.NewEncoder(w).Encode(APIResponse{

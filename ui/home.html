@@ -131,12 +131,63 @@
                             }
                         });
                     } else {
-                        // Existing binary habit logic
-                        // ...
+                        // Binary habit with explicit status
+                        fetch('/api/habits/logs', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                habit_id: habitId,
+                                date: date,
+                                status: status
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(result => {
+                            if (result.success) {
+                                const key = `${habitId}_${date}`;
+                                this.habitLogs[key] = {
+                                    habit_id: habitId,
+                                    date: date,
+                                    status: status
+                                };
+                            }
+                        });
                     }
                 } else {
-                    // Existing click-to-cycle logic for binary habits
-                    // ...
+                    // Click-to-cycle logic for binary habits
+                    const habit = this.habits.find(h => h.id === habitId);
+                    if (habit?.habit_type === 'binary') {
+                        const currentStatus = this.getStatus(habitId, date);
+                        const nextStatus = this.getNextStatus(currentStatus);
+                        
+                        fetch('/api/habits/logs', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                habit_id: habitId,
+                                date: date,
+                                status: nextStatus
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(result => {
+                            if (result.success) {
+                                const key = `${habitId}_${date}`;
+                                this.habitLogs[key] = {
+                                    habit_id: habitId,
+                                    date: date,
+                                    status: nextStatus
+                                };
+                            }
+                        });
+                    } else if (habit?.habit_type === 'numeric') {
+                        this.showTooltip = `${habitId}_${date}`;
+                        this.showNumericInput = false;
+                    }
                 }
             },
 
@@ -264,7 +315,7 @@
             showNumericInput: false,
             numericValue: 0,
 
-            handleNumericSubmit(habitId, date) {
+            handleNumericSubmit(habitId, date, status = 'done') {
                 fetch('/api/habits/logs', {
                     method: 'POST',
                     headers: {
@@ -273,7 +324,7 @@
                     body: JSON.stringify({
                         habit_id: habitId,
                         date: date,
-                        status: 'done',
+                        status: status,
                         value: { value: parseInt(this.numericValue) }
                     })
                 })
@@ -284,7 +335,7 @@
                         this.habitLogs[key] = {
                             habit_id: habitId,
                             date: date,
-                            status: 'done',
+                            status: status,
                             value: { String: JSON.stringify({ value: parseInt(this.numericValue) }), Valid: true }
                         };
                         this.showTooltip = null;

@@ -118,11 +118,11 @@ func (hl *HabitLog) CreateOrUpdate(db *sql.DB) error {
 			return err
 		}
 
-		// Insert new log with the latest value
+		// Insert new log with the latest value and status
 		result, err := db.Exec(`
 			INSERT INTO habit_logs (habit_id, date, status, value, created_at) 
-			VALUES (?, ?, 'done', ?, CURRENT_TIMESTAMP)
-		`, hl.HabitID, hl.Date, hl.Value)
+			VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+		`, hl.HabitID, hl.Date, hl.Status, hl.Value)
 
 		if err != nil {
 			return err
