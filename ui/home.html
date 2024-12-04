@@ -20,7 +20,17 @@
                   name: '', 
                   type: null 
               } 
-          } 
+          },
+          formatNumericValue(value) {
+              if (value >= 1000000) {
+                  return Math.floor(value/100000)/10 + 'M';
+              } else if (value >= 1000) {
+                  return (value % 1000 === 0) ? 
+                      Math.floor(value/1000) + 'k' : 
+                      Math.floor(value/100)/10 + 'k';
+              }
+              return value;
+          }
       }">
     {{ template "header" dict "User" .User "Page" "home" }}
     
@@ -382,17 +392,16 @@
                     <p class="text-gray-600 mb-8">Choose some habits you'd like to track. You can always add more later.</p>
                     
                     <div class="flex flex-wrap gap-3 mb-8">
-                        <template x-for="suggestion in habitSuggestions" :key="suggestion.name">
+                        <template x-for="suggestion in habitSuggestions.slice(1)" :key="suggestion.name">
                             <button 
                                 @click="selectedSuggestions.includes(suggestion.name) ? 
                                     selectedSuggestions = selectedSuggestions.filter(s => s !== suggestion.name) : 
                                     selectedSuggestions.push(suggestion.name)"
                                 :class="{
-                                    'bg-indigo-100 border-indigo-500': selectedSuggestions.includes(suggestion.name),
-                                    'bg-white border-gray-300 hover:border-gray-400': !selectedSuggestions.includes(suggestion.name)
+                                    'bg-[#e6f4ea] text-[#2da44e] border-[#2da44e]': selectedSuggestions.includes(suggestion.name),
+                                    'bg-white text-gray-700 border-gray-300 hover:border-gray-400': !selectedSuggestions.includes(suggestion.name)
                                 }"
-                                class="px-4 py-2 rounded-full border transition-colors duration-200"
-                            >
+                                class="px-4 py-2 rounded-full border transition-colors duration-200">
                                 <span x-text="suggestion.emoji"></span>
                                 <span x-text="suggestion.name" class="ml-2"></span>
                             </button>
@@ -402,9 +411,11 @@
                     <button 
                         @click="addSelectedHabits()"
                         :disabled="selectedSuggestions.length === 0"
-                        :class="{'opacity-50 cursor-not-allowed': selectedSuggestions.length === 0}"
-                        class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition-colors duration-200"
-                    >
+                        :class="{
+                            'opacity-50 cursor-not-allowed': selectedSuggestions.length === 0,
+                            'hover:bg-[#2c974b]': selectedSuggestions.length > 0
+                        }"
+                        class="bg-[#2da44e] text-white px-6 py-2 rounded-lg transition-colors duration-200">
                         Add <span x-text="selectedSuggestions.length"></span> Habits
                     </button>
                 </div>
@@ -515,7 +526,7 @@
                                                     <template x-if="habit.habit_type === 'numeric'">
                                                         <span class="text-white" 
                                                               x-text="habitLogs[`${habit.id}_${formatDate(day)}`]?.value?.Valid ? 
-                                                                     JSON.parse(habitLogs[`${habit.id}_${formatDate(day)}`].value.String).value : 
+                                                                     formatNumericValue(JSON.parse(habitLogs[`${habit.id}_${formatDate(day)}`].value.String).value) : 
                                                                      (habitLogs[`${habit.id}_${formatDate(day)}`]?.status === 'missed' || 
                                                                       habitLogs[`${habit.id}_${formatDate(day)}`]?.status === 'skipped' ? '0' : '')">
                                                         </span>
@@ -618,8 +629,8 @@
                             <button 
                                 @click="modalState.selectedHabit = modalState.selectedHabit === suggestion.name ? null : suggestion.name"
                                 :class="{
-                                    'bg-indigo-100 border-indigo-500': modalState.selectedHabit === suggestion.name,
-                                    'bg-white border-gray-300 hover:border-gray-400': modalState.selectedHabit !== suggestion.name
+                                    'bg-[#e6f4ea] text-[#2da44e] border-[#2da44e]': modalState.selectedHabit === suggestion.name,
+                                    'bg-white text-gray-700 border-gray-300 hover:border-gray-400': modalState.selectedHabit !== suggestion.name
                                 }"
                                 class="px-4 py-2 rounded-full border transition-colors duration-200">
                                 <span x-text="suggestion.emoji"></span>
