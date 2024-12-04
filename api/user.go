@@ -63,9 +63,14 @@ func RegisterHandler(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
 
 		log.Println("User registered successfully:", email)
 
-		// Set flash message for successful registration
-		middleware.SetFlash(r, "Registration successful! Please log in.")
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		// Set user session immediately after registration
+		middleware.SetUserID(r, int(user.ID))
+
+		// Set welcome flash message
+		middleware.SetFlash(r, "Welcome to Habits, "+user.FirstName+"! 🎉")
+
+		// Redirect to home page instead of login
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 }
 
