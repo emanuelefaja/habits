@@ -58,6 +58,7 @@ func main() {
 	templates := template.Must(template.New("").Funcs(funcMap).ParseFiles(
 		"ui/components/header.html",
 		"ui/components/habit-modal.html",
+		"ui/components/monthly-grid.html",
 		"ui/home.html",
 		"ui/settings.html",
 		"ui/login.html",
