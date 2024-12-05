@@ -68,12 +68,12 @@
                 <div class="grid mb-2" style="gap: 3px; grid-template-columns: 150px repeat(31, 35px) 70px;">
                     <div class="h-8"></div>
                     <template x-for="day in 31" :key="day">
-                        <div class="text-sm text-center text-gray-600" 
-                             style="width: 35px;" 
-                             :class="{ 
-                                 'invisible': day > getDaysInMonth(),
-                                 'bg-[#2da44e] text-white font-bold rounded-full inline-flex items-center justify-center': isToday(day)
+                        <div :class="{ 
+                                'invisible': day > getDaysInMonth(),
+                                'bg-[#2da44e] text-white rounded-full inline-flex items-center justify-center': isToday(day),
+                                'text-sm text-center text-gray-600': !isToday(day)
                              }"
+                             style="width: 35px;" 
                              :style="{ 
                                  width: isToday(day) ? '24px' : '35px', 
                                  height: isToday(day) ? '24px' : '35px', 
@@ -91,8 +91,9 @@
                 <!-- Sortable List of Habit Rows -->
                 <div x-ref="habitsListContainer" class="flex flex-col gap-1">
                     <template x-for="habit in habits" :key="habit.id">
-                        <div class="grid bg-white group" 
-                             style="gap: 3px; grid-template-columns: 150px repeat(31, 35px) 70px;" 
+                        <div class="grid bg-white group"
+                             x-bind:data-habit-id="habit.id"
+                             style="gap: 3px; grid-template-columns: 150px repeat(31, 35px) 70px;"
                              class="border border-gray-200 rounded-sm">
                              
                             <!-- Habit Name Cell (drag handle) -->
@@ -227,4 +228,47 @@
         </div>
     </div>
 </template>
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('monthlyGrid', () => ({
+            init() {
+                // Initialize SortableJS when Alpine component is ready
+                Sortable.create(this.$refs.habitsListContainer, {
+                    animation: 150,
+                    handle: '.habit-handle',
+                    onEnd: (evt) => {
+                        const habitRows = this.$refs.habitsListContainer.querySelectorAll('[data-habit-id]');
+                        const newOrder = [];
+                        habitRows.forEach(row => {
+                            const habitId = parseInt(row.getAttribute('data-habit-id'));
+                            if (habitId) {
+                                newOrder.push(habitId);
+                            }
+                        });
+
+                        console.log("New order:", newOrder); // Check the console to ensure it's not empty
+
+                        fetch('/api/habits/reorder', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(newOrder)
+                        })
+                        .then(res => res.json())
+                        .then(result => {
+                            if (!result.success) {
+                                console.error("Error updating order:", result.message);
+                            } else {
+                                console.log("Order updated successfully");
+                            }
+                        })
+                        .catch(err => {
+                            console.error("Network error updating order:", err);
+                        });
+                    }
+                });
+            }
+        }))
+    });
+</script>
+
 {{ end }}

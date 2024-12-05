@@ -11,23 +11,7 @@
     </style>
     <script src="https://unpkg.com/@emoji-mart/data@latest/sets/14/native.json"></script>
     <script src="https://unpkg.com/emoji-mart@latest/dist/browser.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-<script>
-document.addEventListener('alpine:init', () => {
-    Alpine.data('monthlyGrid', () => ({
-        init() {
-            // Initialize SortableJS when Alpine component is ready
-            Sortable.create(this.$refs.habitsListContainer, {
-                animation: 150,
-                handle: '.habit-handle',
-                onEnd: (evt) => {
-                    // Handle updated order if needed
-                }
-            });
-        }
-    }))
-});
-</script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>      
 
     <script>
         // Initialize emoji-mart and create global search function

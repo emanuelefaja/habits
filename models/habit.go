@@ -15,13 +15,14 @@ const (
 )
 
 type Habit struct {
-	ID        int       `json:"id"`         // Unique identifier for the habit
-	UserID    int       `json:"user_id"`    // ID of the user who owns this habit
-	Name      string    `json:"name"`       // Name of the habit
-	Emoji     string    `json:"emoji"`      // Emoji for the habit
-	CreatedAt time.Time `json:"created_at"` // Timestamp of when the habit was created
-	HabitType HabitType `json:"habit_type"` // Type of habit (e.g., "binary", "numeric", etc.)
-	IsDefault bool      `json:"is_default"` // Flag to indicate if it's a default habit
+	ID           int       `json:"id"`            // Unique identifier for the habit
+	UserID       int       `json:"user_id"`       // ID of the user who owns this habit
+	Name         string    `json:"name"`          // Name of the habit
+	Emoji        string    `json:"emoji"`         // Emoji for the habit
+	CreatedAt    time.Time `json:"created_at"`    // Timestamp of when the habit was created
+	HabitType    HabitType `json:"habit_type"`    // Type of habit (e.g., "binary", "numeric", etc.)
+	IsDefault    bool      `json:"is_default"`    // Flag to indicate if it's a default habit
+	DisplayOrder int       `json:"display_order"` // Order in which the habit should be displayed
 }
 
 type HabitLog struct {
@@ -45,6 +46,7 @@ func InitializeHabitsDB(db *sql.DB) error {
             habit_type TEXT NOT NULL CHECK(habit_type IN ('binary', 'numeric')),
             is_default BOOLEAN NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            display_order INTEGER NOT NULL DEFAULT 0,
             FOREIGN KEY(user_id) REFERENCES users(id),
             UNIQUE(user_id, name)
         )
@@ -170,10 +172,11 @@ func GetHabitLogsByDateRange(db *sql.DB, habitID int, startDate, endDate time.Ti
 
 // Create inserts a new habit into the database
 func (h *Habit) Create(db *sql.DB) error {
+	// Insert the new habit
 	result, err := db.Exec(`
-		INSERT INTO habits (user_id, name, emoji, habit_type, is_default, created_at) 
-		VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-	`, h.UserID, h.Name, h.Emoji, h.HabitType, h.IsDefault)
+        INSERT INTO habits (user_id, name, emoji, habit_type, is_default, created_at) 
+        VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+    `, h.UserID, h.Name, h.Emoji, h.HabitType, h.IsDefault)
 
 	if err != nil {
 		return err
@@ -183,8 +186,22 @@ func (h *Habit) Create(db *sql.DB) error {
 	if err != nil {
 		return err
 	}
-
 	h.ID = int(id)
+
+	// Get the current max display_order for this user
+	var maxOrder int
+	err = db.QueryRow("SELECT IFNULL(MAX(display_order), 0) FROM habits WHERE user_id = ?", h.UserID).Scan(&maxOrder)
+	if err != nil {
+		return err
+	}
+
+	// Set this habit's display_order to maxOrder + 1
+	h.DisplayOrder = maxOrder + 1
+	_, err = db.Exec("UPDATE habits SET display_order = ? WHERE id = ?", h.DisplayOrder, h.ID)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -236,10 +253,10 @@ func HabitExists(db *sql.DB, name string, userID int) (bool, error) {
 func GetHabitsByUserID(db *sql.DB, userID int) ([]Habit, error) {
 	habits := []Habit{}
 	rows, err := db.Query(`
-		SELECT id, user_id, name, emoji, habit_type, is_default, created_at 
+		SELECT id, user_id, name, emoji, habit_type, is_default, created_at, display_order
 		FROM habits 
 		WHERE user_id = ?
-		ORDER BY LOWER(name) ASC
+		ORDER BY display_order ASC
 	`, userID)
 	if err != nil {
 		return nil, err
@@ -248,7 +265,7 @@ func GetHabitsByUserID(db *sql.DB, userID int) ([]Habit, error) {
 
 	for rows.Next() {
 		var habit Habit
-		err := rows.Scan(&habit.ID, &habit.UserID, &habit.Name, &habit.Emoji, &habit.HabitType, &habit.IsDefault, &habit.CreatedAt)
+		err := rows.Scan(&habit.ID, &habit.UserID, &habit.Name, &habit.Emoji, &habit.HabitType, &habit.IsDefault, &habit.CreatedAt, &habit.DisplayOrder)
 		if err != nil {
 			return nil, err
 		}

@@ -478,3 +478,82 @@ func GetHabitsHandler(db *sql.DB) http.HandlerFunc {
 		})
 	}
 }
+
+func UpdateHabitOrderHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		userID := middleware.GetUserID(r)
+		if userID == 0 {
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "User not authenticated",
+			})
+			return
+		}
+
+		var habitIDs []int
+		if err := json.NewDecoder(r.Body).Decode(&habitIDs); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Invalid request format",
+			})
+			return
+		}
+
+		log.Printf("Reorder request received: %v", habitIDs)
+
+		// Update each habit's display_order
+		tx, err := db.Begin()
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Error starting transaction",
+			})
+			return
+		}
+
+		for i, id := range habitIDs {
+			// Ensure habit belongs to user
+			var belongsToUser bool
+			err = tx.QueryRow("SELECT EXISTS (SELECT 1 FROM habits WHERE id = ? AND user_id = ?)", id, userID).Scan(&belongsToUser)
+			if err != nil || !belongsToUser {
+				tx.Rollback()
+				w.WriteHeader(http.StatusForbidden)
+				json.NewEncoder(w).Encode(APIResponse{
+					Success: false,
+					Message: "Unauthorized access to habit",
+				})
+				return
+			}
+
+			_, err := tx.Exec("UPDATE habits SET display_order = ? WHERE id = ?", i, id)
+			if err != nil {
+				tx.Rollback()
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(APIResponse{
+					Success: false,
+					Message: "Error updating order",
+				})
+				return
+			}
+		}
+
+		err = tx.Commit()
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Error committing transaction",
+			})
+			return
+		}
+
+		json.NewEncoder(w).Encode(APIResponse{
+			Success: true,
+			Message: "Habit order updated successfully",
+		})
+	}
+}
