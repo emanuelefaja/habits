@@ -66,7 +66,7 @@
                 
                 <!-- Grid -->
                 <div class="flex flex-col">
-                    <div class="grid" style="gap: 3px; grid-template-columns: 150px repeat(31, 35px)">
+                    <div class="grid" style="gap: 3px; grid-template-columns: 150px repeat(31, 35px) 70px">
                         <!-- Header row with day numbers -->
                         <div class="h-8"></div>
                         <template x-for="day in 31" :key="day">
@@ -85,7 +85,11 @@
                                  x-text="day">
                             </div>
                         </template>
-                        
+                        <!-- Add Totals header -->
+                        <div class="h-8 flex items-center justify-center">
+                            <span class="text-sm font-medium text-gray-600">Total</span>
+                        </div>
+
                         <!-- Habit rows -->
                         <template x-for="habit in habits">
                             <div class="contents">
@@ -175,6 +179,30 @@
                                         </div>
                                     </div>
                                 </template>
+                                <!-- Add Totals cell -->
+                                <div class="h-8 flex items-center justify-center">
+                                    <span class="text-sm font-bold text-gray-700" x-text="(() => {
+                                        if (habit.habit_type === 'numeric') {
+                                            // Calculate sum for numeric habits
+                                            let sum = 0;
+                                            for (let day = 1; day <= getDaysInMonth(); day++) {
+                                                const log = habitLogs[`${habit.id}_${formatDate(day)}`];
+                                                if (log?.value?.Valid) {
+                                                    sum += parseFloat(JSON.parse(log.value.String).value);
+                                                }
+                                            }
+                                            return formatNumericValue(sum);
+                                        } else {
+                                            // Count 'done' status for binary habits
+                                            return Object.entries(habitLogs)
+                                                .filter(([key, log]) => 
+                                                    key.startsWith(`${habit.id}_${currentYear}-${String(currentMonth).padStart(2, '0')}`) && 
+                                                    log.status === 'done'
+                                                ).length;
+                                        }
+                                    })()">
+                                    </span>
+                                </div>
                             </div>
                         </template>
                     </div>
