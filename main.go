@@ -61,6 +61,7 @@ func main() {
 		"ui/settings.html",
 		"ui/login.html",
 		"ui/register.html",
+		"ui/roadmap.html",
 	))
 
 	// Handle static files
@@ -233,6 +234,31 @@ func main() {
 	http.Handle("/api/user/password", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(api.UpdatePasswordHandler(db))))
 	http.Handle("/api/user/delete", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(api.DeleteAccountHandler(db))))
 	http.Handle("/api/user/export", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(api.ExportDataHandler(db))))
+
+	// Roadmap route with session middleware and authentication check
+	http.Handle("/roadmap", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Get current user
+		userID := middleware.GetUserID(r)
+		user, err := models.GetUserByID(db, int64(userID))
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		data := struct {
+			User  *models.User
+			Flash string
+		}{
+			User:  user,
+			Flash: middleware.GetFlash(r),
+		}
+
+		err = templates.ExecuteTemplate(w, "roadmap.html", data)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+	}))))
 
 	// Start server
 	log.Println("Server started at :8080")

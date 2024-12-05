@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roadmap - Habits</title>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
+</head>
+<body class="h-full" x-data="{ 
+    columns: [
+        {
+            title: 'Ideas 💡',
+            cards: [
+                { emoji: '🎯', title: 'Sidebar Navigation', description: 'Left sidebar with navigation links and sections' },
+                { emoji: '📱', title: 'Mobile App', description: 'Native mobile application for iOS and Android' },
+                { emoji: '🌙', title: 'Dark Mode', description: 'System-wide dark mode support' },
+                { emoji: '📊', title: 'Advanced Analytics', description: 'Detailed insights and progress tracking' },
+                { emoji: '🔌', title: 'Public API', description: 'REST API for integrating with other services' },
+                { emoji: '🔔', title: 'Notifications', description: 'Custom reminders and notifications' }
+            ]
+        },
+        {
+            title: 'Planned 🎯',
+            cards: [
+                { emoji: '↕️', title: 'Sortable Habits', description: 'Drag and drop to reorder habits in the grid' },
+                { emoji: '📈', title: 'Habit Streaks', description: 'Track consecutive days of habits' },
+                { emoji: '📝', title: 'Notes & Journaling', description: 'Add notes to habit entries' },
+                { emoji: '📱', title: 'Responsive Design', description: 'Works on all screen sizes' },
+                { emoji: '🎯', title: 'Goals', description: 'Set and track progress towards habit goals' },
+                { emoji: '📱', title: 'Full PWA', description: 'Full Progressive Web App with offline support' }
+            ]
+        },
+        {
+            title: 'In Progress 🚧',
+            cards: [
+                { emoji: '↕️', title: 'Sortable Habits', description: 'Drag and drop to reorder habits in the grid' },
+                { emoji: '😊', title: 'Mood Tracking', description: 'Track daily mood with customizable emoji reactions' },
+                { emoji: '💪', title: 'Set+Rep Habits', description: 'Track exercises with sets, reps and weight' },
+            ]
+        },
+        {
+            title: 'Done ✨',
+            cards: [
+                { emoji: '📊', title: 'Monthly View', description: 'Calendar view of habits' },
+                { emoji: '🔢', title: 'Numeric Habits', description: 'Track habits with numbers' },
+                { emoji: '✅', title: 'Binary Habits', description: 'Simple yes/no habit tracking' },
+                { emoji: '⚙️', title: 'User Settings', description: 'Update name, email and password.' },
+                { emoji: '🗺️', title: 'Roadmap', description: 'Public roadmap page showing planned features' },
+                { emoji: '📥', title: 'CSV Export', description: 'Download habit data as CSV' }
+            ]
+        }
+    ]
+}">
+    {{ template "header" dict "User" .User "Page" "roadmap" }}
+
+    <div class="p-6">
+        <!-- Kanban Board -->
+        <div class="grid grid-cols-4 gap-4">
+            <template x-for="column in columns" :key="column.title">
+                <div class="bg-white rounded-lg shadow p-4">
+                    <!-- Column Header -->
+                    <h2 class="text-lg font-semibold mb-4" x-text="column.title"></h2>
+                    
+                    <!-- Cards Container -->
+                    <div class="space-y-3">
+                        <template x-for="card in column.cards" :key="card.title">
+                            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
+                                <div class="flex items-start space-x-3">
+                                    <!-- Emoji -->
+                                    <div class="text-2xl" x-text="card.emoji"></div>
+                                    
+                                    <!-- Content -->
+                                    <div>
+                                        <h3 class="font-medium" x-text="card.title"></h3>
+                                        <p class="text-sm text-gray-600 mt-1" x-text="card.description"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <!-- Logout Button (Fixed at bottom center) - Reusing from home.html -->
+    <div class="fixed bottom-8 left-1/2 transform -translate-x-1/2">
+        <form action="/logout" method="POST">
+            <button type="submit" 
+                class="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
+                Logout 👋
+            </button>
+        </form>
+    </div>
+</body>
+</html> 
