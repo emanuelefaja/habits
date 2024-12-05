@@ -59,6 +59,7 @@ func main() {
 		"ui/components/header.html",
 		"ui/components/habit-modal.html",
 		"ui/components/monthly-grid.html",
+		"ui/components/welcome.html",
 		"ui/home.html",
 		"ui/settings.html",
 		"ui/login.html",

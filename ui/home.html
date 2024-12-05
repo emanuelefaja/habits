@@ -448,32 +448,7 @@
         </div>
 
         <!-- First Time User View -->
-        <template x-if="habits.length === 0">
-            <div class="flex-grow flex items-center justify-center mb-8">
-                <div class="flex flex-col items-start gap-4">
-                    <!-- Title -->
-                    <h2 class="text-xl text-gray-600 font-medium ml-2">
-                        Looks like this button might do something interesting...
-                    </h2>
-                    
-                    <!-- Button and Emoji Container -->
-                    <div class="flex items-center gap-16">
-                        <!-- Create Habit Button -->
-                        <button 
-                            @click="modalState.isOpen = true"
-                            class="px-6 py-3 text-lg rounded-lg bg-[#2da44e] text-white hover:bg-[#2c974b] transition-colors duration-200 flex items-center gap-2">
-                            <span>Create Your First Habit</span>
-                            <span>✨</span>
-                        </button>
-                        
-                        <!-- Large Emoji -->
-                        <div class="text-9xl">
-                            👀
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </template>
+        {{ template "welcome" . }}
 
         <!-- Monthly Grid -->
         {{ template "monthly-grid" . }}
