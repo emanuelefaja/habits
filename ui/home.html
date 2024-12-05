@@ -96,6 +96,14 @@
                         'July', 'August', 'September', 'October', 'November', 'December'],
             isLoading: false,
 
+            // Add this new method
+            isToday(day) {
+                const today = new Date();
+                return today.getDate() === day && 
+                       today.getMonth() + 1 === this.currentMonth && 
+                       today.getFullYear() === this.currentYear;
+            },
+
             // Get days in current month
             getDaysInMonth() {
                 return new Date(this.currentYear, this.currentMonth, 0).getDate();
@@ -541,7 +549,16 @@
                                 <template x-for="day in 31" :key="day">
                                     <div class="text-sm text-center text-gray-600" 
                                          style="width: 35px;" 
-                                         :class="{ 'invisible': day > getDaysInMonth() }"
+                                         :class="{ 
+                                             'invisible': day > getDaysInMonth(),
+                                             'bg-[#2da44e] text-white font-bold rounded-full inline-flex items-center justify-center': isToday(day)
+                                         }"
+                                         :style="{ 
+                                             width: isToday(day) ? '24px' : '35px', 
+                                             height: isToday(day) ? '24px' : '35px', 
+                                             lineHeight: isToday(day) ? '24px' : '35px',
+                                             margin: isToday(day) ? '5.5px auto' : '0'
+                                         }"
                                          x-text="day">
                                     </div>
                                 </template>
