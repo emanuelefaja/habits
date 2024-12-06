@@ -265,22 +265,27 @@ func main() {
 	http.Handle("/api/user/delete", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(api.DeleteAccountHandler(db))))
 	http.Handle("/api/user/export", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(api.ExportDataHandler(db))))
 
-	// Roadmap route with session middleware and authentication check
-	http.Handle("/roadmap", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Get current user
-		userID := middleware.GetUserID(r)
-		user, err := models.GetUserByID(db, int64(userID))
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
+	// Roadmap route with session middleware but no auth requirement
+	http.Handle("/roadmap", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var user *models.User
+		var err error
+
+		// Check if user is authenticated
+		if middleware.IsAuthenticated(r) {
+			userID := middleware.GetUserID(r)
+			user, err = models.GetUserByID(db, int64(userID))
+			if err != nil {
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				return
+			}
 		}
 
 		data := struct {
-			User  *models.User
-			Flash string
+			User *models.User
+			Page string
 		}{
-			User:  user,
-			Flash: middleware.GetFlash(r),
+			User: user,
+			Page: "roadmap",
 		}
 
 		err = templates.ExecuteTemplate(w, "roadmap.html", data)
@@ -288,7 +293,7 @@ func main() {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-	}))))
+	})))
 
 	// Habit view route with session middleware and authentication check
 	http.Handle("/habit/", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -367,18 +372,6 @@ func main() {
 		}
 	})))
 
-	// Roadmap Likes API routes
-	http.Handle("/api/roadmap/likes", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodGet:
-			api.GetRoadmapLikesHandler(db)(w, r)
-		case http.MethodPost:
-			api.ToggleRoadmapLikeHandler(db)(w, r)
-		default:
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-		}
-	}))))
-
 	// Start server
 	log.Println("Server started at :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
@@ -397,4 +390,44 @@ func dict(values ...interface{}) (map[string]interface{}, error) {
 		dict[key] = values[i+1]
 	}
 	return dict, nil
+}
+
+// GetRoadmapLikesHandler returns a handler for getting roadmap likes
+func GetRoadmapLikesHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("GetRoadmapLikes: Received request")
+
+		userID := middleware.GetUserID(r)
+		log.Printf("GetRoadmapLikes: User ID: %d", userID)
+
+		rows, err := db.Query(`
+			SELECT 
+				card_id,
+				COUNT(DISTINCT user_id) as total_likes,
+				COUNT(CASE WHEN user_id = ? THEN 1 END) > 0 as user_liked
+			FROM roadmap_likes
+			GROUP BY card_id`, userID)
+		if err != nil {
+			log.Printf("GetRoadmapLikes: Database query error: %v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		defer rows.Close()
+
+		likes := make([]LikeResponse, 0)
+		for rows.Next() {
+			var like LikeResponse
+			err := rows.Scan(&like.CardID, &like.TotalLikes, &like.UserLiked)
+			if err != nil {
+				log.Printf("GetRoadmapLikes: Row scan error: %v", err)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				return
+			}
+			likes = append(likes, like)
+		}
+
+		log.Printf("GetRoadmapLikes: Returning %d likes", len(likes))
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(likes)
+	}
 }

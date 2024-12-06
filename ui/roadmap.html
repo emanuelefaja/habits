@@ -22,7 +22,7 @@
     </div>
 
     <!-- Roadmap component -->
-    <div x-data="roadmap">
+    <div x-data="roadmap({{ if .User }}true{{ else }}false{{ end }})">
         <div class="p-6">
             <div class="grid grid-cols-4 gap-4">
                 <template x-for="column in columns" :key="column.title">
@@ -33,9 +33,11 @@
                                 <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 relative">
                                     <!-- Like button -->
                                     <button 
-                                        @click="column.title !== 'Done ✨' && toggleLike(card.id)"
-                                        :class="column.title === 'Done ✨' ? 'cursor-default opacity-50' : 'cursor-pointer'"
-                                        class="absolute top-2 right-2 flex items-center space-x-1">
+                                        @click="isAuthenticated && column.title !== 'Done ✨' && toggleLike(card.id)"
+                                        :class="!isAuthenticated || column.title === 'Done ✨' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'"
+                                        class="absolute top-2 right-2 flex items-center space-x-1"
+                                        :title="!isAuthenticated ? 'Sign in to vote on features' : ''"
+                                        >
                                         <span class="text-sm text-gray-600" x-text="getLikeCount(card.id)"></span>
                                         <span class="text-xl" x-text="isLiked(card.id) ? '❤️' : '🤍'"></span>
                                     </button>
@@ -59,7 +61,7 @@
 
     <script>
         document.addEventListener('alpine:init', () => {
-            Alpine.data('roadmap', () => ({
+            Alpine.data('roadmap', (isAuthenticated = false) => ({
                 columns: [
                     {
                         title: 'Ideas 💡',
@@ -110,6 +112,7 @@
                 ],
                 likes: {},
                 loading: {},
+                isAuthenticated,
                 
                 async init() {
                     console.log('Initializing roadmap...');
@@ -195,6 +198,15 @@
 
                 isLiked(cardId) {
                     return this.likes[cardId]?.liked || false;
+                },
+
+                handleLikeClick(cardId) {
+                    if (!this.isAuthenticated) {
+                        window.location.href = '/login?redirect=/roadmap';
+                        return;
+                    }
+                    if (this.loading[cardId]) return;
+                    this.toggleLike(cardId);
                 }
             }));
         });
