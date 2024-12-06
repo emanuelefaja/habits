@@ -69,19 +69,31 @@ func main() {
 		"ui/roadmap.html",
 		"ui/habit.html",
 		"ui/about.html",
+		"ui/guest-home.html",
 	))
 
 	// Handle static files
 	fs := http.FileServer(http.Dir("static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 
-	// Home route with session middleware and authentication check
-	http.Handle("/", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	// Home route with session middleware
+	http.Handle("/", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Home handler: Received request for path: %s", r.URL.Path)
 
 		if r.URL.Path != "/" {
 			log.Printf("Home handler: Not root path, returning 404")
 			http.NotFound(w, r)
+			return
+		}
+
+		// Check if user is authenticated
+		if !middleware.IsAuthenticated(r) {
+			// Render guest home page for non-authenticated users
+			err := templates.ExecuteTemplate(w, "guest-home.html", nil)
+			if err != nil {
+				log.Printf("Home handler: Error executing guest template: %v", err)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			}
 			return
 		}
 
@@ -115,7 +127,7 @@ func main() {
 
 		data := struct {
 			User       *models.User
-			HabitsJSON template.JS // Use template.JS to safely inject JSON into JavaScript
+			HabitsJSON template.JS
 			Flash      string
 		}{
 			User:       user,
@@ -130,7 +142,7 @@ func main() {
 			return
 		}
 		log.Printf("Home handler: Successfully rendered home page")
-	}))))
+	})))
 
 	// Settings route with session middleware and authentication check
 	http.Handle("/settings", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
