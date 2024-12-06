@@ -1,35 +1,61 @@
 {{ define "header" }}
 <div class="flex justify-between items-center px-6 py-4">
     <h1 class="text-left text-3xl font-bold tracking-tight text-gray-900">
-        👋 {{ .User.FirstName }}
+        {{ if .User }}
+            👋 {{ .User.FirstName }}
+        {{ else }}
+            <p class="text-3xl tracking-tight">Mindful action, daily.</p>
+        {{ end }}
     </h1>
     <div class="flex items-center space-x-4">
-        <a href="/" 
-            class="rounded-md {{ if eq .Page "home" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
-            Habits 🏠
-        </a>
+        {{ if .User }}
+            <a href="/" 
+                class="rounded-md {{ if eq .Page "home" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                Habits 🏠
+            </a>
 
-        <a href="/about" 
+            <a href="/about" 
             class="rounded-md {{ if eq .Page "about" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
-            About ℹ️
-        </a>
+                About 👀
+            </a>
 
-        <a href="/roadmap" 
-            class="rounded-md {{ if eq .Page "roadmap" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
-            Roadmap 🛣️
-        </a>
+            <a href="/roadmap" 
+                class="rounded-md {{ if eq .Page "roadmap" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                Roadmap 🚀
+            </a>
 
-        <a href="/settings" 
-            class="rounded-md {{ if eq .Page "settings" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
-            Settings ⚙️
-        </a>
+            <a href="/settings" 
+                class="rounded-md {{ if eq .Page "settings" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                Settings ⚙️
+            </a>
 
-        <form action="/logout" method="POST" class="inline">
-            <button type="submit" 
-                class="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
-                Logout 👋
-            </button>
-        </form>
+            <form action="/logout" method="POST" class="inline">
+                <button type="submit" 
+                    class="rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
+                    Logout 👋
+                </button>
+            </form>
+        {{ else }}
+            <a href="/about" 
+                class="rounded-md {{ if eq .Page "about" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                About 👀
+            </a>
+
+            <a href="/roadmap" 
+                class="rounded-md {{ if eq .Page "roadmap" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                Roadmap 🚀
+            </a>
+
+            <a href="/login" 
+                class="rounded-md bg-white px-4 py-2 text-sm font-semibold text-[#2da44e] shadow-sm ring-1 ring-inset ring-[#2da44e] hover:bg-gray-50">
+                Sign in 👋
+            </a>
+
+            <a href="/register" 
+                class="rounded-md bg-[#2da44e] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#2c974b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2da44e]">
+                Register ✨
+            </a>
+        {{ end }}
     </div>
 </div>
 {{ end }}

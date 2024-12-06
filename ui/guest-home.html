@@ -1,30 +1,107 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-gray-50">
+<html lang="en" class="h-full bg-gray-50 scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Welcome to Habits</title>
     <script src="https://unpkg.com/alpinejs" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards'
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': {
+                                opacity: '0',
+                                transform: 'translateY(20px)'
+                            },
+                            '100%': {
+                                opacity: '1',
+                                transform: 'translateY(0)'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        function smoothScroll(targetId) {
+            const target = document.querySelector(targetId);
+            const targetPosition = target.getBoundingClientRect().top + window.pageYOffset;
+            const startPosition = window.pageYOffset;
+            const distance = targetPosition - startPosition;
+            const duration = 1000;
+            let start = null;
+
+            function animation(currentTime) {
+                if (start === null) start = currentTime;
+                const timeElapsed = currentTime - start;
+                const run = ease(timeElapsed, startPosition, distance, duration);
+                window.scrollTo(0, run);
+                if (timeElapsed < duration) requestAnimationFrame(animation);
+            }
+
+            function ease(t, b, c, d) {
+                t /= d / 2;
+                if (t < 1) return c / 2 * t * t + b;
+                t--;
+                return -c / 2 * (t * (t - 2) - 1) + b;
+            }
+
+            requestAnimationFrame(animation);
+        }
+    </script>
 </head>
 <body class="h-full">
-    <div class="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
-        <div class="sm:mx-auto sm:w-full sm:max-w-md text-center">
-            <h1 class="mt-6 text-4xl font-bold tracking-tight text-gray-900">Welcome to Habits! ✨</h1>
-            <p class="mt-4 text-lg text-gray-600">Track your habits, build better routines.</p>
+    {{ template "header" . }}
+    
+    <div class="min-h-[calc(100vh-4rem)] relative sm:px-6 lg:px-8">
+        <div class="absolute top-[30%] left-1/2 -translate-x-1/2 sm:w-full sm:max-w-md text-center"
+             x-data="{ show: false }"
+             x-init="setTimeout(() => show = true, 100)">
+            <h1 class="text-4xl tracking-tight text-gray-900 text-left space-y-2">
+                <span class="block font-bold opacity-0"
+                      :class="{ 'animate-fade-in-up': show }"
+                      style="animation-delay: 0.2s">
+                    Mindful action, daily.
+                </span>
+                <span class="block opacity-0"
+                      :class="{ 'animate-fade-in-up': show }"
+                      style="animation-delay: 0.5s">
+                    Shapes the life we long to see.
+                </span>
+                <span class="block opacity-0"
+                      :class="{ 'animate-fade-in-up': show }"
+                      style="animation-delay: 1s">
+                    Dreams no longer wait.
+                </span>
+            </h1>
         </div>
 
-        <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-            <div class="flex justify-center space-x-4">
-                <a href="/login" 
-                    class="rounded-md bg-[#2da44e] px-6 py-3 text-lg font-semibold text-white shadow-sm hover:bg-[#2c974b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2da44e]">
-                    Sign in 👋
-                </a>
-                <a href="/register" 
-                    class="rounded-md bg-white px-6 py-3 text-lg font-semibold text-[#2da44e] shadow-sm ring-1 ring-inset ring-[#2da44e] hover:bg-gray-50">
-                    Register ✨
-                </a>
-            </div>
+        <div class="absolute top-[75%] left-1/2 -translate-x-1/2"
+             x-data="{ show: false }"
+             x-init="setTimeout(() => show = true, 100)">
+            <button 
+               class="inline-block opacity-0 px-4 py-2 text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 transition-all duration-200"
+               :class="{ 'animate-fade-in-up': show }"
+               style="animation-delay: 1.5s"
+               onclick="smoothScroll('#intro')">
+                Learn More ↓
+            </button>
+        </div>
+    </div>
+
+    <div id="intro" class="min-h-screen px-6 py-24 sm:py-32 lg:px-8">
+        <div class="mx-auto max-w-2xl text-center relative">
+            <h2 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">Build better habits.</h2>
+            <p class="mt-6 mb-24 text-lg leading-8 text-gray-600">
+                Track daily habits, build consistent routines, and achieve your goals.
+            </p>
+            {{ template "demo-grid" . }}
         </div>
     </div>
 </body>
