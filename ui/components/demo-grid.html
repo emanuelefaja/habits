@@ -240,13 +240,13 @@
                                             .filter(([key, log]) => 
                                                 key.startsWith(`${habit.id}_${currentYear}-${String(currentMonth).padStart(2, '0')}`) && 
                                                 log.status === 'done'
-                                            ).length + ' days';
+                                            ).length;
                                     } else {
                                         return Object.entries(habitLogs)
                                             .filter(([key, log]) => 
                                                 key.startsWith(`${habit.id}_${currentYear}-${String(currentMonth).padStart(2, '0')}`) && 
                                                 log.status === 'done'
-                                            ).length + ' days';
+                                            ).length;
                                     }
                                 })()">
                                 </span>
