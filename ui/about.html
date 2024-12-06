@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Habit Tracker</title>
+    <script src="https://unpkg.com/alpinejs" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div class="min-h-screen bg-gray-50">
+        {{ template "header" . }}
+        
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center mb-8">
+                <div class="text-6xl mb-2">ℹ️</div>
+                <h1 class="text-3xl font-bold text-gray-900">About</h1>
+            </div>
+
+            <div class="space-y-6 text-gray-600">
+                <p class="text-lg">
+                    Welcome to Habit Tracker, a simple yet powerful tool to help you build and maintain positive habits.
+                </p>
+
+                <p class="text-lg">
+                    Built with Go for scalability and performance, and Alpine.js for simplicity and interactivity, this application represents a labor of love rather than a commercial product. We believe in creating tools that genuinely help people improve their lives, without the constraints of profit-driven development.
+                </p>
+
+                <p class="text-lg">
+                    This is an open-source project focused on providing a clean, distraction-free environment for tracking and building better habits. No ads, no premium features, just pure functionality to support your personal growth journey.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 
