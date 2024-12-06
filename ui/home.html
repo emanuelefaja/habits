@@ -18,23 +18,19 @@
         document.addEventListener('DOMContentLoaded', async () => {
             try {
                 // Initialize emoji-mart
-                await EmojiMart.init({ data: await fetch('https://unpkg.com/@emoji-mart/data@latest/sets/14/native.json').then(r => r.json()) })
+                await EmojiMart.init({ data: await fetch('https://unpkg.com/@emoji-mart/data@latest/sets/14/native.json').then(r => r.json()) });
                 
                 // Create a global Alpine store for emoji functionality
-                document.dispatchEvent(new CustomEvent('emoji-ready', {
-                    detail: {
-                        search: async (value) => {
-                            if (!value) return []
-                            const results = await EmojiMart.SearchIndex.search(value)
-                            console.log('Search results:', results) // Debug log
-                            return results
-                        }
+                Alpine.store('emoji', {
+                    async search(value) {
+                        if (!value) return [];
+                        return await EmojiMart.SearchIndex.search(value);
                     }
-                }))
+                });
             } catch (error) {
-                console.error('Error initializing emoji-mart:', error)
+                console.error('Error initializing emoji-mart:', error);
             }
-        })
+        });
     </script>
 </head>
 <body class="h-full" 
@@ -46,7 +42,8 @@
               customHabit: { 
                   name: '', 
                   emoji: '',
-                  type: null 
+                  type: null,
+                  habitOptions: []
               } 
           },
           formatNumericValue(value) {
@@ -61,25 +58,198 @@
           },
           emojiSearch: '',
           emojiResults: [],
-          emojiSearchFn: null,
           
-          // Initialize emoji search function when ready
-          init() {
-              document.addEventListener('emoji-ready', (e) => {
-                  this.emojiSearchFn = e.detail.search
-                  console.log('Emoji search initialized')
-              })
-          },
-          
-          // Modified search method
+          // Modify the search method to use Alpine.store
           async searchEmojis() {
-              if (!this.emojiSearch || !this.emojiSearchFn) {
+              if (!this.emojiSearch) {
                   this.emojiResults = [];
                   return;
               }
-              console.log('Searching for:', this.emojiSearch) // Debug log
-              this.emojiResults = await this.emojiSearchFn(this.emojiSearch);
-              console.log('Updated results:', this.emojiResults) // Debug log
+              try {
+                  this.emojiResults = await Alpine.store('emoji').search(this.emojiSearch);
+              } catch (error) {
+                  console.error('Error searching emojis:', error);
+                  this.emojiResults = [];
+              }
+          },
+          optionEmojiSearch: '',
+          optionEmojiResults: [],
+          selectedOptionEmoji: null,
+          selectedOptionLabel: '',
+
+          async searchOptionEmojis() {
+            if (!this.optionEmojiSearch) {
+                this.optionEmojiResults = [];
+                return;
+            }
+            try {
+                this.optionEmojiResults = await Alpine.store('emoji').search(this.optionEmojiSearch);
+            } catch (error) {
+                console.error('Error searching emojis:', error);
+                this.optionEmojiResults = [];
+            }
+        },
+
+          addOption() {
+              if (!this.selectedOptionEmoji || !this.selectedOptionLabel) return;
+              
+              if (!this.modalState.customHabit.habitOptions) {
+                  this.modalState.customHabit.habitOptions = [];
+              }
+
+              this.modalState.customHabit.habitOptions.push({
+                  emoji: this.selectedOptionEmoji,
+                  label: this.selectedOptionLabel
+              });
+
+              // Reset input fields
+              this.selectedOptionEmoji = null;
+              this.selectedOptionLabel = '';
+          },
+
+          removeOption(index) {
+              this.modalState.customHabit.habitOptions.splice(index, 1);
+          },
+
+          // Modify existing closeModal method
+          closeModal() {
+              this.modalState.isOpen = false;
+              this.modalState.view = 'suggestions';
+              this.modalState.selectedHabit = null;
+              this.modalState.customHabit = {
+                  name: '',
+                  emoji: '',
+                  type: null,
+                  habitOptions: []
+              };
+              this.optionEmojiSearch = '';
+              this.optionEmojiResults = [];
+              this.selectedOptionEmoji = null;
+              this.selectedOptionLabel = '';
+          },
+
+          // Modify existing createCustomHabit method
+          createCustomHabit() {
+              console.log('Starting createCustomHabit with:', {
+                  name: this.modalState.customHabit.name,
+                  type: this.modalState.customHabit.type,
+                  emoji: this.modalState.customHabit.emoji,
+                  options: this.modalState.customHabit.habitOptions
+              });
+
+              if (!this.modalState.customHabit.name || !this.modalState.customHabit.type) {
+                  console.error('Missing required fields:', {
+                      name: !this.modalState.customHabit.name,
+                      type: !this.modalState.customHabit.type
+                  });
+                  return;
+              }
+
+              // Validate option-select type has options
+              if (this.modalState.customHabit.type === 'option-select') {
+                  console.log('Validating option-select options:', this.modalState.customHabit.habitOptions);
+                  if (!this.modalState.customHabit.habitOptions?.length || 
+                      this.modalState.customHabit.habitOptions.length < 2) {
+                      console.error('Invalid number of options:', this.modalState.customHabit.habitOptions?.length);
+                      this.flashMessage = 'Please add at least 2 options for emoji choice habit';
+                      this.showFlash = true;
+                      setTimeout(() => this.showFlash = false, 3000);
+                      return;
+                  }
+              }
+
+              const habitData = {
+                  name: this.modalState.customHabit.name,
+                  emoji: this.modalState.customHabit.emoji,
+                  habit_type: this.modalState.customHabit.type,
+                  habit_options: this.modalState.customHabit.habitOptions
+              };
+              
+              console.log('Sending habit creation request:', habitData);
+
+              fetch('/api/habits', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                  },
+                  body: JSON.stringify(habitData)
+              })
+              .then(response => {
+                  console.log('Raw response:', response);
+                  return response.json();
+              })
+              .then(result => {
+                  console.log('Server response:', result);
+                  if (result.success) {
+                      this.habits.push(result.data);
+                      this.habits.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+                      this.closeModal();
+                      this.flashMessage = result.message;
+                      this.showFlash = true;
+                      setTimeout(() => this.showFlash = false, 3000);
+                  } else {
+                      this.flashMessage = result.message;
+                      this.showFlash = true;
+                      setTimeout(() => this.showFlash = false, 3000);
+                  }
+              })
+              .catch(error => {
+                  console.error('Fetch error:', error);
+              });
+          },
+          habitOptionsMap: {},
+
+          // Add these new methods
+          init() {
+              this.initHabitOptions();
+              this.loadMonthLogs();
+          },
+
+          initHabitOptions() {
+              this.habitOptionsMap = {};
+              this.habits.forEach(h => {
+                  if (h.habit_type === 'option-select' && h.habit_options?.Valid) {
+                      this.habitOptionsMap[h.id] = JSON.parse(h.habit_options.String);
+                  }
+              });
+          },
+
+          getHabitOptions(id) {
+              return this.habitOptionsMap[id] || [];
+          },
+
+          handleOptionSelection(habitId, date, opt) {
+              fetch('/api/habits/logs', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                      habit_id: habitId,
+                      date: date,
+                      status: 'done',
+                      value: { emoji: opt.emoji, label: opt.label }
+                  })
+              })
+              .then(res => res.json())
+              .then(result => {
+                  if (result.success) {
+                      const key = `${habitId}_${date}`;
+                      this.habitLogs[key] = {
+                          habit_id: habitId,
+                          date: date,
+                          status: 'done',
+                          value: { String: JSON.stringify({ emoji: opt.emoji, label: opt.label }), Valid: true }
+                      };
+                      this.showTooltip = null;
+                  }
+              });
+          },
+
+          formatNumericDisplay(habitId, date) {
+              const log = this.habitLogs[`${habitId}_${date}`];
+              if (log?.value?.Valid) {
+                  return this.formatNumericValue(JSON.parse(log.value.String).value);
+              }
+              return '';
           }
       }">
     {{ template "header" dict "User" .User "Page" "home" }}
@@ -349,27 +519,69 @@
                 this.modalState.isOpen = false;
                 this.modalState.view = 'suggestions';
                 this.modalState.selectedHabit = null;
-                this.modalState.customHabit.name = '';
-                this.modalState.customHabit.emoji = '';
-                this.modalState.customHabit.type = null;
+                this.modalState.customHabit = {
+                    name: '',
+                    emoji: '',
+                    type: null,
+                    habitOptions: []
+                };
+                this.optionEmojiSearch = '';
+                this.optionEmojiResults = [];
+                this.selectedOptionEmoji = null;
+                this.selectedOptionLabel = '';
             },
 
             createCustomHabit() {
-                if (!this.modalState.customHabit.name || !this.modalState.customHabit.type) return;
+                console.log('Starting createCustomHabit with:', {
+                    name: this.modalState.customHabit.name,
+                    type: this.modalState.customHabit.type,
+                    emoji: this.modalState.customHabit.emoji,
+                    options: this.modalState.customHabit.habitOptions
+                });
+
+                if (!this.modalState.customHabit.name || !this.modalState.customHabit.type) {
+                    console.error('Missing required fields:', {
+                        name: !this.modalState.customHabit.name,
+                        type: !this.modalState.customHabit.type
+                    });
+                    return;
+                }
+
+                // Validate option-select type has options
+                if (this.modalState.customHabit.type === 'option-select') {
+                    console.log('Validating option-select options:', this.modalState.customHabit.habitOptions);
+                    if (!this.modalState.customHabit.habitOptions?.length || 
+                        this.modalState.customHabit.habitOptions.length < 2) {
+                        console.error('Invalid number of options:', this.modalState.customHabit.habitOptions?.length);
+                        this.flashMessage = 'Please add at least 2 options for emoji choice habit';
+                        this.showFlash = true;
+                        setTimeout(() => this.showFlash = false, 3000);
+                        return;
+                    }
+                }
+
+                const habitData = {
+                    name: this.modalState.customHabit.name,
+                    emoji: this.modalState.customHabit.emoji,
+                    habit_type: this.modalState.customHabit.type,
+                    habit_options: this.modalState.customHabit.habitOptions
+                };
+                
+                console.log('Sending habit creation request:', habitData);
 
                 fetch('/api/habits', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        name: this.modalState.customHabit.name,
-                        emoji: this.modalState.customHabit.emoji,
-                        habit_type: this.modalState.customHabit.type
-                    })
+                    body: JSON.stringify(habitData)
                 })
-                .then(response => response.json())
+                .then(response => {
+                    console.log('Raw response:', response);
+                    return response.json();
+                })
                 .then(result => {
+                    console.log('Server response:', result);
                     if (result.success) {
                         this.habits.push(result.data);
                         this.habits.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
@@ -384,9 +596,7 @@
                     }
                 })
                 .catch(error => {
-                    this.flashMessage = 'Error creating habit';
-                    this.showFlash = true;
-                    setTimeout(() => this.showFlash = false, 3000);
+                    console.error('Fetch error:', error);
                 });
             },
 

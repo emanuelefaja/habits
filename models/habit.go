@@ -10,19 +10,26 @@ import (
 type HabitType string
 
 const (
-	BinaryHabit  HabitType = "binary"
-	NumericHabit HabitType = "numeric"
+	BinaryHabit       HabitType = "binary"
+	NumericHabit      HabitType = "numeric"
+	OptionSelectHabit HabitType = "option-select"
 )
 
 type Habit struct {
-	ID           int       `json:"id"`            // Unique identifier for the habit
-	UserID       int       `json:"user_id"`       // ID of the user who owns this habit
-	Name         string    `json:"name"`          // Name of the habit
-	Emoji        string    `json:"emoji"`         // Emoji for the habit
-	CreatedAt    time.Time `json:"created_at"`    // Timestamp of when the habit was created
-	HabitType    HabitType `json:"habit_type"`    // Type of habit (e.g., "binary", "numeric", etc.)
-	IsDefault    bool      `json:"is_default"`    // Flag to indicate if it's a default habit
-	DisplayOrder int       `json:"display_order"` // Order in which the habit should be displayed
+	ID           int            `json:"id"`
+	UserID       int            `json:"user_id"`
+	Name         string         `json:"name"`
+	Emoji        string         `json:"emoji"`
+	CreatedAt    time.Time      `json:"created_at"`
+	HabitType    HabitType      `json:"habit_type"`
+	IsDefault    bool           `json:"is_default"`
+	DisplayOrder int            `json:"display_order"`
+	HabitOptions sql.NullString `json:"habit_options"`
+}
+
+type HabitOption struct {
+	Emoji string `json:"emoji"`
+	Label string `json:"label"`
 }
 
 type HabitLog struct {
@@ -42,11 +49,12 @@ func InitializeHabitsDB(db *sql.DB) error {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             name TEXT NOT NULL,
-            emoji TEXT NOT NULL,
-            habit_type TEXT NOT NULL CHECK(habit_type IN ('binary', 'numeric')),
+            emoji TEXT NOT NULL DEFAULT '✨',
+            habit_type TEXT NOT NULL CHECK(habit_type IN ('binary', 'numeric', 'option-select')),
             is_default BOOLEAN NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             display_order INTEGER NOT NULL DEFAULT 0,
+            habit_options TEXT,
             FOREIGN KEY(user_id) REFERENCES users(id),
             UNIQUE(user_id, name)
         )
@@ -138,6 +146,29 @@ func (hl *HabitLog) CreateOrUpdate(db *sql.DB) error {
 		}
 		hl.ID = int(id)
 
+	case OptionSelectHabit:
+		// Add handling for option-select type
+		_, err = db.Exec("DELETE FROM habit_logs WHERE habit_id = ? AND date = ?", hl.HabitID, hl.Date)
+		if err != nil {
+			return err
+		}
+
+		// Insert new log with the option value
+		result, err := db.Exec(`
+			INSERT INTO habit_logs (habit_id, date, status, value, created_at) 
+			VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+		`, hl.HabitID, hl.Date, hl.Status, hl.Value)
+
+		if err != nil {
+			return err
+		}
+
+		id, err := result.LastInsertId()
+		if err != nil {
+			return err
+		}
+		hl.ID = int(id)
+
 	default:
 		return fmt.Errorf("unknown habit type: %s", habitType)
 	}
@@ -173,10 +204,11 @@ func GetHabitLogsByDateRange(db *sql.DB, habitID int, startDate, endDate time.Ti
 // Create inserts a new habit into the database
 func (h *Habit) Create(db *sql.DB) error {
 	// Insert the new habit
+
 	result, err := db.Exec(`
-        INSERT INTO habits (user_id, name, emoji, habit_type, is_default, created_at) 
-        VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-    `, h.UserID, h.Name, h.Emoji, h.HabitType, h.IsDefault)
+    INSERT INTO habits (user_id, name, emoji, habit_type, is_default, created_at, habit_options) 
+    VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
+	`, h.UserID, h.Name, h.Emoji, h.HabitType, h.IsDefault, h.HabitOptions)
 
 	if err != nil {
 		return err
@@ -253,7 +285,7 @@ func HabitExists(db *sql.DB, name string, userID int) (bool, error) {
 func GetHabitsByUserID(db *sql.DB, userID int) ([]Habit, error) {
 	habits := []Habit{}
 	rows, err := db.Query(`
-		SELECT id, user_id, name, emoji, habit_type, is_default, created_at, display_order
+		SELECT id, user_id, name, emoji, habit_type, is_default, created_at, display_order, habit_options
 		FROM habits 
 		WHERE user_id = ?
 		ORDER BY display_order ASC
@@ -265,7 +297,17 @@ func GetHabitsByUserID(db *sql.DB, userID int) ([]Habit, error) {
 
 	for rows.Next() {
 		var habit Habit
-		err := rows.Scan(&habit.ID, &habit.UserID, &habit.Name, &habit.Emoji, &habit.HabitType, &habit.IsDefault, &habit.CreatedAt, &habit.DisplayOrder)
+		err := rows.Scan(
+			&habit.ID,
+			&habit.UserID,
+			&habit.Name,
+			&habit.Emoji,
+			&habit.HabitType,
+			&habit.IsDefault,
+			&habit.CreatedAt,
+			&habit.DisplayOrder,
+			&habit.HabitOptions,
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -370,7 +412,30 @@ func (hl *HabitLog) ValidateValue(db *sql.DB) error {
 		if _, ok := valueMap["unit"]; !ok {
 			return fmt.Errorf("distance_time habits must have a 'unit' field")
 		}
+	case "option-select":
+		// Add validation for option-select
+		var valueMap struct {
+			Emoji string `json:"emoji"`
+			Label string `json:"label"`
+		}
+		if err := json.Unmarshal([]byte(hl.Value.String), &valueMap); err != nil {
+			return fmt.Errorf("invalid option-select value format: %v", err)
+		}
+		if valueMap.Emoji == "" || valueMap.Label == "" {
+			return fmt.Errorf("option-select value must have both emoji and label")
+		}
 	}
 
 	return nil
+}
+
+func MarshalHabitOptions(options []HabitOption) (sql.NullString, error) {
+	if len(options) == 0 {
+		return sql.NullString{Valid: false}, nil
+	}
+	data, err := json.Marshal(options)
+	if err != nil {
+		return sql.NullString{}, err
+	}
+	return sql.NullString{String: string(data), Valid: true}, nil
 }

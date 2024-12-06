@@ -21,11 +21,11 @@ type APIResponse struct {
 	Data    interface{} `json:"data,omitempty"`
 }
 
-// CreateHabitRequest represents a request to create a new habit
 type CreateHabitRequest struct {
-	Name      string           `json:"name"`
-	Emoji     string           `json:"emoji"`
-	HabitType models.HabitType `json:"habit_type"`
+	Name         string               `json:"name"`
+	Emoji        string               `json:"emoji"`
+	HabitType    models.HabitType     `json:"habit_type"`
+	HabitOptions []models.HabitOption `json:"habit_options,omitempty"`
 }
 
 // BulkHabitRequest represents a request to create multiple habits
@@ -38,21 +38,33 @@ type BulkHabitRequest struct {
 // CreateHabitHandler handles the creation of a new habit
 func CreateHabitHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("Starting CreateHabitHandler")
 		w.Header().Set("Content-Type", "application/json")
 
 		// Get user ID from session
 		userID := middleware.GetUserID(r)
-		if userID == 0 {
+		log.Printf("User ID: %d", userID)
+
+		// Read and log request body
+		body, err := io.ReadAll(r.Body)
+		if err != nil {
+			log.Printf("Error reading request body: %v", err)
+			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(APIResponse{
 				Success: false,
-				Message: "User not authenticated",
+				Message: "Error reading request",
 			})
 			return
 		}
+		log.Printf("Raw request body: %s", string(body))
+
+		// Restore body for further processing
+		r.Body = io.NopCloser(bytes.NewBuffer(body))
 
 		// Decode request body
 		var request CreateHabitRequest
 		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+			log.Printf("Error decoding request: %v", err)
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(APIResponse{
 				Success: false,
@@ -60,32 +72,42 @@ func CreateHabitHandler(db *sql.DB) http.HandlerFunc {
 			})
 			return
 		}
+		log.Printf("Decoded request: %+v", request)
 
-		// Validate habit type
-		if request.HabitType != models.BinaryHabit && request.HabitType != models.NumericHabit {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(APIResponse{
-				Success: false,
-				Message: "Invalid habit type. Must be 'binary' or 'numeric'",
-			})
-			return
-		}
-
-		if request.Emoji == "" {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(APIResponse{
-				Success: false,
-				Message: "Emoji is required",
-			})
-			return
+		// Handle option-select habit options
+		var habitOptionsSql sql.NullString
+		if request.HabitType == models.OptionSelectHabit {
+			log.Printf("Processing option-select habit with options: %+v", request.HabitOptions)
+			if len(request.HabitOptions) == 0 {
+				log.Printf("Error: No habit options provided for option-select habit")
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(APIResponse{
+					Success: false,
+					Message: "option-select requires habit_options",
+				})
+				return
+			}
+			ho, err := models.MarshalHabitOptions(request.HabitOptions)
+			if err != nil {
+				log.Printf("Error marshaling habit options: %v", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(APIResponse{
+					Success: false,
+					Message: "Error marshaling habit_options",
+				})
+				return
+			}
+			log.Printf("Marshaled habit options: %s", ho.String)
+			habitOptionsSql = ho
 		}
 
 		habit := models.Habit{
-			UserID:    userID,
-			Name:      request.Name,
-			Emoji:     request.Emoji,
-			HabitType: request.HabitType,
-			IsDefault: false,
+			UserID:       userID,
+			Name:         request.Name,
+			Emoji:        request.Emoji,
+			HabitType:    request.HabitType,
+			IsDefault:    false,
+			HabitOptions: habitOptionsSql,
 		}
 
 		// Check if habit already exists
@@ -195,8 +217,8 @@ func CreateOrUpdateHabitLogHandler(db *sql.DB) http.HandlerFunc {
 		var request struct {
 			HabitID int         `json:"habit_id"`
 			Date    string      `json:"date"`
-			Status  string      `json:"status,omitempty"` // Optional for numeric habits
-			Value   interface{} `json:"value,omitempty"`  // Required for numeric habits
+			Status  string      `json:"status,omitempty"` // For binary/option-select, optional
+			Value   interface{} `json:"value,omitempty"`  // For numeric/option-select, required
 		}
 
 		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -232,7 +254,7 @@ func CreateOrUpdateHabitLogHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Get habit type first
+		// Get habit type
 		var habitType models.HabitType
 		err = db.QueryRow("SELECT habit_type FROM habits WHERE id = ?", request.HabitID).Scan(&habitType)
 		if err != nil {
@@ -244,13 +266,14 @@ func CreateOrUpdateHabitLogHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Validate input based on habit type
 		habitLog := &models.HabitLog{
 			HabitID: request.HabitID,
 			Date:    date,
 		}
 
-		if habitType == models.BinaryHabit {
+		// Handle based on habit type
+		switch habitType {
+		case models.BinaryHabit:
 			if request.Status == "" {
 				w.WriteHeader(http.StatusBadRequest)
 				json.NewEncoder(w).Encode(APIResponse{
@@ -260,8 +283,8 @@ func CreateOrUpdateHabitLogHandler(db *sql.DB) http.HandlerFunc {
 				return
 			}
 			habitLog.Status = request.Status
-		} else {
-			// For numeric habits
+
+		case models.NumericHabit:
 			if request.Value == nil {
 				w.WriteHeader(http.StatusBadRequest)
 				json.NewEncoder(w).Encode(APIResponse{
@@ -270,10 +293,8 @@ func CreateOrUpdateHabitLogHandler(db *sql.DB) http.HandlerFunc {
 				})
 				return
 			}
-			// Use the provided status or default to "done"
-			if request.Status != "" {
-				habitLog.Status = request.Status
-			} else {
+			habitLog.Status = request.Status
+			if habitLog.Status == "" {
 				habitLog.Status = "done"
 			}
 			if err := habitLog.SetValue(request.Value); err != nil {
@@ -284,6 +305,106 @@ func CreateOrUpdateHabitLogHandler(db *sql.DB) http.HandlerFunc {
 				})
 				return
 			}
+
+		case models.OptionSelectHabit:
+			log.Printf("Processing option-select habit log: %+v", request.Value)
+			if request.Value == nil {
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(APIResponse{
+					Success: false,
+					Message: "value is required for option-select habits",
+				})
+				return
+			}
+			if request.Status == "" {
+				habitLog.Status = "done"
+			} else {
+				habitLog.Status = request.Status
+			}
+
+			// Retrieve habit_options
+			var habitOptionsStr sql.NullString
+			if err := db.QueryRow("SELECT habit_options FROM habits WHERE id = ?", request.HabitID).Scan(&habitOptionsStr); err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(APIResponse{
+					Success: false,
+					Message: "Error retrieving habit options",
+				})
+				return
+			}
+			if !habitOptionsStr.Valid {
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(APIResponse{
+					Success: false,
+					Message: "This option-select habit has no options set",
+				})
+				return
+			}
+
+			var habitOptions []models.HabitOption
+			if err := json.Unmarshal([]byte(habitOptionsStr.String), &habitOptions); err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				json.NewEncoder(w).Encode(APIResponse{
+					Success: false,
+					Message: "Invalid habit_options format",
+				})
+				return
+			}
+
+			valMap, ok := request.Value.(map[string]interface{})
+			if !ok || valMap["emoji"] == nil || valMap["label"] == nil {
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(APIResponse{
+					Success: false,
+					Message: "value must contain 'emoji' and 'label' for option-select habits",
+				})
+				return
+			}
+
+			chosenEmoji, okEmoji := valMap["emoji"].(string)
+			chosenLabel, okLabel := valMap["label"].(string)
+			if !okEmoji || !okLabel {
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(APIResponse{
+					Success: false,
+					Message: "emoji and label must be strings",
+				})
+				return
+			}
+
+			// Validate chosen option
+			validOption := false
+			for _, opt := range habitOptions {
+				if opt.Emoji == chosenEmoji && opt.Label == chosenLabel {
+					validOption = true
+					break
+				}
+			}
+			if !validOption {
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(APIResponse{
+					Success: false,
+					Message: "Chosen option not in habit_options",
+				})
+				return
+			}
+
+			if err := habitLog.SetValue(request.Value); err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(APIResponse{
+					Success: false,
+					Message: "Invalid option-select value",
+				})
+				return
+			}
+
+		default:
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Unsupported habit type",
+			})
+			return
 		}
 
 		// Validate value format
