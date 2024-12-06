@@ -35,8 +35,10 @@
 
             <div class="space-y-6 text-gray-600">
                 <p class="text-3xl">
-                    Hey <span class="inline-block animate-[wave_2s_ease-in-out_infinite]" style="transform-origin: 70% 70%;">👋</span> <br><br>
-                Our platform is built on three core principles:
+                    Hey {{ if .User }}{{ .User.FirstName }}{{ end }} <span class="inline-block animate-[wave_2s_ease-in-out_infinite]" style="transform-origin: 70% 70%;">👋</span> <br><br>
+                </p>
+                <p class="text-lg">
+                    Built with modern technology but grounded in habit science, MAD is an open-source platform focused on providing a clean, distraction-free environment for personal growth. No ads, no premium features—just pure functionality to support your journey of transformation.
                 </p>
 
                 <div class="grid md:grid-cols-3 gap-6 my-8">
