@@ -338,13 +338,18 @@ func main() {
 	}))))
 
 	// About route with session middleware and authentication check
-	http.Handle("/about", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Get current user
-		userID := middleware.GetUserID(r)
-		user, err := models.GetUserByID(db, int64(userID))
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
+	http.Handle("/about", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var user *models.User
+		var err error
+
+		// Check if user is authenticated
+		if middleware.IsAuthenticated(r) {
+			userID := middleware.GetUserID(r)
+			user, err = models.GetUserByID(db, int64(userID))
+			if err != nil {
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				return
+			}
 		}
 
 		data := struct {
@@ -352,7 +357,7 @@ func main() {
 			Page string
 		}{
 			User: user,
-			Page: "about", // This will highlight the About button in the header
+			Page: "about",
 		}
 
 		err = templates.ExecuteTemplate(w, "about.html", data)
@@ -360,7 +365,7 @@ func main() {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-	}))))
+	})))
 
 	// Roadmap Likes API routes
 	http.Handle("/api/roadmap/likes", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
