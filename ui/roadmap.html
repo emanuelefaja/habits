@@ -6,90 +6,197 @@
     <title>Roadmap - Habits</title>
     <script src="https://unpkg.com/alpinejs" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        [x-cloak] { display: none !important; }
-    </style>
 </head>
-<body class="h-full" x-data="{ 
-    columns: [
-        {
-            title: 'Ideas 💡',
-            cards: [
-                { emoji: '📱', title: 'Mobile App', description: 'Native mobile application for iOS and Android' },
-                { emoji: '🌙', title: 'Dark Mode', description: 'System-wide dark mode support' },
-                { emoji: '📊', title: 'Advanced Analytics', description: 'Detailed insights and progress tracking' },
-                { emoji: '🔌', title: 'Public API', description: 'REST API for integrating with other services' },
-                { emoji: '📋', title: 'Visual Editor', description: 'Visual editor for editing habits in a table' },
-                { emoji: '🔔', title: 'Notifications', description: 'Custom reminders and notifications' }
-            ]
-        },
-        {
-            title: 'Planned 🎯',
-            cards: [
-                { emoji: '📅', title: 'Weekend Highlighting', description: 'Highlight weekend days in monthly grid view' },
-                { emoji: '📈', title: 'Habit Streaks', description: 'Track consecutive days of habits' },
-                { emoji: '📝', title: 'Notes & Journaling', description: 'Add notes to habit entries' },
-                { emoji: '📱', title: 'Responsive Design', description: 'Works on all screen sizes' },
-                { emoji: '🎯', title: 'Goals', description: 'Set and track progress towards habit goals' },
-                { emoji: '📱', title: 'Full PWA', description: 'Full Progressive Web App with offline support' },
-                { emoji: '🔌', title: 'Chrome Extension', description: 'Extension to open habits in new tab automatically' }
-            ]
-        },
-        {
-            title: 'In Progress 🚧',
-            cards: [
-                { emoji: '😊', title: 'Mood Tracking', description: 'Track daily mood with customizable emoji reactions' },
-                { emoji: '💪', title: 'Set+Rep Habits', description: 'Track exercises with sets, reps and weight' },
-                { emoji: '❤️', title: 'Heart Likes', description: 'Vote on roadmap features with heart likes' },
-                { emoji: '💡', title: 'Submit Ideas', description: 'Submit your own ideas for the roadmap' }
-            ]
-        },
-        {
-            title: 'Done ✨',
-            cards: [
-                { emoji: '📊', title: 'Monthly View', description: 'Calendar view of habits' },
-                { emoji: '🔢', title: 'Numeric Habits', description: 'Track habits with numbers' },
-                { emoji: '✅', title: 'Binary Habits', description: 'Simple yes/no habit tracking' },
-                { emoji: '⚙️', title: 'User Settings', description: 'Update name, email and password.' },
-                { emoji: '🗺️', title: 'Roadmap', description: 'Public roadmap page showing planned features' },
-                { emoji: '📥', title: 'CSV Export', description: 'Download habit data as CSV' },
-                { emoji: '↕️', title: 'Sortable Habits', description: 'Drag and drop to reorder habits in the grid' },
-                { emoji: '🗳️', title: 'Options Habits', description: 'Select from a list of options' }
-            ]
-        }
-    ]
-}">
+<body class="h-full">
     {{ template "header" dict "User" .User "Page" "roadmap" }}
 
-   ` <div class="p-6">
-        <!-- Kanban Board -->
-        <div class="grid grid-cols-4 gap-4">
-            <template x-for="column in columns" :key="column.title">
-                <div class="bg-white rounded-lg shadow p-4">
-                    <!-- Column Header -->
-                    <h2 class="text-lg font-semibold mb-4" x-text="column.title"></h2>
-                    
-                    <!-- Cards Container -->
-                    <div class="space-y-3">
-                        <template x-for="card in column.cards" :key="card.title">
-                            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                                <div class="flex items-start space-x-3">
-                                    <!-- Emoji -->
-                                    <div class="text-2xl" x-text="card.emoji"></div>
-                                    
-                                    <!-- Content -->
-                                    <div>
-                                        <h3 class="font-medium" x-text="card.title"></h3>
-                                        <p class="text-sm text-gray-600 mt-1" x-text="card.description"></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-            </template>
+    <!-- Test component -->
+    <div x-data="{ count: 0 }">
+        <div class="p-4 bg-white">
+            <button 
+                @click="count++"
+                class="bg-blue-500 text-white px-4 py-2 rounded">
+                Clicked <span x-text="count"></span> times
+            </button>
         </div>
     </div>
 
+    <!-- Roadmap component -->
+    <div x-data="roadmap">
+        <div class="p-6">
+            <div class="grid grid-cols-4 gap-4">
+                <template x-for="column in columns" :key="column.title">
+                    <div class="bg-white rounded-lg shadow p-4">
+                        <h2 class="text-lg font-semibold mb-4" x-text="column.title"></h2>
+                        <div class="space-y-3">
+                            <template x-for="card in column.cards" :key="card.id">
+                                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 relative">
+                                    <!-- Like button -->
+                                    <button 
+                                        @click="column.title !== 'Done ✨' && toggleLike(card.id)"
+                                        :class="column.title === 'Done ✨' ? 'cursor-default opacity-50' : 'cursor-pointer'"
+                                        class="absolute top-2 right-2 flex items-center space-x-1">
+                                        <span class="text-sm text-gray-600" x-text="getLikeCount(card.id)"></span>
+                                        <span class="text-xl" x-text="isLiked(card.id) ? '❤️' : '🤍'"></span>
+                                    </button>
+
+                                    <!-- Card content -->
+                                    <div class="flex items-start space-x-3">
+                                        <div class="text-2xl" x-text="card.emoji"></div>
+                                        <div>
+                                            <h3 class="font-medium" x-text="card.title"></h3>
+                                            <p class="text-sm text-gray-600 mt-1" x-text="card.description"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('roadmap', () => ({
+                columns: [
+                    {
+                        title: 'Ideas 💡',
+                        cards: [
+                            { id: 'mobile-app', emoji: '📱', title: 'Mobile App', description: 'Native mobile application for iOS and Android' },
+                            { id: 'dark-mode', emoji: '🌙', title: 'Dark Mode', description: 'System-wide dark mode support' },
+                            { id: 'advanced-analytics', emoji: '📊', title: 'Advanced Analytics', description: 'Detailed insights and progress tracking' },
+                            { id: 'public-api', emoji: '🔌', title: 'Public API', description: 'REST API for integrating with other services' },
+                            { id: 'visual-editor', emoji: '📋', title: 'Visual Editor', description: 'Visual editor for editing habits in a table' },
+                            { id: 'notifications', emoji: '🔔', title: 'Notifications', description: 'Custom reminders and notifications' }
+                        ]
+                    },
+                    {
+                        title: 'Planned 🎯',
+                        cards: [
+                            { id: 'weekend-highlighting', emoji: '📅', title: 'Weekend Highlighting', description: 'Highlight weekend days in monthly grid view' },
+                            { id: 'habit-streaks', emoji: '📈', title: 'Habit Streaks', description: 'Track consecutive days of habits' },
+                            { id: 'notes-journaling', emoji: '📝', title: 'Notes & Journaling', description: 'Add notes to habit entries' },
+                            { id: 'responsive-design', emoji: '📱', title: 'Responsive Design', description: 'Works on all screen sizes' },
+                            { id: 'goals', emoji: '🎯', title: 'Goals', description: 'Set and track progress towards habit goals' },
+                            { id: 'full-pwa', emoji: '📱', title: 'Full PWA', description: 'Full Progressive Web App with offline support' },
+                            { id: 'chrome-extension', emoji: '🔌', title: 'Chrome Extension', description: 'Extension to open habits in new tab automatically' }
+                        ]
+                    },
+                    {
+                        title: 'In Progress 🚧',
+                        cards: [
+                            { id: 'mood-tracking', emoji: '😊', title: 'Mood Tracking', description: 'Track daily mood with customizable emoji reactions' },
+                            { id: 'set-rep-habits', emoji: '💪', title: 'Set+Rep Habits', description: 'Track exercises with sets, reps and weight' },
+                            { id: 'heart-likes', emoji: '❤️', title: 'Heart Likes', description: 'Vote on roadmap features with heart likes' },
+                            { id: 'submit-ideas', emoji: '💡', title: 'Submit Ideas', description: 'Submit your own ideas for the roadmap' }
+                        ]
+                    },
+                    {
+                        title: 'Done ✨',
+                        cards: [
+                            { id: 'monthly-view', emoji: '📊', title: 'Monthly View', description: 'Calendar view of habits' },
+                            { id: 'numeric-habits', emoji: '🔢', title: 'Numeric Habits', description: 'Track habits with numbers' },
+                            { id: 'binary-habits', emoji: '✅', title: 'Binary Habits', description: 'Simple yes/no habit tracking' },
+                            { id: 'user-settings', emoji: '⚙️', title: 'User Settings', description: 'Update name, email and password.' },
+                            { id: 'roadmap', emoji: '🗺️', title: 'Roadmap', description: 'Public roadmap page showing planned features' },
+                            { id: 'csv-export', emoji: '📥', title: 'CSV Export', description: 'Download habit data as CSV' },
+                            { id: 'sortable-habits', emoji: '↕️', title: 'Sortable Habits', description: 'Drag and drop to reorder habits in the grid' },
+                            { id: 'options-habits', emoji: '🗳️', title: 'Options Habits', description: 'Select from a list of options' }
+                        ]
+                    }
+                ],
+                likes: {},
+                loading: {},
+                
+                async init() {
+                    console.log('Initializing roadmap...');
+                    try {
+                        console.log('Fetching initial likes data...');
+                        const response = await fetch('/api/roadmap/likes');
+                        console.log('Response status:', response.status);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        const data = await response.json();
+                        console.log('Received likes data:', data);
+                        this.likes = data.reduce((acc, like) => {
+                            acc[like.cardId] = {
+                                count: like.totalLikes,
+                                liked: like.userLiked
+                            };
+                            return acc;
+                        }, {});
+                        console.log('Processed likes data:', this.likes);
+                    } catch (error) {
+                        console.error('Failed to fetch likes:', error);
+                    }
+                },
+                
+                async toggleLike(cardId) {
+                    console.log('Toggle like clicked for card:', cardId);
+                    if (this.loading[cardId]) {
+                        console.log('Already processing like for card:', cardId);
+                        return;
+                    }
+                    
+                    console.log('Current likes state:', this.likes[cardId]);
+                    const oldState = { ...this.likes[cardId] };
+                    if (!this.likes[cardId]) {
+                        console.log('First like for card:', cardId);
+                        this.likes[cardId] = { count: 1, liked: true };
+                    } else {
+                        this.likes[cardId].liked = !this.likes[cardId].liked;
+                        this.likes[cardId].count += this.likes[cardId].liked ? 1 : -1;
+                        console.log('Updated likes state:', this.likes[cardId]);
+                    }
+                    
+                    this.loading[cardId] = true;
+                    console.log('Set loading state for card:', cardId);
+                    
+                    try {
+                        console.log('Sending POST request to toggle like...');
+                        const response = await fetch('/api/roadmap/likes', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ cardId }),
+                        });
+                        console.log('Response status:', response.status);
+                        
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        
+                        const data = await response.json();
+                        console.log('Received response data:', data);
+                        this.likes[cardId] = {
+                            count: data.totalLikes,
+                            liked: data.userLiked
+                        };
+                        console.log('Updated likes with server data:', this.likes[cardId]);
+                    } catch (error) {
+                        console.error('Failed to toggle like:', error);
+                        console.log('Reverting to old state:', oldState);
+                        this.likes[cardId] = oldState;
+                        alert('Failed to update like. Please try again.');
+                    } finally {
+                        this.loading[cardId] = false;
+                        console.log('Cleared loading state for card:', cardId);
+                    }
+                },
+
+                getLikeCount(cardId) {
+                    return this.likes[cardId]?.count || 0;
+                },
+
+                isLiked(cardId) {
+                    return this.likes[cardId]?.liked || false;
+                }
+            }));
+        });
+    </script>
 </body>
 </html> 

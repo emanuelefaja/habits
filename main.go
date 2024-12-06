@@ -361,6 +361,18 @@ func main() {
 		}
 	}))))
 
+	// Roadmap Likes API routes
+	http.Handle("/api/roadmap/likes", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			api.GetRoadmapLikesHandler(db)(w, r)
+		case http.MethodPost:
+			api.ToggleRoadmapLikeHandler(db)(w, r)
+		default:
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		}
+	}))))
+
 	// Start server
 	log.Println("Server started at :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
