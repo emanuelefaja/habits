@@ -7,6 +7,8 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"mad/api"
 	"mad/middleware"
@@ -65,6 +67,8 @@ func main() {
 		"ui/login.html",
 		"ui/register.html",
 		"ui/roadmap.html",
+		"ui/habit.html",
+		"ui/about.html",
 	))
 
 	// Handle static files
@@ -267,6 +271,78 @@ func main() {
 		}
 
 		err = templates.ExecuteTemplate(w, "roadmap.html", data)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+	}))))
+
+	// Habit view route with session middleware and authentication check
+	http.Handle("/habit/", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Extract habit ID from URL
+		habitID, err := strconv.Atoi(strings.TrimPrefix(r.URL.Path, "/habit/"))
+		if err != nil {
+			http.Error(w, "Invalid habit ID", http.StatusBadRequest)
+			return
+		}
+
+		// Get current user
+		userID := middleware.GetUserID(r)
+		user, err := models.GetUserByID(db, int64(userID))
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		// Get the habit
+		habit, err := models.GetHabitByID(db, habitID)
+		if err != nil {
+			http.Error(w, "Habit not found", http.StatusNotFound)
+			return
+		}
+
+		// Verify the habit belongs to the user
+		if habit.UserID != userID {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		data := struct {
+			User  *models.User
+			Habit *models.Habit
+			Page  string
+		}{
+			User:  user,
+			Habit: habit,
+			Page:  "home", // This keeps the Habits button highlighted
+		}
+
+		err = templates.ExecuteTemplate(w, "habit.html", data)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+	}))))
+
+	// About route with session middleware and authentication check
+	http.Handle("/about", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Get current user
+		userID := middleware.GetUserID(r)
+		user, err := models.GetUserByID(db, int64(userID))
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		data := struct {
+			User *models.User
+			Page string
+		}{
+			User: user,
+			Page: "about", // This will highlight the About button in the header
+		}
+
+		err = templates.ExecuteTemplate(w, "about.html", data)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return

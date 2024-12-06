@@ -3,7 +3,7 @@
     <div class="flex-grow flex items-center justify-center mb-8" x-data="monthlyGrid">
         <div class="w-auto">
             <div class="bg-white p-8 shadow sm:rounded-lg">
-                <!-- Header with title and legend -->
+                <!-- Header with title and Create Habit button -->
                 <div class="flex justify-between items-center mb-6">
                     <div class="flex items-center gap-3">
                         <span class="isolate inline-flex rounded-md shadow-sm">
@@ -43,25 +43,12 @@
                         <h2 class="text-2xl font-semibold" x-text="`🗓️ ${monthNames[currentMonth-1]} ${currentYear}`"></h2>
                     </div>
                     
-                    <!-- Legend -->
-                    <div class="flex gap-6">
-                        <div class="flex items-center gap-2">
-                            <div class="w-5 h-5 rounded-sm" style="background-color: #2da44e;"></div>
-                            <span class="text-sm text-gray-600">Done</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <div class="w-5 h-5 rounded-sm" style="background-color: #E3211a;"></div>
-                            <span class="text-sm text-gray-600">Missed</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <div class="w-5 h-5 rounded-sm" style="background-color: #00a0d2;"></div>
-                            <span class="text-sm text-gray-600">Skipped</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <div class="w-5 h-5 rounded-sm" style="background-color: #ebedf0;"></div>
-                            <span class="text-sm text-gray-600">No Data</span>
-                        </div>
-                    </div>
+                    <!-- Create Habit button moved to top right -->
+                    <button 
+                        @click="modalState.isOpen = true"
+                        class="rounded-md bg-[#2da44e] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#2c974b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2da44e]">
+                        Create Habit ✨
+                    </button>
                 </div>
                 
                 <!-- Grid Header Row -->
@@ -110,8 +97,10 @@
                                     </svg>
                                 </div>
                                 <div class="flex items-center pl-7">
-                                    <span class="mr-2" x-text="habit.emoji"></span>
-                                    <span x-text="habit.name"></span>
+                                    <a :href="`/habit/${habit.id}`" class="flex items-center hover:text-[#2da44e] hover:underline" @click.stop>
+                                        <span class="mr-2" x-text="habit.emoji"></span>
+                                        <span x-text="habit.name"></span>
+                                    </a>
                                 </div>
                             </div>
                             
@@ -223,6 +212,26 @@
                             </div>
                         </div>
                     </template>
+                </div>
+
+                <!-- Legend moved to bottom -->
+                <div class="flex justify-center gap-6 mt-6">
+                    <div class="flex items-center gap-2">
+                        <div class="w-5 h-5 rounded-sm" style="background-color: #2da44e;"></div>
+                        <span class="text-sm text-gray-600">Done</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-5 h-5 rounded-sm" style="background-color: #E3211a;"></div>
+                        <span class="text-sm text-gray-600">Missed</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-5 h-5 rounded-sm" style="background-color: #00a0d2;"></div>
+                        <span class="text-sm text-gray-600">Skipped</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-5 h-5 rounded-sm" style="background-color: #ebedf0;"></div>
+                        <span class="text-sm text-gray-600">No Data</span>
+                    </div>
                 </div>
             </div>
         </div>
