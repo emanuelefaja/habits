@@ -10,17 +10,6 @@
 <body class="h-full">
     {{ template "header" dict "User" .User "Page" "roadmap" }}
 
-    <!-- Test component -->
-    <div x-data="{ count: 0 }">
-        <div class="p-4 bg-white">
-            <button 
-                @click="count++"
-                class="bg-blue-500 text-white px-4 py-2 rounded">
-                Clicked <span x-text="count"></span> times
-            </button>
-        </div>
-    </div>
-
     <!-- Roadmap component -->
     <div x-data="roadmap({{ if .User }}true{{ else }}false{{ end }})">
         <div class="p-6">
