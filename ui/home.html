@@ -439,20 +439,21 @@
              x-text="flashMessage">
         </div>
 
-        <!-- Logout Button (Fixed at bottom center) -->
-        <div class="fixed bottom-8 left-1/2 transform -translate-x-1/2">
-            <button 
-                @click="modalState.isOpen = true"
-                class="rounded-md bg-[#2da44e] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#2c974b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2da44e]">
-                Create Habit ✨
-            </button>
-        </div>
+       
 
         <!-- First Time User View -->
         {{ template "welcome" . }}
 
         <!-- Monthly Grid -->
         {{ template "monthly-grid" . }}
+         <!-- Add Create Habit button -->
+    <div class="flex justify-center">
+        <button 
+            @click="modalState.isOpen = true"
+            class="rounded-md bg-[#2da44e] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#2c974b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2da44e]">
+            Create Habit ✨
+        </button>
+    </div>
 
         <!-- New Habit Modal -->
         {{ template "habit-modal" . }}
