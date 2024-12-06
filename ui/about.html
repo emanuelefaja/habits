@@ -6,6 +6,16 @@
     <title>About - Mindful Action, Daily</title>
     <script src="https://unpkg.com/alpinejs" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes wave {
+            0% { transform: rotate(0deg); }
+            20% { transform: rotate(-15deg); }
+            40% { transform: rotate(14deg); }
+            60% { transform: rotate(-4deg); }
+            80% { transform: rotate(10deg); }
+            100% { transform: rotate(0deg); }
+        }
+    </style>
 </head>
 <body>
     <div class="min-h-screen bg-gray-50">
@@ -24,22 +34,23 @@
             </div>
 
             <div class="space-y-6 text-gray-600">
-                <p class="text-lg">
-                    Welcome to MAD (Mindful Action, Daily), where we believe in the power of conscious habit formation. Our platform is built on three core principles:
+                <p class="text-3xl">
+                    Hey <span class="inline-block animate-[wave_2s_ease-in-out_infinite]" style="transform-origin: 70% 70%;">👋</span> <br><br>
+                Our platform is built on three core principles:
                 </p>
 
                 <div class="grid md:grid-cols-3 gap-6 my-8">
-                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                         <div class="text-3xl mb-2">🧠</div>
                         <h3 class="font-semibold text-gray-900 mb-2">Mindful</h3>
                         <p>Building awareness of where you are in life.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                         <div class="text-3xl mb-2">⚡</div>
                         <h3 class="font-semibold text-gray-900 mb-2">Action</h3>
                         <p>Taking deliberate steps toward your goals.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                         <div class="text-3xl mb-2">🌱</div>
                         <h3 class="font-semibold text-gray-900 mb-2">Daily</h3>
                         <p>Take life one day at a time and grow.</p>
@@ -57,19 +68,21 @@
 
             <div class="mt-12 border-t pt-8">
                 <h2 class="text-2xl font-bold text-gray-900 mb-6">Built with Purpose</h2>
-                
+                <p class="text-lg"></p>
+                    Whether you're building new habits or breaking old ones, MAD helps you stay accountable and mindful of your daily choices. Every small action counts, and we're here to help you make those actions count consistently.
+                </p>
                 <div class="grid md:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                         <div class="text-3xl mb-2">⚡</div>
                         <h3 class="font-semibold text-gray-900 mb-2">Simple & Fast</h3>
-                        <p>Built with Go and Alpine.js for lightning-fast performance without unnecessary complexity.</p>
+                        <p>Lightning-fast performance without unnecessary complexity.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                         <div class="text-3xl mb-2">🔒</div>
                         <h3 class="font-semibold text-gray-900 mb-2">Secure & Reliable</h3>
                         <p>Rock-solid security with SQLite for reliable data storage and zero external dependencies.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                         <div class="text-3xl mb-2">😌</div>
                         <h3 class="font-semibold text-gray-900 mb-2">Focused Design</h3>
                         <p>Intentionally minimal tech stack ensures stability and maintainability.</p>
