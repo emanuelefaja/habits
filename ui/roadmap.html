@@ -6,16 +6,28 @@
     <title>Roadmap - Habits</title>
     <script src="https://unpkg.com/alpinejs" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .smooth-scroll {
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+    </style>
 </head>
 <body class="h-full">
     {{ template "header" dict "User" .User "Page" "roadmap" }}
 
     <!-- Roadmap component -->
     <div x-data="roadmap({{ if .User }}true{{ else }}false{{ end }})">
-        <div class="p-6">
-            <div class="grid grid-cols-4 gap-4">
+        <!-- Mobile scroll indicator -->
+        <div class="p-4 text-center text-sm text-gray-500 lg:hidden">
+            Scroll horizontally to see more columns →
+        </div>
+
+        <!-- Main container -->
+        <div class="p-6 overflow-x-auto smooth-scroll">
+            <div class="flex lg:grid lg:grid-cols-4 gap-4 min-w-max lg:min-w-0">
                 <template x-for="column in columns" :key="column.title">
-                    <div class="bg-white rounded-lg shadow p-4">
+                    <div class="bg-white rounded-lg shadow p-4 w-80 lg:w-auto">
                         <h2 class="text-lg font-semibold mb-4" x-text="column.title"></h2>
                         <div class="space-y-3">
                             <template x-for="card in column.cards" :key="card.id">
@@ -25,10 +37,9 @@
                                         @click="isAuthenticated && column.title !== 'Done ✨' && toggleLike(card.id)"
                                         :class="!isAuthenticated || column.title === 'Done ✨' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'"
                                         class="absolute top-2 right-2 flex items-center space-x-1"
-                                        :title="!isAuthenticated ? 'Sign in to vote on features' : ''"
-                                        >
+                                        :title="!isAuthenticated ? 'Sign in to vote on features' : ''">
                                         <span class="text-sm text-gray-600" x-text="getLikeCount(card.id)"></span>
-                                        <span class="text-xl" x-text="isLiked(card.id) ? '❤️' : '🤍'"></span>
+                                        <span class="text-xl" x-text="isLiked(card.id) ? '💖' : '🤍'"></span>
                                     </button>
 
                                     <!-- Card content -->
