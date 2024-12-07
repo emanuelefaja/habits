@@ -384,6 +384,15 @@ func main() {
 		}
 	})))
 
+	// Roadmap API routes
+	http.Handle("/api/roadmap/ideas", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			api.SubmitRoadmapIdeaHandler(db)(w, r)
+		} else {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		}
+	})))
+
 	// Start server
 	log.Println("Server started at :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))

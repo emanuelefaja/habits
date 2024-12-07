@@ -132,3 +132,49 @@ func ToggleRoadmapLikeHandler(db *sql.DB) http.HandlerFunc {
 		json.NewEncoder(w).Encode(response)
 	}
 }
+
+// Add this after the existing roadmap handlers
+func SubmitRoadmapIdeaHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("SubmitRoadmapIdea: Received request")
+
+		// Get user ID from session
+		userID := middleware.GetUserID(r)
+		if userID == 0 {
+			http.Error(w, "Must be logged in to submit ideas", http.StatusUnauthorized)
+			return
+		}
+
+		// Parse request body
+		var req struct {
+			IdeaText string `json:"ideaText"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			log.Printf("SubmitRoadmapIdea: Failed to decode request body: %v", err)
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
+
+		// Validate idea text
+		if req.IdeaText == "" {
+			http.Error(w, "Idea text cannot be empty", http.StatusBadRequest)
+			return
+		}
+
+		// Insert into database
+		_, err := db.Exec(`
+			INSERT INTO roadmap_ideas (user_id, idea_text)
+			VALUES (?, ?)
+		`, userID, req.IdeaText)
+
+		if err != nil {
+			log.Printf("SubmitRoadmapIdea: Database error: %v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		// Return success response
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]bool{"success": true})
+	}
+}

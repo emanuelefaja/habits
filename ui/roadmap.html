@@ -108,7 +108,7 @@
                             Cancel ❌
                         </button>
                         <button 
-                        @click="feedbackOpen = false; flashMessage = 'Idea submitted successfully'; showFlash = true; setTimeout(() => showFlash = false, 3000);"
+                        @click="submitIdea()"
                             class="px-4 py-2 rounded-md bg-[#2da44e] text-white hover:bg-[#2c974b] transition-colors duration-200">
                             Submit ✅
                         </button>
@@ -281,6 +281,41 @@ x-text="flashMessage">
                     }
                     if (this.loading[cardId]) return;
                     this.toggleLike(cardId);
+                },
+
+                submitIdea() {
+                    const ideaText = document.querySelector('textarea[placeholder="Enter your feedback..."]').value;
+                    if (!ideaText.trim()) {
+                        this.flashMessage = 'Please enter your idea before submitting';
+                        this.showFlash = true;
+                        setTimeout(() => this.showFlash = false, 3000);
+                        return;
+                    }
+
+                    fetch('/api/roadmap/ideas', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ ideaText: ideaText })
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            this.feedbackOpen = false;
+                            this.flashMessage = 'Idea submitted successfully';
+                            this.showFlash = true;
+                            setTimeout(() => this.showFlash = false, 3000);
+                        } else {
+                            throw new Error('Failed to submit idea');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error submitting idea:', error);
+                        this.flashMessage = 'Failed to submit idea. Please try again.';
+                        this.showFlash = true;
+                        setTimeout(() => this.showFlash = false, 3000);
+                    });
                 }
             }));
         });
