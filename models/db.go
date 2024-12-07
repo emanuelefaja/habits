@@ -46,12 +46,12 @@ func InitDB(db *sql.DB) error {
 		CREATE TABLE IF NOT EXISTS habit_logs (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			habit_id INTEGER NOT NULL,
-			user_id INTEGER NOT NULL,
-			value TEXT NOT NULL,
 			date DATE NOT NULL,
+			status TEXT NOT NULL CHECK(status IN ('done', 'missed', 'skipped')),
+			value TEXT,
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-			FOREIGN KEY (habit_id) REFERENCES habits(id),
-			FOREIGN KEY (user_id) REFERENCES users(id)
+			FOREIGN KEY(habit_id) REFERENCES habits(id) ON DELETE CASCADE,
+			UNIQUE(habit_id, date)
 		)
 	`)
 	if err != nil {
@@ -61,7 +61,7 @@ func InitDB(db *sql.DB) error {
 	// Create index on habit_logs.date
 	_, err = db.Exec(`
 		CREATE INDEX IF NOT EXISTS idx_habit_logs_date 
-		ON habit_logs(date)
+		ON habit_logs(habit_id, date)
 	`)
 	if err != nil {
 		return err
@@ -70,7 +70,7 @@ func InitDB(db *sql.DB) error {
 	// Create index on habits.user_id
 	_, err = db.Exec(`
 		CREATE INDEX IF NOT EXISTS idx_habits_user_id 
-		ON habits(user_id)
+			ON habits(user_id)
 	`)
 	if err != nil {
 		return err
