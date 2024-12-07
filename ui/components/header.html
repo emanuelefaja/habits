@@ -1,13 +1,20 @@
 {{ define "header" }}
 <div x-data="{ open: false }" class="flex justify-between items-center px-6 py-4 relative">
 
-    <h1 class="text-left text-3xl font-bold tracking-tight text-gray-900">
-        {{ if .User }}
-            👋 {{ .User.FirstName }}
-        {{ else }}
-            <a href="/" class="text-3xl tracking-tight hover:underline">✅ habits.co</a>
+    <div class="flex items-center gap-4">
+        <h1 class="text-left text-3xl font-bold tracking-tight text-gray-900">
+            {{ if .User }}
+                👋 {{ .User.FirstName }}
+            {{ else }}
+                <a href="/" class="text-3xl tracking-tight hover:underline">✅ habits.co</a>
+            {{ end }}
+        </h1>
+        {{ if and .User (eq .User.ID 1) }}
+            <a href="/admin" class="rounded-md {{ if eq .Page "admin" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                Adminland 🗄️
+            </a>
         {{ end }}
-    </h1>
+    </div>
 
     <!-- Mobile menu button -->
     <button 
