@@ -32,8 +32,9 @@
                         <div class="space-y-3">
                             <!-- Special Submit Idea card for Ideas column -->
                             <template x-if="column.title === 'Ideas 💡'">
-                                <div @click="openIdeaModal()" 
-                                     class="bg-[#e6f4ea] rounded-lg p-4 border-2 border-dashed border-[#2da44e] hover:bg-[#d3ebda] transition-colors duration-200 cursor-pointer">
+                                <div 
+                                    @click="feedbackOpen = true" 
+                                    class="bg-[#e6f4ea] rounded-lg p-4 border-2 border-dashed border-[#2da44e] hover:bg-[#d3ebda] transition-colors duration-200 cursor-pointer">
                                     <div class="flex items-start space-x-3">
                                         <div class="text-2xl">✨</div>
                                         <div>
@@ -43,7 +44,7 @@
                                     </div>
                                 </div>
                             </template>
-                            
+
                             <!-- Regular cards -->
                             <template x-for="card in column.cards" :key="card.id">
                                 <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 relative">
@@ -72,11 +73,50 @@
                 </template>
             </div>
         </div>
+
+        <!-- Feedback Modal (moved inside roadmap component) -->
+        <div @keydown.window.escape="feedbackOpen = false">
+            <div 
+                x-show="feedbackOpen"
+                x-cloak
+                class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+                @click="feedbackOpen = false">
+                <div class="bg-white rounded-lg p-6 w-11/12 max-w-md"
+                     @click.stop>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">💡 Submit Your Idea</h2>
+                        <button @click="feedbackOpen = false" class="text-gray-500 hover:text-gray-700">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                      d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-4">Share your thoughts on what you'd like to see next. <br> We don't reply to ideas, but we do read them all.</p>
+                    <textarea 
+                        class="w-full border border-gray-300 rounded-md p-2 h-24 focus:border-[#2da44e] focus:ring-0"
+                        placeholder="Enter your feedback..."></textarea>
+                    <div class="flex justify-end space-x-4 mt-4">
+                        <button 
+                            @click="feedbackOpen = false"
+                            class="px-4 py-2 rounded-md bg-gray-300 text-gray-700 hover:bg-gray-200 transition-colors duration-200">
+                            Cancel ❌
+                        </button>
+                        <button 
+                            @click="feedbackOpen = false; /* Implement feedback submission logic here */"
+                            class="px-4 py-2 rounded-md bg-[#2da44e] text-white hover:bg-[#2c974b] transition-colors duration-200">
+                            Submit ✅
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('roadmap', (isAuthenticated = false) => ({
+                feedbackOpen: false,
                 columns: [
                     {
                         title: 'Ideas 💡',
