@@ -416,23 +416,10 @@ func main() {
 		}
 	})))
 
-	// Admin route with special authentication
-	http.Handle("/admin", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Check if user is authenticated
-		if !middleware.IsAuthenticated(r) {
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
-			return
-		}
-
+	// Admin route with session middleware and authentication check
+	http.Handle("/admin", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Get current user
 		userID := middleware.GetUserID(r)
-
-		// Only allow user ID 1 (admin)
-		if userID != 1 {
-			http.Error(w, "Unauthorized", http.StatusUnauthorized)
-			return
-		}
-
 		user, err := models.GetUserByID(db, int64(userID))
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -442,18 +429,27 @@ func main() {
 		// Get total users count
 		totalUsers, err := models.GetTotalUsers(db)
 		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
+			log.Printf("Error getting total users: %v", err)
+			totalUsers = 0
+		}
+
+		// Get total habits count
+		totalHabits, err := models.GetTotalHabits(db)
+		if err != nil {
+			log.Printf("Error getting total habits: %v", err)
+			totalHabits = 0
 		}
 
 		data := struct {
-			User       *models.User
-			Page       string
-			TotalUsers int
+			User        *models.User
+			TotalUsers  int
+			TotalHabits int
+			Page        string
 		}{
-			User:       user,
-			Page:       "admin",
-			TotalUsers: totalUsers,
+			User:        user,
+			TotalUsers:  totalUsers,
+			TotalHabits: totalHabits,
+			Page:        "admin",
 		}
 
 		err = templates.ExecuteTemplate(w, "admin.html", data)
@@ -461,7 +457,7 @@ func main() {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-	})))
+	}))))
 
 	// Start server with dynamic port
 	port := os.Getenv("PORT")

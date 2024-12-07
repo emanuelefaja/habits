@@ -10,3 +10,12 @@ func GetTotalUsers(db *sql.DB) (int, error) {
 	}
 	return count, nil
 }
+
+func GetTotalHabits(db *sql.DB) (int, error) {
+	var count int
+	err := db.QueryRow("SELECT COUNT(*) FROM habits").Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
