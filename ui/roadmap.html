@@ -38,13 +38,16 @@
                             <!-- Special Submit Idea card for Ideas column -->
                             <template x-if="column.title === 'Ideas 💡'">
                                 <div 
-                                    @click="feedbackOpen = true" 
-                                    class="bg-[#e6f4ea] rounded-lg p-4 border-2 border-dashed border-[#2da44e] hover:bg-[#d3ebda] transition-colors duration-200 cursor-pointer">
+                                    @click="isAuthenticated && (feedbackOpen = true)"
+                                    :class="!isAuthenticated ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'"
+                                    :title="!isAuthenticated ? 'Sign in to submit ideas' : ''"
+                                    class="bg-[#e6f4ea] rounded-lg p-4 border-2 border-dashed border-[#2da44e] hover:bg-[#d3ebda] transition-colors duration-200">
                                     <div class="flex items-start space-x-3">
                                         <div class="text-2xl">✨</div>
                                         <div>
                                             <h3 class="font-medium">Submit Your Idea</h3>
-                                            <p class="text-sm text-gray-600 mt-1">Share your feature suggestions with us!</p>
+                                            <p class="text-sm text-gray-600 mt-1">
+                                                <span x-text="isAuthenticated ? 'Share your feature suggestions with us!' : 'Sign in to submit ideas'"></p>
                                         </div>
                                     </div>
                                 </div>
@@ -171,7 +174,7 @@ x-text="flashMessage">
                         title: 'Done ✨',
                         cards: [
                             { id: 'monthly-view', emoji: '📊', title: 'Monthly View', description: 'Calendar view of habits' },
-                            { id: 'numeric-habits', emoji: '🔢', title: 'Numeric Habits', description: 'Track habits with numbers' },
+                            { id: 'numeric-habits', emoji: '🔢🔢', title: 'Numeric Habits', description: 'Track habits with numbers' },
                             { id: 'binary-habits', emoji: '✅', title: 'Binary Habits', description: 'Simple yes/no habit tracking' },
                             { id: 'heart-likes', emoji: '❤️', title: 'Heart Likes', description: 'Vote on roadmap features with heart likes' },
                             { id: 'user-settings', emoji: '⚙️', title: 'User Settings', description: 'Update name, email and password.' },
