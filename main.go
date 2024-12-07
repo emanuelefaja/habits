@@ -30,12 +30,27 @@ func main() {
 		log.Printf("Warning: .env file not found")
 	}
 
-	// Initialize database
-	db, err := sql.Open("sqlite3", "./habits.db")
+	dbPath := os.Getenv("DATABASE_PATH")
+	if dbPath == "" {
+		dbPath = "./habits.db" // default path if not specified
+	}
+
+	// This will create the database file if it doesn't exist
+	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("Error opening database:", err)
 	}
 	defer db.Close()
+
+	// Verify the connection
+	if err := db.Ping(); err != nil {
+		log.Fatal("Error connecting to database:", err)
+	}
+
+	// Initialize tables
+	if err := models.InitDB(db); err != nil {
+		log.Fatal("Error initializing database:", err)
+	}
 
 	// Initialize habits table
 	err = models.InitializeHabitsDB(db)
