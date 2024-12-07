@@ -126,5 +126,14 @@ func InitDB(db *sql.DB) error {
 		return err
 	}
 
+	// Create index on habits.user_id and display_order
+	_, err = db.Exec(`
+		CREATE INDEX IF NOT EXISTS idx_habits_user_id_display_order 
+		ON habits(user_id, display_order)
+	`)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
