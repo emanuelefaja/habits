@@ -93,6 +93,7 @@ func main() {
 		"ui/habit.html",
 		"ui/about.html",
 		"ui/guest-home.html",
+		"ui/admin.html",
 	))
 
 	// Handle static files
@@ -412,6 +413,53 @@ func main() {
 			api.SubmitRoadmapIdeaHandler(db)(w, r)
 		} else {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		}
+	})))
+
+	// Admin route with special authentication
+	http.Handle("/admin", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Check if user is authenticated
+		if !middleware.IsAuthenticated(r) {
+			http.Redirect(w, r, "/login", http.StatusSeeOther)
+			return
+		}
+
+		// Get current user
+		userID := middleware.GetUserID(r)
+
+		// Only allow user ID 1 (admin)
+		if userID != 1 {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		user, err := models.GetUserByID(db, int64(userID))
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		// Get total users count
+		totalUsers, err := models.GetTotalUsers(db)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		data := struct {
+			User       *models.User
+			Page       string
+			TotalUsers int
+		}{
+			User:       user,
+			Page:       "admin",
+			TotalUsers: totalUsers,
+		}
+
+		err = templates.ExecuteTemplate(w, "admin.html", data)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
 		}
 	})))
 
