@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
@@ -14,6 +15,7 @@ import (
 	"mad/middleware"
 	"mad/models"
 
+	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -23,6 +25,11 @@ type TemplateData struct {
 }
 
 func main() {
+	// Load .env file
+	if err := godotenv.Load(); err != nil {
+		log.Printf("Warning: .env file not found")
+	}
+
 	// Initialize database
 	db, err := sql.Open("sqlite3", "./habits.db")
 	if err != nil {
@@ -393,9 +400,13 @@ func main() {
 		}
 	})))
 
-	// Start server
-	log.Println("Server started at :8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	// Start server with dynamic port
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // Default port
+	}
+	log.Printf("Server started at :%s", port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
 func dict(values ...interface{}) (map[string]interface{}, error) {

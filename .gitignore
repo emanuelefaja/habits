@@ -1,6 +1,6 @@
-
 .DS_Store
 .cursorrules
 habits.db
 /tmp
 users.db
+.env
