@@ -27,10 +27,14 @@ func InitDB(db *sql.DB) error {
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			user_id INTEGER NOT NULL,
 			name TEXT NOT NULL,
-			emoji TEXT,
-			type TEXT NOT NULL,
+			emoji TEXT NOT NULL DEFAULT '✨',
+			habit_type TEXT NOT NULL CHECK(habit_type IN ('binary', 'numeric', 'option-select')),
+			is_default BOOLEAN NOT NULL,
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-			FOREIGN KEY (user_id) REFERENCES users(id)
+			display_order INTEGER NOT NULL DEFAULT 0,
+			habit_options TEXT,
+			FOREIGN KEY (user_id) REFERENCES users(id),
+			UNIQUE(user_id, name)
 		)
 	`)
 	if err != nil {
