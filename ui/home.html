@@ -315,17 +315,24 @@
                     // Clear existing logs for the month
                     this.habitLogs = {};
 
-                    for (const habit of this.habits) {
-                        const response = await fetch(`/api/habits/logs?habit_id=${habit.id}&start_date=${startDate}&end_date=${endDate}`);
-                        const result = await response.json();
-                        
+                    // Create array of fetch promises
+                    const fetchPromises = this.habits.map(habit => 
+                        fetch(`/api/habits/logs?habit_id=${habit.id}&start_date=${startDate}&end_date=${endDate}`)
+                            .then(response => response.json())
+                    );
+
+                    // Wait for all requests to complete
+                    const results = await Promise.all(fetchPromises);
+
+                    // Process all results
+                    results.forEach(result => {
                         if (result.success) {
                             result.data.forEach(log => {
                                 const key = `${log.habit_id}_${log.date.split('T')[0]}`;
                                 this.habitLogs[key] = log;
                             });
                         }
-                    }
+                    });
                 } catch (error) {
                     console.error('Error loading habit logs:', error);
                 } finally {
