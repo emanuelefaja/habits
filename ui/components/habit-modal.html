@@ -153,7 +153,7 @@ class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-5
        </div>
 
        <!-- Type Selection -->
-       <div class="grid grid-cols-3 gap-4">
+       <div class="grid grid-cols-4 gap-4">
            <!-- Binary Card -->
            <button 
                @click="modalState.customHabit.type = 'binary'"
@@ -191,6 +191,19 @@ class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-5
                <div class="text-2xl h-12 flex items-center">🗳️</div>
                <h3 class="font-semibold mb-2">Choice</h3>
                <p class="text-sm text-gray-600">Select from a list of options</p>
+           </button>
+
+           <!-- Set+Reps Card -->
+           <button 
+               @click="modalState.customHabit.type = 'set-reps'"
+               :class="{
+                   'ring-2 ring-[#2da44e]': modalState.customHabit.type === 'set-reps',
+                   'hover:border-gray-400': modalState.customHabit.type !== 'set-reps'
+               }"
+               class="p-4 border rounded-lg text-center transition-all flex flex-col items-center">
+               <div class="text-2xl h-12 flex items-center">💪</div>
+               <h3 class="font-semibold mb-2">Set+Reps</h3>
+               <p class="text-sm text-gray-600">Track exercises with sets and reps</p>
            </button>
        </div>
 
@@ -300,4 +313,5 @@ class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-5
    </div>
 </div>
 </div>
+
 {{ end }} 

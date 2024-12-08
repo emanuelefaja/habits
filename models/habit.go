@@ -13,6 +13,7 @@ const (
 	BinaryHabit       HabitType = "binary"
 	NumericHabit      HabitType = "numeric"
 	OptionSelectHabit HabitType = "option-select"
+	SetRepsHabit      HabitType = "set-reps"
 )
 
 type Habit struct {
@@ -50,7 +51,7 @@ func InitializeHabitsDB(db *sql.DB) error {
             user_id INTEGER NOT NULL,
             name TEXT NOT NULL,
             emoji TEXT NOT NULL DEFAULT '✨',
-            habit_type TEXT NOT NULL CHECK(habit_type IN ('binary', 'numeric', 'option-select')),
+            habit_type TEXT NOT NULL CHECK(habit_type IN ('binary', 'numeric', 'option-select', 'set-reps')),
             is_default BOOLEAN NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             display_order INTEGER NOT NULL DEFAULT 0,
@@ -154,6 +155,29 @@ func (hl *HabitLog) CreateOrUpdate(db *sql.DB) error {
 		}
 
 		// Insert new log with the option value
+		result, err := db.Exec(`
+			INSERT INTO habit_logs (habit_id, date, status, value, created_at) 
+			VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+		`, hl.HabitID, hl.Date, hl.Status, hl.Value)
+
+		if err != nil {
+			return err
+		}
+
+		id, err := result.LastInsertId()
+		if err != nil {
+			return err
+		}
+		hl.ID = int(id)
+
+	case SetRepsHabit:
+		// Add handling for set-reps type
+		_, err = db.Exec("DELETE FROM habit_logs WHERE habit_id = ? AND date = ?", hl.HabitID, hl.Date)
+		if err != nil {
+			return err
+		}
+
+		// Insert new log with the set-reps data
 		result, err := db.Exec(`
 			INSERT INTO habit_logs (habit_id, date, status, value, created_at) 
 			VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
@@ -423,6 +447,29 @@ func (hl *HabitLog) ValidateValue(db *sql.DB) error {
 		}
 		if valueMap.Emoji == "" || valueMap.Label == "" {
 			return fmt.Errorf("option-select value must have both emoji and label")
+		}
+	case "set-reps":
+		var setRepsData struct {
+			Sets []struct {
+				Reps   int      `json:"reps"`
+				Weight *float64 `json:"weight,omitempty"`
+				Unit   *string  `json:"unit,omitempty"`
+			} `json:"sets"`
+		}
+		if err := json.Unmarshal([]byte(hl.Value.String), &setRepsData); err != nil {
+			return fmt.Errorf("invalid set-reps value format: %v", err)
+		}
+		if len(setRepsData.Sets) == 0 {
+			return fmt.Errorf("set-reps value must have at least one set")
+		}
+		for i, set := range setRepsData.Sets {
+			if set.Reps <= 0 {
+				return fmt.Errorf("set %d: reps must be positive", i+1)
+			}
+			// Only validate weight and unit if they're provided
+			if set.Weight != nil && *set.Weight < 0 {
+				return fmt.Errorf("set %d: weight cannot be negative", i+1)
+			}
 		}
 	}
 
