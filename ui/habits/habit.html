@@ -8,7 +8,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-    <div class="min-h-screen bg-gray-50">
+    <div class="min-h-screen bg-gray-50" 
+         x-data="{ 
+            status: 'none',
+            habitType: '{{ .Habit.HabitType }}'
+         }">
         {{ template "header" . }}
         
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -17,6 +21,13 @@
                 <h1 class="text-3xl font-bold text-gray-900">{{ .Habit.Name }}</h1>
             </div>
         </div>
+
+        <!-- Conditionally include habit type components -->
+        {{ if eq .Habit.HabitType "binary" }}
+            {{ template "binary-habit" . }}
+        {{ else if eq .Habit.HabitType "numeric" }}
+            {{ template "numeric-habit" . }}
+        {{ end }}
     </div>
 </body>
-</html> 
+</html>
