@@ -28,7 +28,7 @@ func InitDB(db *sql.DB) error {
 			user_id INTEGER NOT NULL,
 			name TEXT NOT NULL,
 			emoji TEXT NOT NULL DEFAULT '✨',
-			habit_type TEXT NOT NULL CHECK(habit_type IN ('binary', 'numeric', 'option-select')),
+			habit_type TEXT NOT NULL CHECK(habit_type IN ('binary', 'numeric', 'option-select', "set-reps")),
 			is_default BOOLEAN NOT NULL,
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			display_order INTEGER NOT NULL DEFAULT 0,

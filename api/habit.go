@@ -398,6 +398,36 @@ func CreateOrUpdateHabitLogHandler(db *sql.DB) http.HandlerFunc {
 				return
 			}
 
+		case models.SetRepsHabit:
+			if request.Value == nil {
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(APIResponse{
+					Success: false,
+					Message: "value is required for set-reps habits",
+				})
+				return
+			}
+
+			var setRepsValue models.SetRepsValue
+			if err := json.Unmarshal([]byte(request.Value.(string)), &setRepsValue); err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(APIResponse{
+					Success: false,
+					Message: "Invalid set-reps value format",
+				})
+				return
+			}
+
+			// Validate sets
+			if len(setRepsValue.Sets) == 0 {
+				w.WriteHeader(http.StatusBadRequest)
+				json.NewEncoder(w).Encode(APIResponse{
+					Success: false,
+					Message: "At least one set is required",
+				})
+				return
+			}
+
 		default:
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(APIResponse{

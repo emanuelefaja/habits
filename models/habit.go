@@ -13,6 +13,7 @@ const (
 	BinaryHabit       HabitType = "binary"
 	NumericHabit      HabitType = "numeric"
 	OptionSelectHabit HabitType = "option-select"
+	SetRepsHabit      HabitType = "set-reps"
 )
 
 type Habit struct {
@@ -50,7 +51,7 @@ func InitializeHabitsDB(db *sql.DB) error {
             user_id INTEGER NOT NULL,
             name TEXT NOT NULL,
             emoji TEXT NOT NULL DEFAULT '✨',
-            habit_type TEXT NOT NULL CHECK(habit_type IN ('binary', 'numeric', 'option-select')),
+            habit_type TEXT NOT NULL CHECK(habit_type IN ('binary', 'numeric', 'option-select', 'set-reps')),
             is_default BOOLEAN NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             display_order INTEGER NOT NULL DEFAULT 0,
@@ -154,6 +155,29 @@ func (hl *HabitLog) CreateOrUpdate(db *sql.DB) error {
 		}
 
 		// Insert new log with the option value
+		result, err := db.Exec(`
+			INSERT INTO habit_logs (habit_id, date, status, value, created_at) 
+			VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+		`, hl.HabitID, hl.Date, hl.Status, hl.Value)
+
+		if err != nil {
+			return err
+		}
+
+		id, err := result.LastInsertId()
+		if err != nil {
+			return err
+		}
+		hl.ID = int(id)
+
+	case SetRepsHabit:
+		// Add handling for set-reps type
+		_, err = db.Exec("DELETE FROM habit_logs WHERE habit_id = ? AND date = ?", hl.HabitID, hl.Date)
+		if err != nil {
+			return err
+		}
+
+		// Insert new log with the set-reps value
 		result, err := db.Exec(`
 			INSERT INTO habit_logs (habit_id, date, status, value, created_at) 
 			VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
@@ -438,4 +462,15 @@ func MarshalHabitOptions(options []HabitOption) (sql.NullString, error) {
 		return sql.NullString{}, err
 	}
 	return sql.NullString{String: string(data), Valid: true}, nil
+}
+
+type SetRep struct {
+	Set   int     `json:"set"`
+	Reps  int     `json:"reps"`
+	Value float64 `json:"value,omitempty"` // Optional weight value
+}
+
+type SetRepsValue struct {
+	Sets []SetRep `json:"sets"`
+	Unit string   `json:"unit,omitempty"` // kg or lbs
 }
