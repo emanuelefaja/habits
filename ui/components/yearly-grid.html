@@ -64,6 +64,40 @@
                                             'bg-transparent cursor-default': day === null,
                                             'transition-transform duration-150 hover:-translate-y-0.5 cursor-pointer': day !== null
                                          }"
+                                         @click="(() => {
+                                             if (day === null) return;
+                                             const dateStr = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`;
+                                             const currentStatus = getStatus(day);
+                                             let newStatus = 'done';
+                                             
+                                             // Cycle through states
+                                             switch(currentStatus) {
+                                                 case 'none': newStatus = 'done'; break;
+                                                 case 'done': newStatus = 'missed'; break;
+                                                 case 'missed': newStatus = 'skipped'; break;
+                                                 case 'skipped': newStatus = 'none'; break;
+                                             }
+                                             
+                                             fetch('/api/habits/logs', {
+                                                 method: 'POST',
+                                                 headers: { 'Content-Type': 'application/json' },
+                                                 body: JSON.stringify({
+                                                     habit_id: {{ .Habit.ID }},
+                                                     date: dateStr,
+                                                     status: newStatus
+                                                 })
+                                             })
+                                             .then(res => res.json())
+                                             .then(result => {
+                                                 if (result.success) {
+                                                     habitLogs[dateStr] = {
+                                                         habit_id: {{ .Habit.ID }},
+                                                         date: dateStr,
+                                                         status: newStatus
+                                                     };
+                                                 }
+                                             });
+                                         })()"
                                          :style="{ 
                                              backgroundColor: day ? getStatusColor(getStatus(day)) : 'transparent'
                                          }"
