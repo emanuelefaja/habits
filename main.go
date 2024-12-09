@@ -259,8 +259,6 @@ func main() {
 			api.GetHabitLogsHandler(db)(w, r)
 		case http.MethodPost:
 			api.CreateOrUpdateHabitLogHandler(db)(w, r)
-		case http.MethodDelete:
-			api.CreateOrUpdateHabitLogHandler(db)(w, r)
 		default:
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		}

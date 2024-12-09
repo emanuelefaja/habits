@@ -213,57 +213,6 @@ func CreateOrUpdateHabitLogHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 
-		// Handle DELETE method
-		if r.Method == "DELETE" {
-			var request struct {
-				HabitID int    `json:"habit_id"`
-				Date    string `json:"date"`
-			}
-
-			if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-				w.WriteHeader(http.StatusBadRequest)
-				json.NewEncoder(w).Encode(APIResponse{
-					Success: false,
-					Message: "Invalid request format",
-				})
-				return
-			}
-
-			// Verify habit belongs to user
-			userID := middleware.GetUserID(r)
-			var habitUserID int
-			err := db.QueryRow("SELECT user_id FROM habits WHERE id = ?", request.HabitID).Scan(&habitUserID)
-			if err != nil || habitUserID != userID {
-				w.WriteHeader(http.StatusForbidden)
-				json.NewEncoder(w).Encode(APIResponse{
-					Success: false,
-					Message: "Unauthorized access to habit",
-				})
-				return
-			}
-
-			// Delete the habit log
-			_, err = db.Exec(`
-				DELETE FROM habit_logs 
-				WHERE habit_id = ? AND date = ?
-			`, request.HabitID, request.Date)
-
-			if err != nil {
-				w.WriteHeader(http.StatusInternalServerError)
-				json.NewEncoder(w).Encode(APIResponse{
-					Success: false,
-					Message: "Error deleting habit log",
-				})
-				return
-			}
-
-			json.NewEncoder(w).Encode(APIResponse{
-				Success: true,
-				Message: "Habit log deleted successfully",
-			})
-			return
-		}
-
 		// Parse request body
 		var request struct {
 			HabitID int         `json:"habit_id"`
@@ -445,25 +394,6 @@ func CreateOrUpdateHabitLogHandler(db *sql.DB) http.HandlerFunc {
 				json.NewEncoder(w).Encode(APIResponse{
 					Success: false,
 					Message: "Invalid option-select value",
-				})
-				return
-			}
-
-		case models.SetRepsHabit:
-			if request.Value == nil {
-				w.WriteHeader(http.StatusBadRequest)
-				json.NewEncoder(w).Encode(APIResponse{
-					Success: false,
-					Message: "Value is required for set-reps habits",
-				})
-				return
-			}
-			habitLog.Status = "done"
-			if err := habitLog.SetValue(request.Value); err != nil {
-				w.WriteHeader(http.StatusBadRequest)
-				json.NewEncoder(w).Encode(APIResponse{
-					Success: false,
-					Message: "Invalid set-reps value format",
 				})
 				return
 			}
