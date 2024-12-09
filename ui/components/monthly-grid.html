@@ -106,7 +106,7 @@
                             
                             <!-- Day Cells - Reorganized by Habit Type -->
                             <template x-for="day in 31" :key="day">
-                                <div class="h-8 flex items-center justify-center relative"
+                                <div class="h-8 flex items-center justify-center relative transition-transform duration-150 hover:-translate-y-0.5"
                                      :class="{ 'invisible': day > getDaysInMonth() }">
                                     
                                     <!-- Option-Select Habit Type -->
