@@ -1,44 +1,53 @@
 {{ define "yearly-grid" }}
-<div x-data="yearlyGrid" class="flex justify-center p-8">
-    <div class="overflow-auto">
-        <div class="flex flex-col">
-            <!-- Month labels row -->
-            <div class="flex items-center mb-2">
-                <div style="width: 20px;"></div> <!-- Spacer for day labels column -->
-                <template x-for="(week, wIndex) in weeks" :key="'month-'+wIndex">
-                    <div class="flex-1 text-center text-[10px] font-semibold"
-                         style="width: 10px; margin-right: 2px;"
-                         x-text="getMonthLabel(wIndex)">
+<div x-data="yearlyGrid" class="flex justify-center mt-8">
+    <div class="bg-white p-8 shadow sm:rounded-lg w-full">
+        <div class="overflow-auto">
+            <div class="flex flex-col">
+                <!-- Month labels row -->
+                <div class="flex items-center mb-2">
+                    <div style="width: 30px;"></div>
+                    <div class="flex" style="width: calc(100% - 30px);">
+                        <template x-for="(month, mIndex) in monthNames" :key="'month-'+mIndex">
+                            <div x-show="getMonthStartWeek(mIndex) !== -1"
+                                 :style="{ 
+                                     width: getMonthWidth(mIndex),
+                                     marginLeft: mIndex === 0 ? '0' : '',
+                                     borderLeft: mIndex !== 0 ? '1px solid #eee' : ''
+                                 }"
+                                 class="text-center text-xs font-semibold"
+                                 x-text="month">
+                            </div>
+                        </template>
                     </div>
-                </template>
-            </div>
-
-            <!-- Days + Grid -->
-            <div class="flex">
-                <!-- Day Labels -->
-                <div class="flex flex-col">
-                    <template x-for="(dayLabel, dIndex) in dayLabels" :key="dayLabel">
-                        <div class="flex items-center justify-end text-[10px] font-medium text-gray-600 mb-1"
-                             style="height: 10px; width: 20px; margin-bottom: 2px;"
-                             x-text="dayLabel">
-                        </div>
-                    </template>
                 </div>
-
-                <!-- Year Heatmap Grid -->
+    
+                <!-- Days + Grid -->
                 <div class="flex">
-                    <template x-for="(week, wIndex) in weeks" :key="'week-'+wIndex">
-                        <div class="flex flex-col mr-1">
-                            <template x-for="(day, dIndex) in week" :key="'day-'+wIndex+'-'+dIndex">
-                                <div :class="{
-                                        'bg-gray-300': day !== null,
-                                        'bg-transparent': day === null
-                                     }"
-                                     style="width: 10px; height: 10px; margin-bottom: 2px; border-radius: 2px;">
-                                </div>
-                            </template>
-                        </div>
-                    </template>
+                    <!-- Day Labels -->
+                    <div class="flex flex-col justify-center">
+                        <template x-for="(dayLabel, index) in ['M', 'T', 'W', 'T', 'F', 'S', 'S']" :key="index">
+                            <div class="flex items-center justify-center text-sm font-medium text-gray-300"
+                                 style="height: 17px; margin-bottom: 3px; width: 30px; margin-right: 8px; line-height: 15px;">
+                                <span x-text="dayLabel"></span>
+                            </div>
+                        </template>
+                    </div>
+    
+                    <!-- Year Heatmap Grid -->
+                    <div class="flex">
+                        <template x-for="(week, wIndex) in weeks" :key="'week-'+wIndex">
+                            <div class="flex flex-col mr-1">
+                                <template x-for="(day, dIndex) in week" :key="'day-'+wIndex+'-'+dIndex">
+                                    <div :class="{
+                                            'bg-gray-300': day !== null,
+                                            'bg-transparent': day === null
+                                         }"
+                                         style="width: 17px; height: 17px; margin-bottom: 3px; border-radius: 2px;">
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
                 </div>
             </div>
         </div>
@@ -51,6 +60,7 @@ document.addEventListener('alpine:init', () => {
         dayLabels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
         monthNames: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
         weeks: [],
+        monthDays: [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], // Days in each month for 2024
 
         init() {
             // Generate all days of 2024 in a 2D array by weeks (Monday to Sunday).
@@ -83,28 +93,18 @@ document.addEventListener('alpine:init', () => {
             this.weeks = allWeeks;
         },
 
-        getMonthLabel(weekIndex) {
-            // Get the first valid day of this week (might be null if outside 2024)
-            const firstDay = this.weeks[weekIndex].find(d => d !== null);
-            if (!firstDay) return '';
+        getMonthStartWeek(monthIndex) {
+            // Find the first week that contains a day from this month
+            return this.weeks.findIndex(week => 
+                week.some(day => day && day.getMonth() === monthIndex)
+            );
+        },
 
-            const currentMonth = firstDay.getMonth();
-            
-            // Check previous week's first valid day to see if month changed
-            if (weekIndex === 0) {
-                // First week: always show month if we have a valid day
-                return this.monthNames[currentMonth];
-            } else {
-                const prevWeekFirstDay = this.weeks[weekIndex - 1].find(d => d !== null);
-                if (!prevWeekFirstDay || prevWeekFirstDay.getMonth() !== currentMonth) {
-                    return this.monthNames[currentMonth];
-                }
-            }
-
-            return '';
+        getMonthWidth(monthIndex) {
+            // Divide the grid equally among the 12 months. This should NOT be the final implementation, there must be a better way to do this!
+            return '8.2%'; // 100% / 12 months
         }
     }));
 });
 </script>
-
 {{ end }}
