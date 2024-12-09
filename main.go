@@ -497,6 +497,9 @@ func main() {
 		api.DeleteHabitHandler(db)(w, r)
 	}))))
 
+	// Add with other routes
+	http.Handle("/api/habits/stats", middleware.SessionManager.LoadAndSave(http.HandlerFunc(api.HandleGetHabitStats(db))))
+
 	// Start server with dynamic port
 	port := os.Getenv("PORT")
 	if port == "" {

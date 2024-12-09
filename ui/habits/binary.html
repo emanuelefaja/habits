@@ -1,5 +1,29 @@
 {{ define "binary-habit" }}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" 
+     x-data="{ 
+        stats: {
+            total_done: 0,
+            total_missed: 0,
+            total_skipped: 0,
+            total_days: 0
+        },
+        async loadStats() {
+            try {
+                console.log('Fetching stats for habit:', {{ .Habit.ID }});
+                const response = await fetch(`/api/habits/stats?id={{ .Habit.ID }}`);
+                const result = await response.json();
+                console.log('Stats response:', result);
+                if (result.success) {
+                    this.stats = result.data;
+                } else {
+                    console.error('Error from API:', result.message);
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+     }"
+     x-init="loadStats">
     <!-- Stats Card -->
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-4 mb-8">
         <!-- Total Done Card -->
@@ -12,7 +36,7 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-semibold text-gray-900 truncate">Total Done</dt>
-                            <dd class="text-3xl font-semibold text-gray-900" x-text="Object.values(habitLogs).filter(log => log.status === 'done').length"></dd>
+                            <dd class="text-3xl font-semibold text-gray-900" x-text="stats.total_done"></dd>
                         </dl>
                     </div>
                 </div>
@@ -28,7 +52,7 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-semibold text-gray-900 truncate">Missed</dt>
-                            <dd class="text-3xl font-semibold text-gray-900" x-text="Object.values(habitLogs).filter(log => log.status === 'missed').length"></dd>
+                            <dd class="text-3xl font-semibold text-gray-900" x-text="stats.total_missed"></dd>
                         </dl>
                     </div>
                 </div>
@@ -44,7 +68,7 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-semibold text-gray-900 truncate">Skipped</dt>
-                            <dd class="text-3xl font-semibold text-gray-900" x-text="Object.values(habitLogs).filter(log => log.status === 'skipped').length"></dd>
+                            <dd class="text-3xl font-semibold text-gray-900" x-text="stats.total_skipped"></dd>
                         </dl>
                     </div>
                 </div>
@@ -60,7 +84,7 @@
                     <div class="ml-5 w-0 flex-1">
                         <dl>
                             <dt class="text-sm font-semibold text-gray-900 truncate">Total Days</dt>
-                            <dd class="text-3xl font-semibold text-gray-900" x-text="Object.keys(habitLogs).length"></dd>
+                            <dd class="text-3xl font-semibold text-gray-900" x-text="stats.total_days"></dd>
                         </dl>
                     </div>
                 </div>
