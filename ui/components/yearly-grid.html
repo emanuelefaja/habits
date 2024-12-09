@@ -99,18 +99,22 @@ document.addEventListener('alpine:init', () => {
             }
 
             let allWeeks = [];
+            let firstWeek = true;
 
             while (currentDate < endDate) {
                 let weekDays = [];
                 for (let i = 0; i < 7; i++) {
-                    if (currentDate < endDate) {
+                    if (currentDate < startDate && firstWeek) {
+                        weekDays.push(null); // Hide days before January 1st
+                    } else if (currentDate < endDate) {
                         weekDays.push(new Date(currentDate));
-                        currentDate.setDate(currentDate.getDate() + 1);
                     } else {
                         weekDays.push(null);
                     }
+                    currentDate.setDate(currentDate.getDate() + 1);
                 }
                 allWeeks.push(weekDays);
+                firstWeek = false;
             }
 
             this.weeks = allWeeks;
