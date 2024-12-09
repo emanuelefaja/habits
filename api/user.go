@@ -93,7 +93,7 @@ func LoginHandler(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
 		valid, err := models.ValidatePassword(db, email, password)
 		if err != nil || !valid {
 			tmpl.ExecuteTemplate(w, "login.html", TemplateData{
-				Error: "Invalid email or password",
+				Error: "Invalid email or password ❌",
 			})
 			return
 		}
@@ -106,7 +106,7 @@ func LoginHandler(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
 				middleware.SetUserID(r, int(user.ID))
 
 				// Set welcome flash message
-				middleware.SetFlash(r, "Welcome back, "+user.FirstName+"!")
+				middleware.SetFlash(r, "Welcome back, "+user.FirstName+"! ✨")
 
 				// Redirect to home page
 				http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -116,7 +116,7 @@ func LoginHandler(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
 
 		// If we get here, something went wrong
 		tmpl.ExecuteTemplate(w, "login.html", TemplateData{
-			Error: "Internal server error",
+			Error: "An error occurred while logging in ❌",
 		})
 	}
 }

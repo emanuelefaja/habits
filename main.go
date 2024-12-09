@@ -226,7 +226,9 @@ func main() {
 		switch r.Method {
 		case http.MethodGet:
 			flash := middleware.GetFlash(r)
-			templates.ExecuteTemplate(w, "login.html", TemplateData{Flash: flash})
+			templates.ExecuteTemplate(w, "login.html", TemplateData{
+				Flash: flash,
+			})
 		case http.MethodPost:
 			api.LoginHandler(db, templates)(w, r)
 		default:
