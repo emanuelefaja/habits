@@ -61,7 +61,7 @@
                             <div class="flex flex-col mr-1">
                                 <template x-for="(day, dIndex) in week" :key="'day-'+wIndex+'-'+dIndex">
                                     <div :class="{
-                                            'bg-gray-300': day !== null,
+                                            'bg-[#ebedf0]': day !== null,
                                             'bg-transparent': day === null
                                          }"
                                          style="width: 17px; height: 17px; margin-bottom: 3px; border-radius: 2px;">
@@ -71,6 +71,26 @@
                         </template>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="flex justify-center gap-6 mt-6">
+            <div class="flex items-center gap-2">
+                <div class="w-4 h-4 rounded-sm" style="background-color: #2da44e;"></div>
+                <span class="text-sm text-gray-600">Done</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="w-4 h-4 rounded-sm" style="background-color: #E3211a;"></div>
+                <span class="text-sm text-gray-600">Missed</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="w-4 h-4 rounded-sm" style="background-color: #00a0d2;"></div>
+                <span class="text-sm text-gray-600">Skipped</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="w-4 h-4 rounded-sm" style="background-color: #ebedf0;"></div>
+                <span class="text-sm text-gray-600">No Data</span>
             </div>
         </div>
     </div>
