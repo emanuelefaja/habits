@@ -280,7 +280,27 @@
                                                     
                                                     <!-- Delete button - only show if there's a log -->
                                                     <template x-if="habitLogs[`${habit.id}_${formatDate(day)}`]">
-                                                        <button @click="deleteHabitLog(habit.id, formatDate(day))"
+                                                        <button @click="(() => {
+                                                            const logId = habitLogs[`${habit.id}_${formatDate(day)}`].id;
+                                                            fetch(`/api/habits/logs/delete?id=${logId}`, {
+                                                                method: 'DELETE'
+                                                            })
+                                                            .then(res => res.json())
+                                                            .then(result => {
+                                                                if (result.success) {
+                                                                    delete habitLogs[`${habit.id}_${formatDate(day)}`];
+                                                                    showTooltip = null;
+                                                                    showSetRepsInput = false;  // Reset the set-reps input view
+                                                                    setReps = [{reps: 0}];     // Reset the set-reps data
+                                                                } else {
+                                                                    alert('Error deleting log: ' + result.message);
+                                                                }
+                                                            })
+                                                            .catch(err => {
+                                                                console.error('Error:', err);
+                                                                alert('Error deleting log');
+                                                            });
+                                                        })()"
                                                             class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left text-red-600">
                                                             🗑️ Delete
                                                         </button>
