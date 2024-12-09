@@ -327,10 +327,30 @@ func (h *Habit) Update(db *sql.DB) error {
 	return err
 }
 
-// Delete removes a habit from the database
+// Delete removes a habit and all associated logs from the database
 func (h *Habit) Delete(db *sql.DB) error {
-	_, err := db.Exec("DELETE FROM habits WHERE id = ?", h.ID)
-	return err
+	// Start a transaction
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+
+	// Delete all associated habit logs first
+	_, err = tx.Exec("DELETE FROM habit_logs WHERE habit_id = ?", h.ID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// Delete the habit
+	_, err = tx.Exec("DELETE FROM habits WHERE id = ?", h.ID)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// Commit the transaction
+	return tx.Commit()
 }
 
 // HabitExists checks if a habit with the given name already exists for the user

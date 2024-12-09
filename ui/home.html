@@ -255,6 +255,15 @@
               return '';
           }
       }">
+    <div x-init="
+        // Check for flash message in session storage
+        const flash = sessionStorage.getItem('flash');
+        if (flash) {
+            $dispatch('notify', { message: flash });
+            sessionStorage.removeItem('flash');
+        }
+    ">
+    </div>
     {{ template "header" dict "User" .User "Page" "home" }}
     
     <div class="min-h-full flex flex-col" 

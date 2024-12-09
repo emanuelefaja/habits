@@ -211,7 +211,13 @@ func DeleteHabitHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		w.WriteHeader(http.StatusNoContent)
+		// Return a JSON response with success and redirect URL
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success":  true,
+			"redirect": "/",
+			"message":  "Habit deleted successfully",
+		})
 	}
 }
 

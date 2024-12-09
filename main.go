@@ -485,6 +485,15 @@ func main() {
 		api.DeleteHabitLogHandler(db)(w, r)
 	}))))
 
+	// Add this route for deleting a habit
+	http.Handle("/api/habits/delete", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		api.DeleteHabitHandler(db)(w, r)
+	}))))
+
 	// Start server with dynamic port
 	port := os.Getenv("PORT")
 	if port == "" {
