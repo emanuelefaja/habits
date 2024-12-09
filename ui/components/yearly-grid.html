@@ -61,8 +61,10 @@
                             <div class="flex flex-col mr-1">
                                 <template x-for="(day, dIndex) in week" :key="'day-'+wIndex+'-'+dIndex">
                                     <div :class="{
-                                            'bg-[#ebedf0]': day !== null,
                                             'bg-transparent': day === null
+                                         }"
+                                         :style="{ 
+                                             backgroundColor: day ? getStatusColor(getStatus(day)) : 'transparent'
                                          }"
                                          style="width: 17px; height: 17px; margin-bottom: 3px; border-radius: 2px;">
                                     </div>
@@ -103,9 +105,11 @@ document.addEventListener('alpine:init', () => {
         monthNames: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
         weeks: [],
         currentYear: new Date().getFullYear(),
+        habitLogs: {},
 
         init() {
             this.generateYearDays(this.currentYear);
+            this.loadYearData();
         },
 
         generateYearDays(year) {
@@ -152,14 +156,60 @@ document.addEventListener('alpine:init', () => {
             return `${(daysInMonth / totalDays) * 100}%`;
         },
 
+        loadYearData() {
+            const startDate = `${this.currentYear}-01-01`;
+            const endDate = `${this.currentYear}-12-31`;
+            
+            fetch(`/api/habits/logs?habit_id={{ .Habit.ID }}&start_date=${startDate}&end_date=${endDate}`)
+                .then(response => response.json())
+                .then(result => {
+                    // Reset habitLogs
+                    this.habitLogs = {};
+                    
+                    // Process the logs into a lookup object
+                    if (result.success && Array.isArray(result.data)) {
+                        result.data.forEach(log => {
+                            // Convert the date to YYYY-MM-DD format for lookup
+                            const key = log.date.split('T')[0];
+                            this.habitLogs[key] = log;
+                        });
+                    } else {
+                        console.error('Invalid response format:', result);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading year data:', error);
+                });
+        },
+
+        getStatus(date) {
+            if (!date) return 'none';
+            
+            // Format date as YYYY-MM-DD
+            const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            return this.habitLogs[dateStr]?.status || 'none';
+        },
+
+        getStatusColor(status) {
+            const colors = {
+                'done': '#2da44e',
+                'missed': '#E3211a',
+                'skipped': '#00a0d2',
+                'none': '#ebedf0'
+            };
+            return colors[status] || colors.none;
+        },
+
         previousYear() {
             this.currentYear--;
             this.generateYearDays(this.currentYear);
+            this.loadYearData();
         },
 
         nextYear() {
             this.currentYear++;
             this.generateYearDays(this.currentYear);
+            this.loadYearData();
         }
     }));
 });
