@@ -325,18 +325,10 @@
                                                             </div>
                                                         </template>
                                                         
-                                                        <button @click="setReps.push({reps: 0})"
-                                                                class="text-sm text-gray-600 hover:text-gray-800">
-                                                            + Add Set
-                                                        </button>
-                                                        
-                                                        <div class="flex justify-end gap-2 mt-2">
-                                                            <button @click="
-                                                                showSetRepsInput = false;
-                                                                setReps = [{reps: 0}];
-                                                            "
-                                                                class="px-2 py-1 text-sm text-red-600 hover:text-red-700">
-                                                                Clear
+                                                        <div class="flex justify-between items-center mt-2">
+                                                            <button @click="setReps.push({reps: 0})"
+                                                                    class="text-sm text-gray-600 hover:text-gray-800">
+                                                                + Add Set
                                                             </button>
                                                             <button @click="handleSetRepsSubmit(habit.id, formatDate(day))"
                                                                     :disabled="!setReps.some(set => set.reps > 0)"
@@ -390,6 +382,15 @@
                                             }
                                         }
                                         return formatNumericValue(sum);
+                                    } else if (habit.habit_type === 'set-reps') {
+                                        let totalReps = 0;
+                                        for (let d = 1; d <= getDaysInMonth(); d++) {
+                                            const log = habitLogs[`${habit.id}_${formatDate(d)}`];
+                                            if (log?.total_reps) {
+                                                totalReps += parseInt(log.total_reps);
+                                            }
+                                        }
+                                        return totalReps;
                                     } else {
                                         return Object.entries(habitLogs)
                                             .filter(([key, log]) => 
