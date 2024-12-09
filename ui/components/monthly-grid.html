@@ -199,10 +199,9 @@
                                              x-transition:enter="transition ease-out duration-200"
                                              x-transition:enter-start="opacity-0 transform -translate-y-2"
                                              x-transition:enter-end="opacity-100 transform translate-y-0"
-                                             class="absolute left-1/2 -translate-x-1/2 bg-white shadow-xl rounded-md py-2 px-1 z-50 w-44 border border-gray-200"
-                                             :class="showNumericInput ? '-top-8' : '-top-24'">
+                                             class="absolute bottom-full left-1/2 -translate-x-1/2 bg-white shadow-xl rounded-md py-2 px-1 z-50 w-44 border border-gray-200 mb-2">
                                             <!-- Arrow -->
-                                            <div class="absolute bottom-[-6px] left-1/2 -translate-x-1/2 w-3 h-3 bg-white transform rotate-45 border-r border-b border-gray-200 shadow-md"></div>
+                                            <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white transform rotate-45 border-r border-b border-gray-200"></div>
                                             
                                             <!-- Options View -->
                                             <div x-show="!showNumericInput" class="flex flex-col gap-1">
@@ -222,6 +221,32 @@
                                                     class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
                                                     ⏭️ Skipped
                                                 </button>
+                                                
+                                                <!-- Delete button - only show if there's a log -->
+                                                <template x-if="habitLogs[`${habit.id}_${formatDate(day)}`]">
+                                                    <button @click="(() => {
+                                                        const logId = habitLogs[`${habit.id}_${formatDate(day)}`].id;
+                                                        fetch(`/api/habits/logs/delete?id=${logId}`, {
+                                                            method: 'DELETE'
+                                                        })
+                                                        .then(res => res.json())
+                                                        .then(result => {
+                                                            if (result.success) {
+                                                                delete habitLogs[`${habit.id}_${formatDate(day)}`];
+                                                                showTooltip = null;
+                                                            } else {
+                                                                alert('Error deleting log: ' + result.message);
+                                                            }
+                                                        })
+                                                        .catch(err => {
+                                                            console.error('Error:', err);
+                                                            alert('Error deleting log');
+                                                        });
+                                                    })()"
+                                                        class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left text-red-600">
+                                                        🗑️ Delete
+                                                    </button>
+                                                </template>
                                             </div>
                                             
                                             <!-- Numeric Input -->

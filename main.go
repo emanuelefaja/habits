@@ -461,6 +461,15 @@ func main() {
 		}
 	}))))
 
+	// Habit Logs API routes
+	http.Handle("/api/habits/logs/delete", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		api.DeleteHabitLogHandler(db)(w, r)
+	}))))
+
 	// Start server with dynamic port
 	port := os.Getenv("PORT")
 	if port == "" {

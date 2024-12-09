@@ -678,3 +678,76 @@ func UpdateHabitOrderHandler(db *sql.DB) http.HandlerFunc {
 		})
 	}
 }
+
+// DeleteHabitLogHandler handles the deletion of a habit log
+func DeleteHabitLogHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		// Get log ID from URL parameter
+		logID, err := strconv.Atoi(r.URL.Query().Get("id"))
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Invalid log ID",
+			})
+			return
+		}
+
+		// Get current user ID from session
+		userID := middleware.GetUserID(r)
+
+		// Verify the habit log belongs to the user
+		var habitUserID int
+		err = db.QueryRow(`
+			SELECT h.user_id 
+			FROM habit_logs hl 
+			JOIN habits h ON hl.habit_id = h.id 
+			WHERE hl.id = ?`, logID).Scan(&habitUserID)
+
+		if err == sql.ErrNoRows {
+			w.WriteHeader(http.StatusNotFound)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Habit log not found",
+			})
+			return
+		}
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Error verifying habit log ownership",
+			})
+			return
+		}
+
+		if habitUserID != userID {
+			w.WriteHeader(http.StatusForbidden)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Unauthorized access to habit log",
+			})
+			return
+		}
+
+		// Delete the habit log
+		_, err = db.Exec("DELETE FROM habit_logs WHERE id = ?", logID)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Error deleting habit log",
+			})
+			return
+		}
+
+		// Return success response
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(APIResponse{
+			Success: true,
+			Message: "Habit log deleted successfully",
+		})
+	}
+}
