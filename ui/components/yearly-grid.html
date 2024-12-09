@@ -21,7 +21,13 @@
                     </svg>
                 </button>
             </span>
-            <h2 class="text-2xl font-semibold">🗓️ <span x-text="currentYear"></span></h2>
+            <h2 class="text-2xl font-semibold">🗓️ <span x-text="currentYear"></span>
+                <span x-show="hoverDate" 
+                      x-text="hoverDate" 
+                      class="text-sm text-gray-400 ml-2"
+                      style="font-weight: normal;">
+                </span>
+            </h2>
         </div>
         <div class="overflow-auto">
             <div class="flex flex-col">
@@ -64,6 +70,8 @@
                                             'bg-transparent cursor-default': day === null,
                                             'transition-transform duration-150 hover:-translate-y-0.5 cursor-pointer': day !== null
                                          }"
+                                         @mouseenter="day && (hoverDate = monthNames[day.getMonth()] + ' ' + day.getDate())"
+                                         @mouseleave="hoverDate = ''"
                                          @click="(() => {
                                              if (day === null) return;
                                              const dateStr = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`;
@@ -147,6 +155,7 @@ document.addEventListener('alpine:init', () => {
         weeks: [],
         currentYear: new Date().getFullYear(),
         habitLogs: {},
+        hoverDate: '',
 
         init() {
             this.generateYearDays(this.currentYear);
