@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"time"
 )
 
@@ -172,9 +173,48 @@ func (hl *HabitLog) CreateOrUpdate(db *sql.DB) error {
 
 	case SetRepsHabit:
 		// Add handling for set-reps type
+		log.Printf("SetRepsHabit: Processing log with status: %s and value: %s", hl.Status, hl.Value.String)
+
 		_, err = db.Exec("DELETE FROM habit_logs WHERE habit_id = ? AND date = ?", hl.HabitID, hl.Date)
 		if err != nil {
+			log.Printf("SetRepsHabit: Error deleting existing log: %v", err)
 			return err
+		}
+
+		// Skip validation for missed/skipped status
+		if hl.Status == "missed" || hl.Status == "skipped" {
+			log.Printf("SetRepsHabit: Handling %s status", hl.Status)
+
+			// Insert new log with empty sets
+			result, err := db.Exec(`
+				INSERT INTO habit_logs (habit_id, date, status, value, created_at) 
+				VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+			`, hl.HabitID, hl.Date, hl.Status, hl.Value)
+
+			if err != nil {
+				log.Printf("SetRepsHabit: Error inserting %s log: %v", hl.Status, err)
+				return err
+			}
+
+			id, err := result.LastInsertId()
+			if err != nil {
+				log.Printf("SetRepsHabit: Error getting last insert ID: %v", err)
+				return err
+			}
+
+			hl.ID = int(id)
+			log.Printf("SetRepsHabit: Successfully saved %s log with ID %d", hl.Status, hl.ID)
+			return nil
+		}
+
+		// For 'done' status, validate sets
+		var setRepsValue SetRepsValue
+		if err := json.Unmarshal([]byte(hl.Value.String), &setRepsValue); err != nil {
+			return err
+		}
+
+		if len(setRepsValue.Sets) == 0 {
+			return fmt.Errorf("At least one set is required")
 		}
 
 		// Insert new log with the set-reps value
@@ -447,6 +487,31 @@ func (hl *HabitLog) ValidateValue(db *sql.DB) error {
 		}
 		if valueMap.Emoji == "" || valueMap.Label == "" {
 			return fmt.Errorf("option-select value must have both emoji and label")
+		}
+	case "set-reps":
+		var setRepsValue SetRepsValue
+		if err := json.Unmarshal([]byte(hl.Value.String), &setRepsValue); err != nil {
+			return fmt.Errorf("invalid set-reps value format: %v", err)
+		}
+
+		// Allow empty sets array for missed/skipped status
+		if hl.Status == "missed" || hl.Status == "skipped" {
+			if len(setRepsValue.Sets) > 0 {
+				return fmt.Errorf("missed/skipped status should have empty sets")
+			}
+			return nil
+		}
+
+		// For 'done' status, require at least one set
+		if len(setRepsValue.Sets) == 0 {
+			return fmt.Errorf("at least one set is required for done status")
+		}
+
+		// Validate each set
+		for _, set := range setRepsValue.Sets {
+			if set.Reps <= 0 {
+				return fmt.Errorf("reps must be greater than 0")
+			}
 		}
 	}
 

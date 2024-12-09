@@ -35,6 +35,13 @@ type BulkHabitRequest struct {
 	HabitType models.HabitType `json:"habit_type"`
 }
 
+// SetRepsResponse represents a response for set-reps habits
+type SetRepsResponse struct {
+	*models.HabitLog
+	TotalSets int `json:"total_sets"`
+	TotalReps int `json:"total_reps"`
+}
+
 // CreateHabitHandler handles the creation of a new habit
 func CreateHabitHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -399,34 +406,111 @@ func CreateOrUpdateHabitLogHandler(db *sql.DB) http.HandlerFunc {
 			}
 
 		case models.SetRepsHabit:
-			if request.Value == nil {
-				w.WriteHeader(http.StatusBadRequest)
+			log.Printf("Processing set-reps habit log. Value: %+v", request.Value)
+
+			// For missed/skipped status, set an empty sets array
+			if request.Status == "missed" || request.Status == "skipped" {
+				emptyValue := models.SetRepsValue{Sets: []models.SetRep{}}
+				valueBytes, err := json.Marshal(emptyValue)
+				if err != nil {
+					log.Printf("Error marshaling empty set-reps value: %v", err)
+					w.WriteHeader(http.StatusInternalServerError)
+					json.NewEncoder(w).Encode(APIResponse{
+						Success: false,
+						Message: "Error processing set-reps value",
+					})
+					return
+				}
+				habitLog.Value = sql.NullString{
+					String: string(valueBytes),
+					Valid:  true,
+				}
+				habitLog.Status = request.Status
+
+				if err := habitLog.CreateOrUpdate(db); err != nil {
+					log.Printf("Error saving habit log: %v", err)
+					w.WriteHeader(http.StatusInternalServerError)
+					json.NewEncoder(w).Encode(APIResponse{
+						Success: false,
+						Message: "Error saving habit log",
+					})
+					return
+				}
+
+				w.WriteHeader(http.StatusOK)
 				json.NewEncoder(w).Encode(APIResponse{
-					Success: false,
-					Message: "value is required for set-reps habits",
+					Success: true,
+					Message: "Habit log saved successfully",
+					Data: SetRepsResponse{
+						HabitLog:  habitLog,
+						TotalSets: 0,
+						TotalReps: 0,
+					},
 				})
 				return
 			}
 
+			// Parse the value for set-reps
 			var setRepsValue models.SetRepsValue
-			if err := json.Unmarshal([]byte(request.Value.(string)), &setRepsValue); err != nil {
+			switch v := request.Value.(type) {
+			case string:
+				if err := json.Unmarshal([]byte(v), &setRepsValue); err != nil {
+					log.Printf("Error unmarshaling string value: %v", err)
+					w.WriteHeader(http.StatusBadRequest)
+					json.NewEncoder(w).Encode(APIResponse{
+						Success: false,
+						Message: "Invalid set-reps format",
+					})
+					return
+				}
+			case map[string]interface{}:
+				// Convert map to JSON string first
+				valueBytes, err := json.Marshal(v)
+				if err != nil {
+					log.Printf("Error marshaling map value: %v", err)
+					w.WriteHeader(http.StatusBadRequest)
+					json.NewEncoder(w).Encode(APIResponse{
+						Success: false,
+						Message: "Invalid set-reps format",
+					})
+					return
+				}
+				if err := json.Unmarshal(valueBytes, &setRepsValue); err != nil {
+					log.Printf("Error unmarshaling map value: %v", err)
+					w.WriteHeader(http.StatusBadRequest)
+					json.NewEncoder(w).Encode(APIResponse{
+						Success: false,
+						Message: "Invalid set-reps format",
+					})
+					return
+				}
+			default:
+				log.Printf("Invalid value type for set-reps: %T", v)
 				w.WriteHeader(http.StatusBadRequest)
 				json.NewEncoder(w).Encode(APIResponse{
 					Success: false,
-					Message: "Invalid set-reps value format",
+					Message: "Invalid value type for set-reps",
 				})
 				return
 			}
 
-			// Validate sets
-			if len(setRepsValue.Sets) == 0 {
-				w.WriteHeader(http.StatusBadRequest)
+			// Set the value
+			valueBytes, err := json.Marshal(setRepsValue)
+			if err != nil {
+				log.Printf("Error marshaling set-reps value: %v", err)
+				w.WriteHeader(http.StatusInternalServerError)
 				json.NewEncoder(w).Encode(APIResponse{
 					Success: false,
-					Message: "At least one set is required",
+					Message: "Error processing set-reps value",
 				})
 				return
 			}
+
+			habitLog.Value = sql.NullString{
+				String: string(valueBytes),
+				Valid:  true,
+			}
+			habitLog.Status = request.Status
 
 		default:
 			w.WriteHeader(http.StatusBadRequest)
@@ -506,7 +590,8 @@ func GetHabitLogsHandler(db *sql.DB) http.HandlerFunc {
 		// Verify habit belongs to user
 		userID := middleware.GetUserID(r)
 		var habitUserID int
-		err = db.QueryRow("SELECT user_id FROM habits WHERE id = ?", habitID).Scan(&habitUserID)
+		var habitType models.HabitType
+		err = db.QueryRow("SELECT user_id, habit_type FROM habits WHERE id = ?", habitID).Scan(&habitUserID, &habitType)
 		if err != nil || habitUserID != userID {
 			w.WriteHeader(http.StatusForbidden)
 			json.NewEncoder(w).Encode(APIResponse{
@@ -527,7 +612,42 @@ func GetHabitLogsHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Return success response
+		// If this is a set-reps habit, enhance the response with totals
+		if habitType == models.SetRepsHabit {
+			var enhancedLogs []SetRepsResponse
+			for _, log := range logs {
+				var setRepsValue models.SetRepsValue
+				totalReps := 0
+				totalSets := 0
+
+				if log.Value.Valid {
+					if err := json.Unmarshal([]byte(log.Value.String), &setRepsValue); err == nil {
+						totalSets = len(setRepsValue.Sets)
+						for _, set := range setRepsValue.Sets {
+							totalReps += set.Reps
+						}
+					}
+				}
+
+				// Create a copy of the log to get a pointer to it
+				logCopy := log
+				enhancedLogs = append(enhancedLogs, SetRepsResponse{
+					HabitLog:  &logCopy,
+					TotalSets: totalSets,
+					TotalReps: totalReps,
+				})
+			}
+
+			// Return enhanced response
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: true,
+				Data:    enhancedLogs,
+			})
+			return
+		}
+
+		// Return standard response for other habit types
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(APIResponse{
 			Success: true,
