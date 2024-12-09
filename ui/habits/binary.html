@@ -23,7 +23,8 @@
             }
         }
      }"
-     x-init="loadStats">
+     x-init="loadStats"
+     @habit-log-updated.window="loadStats()">
     <!-- Stats Card -->
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-4 mb-8">
         <!-- Total Done Card -->

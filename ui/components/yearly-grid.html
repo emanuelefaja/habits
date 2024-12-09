@@ -95,6 +95,12 @@
                                                          date: dateStr,
                                                          status: newStatus
                                                      };
+                                                     // Dispatch custom event with updated log
+                                                     $dispatch('habit-log-updated', {
+                                                         habitId: {{ .Habit.ID }},
+                                                         date: dateStr,
+                                                         status: newStatus
+                                                     });
                                                  }
                                              });
                                          })()"
