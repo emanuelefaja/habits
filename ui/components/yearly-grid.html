@@ -1,6 +1,28 @@
 {{ define "yearly-grid" }}
 <div x-data="yearlyGrid" class="flex justify-center mt-8">
     <div class="bg-white p-8 shadow sm:rounded-lg w-full">
+        <!-- Add year navigation -->
+        <div class="flex items-center gap-3 mb-6">
+            <span class="isolate inline-flex rounded-md shadow-sm">
+                <button type="button" 
+                        class="relative inline-flex items-center rounded-l-md bg-white px-1.5 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10"
+                        @click="previousYear">
+                    <span class="sr-only">Previous Year</span>
+                    <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+                <button type="button"
+                        class="relative -ml-px inline-flex items-center rounded-r-md bg-white px-1.5 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10"
+                        @click="nextYear">
+                    <span class="sr-only">Next Year</span>
+                    <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                    </svg>
+                </button>
+            </span>
+            <h2 class="text-2xl font-semibold">🗓️ <span x-text="currentYear"></span></h2>
+        </div>
         <div class="overflow-auto">
             <div class="flex flex-col">
                 <!-- Month labels row -->
@@ -60,28 +82,29 @@ document.addEventListener('alpine:init', () => {
         dayLabels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
         monthNames: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
         weeks: [],
-        monthDays: [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], // Days in each month for 2024
+        currentYear: new Date().getFullYear(),
 
         init() {
-            // Generate all days of 2024 in a 2D array by weeks (Monday to Sunday).
-            // 2024-01-01 is a Monday.
-            const startDate = new Date(2024, 0, 1);
-            const endDate = new Date(2025, 0, 1);
+            this.generateYearDays(this.currentYear);
+        },
 
-            // We'll loop through each week until we hit the endDate
+        generateYearDays(year) {
+            const startDate = new Date(year, 0, 1);
+            const endDate = new Date(year + 1, 0, 1);
+
+            // Get to the first Monday before or on January 1st
             let currentDate = new Date(startDate.getTime());
+            while (currentDate.getDay() !== 1) { // 1 represents Monday
+                currentDate.setDate(currentDate.getDate() - 1);
+            }
+
             let allWeeks = [];
 
             while (currentDate < endDate) {
                 let weekDays = [];
                 for (let i = 0; i < 7; i++) {
                     if (currentDate < endDate) {
-                        // If within 2024
-                        if (currentDate.getFullYear() === 2024) {
-                            weekDays.push(new Date(currentDate));
-                        } else {
-                            weekDays.push(null);
-                        }
+                        weekDays.push(new Date(currentDate));
                         currentDate.setDate(currentDate.getDate() + 1);
                     } else {
                         weekDays.push(null);
@@ -94,15 +117,25 @@ document.addEventListener('alpine:init', () => {
         },
 
         getMonthStartWeek(monthIndex) {
-            // Find the first week that contains a day from this month
             return this.weeks.findIndex(week => 
                 week.some(day => day && day.getMonth() === monthIndex)
             );
         },
 
         getMonthWidth(monthIndex) {
-            // Divide the grid equally among the 12 months. This should NOT be the final implementation, there must be a better way to do this!
-            return '8.2%'; // 100% / 12 months
+            const daysInMonth = new Date(this.currentYear, monthIndex + 1, 0).getDate();
+            const totalDays = this.weeks.flat().filter(day => day !== null).length;
+            return `${(daysInMonth / totalDays) * 100}%`;
+        },
+
+        previousYear() {
+            this.currentYear--;
+            this.generateYearDays(this.currentYear);
+        },
+
+        nextYear() {
+            this.currentYear++;
+            this.generateYearDays(this.currentYear);
         }
     }));
 });
