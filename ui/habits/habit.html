@@ -42,16 +42,24 @@
         {{ template "header" . }}
         
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="text-center">
-                <div class="text-6xl mb-2">{{ .Habit.Emoji }}</div>
-                <h1 class="text-3xl font-bold text-gray-900">{{ .Habit.Name }}</h1>
-                
-                <!-- Add Delete Button -->
-                <button 
-                    @click="showDeleteModal = true"
-                    class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                    Delete Habit 🗑️
-                </button>
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <div class="text-6xl mr-2">{{ .Habit.Emoji }}</div>
+                    <h1 class="text-3xl font-bold text-gray-900">{{ .Habit.Name }}</h1>
+                </div>
+                <div class="flex space-x-2">
+                    <!-- Edit Name Button -->
+                    <button 
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400">
+                        Edit Name ✏️
+                    </button>
+                    <!-- Delete Button -->
+                    <button 
+                        @click="showDeleteModal = true"
+                        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        Delete Habit 🗑️
+                    </button>
+                </div>
             </div>
         </div>
 
