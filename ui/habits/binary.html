@@ -1,7 +1,7 @@
 {{ define "binary-habit" }}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     <!-- Stats Card -->
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-8">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-4 mb-8">
         <!-- Total Done Card -->
         <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
             <div class="p-5">
@@ -18,7 +18,54 @@
                 </div>
             </div>
         </div>
+        <!-- Missed Card -->
+        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl">❌</span>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-semibold text-gray-900 truncate">Missed</dt>
+                            <dd class="text-3xl font-semibold text-gray-900" x-text="Object.values(habitLogs).filter(log => log.status === 'missed').length"></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Skipped Card -->
+        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl">⏭️</span>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-semibold text-gray-900 truncate">Skipped</dt>
+                            <dd class="text-3xl font-semibold text-gray-900" x-text="Object.values(habitLogs).filter(log => log.status === 'skipped').length"></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Total Days Card -->
+        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl">📅</span>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-semibold text-gray-900 truncate">Total Days</dt>
+                            <dd class="text-3xl font-semibold text-gray-900" x-text="Object.keys(habitLogs).length"></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
 </div>
 {{ end }}
