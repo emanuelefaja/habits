@@ -6,7 +6,10 @@
             {{ if .User }}
                 👋 {{ .User.FirstName }}
             {{ else }}
-                <a href="/" class="text-3xl tracking-tight hover:underline">✅ habits.co</a>
+                <a href="/" class="flex items-center gap-2 text-3xl tracking-tight hover:underline">
+                    <img src="/static/icons/icon-512.png" alt="habits logo" class="w-8 h-8">
+                    habits
+                </a>
             {{ end }}
         </h1>
         {{ if and .User (eq .User.ID 1) }}
