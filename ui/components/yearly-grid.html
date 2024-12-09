@@ -1,0 +1,110 @@
+{{ define "yearly-grid" }}
+<div x-data="yearlyGrid" class="flex justify-center p-8">
+    <div class="overflow-auto">
+        <div class="flex flex-col">
+            <!-- Month labels row -->
+            <div class="flex items-center mb-2">
+                <div style="width: 20px;"></div> <!-- Spacer for day labels column -->
+                <template x-for="(week, wIndex) in weeks" :key="'month-'+wIndex">
+                    <div class="flex-1 text-center text-[10px] font-semibold"
+                         style="width: 10px; margin-right: 2px;"
+                         x-text="getMonthLabel(wIndex)">
+                    </div>
+                </template>
+            </div>
+
+            <!-- Days + Grid -->
+            <div class="flex">
+                <!-- Day Labels -->
+                <div class="flex flex-col">
+                    <template x-for="(dayLabel, dIndex) in dayLabels" :key="dayLabel">
+                        <div class="flex items-center justify-end text-[10px] font-medium text-gray-600 mb-1"
+                             style="height: 10px; width: 20px; margin-bottom: 2px;"
+                             x-text="dayLabel">
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Year Heatmap Grid -->
+                <div class="flex">
+                    <template x-for="(week, wIndex) in weeks" :key="'week-'+wIndex">
+                        <div class="flex flex-col mr-1">
+                            <template x-for="(day, dIndex) in week" :key="'day-'+wIndex+'-'+dIndex">
+                                <div :class="{
+                                        'bg-gray-300': day !== null,
+                                        'bg-transparent': day === null
+                                     }"
+                                     style="width: 10px; height: 10px; margin-bottom: 2px; border-radius: 2px;">
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('yearlyGrid', () => ({
+        dayLabels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
+        monthNames: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        weeks: [],
+
+        init() {
+            // Generate all days of 2024 in a 2D array by weeks (Monday to Sunday).
+            // 2024-01-01 is a Monday.
+            const startDate = new Date(2024, 0, 1);
+            const endDate = new Date(2025, 0, 1);
+
+            // We'll loop through each week until we hit the endDate
+            let currentDate = new Date(startDate.getTime());
+            let allWeeks = [];
+
+            while (currentDate < endDate) {
+                let weekDays = [];
+                for (let i = 0; i < 7; i++) {
+                    if (currentDate < endDate) {
+                        // If within 2024
+                        if (currentDate.getFullYear() === 2024) {
+                            weekDays.push(new Date(currentDate));
+                        } else {
+                            weekDays.push(null);
+                        }
+                        currentDate.setDate(currentDate.getDate() + 1);
+                    } else {
+                        weekDays.push(null);
+                    }
+                }
+                allWeeks.push(weekDays);
+            }
+
+            this.weeks = allWeeks;
+        },
+
+        getMonthLabel(weekIndex) {
+            // Get the first valid day of this week (might be null if outside 2024)
+            const firstDay = this.weeks[weekIndex].find(d => d !== null);
+            if (!firstDay) return '';
+
+            const currentMonth = firstDay.getMonth();
+            
+            // Check previous week's first valid day to see if month changed
+            if (weekIndex === 0) {
+                // First week: always show month if we have a valid day
+                return this.monthNames[currentMonth];
+            } else {
+                const prevWeekFirstDay = this.weeks[weekIndex - 1].find(d => d !== null);
+                if (!prevWeekFirstDay || prevWeekFirstDay.getMonth() !== currentMonth) {
+                    return this.monthNames[currentMonth];
+                }
+            }
+
+            return '';
+        }
+    }));
+});
+</script>
+
+{{ end }}
