@@ -548,6 +548,12 @@
             formatSetRepsDisplay(habitId, date) {
                 const log = this.habitLogs[`${habitId}_${date}`];
                 if (!log?.value?.Valid) return '';
+                
+                // Return '0' for missed/skipped status
+                if (log.status === 'missed' || log.status === 'skipped') {
+                    return '0';
+                }
+                
                 try {
                     return log.total_reps || '';
                 } catch (error) {
