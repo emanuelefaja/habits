@@ -246,12 +246,25 @@
 
                                     <!-- Set-Reps Habit Type -->
                                     <template x-if="habit.habit_type === 'set-reps'">
-                                        <div class="w-7 h-7 rounded-sm cursor-pointer flex items-center justify-center text-sm"
+                                        <div class="w-7 h-7 rounded-sm cursor-pointer flex items-center justify-center text-sm relative group/setreps"
                                              @click="showTooltip = `${habit.id}_${formatDate(day)}`"
                                              :style="{ backgroundColor: getStatusColor(getStatus(habit.id, formatDate(day))) }">
+                                            
                                             <span class="text-white" x-text="formatSetRepsDisplay(habit.id, formatDate(day))"></span>
                                             
-                                            <!-- Set-Reps Input Tooltip -->
+                                            <!-- Hover Tooltip (separate from click interaction) -->
+                                            <template x-if="habitLogs[`${habit.id}_${formatDate(day)}`]?.status === 'done'">
+                                                <div class="absolute bottom-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-3 py-2 rounded text-sm whitespace-nowrap opacity-0 group-hover/setreps:opacity-100 transition-opacity duration-200 pointer-events-none z-30">
+                                                    <template x-for="(set, index) in JSON.parse(habitLogs[`${habit.id}_${formatDate(day)}`].value.String).sets" :key="index">
+                                                        <div>
+                                                            <span x-text="`Set ${index + 1}: ${set.reps}`"></span>
+                                                        </div>
+                                                    </template>
+                                                    <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-800 transform rotate-45"></div>
+                                                </div>
+                                            </template>
+
+                                            <!-- Click Tooltip (existing functionality) -->
                                             <div x-show="showTooltip === `${habit.id}_${formatDate(day)}`"
                                                  @click.outside="showTooltip = null"
                                                  x-transition:enter="transition ease-out duration-200"
@@ -259,7 +272,7 @@
                                                 <!-- Arrow -->
                                                 <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white transform rotate-45 border-r border-b border-gray-200"></div>
                                                 
-                                                <!-- Initial Options View -->
+                                                <!-- Options View -->
                                                 <div x-show="!showSetRepsInput" class="flex flex-col gap-1">
                                                     <button @click="
                                                         showSetRepsInput = true;
