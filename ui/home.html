@@ -32,6 +32,9 @@
             }
         });
     </script>
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#2da44e">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
 </head>
 <body class="h-full" 
       x-data="{ 
@@ -667,5 +670,19 @@
         <!-- New Habit Modal -->
         {{ template "habit-modal" . }}
     </div>
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+              console.log('ServiceWorker registration successful');
+            })
+            .catch(err => {
+              console.log('ServiceWorker registration failed: ', err);
+            });
+        });
+      }
+    </script>
 </body>
 </html>
