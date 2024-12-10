@@ -30,7 +30,36 @@
             }
             const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             this.emailValid = emailPattern.test(this.email);
-        }, 500);
+        }, 1000);
+    },
+    generatePassword() {
+        // Define character sets
+        const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+        const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const numbers = '0123456789';
+        const special = '!@#$%^&*()_+';
+        
+        // Start with one character from each required set
+        let result = '';
+        result += lowercase.charAt(Math.floor(Math.random() * lowercase.length));
+        result += uppercase.charAt(Math.floor(Math.random() * uppercase.length));
+        result += numbers.charAt(Math.floor(Math.random() * numbers.length));
+        result += special.charAt(Math.floor(Math.random() * special.length));
+        
+        // Fill the rest with random characters from all sets
+        const allChars = lowercase + uppercase + numbers + special;
+        const remainingLength = 12; // Total length will be 16 (4 required + 12 random)
+        
+        for (let i = 0; i < remainingLength; i++) {
+            result += allChars.charAt(Math.floor(Math.random() * allChars.length));
+        }
+        
+        // Shuffle the result to make it more random
+        result = result.split('').sort(() => Math.random() - 0.5).join('');
+        
+        this.password = result;
+        this.validatePassword();
+        return result;
     }
 }">
     <div class="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -80,20 +109,27 @@
                                 :class="{'outline-red-500': !emailValid, 'outline-gray-300': emailValid}"
                                 class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6">
                         </div>
-                        <p x-show="!emailValid" class="mt-2 text-sm text-red-600">‼ Please enter a valid email address.</p>
+                        <p x-show="!emailValid" class="mt-2 text-sm text-red-600">❌ Please enter a valid email address.</p>
                     </div>
 
                     <!-- Password field with toggle -->
                     <div>
                         <label for="password" class="block text-sm/6 font-medium text-gray-900">🔑 Password</label>
-                        <div class="mt-2 relative">
-                            <input :type="showPassword ? 'text' : 'password'" id="password" name="password" required 
-                                x-model="password"
-                                @input="validatePassword"
-                                class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6">
-                            <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
-                                <span x-show="!showPassword">🔒</span>
-                                <span x-show="showPassword">👀</span>
+                        <div class="mt-2 relative flex">
+                            <div class="relative flex-1">
+                                <input :type="showPassword ? 'text' : 'password'" id="password" name="password" required 
+                                    x-model="password"
+                                    @input="validatePassword"
+                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6">
+                                <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
+                                    <span x-show="!showPassword">🔒</span>
+                                    <span x-show="showPassword">👀</span>
+                                </button>
+                            </div>
+                            <button type="button" 
+                                @click="password = generatePassword()"
+                                class="ml-2 px-3 py-1.5 rounded-md bg-gray-100 text-sm text-gray-700 hover:bg-gray-200 flex-shrink-0">
+                                🎲 Generate
                             </button>
                         </div>
                         <!-- Password Requirements Checklist -->
