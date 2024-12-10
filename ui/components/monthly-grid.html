@@ -1,7 +1,7 @@
 {{ define "monthly-grid" }}
 <template x-if="habits.length > 0">
     <div class="flex-grow flex items-center justify-center mb-8" x-data="monthlyGrid">
-        <div class="w-auto">
+        <div class="w-full md:w-auto">
             <div class="bg-white p-8 shadow sm:rounded-lg">
                 <!-- Header with title and Create Habit button -->
                 <div class="flex justify-between items-center mb-6">
@@ -51,379 +51,379 @@
                     </button>
                 </div>
                 
-                <!-- Grid Header Row -->
-                <div class="grid mb-2" style="gap: 3px; grid-template-columns: 150px repeat(31, 35px) 70px;">
-                    <div class="h-8"></div>
-                    <template x-for="day in 31" :key="day">
-                        <div :class="{ 
-                                'invisible': day > getDaysInMonth(),
-                                'bg-[#2da44e] text-white rounded-full inline-flex items-center justify-center': isToday(day),
-                                'text-sm text-center text-gray-600': !isToday(day)
-                             }"
-                             style="width: 35px;" 
-                             :style="{ 
-                                 width: isToday(day) ? '24px' : '35px', 
-                                 height: isToday(day) ? '24px' : '35px', 
-                                 lineHeight: isToday(day) ? '24px' : '35px',
-                                 margin: isToday(day) ? '5.5px auto' : '0'
-                             }"
-                             x-text="day">
+                <!-- Add overflow wrapper with explicit width -->
+                <div class="w-full overflow-x-auto md:overflow-visible">
+                    <!-- Grid Header Row -->
+                    <div class="grid mb-2 min-w-fit" style="gap: 3px; grid-template-columns: 150px repeat(31, 35px) 70px;">
+                        <div class="h-8"></div>
+                        <template x-for="day in 31" :key="day">
+                            <div :class="{ 
+                                    'invisible': day > getDaysInMonth(),
+                                    'bg-[#2da44e] text-white rounded-full inline-flex items-center justify-center': isToday(day),
+                                    'text-sm text-center text-gray-600': !isToday(day)
+                                 }"
+                                 style="width: 35px;" 
+                                 :style="{ 
+                                     width: isToday(day) ? '24px' : '35px', 
+                                     height: isToday(day) ? '24px' : '35px', 
+                                     lineHeight: isToday(day) ? '24px' : '35px',
+                                     margin: isToday(day) ? '5.5px auto' : '0'
+                                 }"
+                                 x-text="day">
+                            </div>
+                        </template>
+                        <div class="h-8 flex items-center justify-center">
+                            <span class="text-sm font-medium text-gray-600">Total</span>
                         </div>
-                    </template>
-                    <div class="h-8 flex items-center justify-center">
-                        <span class="text-sm font-medium text-gray-600">Total</span>
+                    </div>
+
+                    <!-- Sortable List of Habit Rows -->
+                    <div x-ref="habitsListContainer" class="flex flex-col gap-1 min-w-fit">
+                        <template x-for="habit in habits" :key="habit.id">
+                            <div class="grid bg-white group"
+                                 x-bind:data-habit-id="habit.id"
+                                 style="gap: 3px; grid-template-columns: 150px repeat(31, 35px) 70px;"
+                                 class="border border-gray-200 rounded-sm">
+                                 
+                                <!-- Habit Name Cell (drag handle) -->
+                                <div class="h-8 flex items-center font-medium text-sm text-gray-700 pr-4 habit-handle relative" 
+                                     style="width: 150px; cursor: grab;">
+                                    <div class="absolute left-0 top-0 bottom-0 flex items-center transition-opacity duration-150 opacity-0 group-hover:opacity-100 px-1">
+                                        <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                            <circle cx="4" cy="4" r="1.5"></circle>
+                                            <circle cx="4" cy="10" r="1.5"></circle>
+                                            <circle cx="4" cy="16" r="1.5"></circle>
+                                            <circle cx="10" cy="4" r="1.5"></circle>
+                                            <circle cx="10" cy="10" r="1.5"></circle>
+                                            <circle cx="10" cy="16" r="1.5"></circle>
+                                        </svg>
+                                    </div>
+                                    <div class="flex items-center pl-7">
+                                        <a :href="`/habit/${habit.id}`" class="flex items-center hover:text-[#2da44e] hover:underline" @click.stop>
+                                            <span class="mr-2" x-text="habit.emoji"></span>
+                                            <span x-text="habit.name"></span>
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Day Cells - Reorganized by Habit Type -->
+                                <template x-for="day in 31" :key="day">
+                                    <div class="h-8 flex items-center justify-center relative transition-transform duration-150 hover:-translate-y-0.5"
+                                         :class="{ 'invisible': day > getDaysInMonth() }">
+                                        
+                                        <!-- Option-Select Habit Type -->
+                                        <template x-if="habit.habit_type === 'option-select'">
+                                            <div class="w-7 h-7 relative">
+                                                <!-- Option Display -->
+                                                <div @click="showTooltip = `${habit.id}_${formatDate(day)}`"
+                                                     class="w-7 h-7 rounded-sm cursor-pointer flex items-center justify-center bg-[#ebedf0]">
+                                                    <template x-if="habitLogs[`${habit.id}_${formatDate(day)}`]?.value?.Valid">
+                                                        <div class="relative hover:z-20 group/cell">
+                                                            <!-- Selected Option Display -->
+                                                            <span x-text="JSON.parse(habitLogs[`${habit.id}_${formatDate(day)}`].value.String).emoji"></span>
+                                                            
+                                                            <!-- Option Hover Tooltip -->
+                                                            <div class="absolute bottom-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-2 py-1 rounded text-sm whitespace-nowrap opacity-0 group-hover/cell:opacity-100 transition-opacity duration-200 pointer-events-none">
+                                                                <span x-text="JSON.parse(habitLogs[`${habit.id}_${formatDate(day)}`].value.String).label"></span>
+                                                                <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-800 transform rotate-45"></div>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+                                                </div>
+
+                                                <!-- Option Selection Tooltip -->
+                                                <div x-show="showTooltip === `${habit.id}_${formatDate(day)}`"
+                                                     @click.away="showTooltip = null"
+                                                     x-transition:enter="transition ease-out duration-200"
+                                                     class="absolute z-50 top-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 p-2 -translate-x-1/2 left-1/2">
+                                                    <!-- Arrow pointing up -->
+                                                    <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 transform rotate-45 bg-white border-l border-t border-gray-200"></div>
+                                                    
+                                                    <!-- Options Container -->
+                                                    <div class="relative bg-white rounded-lg" style="min-width: 150px;">
+                                                        <div class="flex flex-col gap-1">
+                                                            <template x-for="option in (() => {
+                                                                const options = getHabitOptions(habit.id);
+                                                                console.log('Available options:', options);
+                                                                return options;
+                                                            })()" :key="option.emoji">
+                                                                <button @click="(() => {
+                                                                        console.log('Option selected:', option);
+                                                                        handleOptionSelection(habit.id, formatDate(day), option);
+                                                                    })()"
+                                                                        class="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded-md w-full text-left">
+                                                                        <span x-text="option.emoji"></span>
+                                                                        <span x-text="option.label" class="text-sm text-gray-700"></span>
+                                                                    </button>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <!-- Numeric Habit Type -->
+                                        <template x-if="habit.habit_type === 'numeric'">
+                                            <div class="w-7 h-7 rounded-sm cursor-pointer flex items-center justify-center text-sm"
+                                                 @click="showTooltip = `${habit.id}_${formatDate(day)}`"
+                                                 :style="{ backgroundColor: getStatusColor(getStatus(habit.id, formatDate(day))) }">
+                                                <span class="text-white" x-text="formatNumericDisplay(habit.id, formatDate(day))"></span>
+                                                
+                                                <!-- Numeric Input Tooltip -->
+                                                <div x-show="showTooltip === `${habit.id}_${formatDate(day)}`"
+                                                     @click.outside="showTooltip = null"
+                                                     x-transition:enter="transition ease-out duration-200"
+                                                     class="absolute bottom-full left-1/2 -translate-x-1/2 bg-white shadow-xl rounded-md py-2 px-1 z-50 w-44 border border-gray-200 mb-2">
+                                                    <!-- Arrow -->
+                                                    <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white transform rotate-45 border-r border-b border-gray-200"></div>
+                                                    
+                                                    <!-- Options View -->
+                                                    <div x-show="!showNumericInput" class="flex flex-col gap-1">
+                                                        <button @click="
+                                                            showNumericInput = true;
+                                                            const log = habitLogs[`${habit.id}_${formatDate(day)}`];
+                                                            numericValue = log?.value?.Valid ? JSON.parse(log.value.String).value : 0;
+                                                        "
+                                                            class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
+                                                            ✅ Log amount
+                                                        </button>
+                                                        <button @click="handleSquareClick(habit.id, formatDate(day), 'missed')"
+                                                            class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
+                                                            ❌ Missed
+                                                        </button>
+                                                        <button @click="handleSquareClick(habit.id, formatDate(day), 'skipped')"
+                                                            class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
+                                                            ⏭️ Skipped
+                                                        </button>
+                                                        
+                                                        <!-- Delete button - only show if there's a log -->
+                                                        <template x-if="habitLogs[`${habit.id}_${formatDate(day)}`]">
+                                                            <button @click="(() => {
+                                                                const logId = habitLogs[`${habit.id}_${formatDate(day)}`].id;
+                                                                fetch(`/api/habits/logs/delete?id=${logId}`, {
+                                                                    method: 'DELETE'
+                                                                })
+                                                                .then(res => res.json())
+                                                                .then(result => {
+                                                                    if (result.success) {
+                                                                        delete habitLogs[`${habit.id}_${formatDate(day)}`];
+                                                                        showTooltip = null;
+                                                                    } else {
+                                                                        alert('Error deleting log: ' + result.message);
+                                                                    }
+                                                                })
+                                                                .catch(err => {
+                                                                    console.error('Error:', err);
+                                                                    alert('Error deleting log');
+                                                                });
+                                                            })()"
+                                                                class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left text-red-600">
+                                                                🗑️ Delete
+                                                            </button>
+                                                        </template>
+                                                    </div>
+                                                    
+                                                    <!-- Numeric Input -->
+                                                    <div x-show="showNumericInput" class="px-2">
+                                                        <div class="flex items-center gap-2">
+                                                            <button @click="numericValue = Math.max(0, parseInt(numericValue) - 1)"
+                                                                class="text-gray-500 hover:text-gray-700">-</button>
+                                                            <input type="number" 
+                                                                   x-model="numericValue"
+                                                                   @keyup.enter="handleNumericSubmit(habit.id, formatDate(day))"
+                                                                   x-ref="numericInput"
+                                                                   class="w-16 text-center border rounded-md"
+                                                                   min="0"
+                                                                   step="1">
+                                                            <button @click="numericValue = parseInt(numericValue) + 1"
+                                                                class="text-gray-500 hover:text-gray-700">+</button>
+                                                            <button @click="handleNumericSubmit(habit.id, formatDate(day))"
+                                                                class="px-2 py-1 bg-[#2da44e] hover:bg-[#2c974b] text-white rounded-md text-sm">
+                                                                Log
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <!-- Set-Reps Habit Type -->
+                                        <template x-if="habit.habit_type === 'set-reps'">
+                                            <div class="w-7 h-7 rounded-sm cursor-pointer flex items-center justify-center text-sm relative group/setreps"
+                                                 @click="showTooltip = `${habit.id}_${formatDate(day)}`"
+                                                 :style="{ backgroundColor: getStatusColor(getStatus(habit.id, formatDate(day))) }">
+                                                
+                                                <span class="text-white" x-text="formatSetRepsDisplay(habit.id, formatDate(day))"></span>
+                                                
+                                                <!-- Hover Tooltip (separate from click interaction) -->
+                                                <template x-if="habitLogs[`${habit.id}_${formatDate(day)}`]?.status === 'done'">
+                                                    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-3 py-2 rounded text-sm whitespace-nowrap opacity-0 group-hover/setreps:opacity-100 transition-opacity duration-200 pointer-events-none z-30">
+                                                        <template x-for="(set, index) in JSON.parse(habitLogs[`${habit.id}_${formatDate(day)}`].value.String).sets" :key="index">
+                                                            <div>
+                                                                <span x-text="`Set ${index + 1}: ${set.reps}`"></span>
+                                                            </div>
+                                                        </template>
+                                                        <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-800 transform rotate-45"></div>
+                                                    </div>
+                                                </template>
+
+                                                <!-- Click Tooltip (existing functionality) -->
+                                                <div x-show="showTooltip === `${habit.id}_${formatDate(day)}`"
+                                                     @click.outside="showTooltip = null"
+                                                     x-transition:enter="transition ease-out duration-200"
+                                                     class="absolute bottom-full left-1/2 -translate-x-1/2 bg-white shadow-xl rounded-md py-2 px-1 z-50 w-64 border border-gray-200 mb-2">
+                                                    <!-- Arrow -->
+                                                    <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white transform rotate-45 border-r border-b border-gray-200"></div>
+                                                    
+                                                    <!-- Options View -->
+                                                    <div x-show="!showSetRepsInput" class="flex flex-col gap-1">
+                                                        <button @click="
+                                                            showSetRepsInput = true;
+                                                            const log = habitLogs[`${habit.id}_${formatDate(day)}`];
+                                                            setReps = log?.value?.Valid ? JSON.parse(log.value.String).sets : [{reps: 0}];
+                                                        "
+                                                            class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
+                                                            ✅ Log Sets & Reps
+                                                        </button>
+                                                        <button @click="handleSquareClick(habit.id, formatDate(day), 'missed')"
+                                                            class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
+                                                            ❌ Missed
+                                                        </button>
+                                                        <button @click="handleSquareClick(habit.id, formatDate(day), 'skipped')"
+                                                            class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
+                                                            ⏭️ Skipped
+                                                        </button>
+                                                        
+                                                        <!-- Delete button - only show if there's a log -->
+                                                        <template x-if="habitLogs[`${habit.id}_${formatDate(day)}`]">
+                                                            <button @click="(() => {
+                                                                const logId = habitLogs[`${habit.id}_${formatDate(day)}`].id;
+                                                                fetch(`/api/habits/logs/delete?id=${logId}`, {
+                                                                    method: 'DELETE'
+                                                                })
+                                                                .then(res => res.json())
+                                                                .then(result => {
+                                                                    if (result.success) {
+                                                                        delete habitLogs[`${habit.id}_${formatDate(day)}`];
+                                                                        showTooltip = null;
+                                                                        showSetRepsInput = false;  // Reset the set-reps input view
+                                                                        setReps = [{reps: 0}];     // Reset the set-reps data
+                                                                    } else {
+                                                                        alert('Error deleting log: ' + result.message);
+                                                                    }
+                                                                })
+                                                                .catch(err => {
+                                                                    console.error('Error:', err);
+                                                                    alert('Error deleting log');
+                                                                });
+                                                            })()"
+                                                                class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left text-red-600">
+                                                                🗑️ Delete
+                                                            </button>
+                                                        </template>
+                                                    </div>
+                                                    
+                                                    <!-- Set-Reps Input View -->
+                                                    <div x-show="showSetRepsInput" class="px-2">
+                                                        <div class="flex flex-col gap-2">
+                                                            <template x-for="(set, index) in setReps" :key="index">
+                                                                <div class="flex items-center gap-2">
+                                                                    <span class="text-sm text-gray-600" x-text="`Set ${index + 1}:`"></span>
+                                                                    <input type="number" 
+                                                                           x-model="set.reps"
+                                                                           class="w-16 text-center border rounded-md"
+                                                                           min="0"
+                                                                           step="1">
+                                                                    <button @click="setReps = setReps.filter((_, i) => i !== index)"
+                                                                            class="text-red-600 hover:text-red-700">
+                                                                        ×
+                                                                    </button>
+                                                                </div>
+                                                            </template>
+                                                            
+                                                            <div class="flex justify-between items-center mt-2">
+                                                                <button @click="setReps.push({reps: 0})"
+                                                                        class="text-sm text-gray-600 hover:text-gray-800">
+                                                                    + Add Set
+                                                                </button>
+                                                                <button @click="handleSetRepsSubmit(habit.id, formatDate(day))"
+                                                                        :disabled="!setReps.some(set => set.reps > 0)"
+                                                                        :class="{
+                                                                            'bg-[#2da44e] hover:bg-[#2c974b]': setReps.some(set => set.reps > 0),
+                                                                            'bg-gray-300 cursor-not-allowed': !setReps.some(set => set.reps > 0)
+                                                                        }"
+                                                                        class="px-3 py-1 text-white rounded-md text-sm">
+                                                                    Save
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+
+                                        <!-- Binary Habit Type -->
+                                        <template x-if="habit.habit_type === 'binary'">
+                                            <div class="w-7 h-7 rounded-sm cursor-pointer flex items-center justify-center"
+                                                 @click="(() => {
+                                                     const currentStatus = getStatus(habit.id, formatDate(day));
+                                                     let newStatus = 'done';
+                                                     
+                                                     // Cycle through states
+                                                     switch(currentStatus) {
+                                                         case 'none': newStatus = 'done'; break;
+                                                         case 'done': newStatus = 'missed'; break;
+                                                         case 'missed': newStatus = 'skipped'; break;
+                                                         case 'skipped': newStatus = 'none'; break;
+                                                     }
+                                                     
+                                                     handleSquareClick(habit.id, formatDate(day), newStatus);
+                                                 })()"
+                                                 :style="{ backgroundColor: getStatusColor(getStatus(habit.id, formatDate(day))) }">
+                                            </div>
+                                        </template>
+
+                                    </div>
+                                </template>
+
+                                <!-- Totals Cell -->
+                                <div class="h-8 flex items-center justify-center">
+                                    <span class="text-sm font-bold text-gray-700" x-text="(() => {
+                                        if (habit.habit_type === 'numeric') {
+                                            let sum = 0;
+                                            for (let d = 1; d <= getDaysInMonth(); d++) {
+                                                const log = habitLogs[`${habit.id}_${formatDate(d)}`];
+                                                if (log?.value?.Valid) {
+                                                    sum += parseFloat(JSON.parse(log.value.String).value);
+                                                }
+                                            }
+                                            return formatNumericValue(sum);
+                                        } else if (habit.habit_type === 'set-reps') {
+                                            let totalReps = 0;
+                                            for (let d = 1; d <= getDaysInMonth(); d++) {
+                                                const log = habitLogs[`${habit.id}_${formatDate(d)}`];
+                                                if (log?.total_reps) {
+                                                    totalReps += parseInt(log.total_reps);
+                                                }
+                                            }
+                                            return totalReps;
+                                        } else {
+                                            return Object.entries(habitLogs)
+                                                .filter(([key, log]) => 
+                                                    key.startsWith(`${habit.id}_${currentYear}-${String(currentMonth).padStart(2, '0')}`) && 
+                                                    log.status === 'done'
+                                                ).length;
+                                        }
+                                    })()">
+                                    </span>
+                                </div>
+                            </div>
+                        </template>
                     </div>
                 </div>
 
-                <!-- Sortable List of Habit Rows -->
-                <div x-ref="habitsListContainer" class="flex flex-col gap-1">
-                    <template x-for="habit in habits" :key="habit.id">
-                        <div class="grid bg-white group"
-                             x-bind:data-habit-id="habit.id"
-                             style="gap: 3px; grid-template-columns: 150px repeat(31, 35px) 70px;"
-                             class="border border-gray-200 rounded-sm">
-                             
-                            <!-- Habit Name Cell (drag handle) -->
-                            <div class="h-8 flex items-center font-medium text-sm text-gray-700 pr-4 habit-handle relative" 
-                                 style="width: 150px; cursor: grab;">
-                                <div class="absolute left-0 top-0 bottom-0 flex items-center transition-opacity duration-150 opacity-0 group-hover:opacity-100 px-1">
-                                    <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                                        <circle cx="4" cy="4" r="1.5"></circle>
-                                        <circle cx="4" cy="10" r="1.5"></circle>
-                                        <circle cx="4" cy="16" r="1.5"></circle>
-                                        <circle cx="10" cy="4" r="1.5"></circle>
-                                        <circle cx="10" cy="10" r="1.5"></circle>
-                                        <circle cx="10" cy="16" r="1.5"></circle>
-                                    </svg>
-                                </div>
-                                <div class="flex items-center pl-7">
-                                    <a :href="`/habit/${habit.id}`" class="flex items-center hover:text-[#2da44e] hover:underline" @click.stop>
-                                        <span class="mr-2" x-text="habit.emoji"></span>
-                                        <span x-text="habit.name"></span>
-                                    </a>
-                                </div>
-                            </div>
-                            
-                            <!-- Day Cells - Reorganized by Habit Type -->
-                            <template x-for="day in 31" :key="day">
-                                <div class="h-8 flex items-center justify-center relative"
-                                     :class="{
-                                         'invisible': day > getDaysInMonth(),
-                                         'transition-transform duration-150 hover:-translate-y-0.5': !showTooltip || showTooltip !== `${habit.id}_${formatDate(day)}`
-                                     }">
-                                    
-                                    <!-- Option-Select Habit Type -->
-                                    <template x-if="habit.habit_type === 'option-select'">
-                                        <div class="w-7 h-7 relative">
-                                            <!-- Option Display -->
-                                            <div @click="showTooltip = `${habit.id}_${formatDate(day)}`"
-                                                 class="w-7 h-7 rounded-sm cursor-pointer flex items-center justify-center bg-[#ebedf0] relative">
-                                                <template x-if="habitLogs[`${habit.id}_${formatDate(day)}`]?.value?.Valid">
-                                                    <div class="relative hover:z-20 group/cell">
-                                                        <!-- Selected Option Display -->
-                                                        <span x-text="JSON.parse(habitLogs[`${habit.id}_${formatDate(day)}`].value.String).emoji"></span>
-                                                        
-                                                        <!-- Option Hover Tooltip -->
-                                                        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-2 py-1 rounded text-sm whitespace-nowrap opacity-0 group-hover/cell:opacity-100 transition-opacity duration-200 pointer-events-none">
-                                                            <span x-text="JSON.parse(habitLogs[`${habit.id}_${formatDate(day)}`].value.String).label"></span>
-                                                            <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-800 transform rotate-45"></div>
-                                                        </div>
-                                                    </div>
-                                                </template>
-                                            </div>
-
-                                            <!-- Option Selection Tooltip -->
-                                            <div x-show="showTooltip === `${habit.id}_${formatDate(day)}`"
-                                                 @click.away="showTooltip = null"
-                                                 x-transition:enter="transition ease-out duration-200"
-                                                 class="absolute z-[100] top-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 p-2 -translate-x-1/2 left-1/2">
-                                                <!-- Arrow pointing up -->
-                                                <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 transform rotate-45 bg-white border-l border-t border-gray-200"></div>
-                                                
-                                                <!-- Options Container -->
-                                                <div class="relative bg-white rounded-lg" style="min-width: 150px;">
-                                                    <div class="flex flex-col gap-1">
-                                                        <template x-for="option in (() => {
-                                                            const options = getHabitOptions(habit.id);
-                                                            console.log('Available options:', options);
-                                                            return options;
-                                                        })()" :key="option.emoji">
-                                                            <button @click="(() => {
-                                                                    console.log('Option selected:', option);
-                                                                    handleOptionSelection(habit.id, formatDate(day), option);
-                                                                })()"
-                                                                class="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded-md w-full text-left">
-                                                                <span x-text="option.emoji"></span>
-                                                                <span x-text="option.label" class="text-sm text-gray-700"></span>
-                                                            </button>
-                                                        </template>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </template>
-
-                                    <!-- Numeric Habit Type -->
-                                    <template x-if="habit.habit_type === 'numeric'">
-                                        <div class="w-7 h-7 rounded-sm cursor-pointer flex items-center justify-center text-sm"
-                                             @click="showTooltip = `${habit.id}_${formatDate(day)}`"
-                                             :style="{ backgroundColor: getStatusColor(getStatus(habit.id, formatDate(day))) }">
-                                            <span class="text-white" x-text="formatNumericDisplay(habit.id, formatDate(day))"></span>
-                                            
-                                            <!-- Numeric Input Tooltip -->
-                                            <div x-show="showTooltip === `${habit.id}_${formatDate(day)}`"
-                                                 @click.outside="showTooltip = null"
-                                                 x-transition:enter="transition ease-out duration-200"
-                                                 class="absolute bottom-full left-1/2 -translate-x-1/2 bg-white shadow-xl rounded-md py-2 px-1 z-50 w-44 border border-gray-200 mb-2">
-                                                <!-- Arrow -->
-                                                <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white transform rotate-45 border-r border-b border-gray-200"></div>
-                                                
-                                                <!-- Options View -->
-                                                <div x-show="!showNumericInput" class="flex flex-col gap-1">
-                                                    <button @click="
-                                                        showNumericInput = true;
-                                                        const log = habitLogs[`${habit.id}_${formatDate(day)}`];
-                                                        numericValue = log?.value?.Valid ? JSON.parse(log.value.String).value : 0;
-                                                    "
-                                                        class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
-                                                        ✅ Log amount
-                                                    </button>
-                                                    <button @click="handleSquareClick(habit.id, formatDate(day), 'missed')"
-                                                        class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
-                                                        ❌ Missed
-                                                    </button>
-                                                    <button @click="handleSquareClick(habit.id, formatDate(day), 'skipped')"
-                                                        class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
-                                                        ⏭️ Skipped
-                                                    </button>
-                                                    
-                                                    <!-- Delete button - only show if there's a log -->
-                                                    <template x-if="habitLogs[`${habit.id}_${formatDate(day)}`]">
-                                                        <button @click="(() => {
-                                                            const logId = habitLogs[`${habit.id}_${formatDate(day)}`].id;
-                                                            fetch(`/api/habits/logs/delete?id=${logId}`, {
-                                                                method: 'DELETE'
-                                                            })
-                                                            .then(res => res.json())
-                                                            .then(result => {
-                                                                if (result.success) {
-                                                                    delete habitLogs[`${habit.id}_${formatDate(day)}`];
-                                                                    showTooltip = null;
-                                                                } else {
-                                                                    alert('Error deleting log: ' + result.message);
-                                                                }
-                                                            })
-                                                            .catch(err => {
-                                                                console.error('Error:', err);
-                                                                alert('Error deleting log');
-                                                            });
-                                                        })()"
-                                                            class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left text-red-600">
-                                                            🗑️ Delete
-                                                        </button>
-                                                    </template>
-                                                </div>
-                                                
-                                                <!-- Numeric Input -->
-                                                <div x-show="showNumericInput" class="px-2">
-                                                    <div class="flex items-center gap-2">
-                                                        <button @click="numericValue = Math.max(0, parseInt(numericValue) - 1)"
-                                                            class="text-gray-500 hover:text-gray-700">-</button>
-                                                        <input type="number" 
-                                                               x-model="numericValue"
-                                                               @keyup.enter="handleNumericSubmit(habit.id, formatDate(day))"
-                                                               x-ref="numericInput"
-                                                               class="w-16 text-center border rounded-md"
-                                                               min="0"
-                                                               step="1">
-                                                        <button @click="numericValue = parseInt(numericValue) + 1"
-                                                            class="text-gray-500 hover:text-gray-700">+</button>
-                                                        <button @click="handleNumericSubmit(habit.id, formatDate(day))"
-                                                            class="px-2 py-1 bg-[#2da44e] hover:bg-[#2c974b] text-white rounded-md text-sm">
-                                                            Log
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </template>
-
-                                    <!-- Set-Reps Habit Type -->
-                                    <template x-if="habit.habit_type === 'set-reps'">
-                                        <div class="w-7 h-7 rounded-sm cursor-pointer flex items-center justify-center text-sm relative group/setreps"
-                                             @click="showTooltip = `${habit.id}_${formatDate(day)}`"
-                                             :style="{ backgroundColor: getStatusColor(getStatus(habit.id, formatDate(day))) }">
-                                            
-                                            <span class="text-white" x-text="formatSetRepsDisplay(habit.id, formatDate(day))"></span>
-                                            
-                                            <!-- Hover Tooltip (separate from click interaction) -->
-                                            <template x-if="habitLogs[`${habit.id}_${formatDate(day)}`]?.status === 'done'">
-                                                <div class="absolute bottom-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-3 py-2 rounded text-sm whitespace-nowrap opacity-0 group-hover/setreps:opacity-100 transition-opacity duration-200 pointer-events-none z-30">
-                                                    <template x-for="(set, index) in JSON.parse(habitLogs[`${habit.id}_${formatDate(day)}`].value.String).sets" :key="index">
-                                                        <div>
-                                                            <span x-text="`Set ${index + 1}: ${set.reps}`"></span>
-                                                        </div>
-                                                    </template>
-                                                    <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-800 transform rotate-45"></div>
-                                                </div>
-                                            </template>
-
-                                            <!-- Click Tooltip (existing functionality) -->
-                                            <div x-show="showTooltip === `${habit.id}_${formatDate(day)}`"
-                                                 @click.outside="showTooltip = null"
-                                                 x-transition:enter="transition ease-out duration-200"
-                                                 class="absolute bottom-full left-1/2 -translate-x-1/2 bg-white shadow-xl rounded-md py-2 px-1 z-50 w-64 border border-gray-200 mb-2">
-                                                <!-- Arrow -->
-                                                <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white transform rotate-45 border-r border-b border-gray-200"></div>
-                                                
-                                                <!-- Options View -->
-                                                <div x-show="!showSetRepsInput" class="flex flex-col gap-1">
-                                                    <button @click="
-                                                        showSetRepsInput = true;
-                                                        const log = habitLogs[`${habit.id}_${formatDate(day)}`];
-                                                        setReps = log?.value?.Valid ? JSON.parse(log.value.String).sets : [{reps: 0}];
-                                                    "
-                                                        class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
-                                                        ✅ Log Sets & Reps
-                                                    </button>
-                                                    <button @click="handleSquareClick(habit.id, formatDate(day), 'missed')"
-                                                        class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
-                                                        ❌ Missed
-                                                    </button>
-                                                    <button @click="handleSquareClick(habit.id, formatDate(day), 'skipped')"
-                                                        class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
-                                                        ⏭️ Skipped
-                                                    </button>
-                                                    
-                                                    <!-- Delete button - only show if there's a log -->
-                                                    <template x-if="habitLogs[`${habit.id}_${formatDate(day)}`]">
-                                                        <button @click="(() => {
-                                                            const logId = habitLogs[`${habit.id}_${formatDate(day)}`].id;
-                                                            fetch(`/api/habits/logs/delete?id=${logId}`, {
-                                                                method: 'DELETE'
-                                                            })
-                                                            .then(res => res.json())
-                                                            .then(result => {
-                                                                if (result.success) {
-                                                                    delete habitLogs[`${habit.id}_${formatDate(day)}`];
-                                                                    showTooltip = null;
-                                                                    showSetRepsInput = false;  // Reset the set-reps input view
-                                                                    setReps = [{reps: 0}];     // Reset the set-reps data
-                                                                } else {
-                                                                    alert('Error deleting log: ' + result.message);
-                                                                }
-                                                            })
-                                                            .catch(err => {
-                                                                console.error('Error:', err);
-                                                                alert('Error deleting log');
-                                                            });
-                                                        })()"
-                                                            class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left text-red-600">
-                                                            🗑️ Delete
-                                                        </button>
-                                                    </template>
-                                                </div>
-                                                
-                                                <!-- Set-Reps Input View -->
-                                                <div x-show="showSetRepsInput" class="px-2">
-                                                    <div class="flex flex-col gap-2">
-                                                        <template x-for="(set, index) in setReps" :key="index">
-                                                            <div class="flex items-center gap-2">
-                                                                <span class="text-sm text-gray-600" x-text="`Set ${index + 1}:`"></span>
-                                                                <input type="number" 
-                                                                       x-model="set.reps"
-                                                                       class="w-16 text-center border rounded-md"
-                                                                       min="0"
-                                                                       step="1">
-                                                                <button @click="setReps = setReps.filter((_, i) => i !== index)"
-                                                                        class="text-red-600 hover:text-red-700">
-                                                                    ×
-                                                                </button>
-                                                            </div>
-                                                        </template>
-                                                        
-                                                        <div class="flex justify-between items-center mt-2">
-                                                            <button @click="setReps.push({reps: 0})"
-                                                                    class="text-sm text-gray-600 hover:text-gray-800">
-                                                                + Add Set
-                                                            </button>
-                                                            <button @click="handleSetRepsSubmit(habit.id, formatDate(day))"
-                                                                    :disabled="!setReps.some(set => set.reps > 0)"
-                                                                    :class="{
-                                                                        'bg-[#2da44e] hover:bg-[#2c974b]': setReps.some(set => set.reps > 0),
-                                                                        'bg-gray-300 cursor-not-allowed': !setReps.some(set => set.reps > 0)
-                                                                    }"
-                                                                    class="px-3 py-1 text-white rounded-md text-sm">
-                                                                Save
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </template>
-
-                                    <!-- Binary Habit Type -->
-                                    <template x-if="habit.habit_type === 'binary'">
-                                        <div class="w-7 h-7 rounded-sm cursor-pointer flex items-center justify-center"
-                                             @click="(() => {
-                                                 const currentStatus = getStatus(habit.id, formatDate(day));
-                                                 let newStatus = 'done';
-                                                 
-                                                 // Cycle through states
-                                                 switch(currentStatus) {
-                                                     case 'none': newStatus = 'done'; break;
-                                                     case 'done': newStatus = 'missed'; break;
-                                                     case 'missed': newStatus = 'skipped'; break;
-                                                     case 'skipped': newStatus = 'none'; break;
-                                                 }
-                                                 
-                                                 handleSquareClick(habit.id, formatDate(day), newStatus);
-                                             })()"
-                                             :style="{ backgroundColor: getStatusColor(getStatus(habit.id, formatDate(day))) }">
-                                        </div>
-                                    </template>
-
-                                </div>
-                            </template>
-
-                            <!-- Totals Cell -->
-                            <div class="h-8 flex items-center justify-center">
-                                <span class="text-sm font-bold text-gray-700" x-text="(() => {
-                                    if (habit.habit_type === 'numeric') {
-                                        let sum = 0;
-                                        for (let d = 1; d <= getDaysInMonth(); d++) {
-                                            const log = habitLogs[`${habit.id}_${formatDate(d)}`];
-                                            if (log?.value?.Valid) {
-                                                sum += parseFloat(JSON.parse(log.value.String).value);
-                                            }
-                                        }
-                                        return formatNumericValue(sum);
-                                    } else if (habit.habit_type === 'set-reps') {
-                                        let totalReps = 0;
-                                        for (let d = 1; d <= getDaysInMonth(); d++) {
-                                            const log = habitLogs[`${habit.id}_${formatDate(d)}`];
-                                            if (log?.total_reps) {
-                                                totalReps += parseInt(log.total_reps);
-                                            }
-                                        }
-                                        return totalReps;
-                                    } else {
-                                        return Object.entries(habitLogs)
-                                            .filter(([key, log]) => 
-                                                key.startsWith(`${habit.id}_${currentYear}-${String(currentMonth).padStart(2, '0')}`) && 
-                                                log.status === 'done'
-                                            ).length;
-                                    }
-                                })()">
-                                </span>
-                            </div>
-                        </div>
-                    </template>
-                </div>
-
                 <!-- Legend moved to bottom -->
-                <div class="flex justify-center gap-6 mt-6">
+                <div class="grid grid-cols-2 md:flex md:justify-center gap-4 md:gap-6 mt-6 justify-center">
                     <div class="flex items-center gap-2">
                         <div class="w-5 h-5 rounded-sm" style="background-color: #2da44e;"></div>
                         <span class="text-sm text-gray-600">Done</span>
