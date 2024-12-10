@@ -8,6 +8,11 @@
             currentYear: new Date().getFullYear(),
             habitLogs: {},
             hoverDate: '',
+            numericStats: {
+                min: 0,
+                max: 0,
+                quartiles: []
+            },
 
             init() {
                 console.log('Initializing yearlyGrid');
@@ -66,18 +71,60 @@
                 fetch(`/api/habits/logs?habit_id={{ .Habit.ID }}&start_date=${startDate}&end_date=${endDate}`)
                     .then(response => response.json())
                     .then(result => {
-                        // Reset habitLogs
                         this.habitLogs = {};
                         
-                        // Process the logs into a lookup object
                         if (result.success && Array.isArray(result.data)) {
+                            // Detailed debug logging
+                            console.log('Raw log data:', result.data);
+                            console.log('First log entry:', JSON.stringify(result.data[0], null, 2));
+                            console.log('Value type:', typeof result.data[0]?.value);
+                            console.log('Value content:', result.data[0]?.value);
+                            
                             result.data.forEach(log => {
-                                // Convert the date to YYYY-MM-DD format for lookup
                                 const key = log.date.split('T')[0];
                                 this.habitLogs[key] = log;
                             });
-                        } else {
-                            console.error('Invalid response format:', result);
+
+                            // Calculate quartiles for numeric habits
+                            if ('{{ .Habit.HabitType }}' === 'numeric') {
+                                const values = result.data
+                                    .filter(log => log.status === 'done')
+                                    .map(log => {
+                                        try {
+                                            // Parse the JSON string to get the value object
+                                            const valueObj = JSON.parse(log.value.String);
+                                            const numericValue = parseFloat(valueObj.value);
+                                            console.log('Parsed value:', numericValue, 'from:', valueObj);
+                                            return numericValue;
+                                        } catch (e) {
+                                            console.error('Error parsing value:', e);
+                                            return 0;
+                                        }
+                                    })
+                                    .filter(value => !isNaN(value))
+                                    .sort((a, b) => a - b);
+
+                                console.log('Parsed numeric values:', values);
+
+                                if (values.length > 0) {
+                                    this.numericStats.min = values[0];
+                                    this.numericStats.max = values[values.length - 1];
+                                    
+                                    // Calculate quartile thresholds
+                                    const range = this.numericStats.max - this.numericStats.min;
+                                    this.numericStats.quartiles = [
+                                        this.numericStats.min + (range * 0.25),
+                                        this.numericStats.min + (range * 0.5),
+                                        this.numericStats.min + (range * 0.75)
+                                    ];
+                                    
+                                    console.log('Stats:', {
+                                        min: this.numericStats.min,
+                                        max: this.numericStats.max,
+                                        quartiles: this.numericStats.quartiles
+                                    });
+                                }
+                            }
                         }
                     })
                     .catch(error => {
@@ -93,7 +140,35 @@
                 return this.habitLogs[dateStr]?.status || 'none';
             },
 
-            getStatusColor(status) {
+            getStatusColor(status, day) {
+                if ('{{ .Habit.HabitType }}' === 'numeric' && status === 'done') {
+                    const dateStr = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`;
+                    const log = this.habitLogs[dateStr];
+                    
+                    try {
+                        const valueObj = JSON.parse(log.value.String);
+                        const value = parseFloat(valueObj.value);
+                        
+                        console.log(`Value for ${dateStr}:`, value);
+                        
+                        if (isNaN(value)) return '#ebedf0'; // Return no-data color for invalid numbers
+                        
+                        // Return color based on value quartile
+                        if (value <= this.numericStats.quartiles[0]) {
+                            return '#39d353'; // Lightest green
+                        } else if (value <= this.numericStats.quartiles[1]) {
+                            return '#26a641'; // Light green
+                        } else if (value <= this.numericStats.quartiles[2]) {
+                            return '#006d32'; // Dark green
+                        } else {
+                            return '#0a4429'; // Darkest green
+                        }
+                    } catch (e) {
+                        console.error('Error parsing value:', e);
+                        return '#ebedf0';
+                    }
+                }
+
                 const colors = {
                     'done': '#2da44e',
                     'missed': '#E3211a',
@@ -232,7 +307,7 @@
                                              });
                                          })()"
                                          :style="{ 
-                                             backgroundColor: day ? getStatusColor(getStatus(day)) : 'transparent'
+                                             backgroundColor: day ? getStatusColor(getStatus(day), day) : 'transparent'
                                          }"
                                          style="width: 17px; height: 17px; margin-bottom: 3px; border-radius: 2px;">
                                     </div>
