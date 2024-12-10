@@ -4,7 +4,26 @@
 <body class="h-full">
     {{ template "header" . }}
     
-    <div class="min-h-[calc(100vh-4rem)] relative px-4 sm:px-6 lg:px-8">
+    <!-- New hero section -->
+    <div class="h-screen bg-[#2da44e] relative">
+        <div class="absolute inset-0 flex flex-col items-center justify-center text-white px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl sm:text-6xl font-bold mb-6">Build better habits.</h1>
+                <p class="text-xl sm:text-2xl mb-8">Turn small daily wins into life-changing achievements.</p>
+            </div>
+            <div class="hidden xl:block"> <!-- Hide on mobile/tablet -->
+                {{ template "demo-grid" . }}
+            </div>
+            <button 
+                class="px-6 py-3 mt-8 text-[#2da44e] bg-white rounded-md font-medium hover:bg-gray-100 transition-colors duration-200"
+                onclick="smoothScroll('#second-hero')">
+                Learn More ↓
+            </button>
+        </div>
+    </div>
+
+    <!-- Original hero section with updated id -->
+    <div id="second-hero" class="min-h-[calc(100vh-4rem)] relative px-4 sm:px-6 lg:px-8">
         <div class="absolute top-[30%] left-1/2 -translate-x-1/2 w-full max-w-md"
              style="width: calc(100% - 2rem)"
              x-data="{ show: false }"
@@ -48,9 +67,6 @@
             <p class="mt-6 mb-24 text-lg leading-8 text-gray-600">
                 Turn small daily wins into life-changing achievements.
             </p>
-            <div class="hidden lg:block"> <!-- Hide on mobile/tablet -->
-                {{ template "demo-grid" . }}
-            </div>
         </div>
     </div>
 </body>

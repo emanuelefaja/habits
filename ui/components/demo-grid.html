@@ -37,7 +37,7 @@
                                 </svg>
                             </button>
                         </span>
-                        <h2 class="text-2xl font-semibold" x-text="`🗓️ ${monthNames[currentMonth-1]} ${currentYear}`"></h2>
+                        <h2 class="text-2xl font-semibold text-gray-900" x-text="`🗓️ ${monthNames[currentMonth-1]} ${currentYear}`"></h2>
                     </div>
                     
                     <!-- Register button -->
@@ -132,7 +132,7 @@
                                             <!-- Selection Tooltip -->
                                             <div x-show="showTooltip === `${habit.id}_${formatDate(day)}`"
                                                  @click.away="showTooltip = null"
-                                                 class="absolute z-50 top-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 p-2 -translate-x-1/2 left-1/2">
+                                                 class="absolute z-50 top-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 p-2 -translate-x-1/2 left-1/2 text-gray-900">
                                                 <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 transform rotate-45 bg-white border-l border-t border-gray-200"></div>
                                                 
                                                 <div class="relative bg-white rounded-lg" style="min-width: 150px;">
@@ -185,15 +185,15 @@
                                                     const log = habitLogs[`${habit.id}_${formatDate(day)}`];
                                                     numericValue = log?.value?.Valid ? JSON.parse(log.value.String).value : 0;
                                                 "
-                                                    class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
+                                                    class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left text-gray-700">
                                                     ✅ Log amount
                                                 </button>
                                                 <button @click="setStatus(habit.id, formatDate(day), 'missed')"
-                                                    class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
+                                                    class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left text-gray-700">
                                                     ❌ Missed
                                                 </button>
                                                 <button @click="setStatus(habit.id, formatDate(day), 'skipped')"
-                                                    class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
+                                                    class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left text-gray-700">
                                                     ⏭️ Skipped
                                                 </button>
                                             </div>
@@ -202,16 +202,16 @@
                                             <div x-show="showNumericInput" class="px-2">
                                                 <div class="flex items-center gap-2">
                                                     <button @click="numericValue = Math.max(0, parseInt(numericValue) - 1)"
-                                                        class="text-gray-500 hover:text-gray-700">-</button>
+                                                        class="text-gray-700 hover:text-gray-900">-</button>
                                                     <input type="number" 
                                                            x-model="numericValue"
                                                            @keyup.enter="handleNumericSubmit(habit.id, formatDate(day))"
                                                            x-ref="numericInput"
-                                                           class="w-16 text-center border rounded-md"
+                                                           class="w-16 text-center border rounded-md text-gray-700"
                                                            min="0"
                                                            step="1">
                                                     <button @click="numericValue = parseInt(numericValue) + 1"
-                                                        class="text-gray-500 hover:text-gray-700">+</button>
+                                                        class="text-gray-700 hover:text-gray-900">+</button>
                                                     <button @click="handleNumericSubmit(habit.id, formatDate(day))"
                                                         class="px-2 py-1 bg-[#2da44e] hover:bg-[#2c974b] text-white rounded-md text-sm">
                                                         Log
