@@ -1,23 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full bg-gray-50">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roadmap - Habits</title>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .smooth-scroll {
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        /* Add this rule */
-        [x-cloak] {
-            display: none !important;
-        }
-    </style>
-</head>
+{{ template "head" . }}
 <body class="h-full">
     {{ template "header" dict "User" .User "Page" "roadmap" }}
 

@@ -1,45 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About habits.co</title>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @keyframes wave {
-            0% { transform: rotate(0deg); }
-            20% { transform: rotate(-15deg); }
-            40% { transform: rotate(14deg); }
-            60% { transform: rotate(-4deg); }
-            80% { transform: rotate(10deg); }
-            100% { transform: rotate(0deg); }
-        }
-    </style>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    animation: {
-                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards'
-                    },
-                    keyframes: {
-                        fadeInUp: {
-                            '0%': {
-                                opacity: '0',
-                                transform: 'translateY(20px)'
-                            },
-                            '100%': {
-                                opacity: '1',
-                                transform: 'translateY(0)'
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-</head>
+ {{ template "head" . }}
 <body>
     <div class="min-h-screen bg-gray-50">
         {{ template "header" . }}
@@ -53,7 +14,7 @@
                             x-init="setTimeout(() => show = true, 100)">
                     <div class="space-y-3 flex flex-col items-center">
                         <div class="w-full max-w-md text-left">
-                            <h1 class="text-4xl tracking-tight text-gray-900 space-y-2">
+                            <h1 class="text-3xl tracking-tight text-gray-900 space-y-2">
                                 <span class="block opacity-0"
                                       :class="{ 'animate-fade-in-up': show }"
                                       style="animation-delay: 0.2s">
@@ -161,6 +122,10 @@
                             <ul class="list-disc list-inside ml-6 mt-1">
                                 <li><a href="https://alpinejs.dev" target="_blank" rel="noopener" class="hover:underline"><code class="text-sm bg-gray-100 px-1 rounded">AlpineJS</code></a> for lightweight interactivity</li>
                                 <li><a href="https://tailwindcss.com" target="_blank" rel="noopener" class="hover:underline"><code class="text-sm bg-gray-100 px-1 rounded">Tailwind CSS</code></a> for modern, responsive styling</li>
+                                <li><a href="https://www.chartjs.org" target="_blank" rel="noopener" class="hover:underline"><code class="text-sm bg-gray-100 px-1 rounded">Chart.js</code></a> for data visualization</li>
+                                <li><a href="https://sortablejs.github.io/Sortable/" target="_blank" rel="noopener" class="hover:underline"><code class="text-sm bg-gray-100 px-1 rounded">SortableJS</code></a> for drag-and-drop functionality</li>
+                                <li><a href="https://github.com/missive/emoji-mart" target="_blank" rel="noopener" class="hover:underline"><code class="text-sm bg-gray-100 px-1 rounded">Emoji Mart</code></a> for emoji picker and search</li>
+                                <li><a href="https://fonts.google.com/specimen/Work+Sans" target="_blank" rel="noopener" class="hover:underline"><code class="text-sm bg-gray-100 px-1 rounded">Work Sans</code></a> for modern typography</li>
                             </ul>
                         </li>
                         <li><span class="font-semibold">Database:</span>
@@ -172,7 +137,7 @@
                         <li><span class="font-semibold">Infrastructure:</span>
                             <ul class="list-disc list-inside ml-6 mt-1">
                                 <li><a href="https://www.cloudflare.com" target="_blank" rel="noopener" class="hover:underline"><code class="text-sm bg-gray-100 px-1 rounded">Cloudflare</code></a> for DNS and DDoS protection</li>
-                                <li><a href="https://www.render.com" target="_blank" rel="noopener" class="hover:underline"><code class="text-sm bg-gray-100 px-1 rounded">Render</code></a> for reliable cloud hosting and database.</li>
+                                <li><a href="https://www.render.com" target="_blank" rel="noopener" class="hover:underline"><code class="text-sm bg-gray-100 px-1 rounded">Render</code></a> for reliable cloud & databse hosting.</li>
                             </ul>
                         </li>
                     </ul>

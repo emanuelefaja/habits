@@ -1,42 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full bg-gray-50">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - Habits</title>
-    <link rel="icon" type="image/png" href="/static/favicon.png">
-    <link rel="apple-touch-icon" href="/icons/icon-192.png">
-    <link rel="manifest" href="/static/manifest.json" type="application/manifest+json">
-    <meta name="theme-color" content="#2da44e">
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        [x-cloak] { display: none !important; }
-    </style>
-    <script src="https://unpkg.com/@emoji-mart/data@latest/sets/14/native.json"></script>
-    <script src="https://unpkg.com/emoji-mart@latest/dist/browser.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>      
-
-    <script>
-        // Initialize emoji-mart and create global search function
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                // Initialize emoji-mart
-                await EmojiMart.init({ data: await fetch('https://unpkg.com/@emoji-mart/data@latest/sets/14/native.json').then(r => r.json()) });
-                
-                // Create a global Alpine store for emoji functionality
-                Alpine.store('emoji', {
-                    async search(value) {
-                        if (!value) return [];
-                        return await EmojiMart.SearchIndex.search(value);
-                    }
-                });
-            } catch (error) {
-                console.error('Error initializing emoji-mart:', error);
-            }
-        });
-    </script>
-</head>
+{{ template "head" . }}
 <body class="h-full" 
       x-data="{ 
           modalState: { 

@@ -1,0 +1,105 @@
+{{ define "head" }}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Habits</title> <!-- TODO: Add Dynamic title -->
+    
+    <!-- Common Meta Tags -->
+    <link rel="icon" type="image/png" href="/static/favicon.png">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    <link rel="manifest" href="/static/manifest.json" type="application/manifest+json">
+    <meta name="theme-color" content="#2da44e">
+
+    <!-- Common Libraries -->
+    <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
+    <!-- Emoji Libraries -->
+    <script src="https://unpkg.com/@emoji-mart/data@latest/sets/14/native.json"></script>
+    <script src="https://unpkg.com/emoji-mart@latest/dist/browser.js"></script>
+
+    <!-- Combined Styles -->
+    <style>
+        [x-cloak] { display: none !important; }
+
+        .smooth-scroll {
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        @keyframes wave {
+            0% { transform: rotate(0deg); }
+            20% { transform: rotate(-15deg); }
+            40% { transform: rotate(14deg); }
+            60% { transform: rotate(-4deg); }
+            80% { transform: rotate(10deg); }
+            100% { transform: rotate(0deg); }
+        }
+    </style>
+
+    <!-- Emoji Initialization -->
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await EmojiMart.init({ 
+                    data: await fetch('https://unpkg.com/@emoji-mart/data@latest/sets/14/native.json').then(r => r.json()) 
+                });
+                Alpine.store('emoji', {
+                    async search(value) {
+                        if (!value) return [];
+                        return await EmojiMart.SearchIndex.search(value);
+                    }
+                });
+            } catch (error) {
+                console.error('Error initializing emoji-mart:', error);
+            }
+        });
+    </script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Work Sans', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards'
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': {
+                                opacity: '0',
+                                transform: 'translateY(20px)'
+                            },
+                            '100%': {
+                                opacity: '1',
+                                transform: 'translateY(0)'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
+</head>
+{{ end }} 
