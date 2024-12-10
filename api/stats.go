@@ -55,10 +55,36 @@ func HandleGetHabitStats(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Get stats
-		stats, err := models.GetBinaryHabitStats(db, habitID)
+		// Get habit type
+		var habitType models.HabitType
+		err = db.QueryRow("SELECT habit_type FROM habits WHERE id = ?", habitID).Scan(&habitType)
 		if err != nil {
-			log.Printf("Error getting binary habit stats: %v", err)
+			log.Printf("Error getting habit type: %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Error getting habit type",
+			})
+			return
+		}
+
+		var stats interface{}
+		switch habitType {
+		case models.BinaryHabit:
+			stats, err = models.GetBinaryHabitStats(db, habitID)
+		case models.NumericHabit:
+			stats, err = models.GetNumericHabitStats(db, habitID)
+		default:
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Unsupported habit type",
+			})
+			return
+		}
+
+		if err != nil {
+			log.Printf("Error getting habit stats: %v", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			json.NewEncoder(w).Encode(APIResponse{
 				Success: false,

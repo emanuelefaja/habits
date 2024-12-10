@@ -17,6 +17,14 @@ const (
 	SetRepsHabit      HabitType = "set-reps"
 )
 
+type BinaryHabitStats struct {
+	TotalDone    int       `json:"total_done"`
+	TotalMissed  int       `json:"total_missed"`
+	TotalSkipped int       `json:"total_skipped"`
+	TotalDays    int       `json:"total_days"`
+	StartDate    time.Time `json:"start_date,omitempty"` // omitempty in case no done logs exist
+}
+
 type Habit struct {
 	ID           int            `json:"id"`
 	UserID       int            `json:"user_id"`
@@ -41,14 +49,6 @@ type HabitLog struct {
 	Status    string         `json:"status"`
 	Value     sql.NullString `json:"value"` // JSON string for type-specific data
 	CreatedAt time.Time      `json:"created_at"`
-}
-
-type BinaryHabitStats struct {
-	TotalDone    int       `json:"total_done"`
-	TotalMissed  int       `json:"total_missed"`
-	TotalSkipped int       `json:"total_skipped"`
-	TotalDays    int       `json:"total_days"`
-	StartDate    time.Time `json:"start_date,omitempty"` // omitempty in case no done logs exist
 }
 
 // InitializeDB creates the habits table if it doesn't exist
