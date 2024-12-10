@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-50">
+{{ template "head" . }}
+<body class="h-full">
+    {{ template "header" dict "User" .User "Page" "changelog" }}
+
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div class="flex items-center justify-between mb-12">
+            <h1 class="text-3xl font-bold tracking-tight text-gray-900">Changelog 🚀</h1>
+            <p class="text-lg text-gray-600">Latest updates and improvements to <b>habits</b></p>
+        </div>
+
+        <div class="space-y-8 relative">
+            <!-- v1.2.0 -->
+            <div class="border-t border-gray-200 pt-8">
+                <div class="sticky top-0 bg-gray-50 z-10">
+                    <div class="absolute inset-x-0 -top-4 h-4 bg-gradient-to-b from-gray-50 to-transparent"></div>
+                    
+                    <div class="flex items-center justify-between py-2">
+                        <h2 class="text font-bold tracking-tight text-gray-500">v0.0.3</h2>
+                        <span class="text-xl tracking-tight font-bold text-gray-900">🔢 Numeric Habits</span>
+                    </div>
+                </div>
+                <span class="text-sm text-gray-500 block mb-4">December 7, 2024</span>
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-gray-600 mb-4">
+                          You can now log numeric habits, and each day can have one numeric log. This is useful for tracking things like weight, number of times you meditate, number of times you exercise, etc. </p>
+                        <video class="w-full rounded-lg shadow-lg" autoplay muted loop>
+                            <source src="/static/videos/v0.0.3.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                </div>    
+            </div>
+
+            <!-- v0.0.2 -->
+            <div class="border-t border-gray-200 pt-8">
+                <div class="sticky top-0 bg-gray-50 z-10 flex items-center justify-between py-2">
+                    <h2 class="text font-bold tracking-tight text-gray-500">v0.0.2</h2>
+                    <span class="text-xl tracking-tight font-bold text-gray-900">🔑 Authentication</span>
+                </div>
+                <span class="text-sm text-gray-500 block mb-4">December 6, 2024</span>
+                
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-gray-600 mb-4">
+                          You can now register via an email and password, login, and logout. All passwords are securely hashed using bcrypt before storage, and we enforce strong password requirements including minimum length, special characters, and complexity rules. Our session management is handled securely using the SCS (Session Control System) library with encrypted cookies. <br><br> For the password field, we've put an icon to show/hide the password and also an emoji-powered password strength indicator that dynamically tells you if your password matches the requirements.                        </p>
+                        <video class="w-full rounded-lg shadow-lg" autoplay muted loop>
+                            <source src="/static/videos/v0.0.2.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                </div>
+            </div>
+
+            <!-- v0.0.1 -->
+            <div class="border-t border-gray-200 pt-8">
+                <div class="sticky top-0 bg-gray-50 z-10 flex items-center justify-between py-2">
+                    <h2 class="text font-bold tracking-tight text-gray-500">v0.0.1</h2>
+                    <span class="text-xl tracking-tight font-bold text-gray-900">✅ Initial Release</span>
+                </div>
+                <span class="text-sm text-gray-500 block mb-4">December 4, 2024</span>
+                
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-gray-600 mb-4">
+                        This first version of habits allows you to start tracking simple binary habits in a basic monthly grid view. You can choose from some predefined habits or create your own. <br><br>  We support a few different statuses such as ✅ done, ❌ missed, and ⏭️ skipped.
+                        </p>
+                        <video class="w-full rounded-lg shadow-lg" autoplay muted loop>
+                            <source src="/static/videos/v0.0.1.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

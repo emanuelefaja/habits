@@ -5,7 +5,10 @@
         <h1 class="text-left text-3xl font-bold tracking-tight text-gray-900">
             <a href="/" class="flex items-center gap-2 text-3xl tracking-tight hover:underline">
                 <img src="/static/icons/icon-512.png" alt="habits logo" class="w-8 h-8">
-                habits
+                <span class="flex items-baseline gap-2">
+                    habits
+                    <span class="text-xs text-gray-500">v0.0.9</span>
+                </span>
             </a>
         </h1>
         {{ if and .User (eq .User.ID 1) }}

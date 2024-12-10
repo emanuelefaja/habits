@@ -102,6 +102,7 @@ func main() {
 		"ui/about.html",
 		"ui/guest-home.html",
 		"ui/admin.html",
+		"ui/changelog.html",
 	))
 
 	// Handle static files
@@ -513,6 +514,36 @@ func main() {
 		}
 		api.UpdateHabitNameHandler(db)(w, r)
 	}))))
+
+	// Changelog route with session middleware but no auth requirement
+	http.Handle("/changelog", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var user *models.User
+		var err error
+
+		// Check if user is authenticated
+		if middleware.IsAuthenticated(r) {
+			userID := middleware.GetUserID(r)
+			user, err = models.GetUserByID(db, int64(userID))
+			if err != nil {
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				return
+			}
+		}
+
+		data := struct {
+			User *models.User
+			Page string
+		}{
+			User: user,
+			Page: "changelog",
+		}
+
+		err = templates.ExecuteTemplate(w, "changelog.html", data)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+	})))
 
 	// Start server with dynamic port
 	port := os.Getenv("PORT")
