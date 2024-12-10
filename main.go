@@ -500,6 +500,15 @@ func main() {
 	// Add with other routes
 	http.Handle("/api/habits/stats", middleware.SessionManager.LoadAndSave(http.HandlerFunc(api.HandleGetHabitStats(db))))
 
+	// Add this with the other habit routes
+	http.Handle("/api/habits/update-name", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		api.UpdateHabitNameHandler(db)(w, r)
+	}))))
+
 	// Start server with dynamic port
 	port := os.Getenv("PORT")
 	if port == "" {

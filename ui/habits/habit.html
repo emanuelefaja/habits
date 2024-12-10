@@ -16,21 +16,17 @@
             status: 'none',
             habitType: '{{ .Habit.HabitType }}',
             showDeleteModal: false,
+            showEditModal: false,
             confirmHabitName: '',
+            newHabitName: '{{ .Habit.Name }}',
             habitLogs: {},
             deleteHabit() {
                 fetch('/api/habits/delete?id={{ .Habit.ID }}', {
                     method: 'DELETE'
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(result => {
                     if (result.success) {
-                        sessionStorage.setItem('flash', result.message);
                         window.location.href = result.redirect;
                     } else {
                         alert('Error deleting habit: ' + result.message);
@@ -39,6 +35,35 @@
                 .catch(error => {
                     console.error('Error:', error);
                     alert('Error deleting habit');
+                });
+            },
+            updateHabitName() {
+                console.log('Updating habit name to:', this.newHabitName.trim());
+                fetch('/api/habits/update-name', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        id: {{ .Habit.ID }},
+                        name: this.newHabitName.trim()
+                    })
+                })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    return response.json();
+                })
+                .then(result => {
+                    console.log('Response result:', result);
+                    if (result.success) {
+                        window.location.reload();
+                    } else {
+                        alert('Error updating habit name: ' + result.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error updating habit name');
                 });
             }
          }">
@@ -60,6 +85,7 @@
                 <div class="flex space-x-2">
                     <!-- Edit Name Button -->
                     <button 
+                        @click="showEditModal = true"
                         class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-gray-700 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400">
                         Edit Name ✏️
                     </button>
@@ -115,6 +141,56 @@
                             </button>
                             <button type="button" 
                                 @click="showDeleteModal = false"
+                                class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Name Modal -->
+        <div x-show="showEditModal" 
+             class="relative z-10" 
+             aria-labelledby="modal-title" 
+             role="dialog" 
+             aria-modal="true"
+             x-cloak>
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+
+            <div class="fixed inset-0 z-10 w-screen overflow-y-auto">
+                <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                    <div class="relative transform overflow-hidden rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                        <div class="absolute right-0 top-0 pr-4 pt-4">
+                            <button @click="showEditModal = false" type="button" class="text-gray-400 hover:text-gray-500">
+                                <span class="sr-only">Close</span>
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="sm:flex sm:items-start">
+                            <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
+                                <h3 class="text-base font-semibold leading-6 text-gray-900" id="modal-title">Edit Habit Name</h3>
+                                <div class="mt-4">
+                                    <input type="text" 
+                                        x-model="newHabitName"
+                                        class="mt-1 block w-full rounded-md bg-white px-3 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-green-600 sm:text-sm sm:leading-6"
+                                        placeholder="Enter new habit name">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+                            <button
+                                @click="console.log('Save button clicked'); updateHabitName()"
+                                :disabled="!newHabitName.trim()"
+                                :class="{'opacity-50 cursor-not-allowed': !newHabitName.trim()}"
+                                class="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto">
+                                Save
+                            </button>
+                            <button type="button" 
+                                @click="showEditModal = false"
                                 class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">
                                 Cancel
                             </button>

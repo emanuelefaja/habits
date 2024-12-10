@@ -907,3 +907,98 @@ func DeleteHabitLogHandler(db *sql.DB) http.HandlerFunc {
 		})
 	}
 }
+
+// Add this struct for the request
+type UpdateHabitNameRequest struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+// Add this handler function
+func UpdateHabitNameHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("UpdateHabitNameHandler: Received request")
+		w.Header().Set("Content-Type", "application/json")
+
+		// Parse request
+		var req UpdateHabitNameRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			log.Printf("UpdateHabitNameHandler: Error decoding request: %v", err)
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Invalid request format",
+			})
+			return
+		}
+		log.Printf("UpdateHabitNameHandler: Request data - ID: %d, Name: %s", req.ID, req.Name)
+
+		// Verify habit belongs to user
+		userID := middleware.GetUserID(r)
+		log.Printf("UpdateHabitNameHandler: UserID from session: %d", userID)
+
+		var habitUserID int
+		err := db.QueryRow("SELECT user_id FROM habits WHERE id = ?", req.ID).Scan(&habitUserID)
+		if err != nil {
+			log.Printf("UpdateHabitNameHandler: Error getting habit user ID: %v", err)
+			w.WriteHeader(http.StatusForbidden)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Unauthorized access to habit",
+			})
+			return
+		}
+		log.Printf("UpdateHabitNameHandler: Habit user ID: %d", habitUserID)
+
+		if habitUserID != userID {
+			log.Printf("UpdateHabitNameHandler: User ID mismatch - Session: %d, Habit: %d", userID, habitUserID)
+			w.WriteHeader(http.StatusForbidden)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Unauthorized access to habit",
+			})
+			return
+		}
+
+		// Check if name already exists for this user
+		exists, err := models.HabitExists(db, req.Name, userID)
+		if err != nil {
+			log.Printf("UpdateHabitNameHandler: Error checking habit existence: %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Error checking for duplicate habit",
+			})
+			return
+		}
+		if exists {
+			log.Printf("UpdateHabitNameHandler: Habit name already exists for user")
+			w.WriteHeader(http.StatusConflict)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "A habit with this name already exists",
+			})
+			return
+		}
+
+		// Update the habit name
+		result, err := db.Exec("UPDATE habits SET name = ? WHERE id = ?", req.Name, req.ID)
+		if err != nil {
+			log.Printf("UpdateHabitNameHandler: Error updating habit name: %v", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: "Error updating habit name",
+			})
+			return
+		}
+
+		rowsAffected, _ := result.RowsAffected()
+		log.Printf("UpdateHabitNameHandler: Update successful, rows affected: %d", rowsAffected)
+
+		json.NewEncoder(w).Encode(APIResponse{
+			Success: true,
+			Message: "Habit name updated successfully",
+		})
+	}
+}
