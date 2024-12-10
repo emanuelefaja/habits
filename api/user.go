@@ -8,6 +8,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"mad/middleware"
@@ -34,8 +35,9 @@ func RegisterHandler(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
 		// Basic validation
 		if firstName == "" || lastName == "" || email == "" || password == "" {
 			log.Println("Validation failed: missing fields")
-			tmpl.ExecuteTemplate(w, "register.html", TemplateData{
-				Error: "All fields are required",
+			w.WriteHeader(http.StatusBadRequest)
+			tmpl.ExecuteTemplate(w, "register.html", map[string]interface{}{
+				"Error": "All fields are required ❌",
 			})
 			return
 		}
@@ -50,8 +52,9 @@ func RegisterHandler(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
 		passwordHash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 		if err != nil {
 			log.Println("Error generating password hash:", err)
-			tmpl.ExecuteTemplate(w, "register.html", TemplateData{
-				Error: "Internal server error",
+			w.WriteHeader(http.StatusInternalServerError)
+			tmpl.ExecuteTemplate(w, "register.html", map[string]interface{}{
+				"Error": "Internal server error ❌",
 			})
 			return
 		}
@@ -59,8 +62,16 @@ func RegisterHandler(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
 		err = user.Create(db, string(passwordHash))
 		if err != nil {
 			log.Println("Error creating user:", err)
-			tmpl.ExecuteTemplate(w, "register.html", TemplateData{
-				Error: "Email already in use",
+			if strings.Contains(err.Error(), "UNIQUE constraint failed") {
+				w.WriteHeader(http.StatusConflict)
+				tmpl.ExecuteTemplate(w, "register.html", map[string]interface{}{
+					"Error": "This email is already registered ✉️",
+				})
+				return
+			}
+			w.WriteHeader(http.StatusInternalServerError)
+			tmpl.ExecuteTemplate(w, "register.html", map[string]interface{}{
+				"Error": "Error creating account ❌",
 			})
 			return
 		}
@@ -70,11 +81,8 @@ func RegisterHandler(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
 		// Set user session immediately after registration
 		middleware.SetUserID(r, int(user.ID))
 
-		// Set welcome flash message
-		middleware.SetFlash(r, "Welcome to Habits, "+user.FirstName+"! 🎉")
-
-		// Redirect to home page instead of login
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		// Return success response for the fetch request
+		w.WriteHeader(http.StatusOK)
 	}
 }
 
