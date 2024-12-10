@@ -1,5 +1,124 @@
 {{ define "yearly-grid" }}
-<div x-data="yearlyGrid" class="flex justify-center mt-8">
+<script defer>
+    function yearlyGridData() {
+        return {
+            dayLabels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
+            monthNames: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+            weeks: [],
+            currentYear: new Date().getFullYear(),
+            habitLogs: {},
+            hoverDate: '',
+
+            init() {
+                console.log('Initializing yearlyGrid');
+                this.generateYearDays(this.currentYear);
+                this.loadYearData();
+            },
+
+            generateYearDays(year) {
+                const startDate = new Date(year, 0, 1);
+                const endDate = new Date(year + 1, 0, 1);
+
+                // Get to the first Monday before or on January 1st
+                let currentDate = new Date(startDate.getTime());
+                while (currentDate.getDay() !== 1) { // 1 represents Monday
+                    currentDate.setDate(currentDate.getDate() - 1);
+                }
+
+                let allWeeks = [];
+                let firstWeek = true;
+
+                while (currentDate < endDate) {
+                    let weekDays = [];
+                    for (let i = 0; i < 7; i++) {
+                        if (currentDate < startDate && firstWeek) {
+                            weekDays.push(null); // Hide days before January 1st
+                        } else if (currentDate < endDate) {
+                            weekDays.push(new Date(currentDate));
+                        } else {
+                            weekDays.push(null);
+                        }
+                        currentDate.setDate(currentDate.getDate() + 1);
+                    }
+                    allWeeks.push(weekDays);
+                    firstWeek = false;
+                }
+
+                this.weeks = allWeeks;
+            },
+
+            getMonthStartWeek(monthIndex) {
+                return this.weeks.findIndex(week => 
+                    week.some(day => day && day.getMonth() === monthIndex)
+                );
+            },
+
+            getMonthWidth(monthIndex) {
+                const daysInMonth = new Date(this.currentYear, monthIndex + 1, 0).getDate();
+                const totalDays = this.weeks.flat().filter(day => day !== null).length;
+                return `${(daysInMonth / totalDays) * 100}%`;
+            },
+
+            loadYearData() {
+                const startDate = `${this.currentYear}-01-01`;
+                const endDate = `${this.currentYear}-12-31`;
+                
+                fetch(`/api/habits/logs?habit_id={{ .Habit.ID }}&start_date=${startDate}&end_date=${endDate}`)
+                    .then(response => response.json())
+                    .then(result => {
+                        // Reset habitLogs
+                        this.habitLogs = {};
+                        
+                        // Process the logs into a lookup object
+                        if (result.success && Array.isArray(result.data)) {
+                            result.data.forEach(log => {
+                                // Convert the date to YYYY-MM-DD format for lookup
+                                const key = log.date.split('T')[0];
+                                this.habitLogs[key] = log;
+                            });
+                        } else {
+                            console.error('Invalid response format:', result);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading year data:', error);
+                    });
+            },
+
+            getStatus(date) {
+                if (!date) return 'none';
+                
+                // Format date as YYYY-MM-DD
+                const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                return this.habitLogs[dateStr]?.status || 'none';
+            },
+
+            getStatusColor(status) {
+                const colors = {
+                    'done': '#2da44e',
+                    'missed': '#E3211a',
+                    'skipped': '#00a0d2',
+                    'none': '#ebedf0'
+                };
+                return colors[status] || colors.none;
+            },
+
+            previousYear() {
+                this.currentYear--;
+                this.generateYearDays(this.currentYear);
+                this.loadYearData();
+            },
+
+            nextYear() {
+                this.currentYear++;
+                this.generateYearDays(this.currentYear);
+                this.loadYearData();
+            }
+        }
+    }
+</script>
+
+<div x-data="yearlyGridData()" class="flex justify-center mt-8">
     <div class="bg-white p-8 shadow sm:rounded-lg w-full">
         <!-- Add year navigation -->
         <div class="flex items-center gap-3 mb-6">
@@ -127,141 +246,54 @@
 
         <!-- Legend -->
         <div class="flex justify-center gap-6 mt-6">
-            <div class="flex items-center gap-2">
-                <div class="w-4 h-4 rounded-sm" style="background-color: #2da44e;"></div>
-                <span class="text-sm text-gray-600">Done</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <div class="w-4 h-4 rounded-sm" style="background-color: #E3211a;"></div>
-                <span class="text-sm text-gray-600">Missed</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <div class="w-4 h-4 rounded-sm" style="background-color: #00a0d2;"></div>
-                <span class="text-sm text-gray-600">Skipped</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <div class="w-4 h-4 rounded-sm" style="background-color: #ebedf0;"></div>
-                <span class="text-sm text-gray-600">No Data</span>
-            </div>
+            {{ if eq .Habit.HabitType "binary" }}
+                <!-- Binary habit legend -->
+                <div class="flex gap-6">
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 rounded-sm" style="background-color: #2da44e;"></div>
+                        <span class="text-sm text-gray-600">Done</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 rounded-sm" style="background-color: #E3211a;"></div>
+                        <span class="text-sm text-gray-600">Missed</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 rounded-sm" style="background-color: #00a0d2;"></div>
+                        <span class="text-sm text-gray-600">Skipped</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 rounded-sm" style="background-color: #ebedf0;"></div>
+                        <span class="text-sm text-gray-600">No Data</span>
+                    </div>
+                </div>
+            {{ else if eq .Habit.HabitType "numeric" }}
+                <!-- Numeric habit legend -->
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-1">
+                        <span class="text-sm text-gray-600 mr-1">Less</span>
+                        <div class="flex gap-0.5">
+                            <div class="w-4 h-4 rounded-sm" style="background-color: #39d353;"></div>
+                            <div class="w-4 h-4 rounded-sm" style="background-color: #26a641;"></div>
+                            <div class="w-4 h-4 rounded-sm" style="background-color: #006d32;"></div>
+                            <div class="w-4 h-4 rounded-sm" style="background-color: #0a4429;"></div>
+                        </div>
+                        <span class="text-sm text-gray-600 ml-1">More</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 rounded-sm" style="background-color: #E3211a;"></div>
+                        <span class="text-sm text-gray-600">Missed</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 rounded-sm" style="background-color: #00a0d2;"></div>
+                        <span class="text-sm text-gray-600">Skipped</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 rounded-sm" style="background-color: #ebedf0;"></div>
+                        <span class="text-sm text-gray-600">No Data</span>
+                    </div>
+                </div>
+            {{ end }}
         </div>
     </div>
 </div>
-
-<script>
-document.addEventListener('alpine:init', () => {
-    Alpine.data('yearlyGrid', () => ({
-        dayLabels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
-        monthNames: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-        weeks: [],
-        currentYear: new Date().getFullYear(),
-        habitLogs: {},
-        hoverDate: '',
-
-        init() {
-            this.generateYearDays(this.currentYear);
-            this.loadYearData();
-        },
-
-        generateYearDays(year) {
-            const startDate = new Date(year, 0, 1);
-            const endDate = new Date(year + 1, 0, 1);
-
-            // Get to the first Monday before or on January 1st
-            let currentDate = new Date(startDate.getTime());
-            while (currentDate.getDay() !== 1) { // 1 represents Monday
-                currentDate.setDate(currentDate.getDate() - 1);
-            }
-
-            let allWeeks = [];
-            let firstWeek = true;
-
-            while (currentDate < endDate) {
-                let weekDays = [];
-                for (let i = 0; i < 7; i++) {
-                    if (currentDate < startDate && firstWeek) {
-                        weekDays.push(null); // Hide days before January 1st
-                    } else if (currentDate < endDate) {
-                        weekDays.push(new Date(currentDate));
-                    } else {
-                        weekDays.push(null);
-                    }
-                    currentDate.setDate(currentDate.getDate() + 1);
-                }
-                allWeeks.push(weekDays);
-                firstWeek = false;
-            }
-
-            this.weeks = allWeeks;
-        },
-
-        getMonthStartWeek(monthIndex) {
-            return this.weeks.findIndex(week => 
-                week.some(day => day && day.getMonth() === monthIndex)
-            );
-        },
-
-        getMonthWidth(monthIndex) {
-            const daysInMonth = new Date(this.currentYear, monthIndex + 1, 0).getDate();
-            const totalDays = this.weeks.flat().filter(day => day !== null).length;
-            return `${(daysInMonth / totalDays) * 100}%`;
-        },
-
-        loadYearData() {
-            const startDate = `${this.currentYear}-01-01`;
-            const endDate = `${this.currentYear}-12-31`;
-            
-            fetch(`/api/habits/logs?habit_id={{ .Habit.ID }}&start_date=${startDate}&end_date=${endDate}`)
-                .then(response => response.json())
-                .then(result => {
-                    // Reset habitLogs
-                    this.habitLogs = {};
-                    
-                    // Process the logs into a lookup object
-                    if (result.success && Array.isArray(result.data)) {
-                        result.data.forEach(log => {
-                            // Convert the date to YYYY-MM-DD format for lookup
-                            const key = log.date.split('T')[0];
-                            this.habitLogs[key] = log;
-                        });
-                    } else {
-                        console.error('Invalid response format:', result);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading year data:', error);
-                });
-        },
-
-        getStatus(date) {
-            if (!date) return 'none';
-            
-            // Format date as YYYY-MM-DD
-            const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-            return this.habitLogs[dateStr]?.status || 'none';
-        },
-
-        getStatusColor(status) {
-            const colors = {
-                'done': '#2da44e',
-                'missed': '#E3211a',
-                'skipped': '#00a0d2',
-                'none': '#ebedf0'
-            };
-            return colors[status] || colors.none;
-        },
-
-        previousYear() {
-            this.currentYear--;
-            this.generateYearDays(this.currentYear);
-            this.loadYearData();
-        },
-
-        nextYear() {
-            this.currentYear++;
-            this.generateYearDays(this.currentYear);
-            this.loadYearData();
-        }
-    }));
-});
-</script>
 {{ end }}
