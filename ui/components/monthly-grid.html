@@ -147,10 +147,7 @@
                                                                 console.log('Available options:', options);
                                                                 return options;
                                                             })()" :key="option.emoji">
-                                                                <button @click="(() => {
-                                                                        console.log('Option selected:', option);
-                                                                        handleOptionSelection(habit.id, formatDate(day), option);
-                                                                    })()"
+                                                                <button @click="handleOptionSelection(habit.id, formatDate(day), option, $event)"
                                                                         class="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-100 rounded-md w-full text-left">
                                                                         <span x-text="option.emoji"></span>
                                                                         <span x-text="option.label" class="text-sm text-gray-700"></span>
@@ -187,11 +184,11 @@
                                                             class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
                                                             ✅ Log amount
                                                         </button>
-                                                        <button @click="handleSquareClick(habit.id, formatDate(day), 'missed')"
+                                                        <button @click="handleSquareClick(habit.id, formatDate(day), 'missed', $event)"
                                                             class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
                                                             ❌ Missed
                                                         </button>
-                                                        <button @click="handleSquareClick(habit.id, formatDate(day), 'skipped')"
+                                                        <button @click="handleSquareClick(habit.id, formatDate(day), 'skipped', $event)"
                                                             class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
                                                             ⏭️ Skipped
                                                         </button>
@@ -230,14 +227,14 @@
                                                                 class="text-gray-500 hover:text-gray-700">-</button>
                                                             <input type="number" 
                                                                    x-model="numericValue"
-                                                                   @keyup.enter="handleNumericSubmit(habit.id, formatDate(day))"
+                                                                   @keyup.enter="handleNumericSubmit(habit.id, formatDate(day), $event)"
                                                                    x-ref="numericInput"
                                                                    class="w-16 text-center border rounded-md"
                                                                    min="0"
                                                                    step="1">
                                                             <button @click="numericValue = parseInt(numericValue) + 1"
                                                                 class="text-gray-500 hover:text-gray-700">+</button>
-                                                            <button @click="handleNumericSubmit(habit.id, formatDate(day))"
+                                                            <button @click="handleNumericSubmit(habit.id, formatDate(day), $event)"
                                                                 class="px-2 py-1 bg-[#2da44e] hover:bg-[#2c974b] text-white rounded-md text-sm">
                                                                 Log
                                                             </button>
@@ -285,11 +282,11 @@
                                                             class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
                                                             ✅ Log Sets & Reps
                                                         </button>
-                                                        <button @click="handleSquareClick(habit.id, formatDate(day), 'missed')"
+                                                        <button @click="handleSquareClick(habit.id, formatDate(day), 'missed', $event)"
                                                             class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
                                                             ❌ Missed
                                                         </button>
-                                                        <button @click="handleSquareClick(habit.id, formatDate(day), 'skipped')"
+                                                        <button @click="handleSquareClick(habit.id, formatDate(day), 'skipped', $event)"
                                                             class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
                                                             ⏭️ Skipped
                                                         </button>
@@ -318,7 +315,7 @@
                                                                 });
                                                             })()"
                                                                 class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left text-red-600">
-                                                                🗑️ Delete
+                                                                ����️ Delete
                                                             </button>
                                                         </template>
                                                     </div>
@@ -346,7 +343,7 @@
                                                                         class="text-sm text-gray-600 hover:text-gray-800">
                                                                     + Add Set
                                                                 </button>
-                                                                <button @click="handleSetRepsSubmit(habit.id, formatDate(day))"
+                                                                <button @click="handleSetRepsSubmit(habit.id, formatDate(day), $event)"
                                                                         :disabled="!setReps.some(set => set.reps > 0)"
                                                                         :class="{
                                                                             'bg-[#2da44e] hover:bg-[#2c974b]': setReps.some(set => set.reps > 0),
@@ -377,7 +374,7 @@
                                                          case 'skipped': newStatus = 'none'; break;
                                                      }
                                                      
-                                                     handleSquareClick(habit.id, formatDate(day), newStatus);
+                                                     handleSquareClick(habit.id, formatDate(day), newStatus, $event);
                                                  })()"
                                                  :style="{ backgroundColor: getStatusColor(getStatus(habit.id, formatDate(day))) }">
                                             </div>
@@ -497,7 +494,7 @@
                 }
             },
 
-            handleOptionSelection(habitId, date, option) {
+            handleOptionSelection(habitId, date, option, event) {
                 fetch('/api/habits/logs', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -528,12 +525,13 @@
                             }
                         };
                         this.showTooltip = null;
+                        this.triggerConfetti(event);
                     }
                 });
             },
 
             // Numeric Habit Methods
-            handleNumericSubmit(habitId, date) {
+            handleNumericSubmit(habitId, date, event) {
                 if (this.numericValue < 0) return;
                 
                 fetch('/api/habits/logs', {
@@ -563,6 +561,7 @@
                         };
                         this.showTooltip = null;
                         this.showNumericInput = false;
+                        this.triggerConfetti(event);
                     }
                 });
             },
@@ -600,7 +599,7 @@
                 }
             },
 
-            handleSetRepsSubmit(habitId, date) {
+            handleSetRepsSubmit(habitId, date, event) {
                 // Calculate totals before sending
                 const totalReps = this.setReps.reduce((sum, set) => sum + (parseInt(set.reps) || 0), 0);
                 const totalSets = this.setReps.filter(set => set.reps > 0).length;
@@ -636,6 +635,7 @@
                         this.showTooltip = null;
                         this.showSetRepsInput = false;
                         this.setReps = [{reps: 0}];
+                        this.triggerConfetti(event);
                     }
                 })
                 .catch(err => {
@@ -644,7 +644,7 @@
             },
 
             // Binary Habit Methods
-            handleSquareClick(habitId, date, status = 'done') {
+            handleSquareClick(habitId, date, status = 'done', event) {
                 const habit = this.habits.find(h => h.id === habitId);
                 let payload = {
                     habit_id: habitId,
@@ -683,6 +683,9 @@
                             })
                         };
                         this.showTooltip = null;
+                        if (status === 'done') {
+                            this.triggerConfetti(event);
+                        }
                     }
                 });
             },
@@ -700,9 +703,27 @@
                     'none': '#ebedf0'
                 };
                 return colors[status] || colors.none;
+            },
+
+            triggerConfetti(event) {
+                if (!event || Math.random() >= 0.25) return;
+
+                // Get the clicked element's position
+                const rect = event.target.getBoundingClientRect();
+                
+                // Calculate origin points (as percentage of window width/height)
+                const x = (rect.left + rect.width / 2) / window.innerWidth;
+                const y = (rect.top + rect.height / 2) / window.innerHeight;
+                
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { x, y }
+                });
             }
         }));
     });
 </script>
+
 
 {{ end }}
