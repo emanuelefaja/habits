@@ -9,7 +9,7 @@
             showDeleteModal: false,
             showEditModal: false,
             confirmHabitName: '',
-            newHabitName: '{{ .Habit.Name }}',
+            newHabitName: {{ .Habit.Name | json }},
             habitLogs: {},
             deleteHabit() {
                 fetch('/api/habits/delete?id={{ .Habit.ID }}', {
@@ -125,8 +125,8 @@
                         <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                             <button
                                 @click="deleteHabit()"
-                                :disabled="confirmHabitName !== '{{ .Habit.Name }}'"
-                                :class="{'opacity-50 cursor-not-allowed': confirmHabitName !== '{{ .Habit.Name }}'}"
+                                :disabled="confirmHabitName !== {{ .Habit.Name | json }}"
+                                :class="{'opacity-50 cursor-not-allowed': confirmHabitName !== {{ .Habit.Name | json }}}"
                                 class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto">
                                 Delete Habit
                             </button>

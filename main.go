@@ -77,6 +77,10 @@ func main() {
 			return a + b
 		},
 		"dict": dict,
+		"json": func(v interface{}) template.JS {
+			b, _ := json.Marshal(v)
+			return template.JS(b)
+		},
 	}
 
 	templates := template.Must(template.New("").Funcs(funcMap).ParseFiles(
