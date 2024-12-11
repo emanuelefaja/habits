@@ -10,7 +10,22 @@
             <p class="text-lg text-gray-600">Latest updates and improvements to <b>habits</b></p>
         </div>
 
-        <div class="space-y-8 relative">
+        <div class="flex space-x-4 mb-8">
+            <button 
+                @click="view = 'main'"
+                :class="{'bg-indigo-600 text-white': view === 'main', 'bg-white text-gray-700 hover:bg-gray-50': view !== 'main'}"
+                class="px-4 py-2 rounded-md font-medium shadow-sm border border-gray-300 transition-colors">
+                Main Changes
+            </button>
+            <button 
+                @click="view = 'detailed'"
+                :class="{'bg-indigo-600 text-white': view === 'detailed', 'bg-white text-gray-700 hover:bg-gray-50': view !== 'detailed'}"
+                class="px-4 py-2 rounded-md font-medium shadow-sm border border-gray-300 transition-colors">
+                Detailed Changes
+            </button>
+        </div>
+
+        <div x-show="view === 'main'" class="space-y-8 relative">
             <template x-for="item in changelogItems" :key="item.version">
                 <div class="border-t border-gray-200 pt-8">
                     <div class="sticky top-0 bg-gray-50 z-10">
@@ -36,11 +51,80 @@
                 </div>
             </template>
         </div>
+
+        <div x-show="view === 'detailed'" class="space-y-8 relative">
+            <div 
+                x-show="connectionStatus" 
+                :class="{
+                    'bg-green-50 text-green-700 border-green-200': connectionStatus === 'connected',
+                    'bg-red-50 text-red-700 border-red-200': connectionStatus === 'error'
+                }"
+                class="p-4 rounded-md border mb-4"
+            >
+                <div class="flex items-center">
+                    <template x-if="connectionStatus === 'connected'">
+                        <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                    </template>
+                    <template x-if="connectionStatus === 'error'">
+                        <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                        </svg>
+                    </template>
+                    <span x-text="statusMessage"></span>
+                </div>
+            </div>
+
+            <template x-for="commit in commitHistory" :key="commit.id">
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900" x-text="commit.title"></h3>
+                            <span class="text-sm text-gray-500" x-text="commit.date"></span>
+                        </div>
+                        <span class="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-1 rounded" x-text="commit.id"></span>
+                    </div>
+                    
+                    <p x-show="commit.description" class="text-gray-600 text-sm mb-4" x-text="commit.description"></p>
+                    
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <h4 class="text-xs font-medium text-gray-500 uppercase mb-3">Code Changes</h4>
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-600">Added</span>
+                                    <span class="font-medium text-green-600" x-text="`+${commit.additions} lines`"></span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-600">Removed</span>
+                                    <span class="font-medium text-red-600" x-text="`-${commit.deletions} lines`"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <h4 class="text-xs font-medium text-gray-500 uppercase mb-3">File Changes</h4>
+                            <div class="space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-600">Added</span>
+                                    <span class="font-medium text-green-600" x-text="commit.filesAdded"></span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-600">Removed</span>
+                                    <span class="font-medium text-red-600" x-text="commit.filesRemoved"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
     </div>
 
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('changelog', () => ({
+                view: 'main',
                 changelogItems: [
                     {
                         version: 'v0.1.4',
@@ -133,7 +217,30 @@
                         description: 'This first version of habits allows you to start tracking simple binary habits in a basic monthly grid view. You can choose from some predefined habits or create your own. We support a few different statuses such as ✅ done, ❌ missed, and ⏭️ skipped.',
                         video: '/static/videos/v0.0.1.mp4'
                     }
-                ]
+                ],
+                commitHistory: [],
+                connectionStatus: null,
+                statusMessage: '',
+                
+                async init() {
+                    await this.fetchCommits();
+                },
+
+                async fetchCommits() {
+                    try {
+                        const response = await fetch('/api/commits');
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        this.commitHistory = await response.json();
+                        this.connectionStatus = 'connected';
+                        this.statusMessage = `Successfully loaded ${this.commitHistory.length} commits`;
+                    } catch (error) {
+                        console.error('Error fetching commits:', error);
+                        this.connectionStatus = 'error';
+                        this.statusMessage = `Error loading commits: ${error.message}`;
+                    }
+                }
             }));
         });
     </script>

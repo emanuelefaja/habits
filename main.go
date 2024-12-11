@@ -64,6 +64,9 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// Start GitHub sync
+	api.StartGitHubSync(db)
+
 	// Create templates with custom functions
 	funcMap := template.FuncMap{
 		"times": func(n int) []int {
@@ -543,6 +546,18 @@ func main() {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
+	})))
+
+	// Add with your other routes
+	http.Handle("/api/commits", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		commits, err := models.GetCommits(db)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(commits)
 	})))
 
 	// Start server with dynamic port

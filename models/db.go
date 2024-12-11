@@ -135,5 +135,32 @@ func InitDB(db *sql.DB) error {
 		return err
 	}
 
+	// Create commits table
+	_, err = db.Exec(`
+		CREATE TABLE IF NOT EXISTS commits (
+			id TEXT PRIMARY KEY,
+			title TEXT NOT NULL,
+			description TEXT,
+			date TIMESTAMP NOT NULL,
+			additions INTEGER NOT NULL,
+			deletions INTEGER NOT NULL,
+			files_added INTEGER NOT NULL,
+			files_removed INTEGER NOT NULL,
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+		)
+	`)
+	if err != nil {
+		return err
+	}
+
+	// Create index on commits.date
+	_, err = db.Exec(`
+		CREATE INDEX IF NOT EXISTS idx_commits_date 
+		ON commits(date DESC)
+	`)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
