@@ -84,12 +84,17 @@ func GetNumericHabitStats(db *sql.DB, habitID int) (NumericHabitStats, error) {
 		SELECT 
 			COUNT(DISTINCT CASE WHEN json_extract(value, '$.value') > 0 THEN date END) as total_done,
 			COALESCE(SUM(CAST(json_extract(value, '$.value') AS INTEGER)), 0) as total_reps,
-			ROUND(CAST(COALESCE(SUM(CAST(json_extract(value, '$.value') AS INTEGER)), 0) AS FLOAT) / 
-				NULLIF(COUNT(DISTINCT CASE WHEN json_extract(value, '$.value') > 0 THEN date END), 0), 2) as average_per_day,
+			COALESCE(
+				ROUND(
+					CAST(COALESCE(SUM(CAST(json_extract(value, '$.value') AS INTEGER)), 0) AS FLOAT) / 
+					NULLIF(COUNT(DISTINCT CASE WHEN json_extract(value, '$.value') > 0 THEN date END), 0),
+				2),
+				0
+			) as average_per_day,
 			COUNT(DISTINCT date) as total_days,
 			COUNT(CASE WHEN status = 'missed' THEN 1 END) as total_missed,
 			COUNT(CASE WHEN status = 'skipped' THEN 1 END) as total_skipped,
-			COALESCE(MAX(SUM(CAST(json_extract(value, '$.value') AS INTEGER))) OVER (PARTITION BY date), 0) as biggest_day,
+			COALESCE(MAX(CAST(json_extract(value, '$.value') AS INTEGER)), 0) as biggest_day,
 			strftime('%Y-%m-%d', MIN(CASE WHEN json_extract(value, '$.value') > 0 THEN date END)) as start_date
 		FROM habit_logs 
 		WHERE habit_id = ?
