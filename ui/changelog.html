@@ -88,30 +88,17 @@
                     
                     <p x-show="commit.description" class="text-gray-600 text-sm mb-4" x-text="commit.description"></p>
                     
-                    <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div class="text-sm">
                         <div class="bg-gray-50 rounded-lg p-4">
                             <h4 class="text-xs font-medium text-gray-500 uppercase mb-3">Code Changes</h4>
                             <div class="space-y-2">
                                 <div class="flex items-center justify-between">
-                                    <span class="text-gray-600">Added</span>
+                                    <span class="text-gray-600">Lines Added</span>
                                     <span class="font-medium text-green-600" x-text="`+${commit.additions} lines`"></span>
                                 </div>
                                 <div class="flex items-center justify-between">
-                                    <span class="text-gray-600">Removed</span>
+                                    <span class="text-gray-600">Lines Removed</span>
                                     <span class="font-medium text-red-600" x-text="`-${commit.deletions} lines`"></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-gray-50 rounded-lg p-4">
-                            <h4 class="text-xs font-medium text-gray-500 uppercase mb-3">File Changes</h4>
-                            <div class="space-y-2">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-gray-600">Added</span>
-                                    <span class="font-medium text-green-600" x-text="commit.filesAdded"></span>
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-gray-600">Removed</span>
-                                    <span class="font-medium text-red-600" x-text="commit.filesRemoved"></span>
                                 </div>
                             </div>
                         </div>
