@@ -242,11 +242,11 @@
                         }
                         this.commitHistory = await response.json();
                         this.connectionStatus = 'connected';
-                        this.statusMessage = `Successfully loaded ${this.commitHistory.length} commits`;
+                        this.statusMessage = `Successfully loaded ${this.commitHistory.length} changes`;
                     } catch (error) {
                         console.error('Error fetching commits:', error);
                         this.connectionStatus = 'error';
-                        this.statusMessage = `Error loading commits: ${error.message}`;
+                        this.statusMessage = `Error loading changes: ${error.message}`;
                     }
                 }
             }));
