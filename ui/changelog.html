@@ -13,13 +13,13 @@
         <div class="flex space-x-4 mb-8">
             <button 
                 @click="view = 'main'"
-                :class="{'bg-indigo-600 text-white': view === 'main', 'bg-white text-gray-700 hover:bg-gray-50': view !== 'main'}"
+                :class="{'bg-[#2da44e] text-white': view === 'main', 'bg-white text-gray-700 hover:bg-gray-50': view !== 'main'}"
                 class="px-4 py-2 rounded-md font-medium shadow-sm border border-gray-300 transition-colors">
                 Main Changes
             </button>
             <button 
                 @click="view = 'detailed'"
-                :class="{'bg-indigo-600 text-white': view === 'detailed', 'bg-white text-gray-700 hover:bg-gray-50': view !== 'detailed'}"
+                :class="{'bg-[#2da44e] text-white': view === 'detailed', 'bg-white text-gray-700 hover:bg-gray-50': view !== 'detailed'}"
                 class="px-4 py-2 rounded-md font-medium shadow-sm border border-gray-300 transition-colors">
                 Detailed Changes
             </button>
@@ -81,7 +81,7 @@
                     <div class="flex items-center justify-between mb-4">
                         <div>
                             <h3 class="text-lg font-semibold text-gray-900" x-text="commit.title"></h3>
-                            <span class="text-sm text-gray-500" x-text="commit.date"></span>
+                            <span class="text-sm text-gray-500" x-text="formatDate(commit.date)"></span>
                         </div>
                         <span class="text-xs font-mono bg-gray-100 text-gray-600 px-2 py-1 rounded" x-text="commit.id"></span>
                     </div>
@@ -222,6 +222,20 @@
                 connectionStatus: null,
                 statusMessage: '',
                 
+                formatDate(dateString) {
+                    const date = new Date(dateString);
+                    const hours = date.getHours();
+                    const minutes = date.getMinutes();
+                    const ampm = hours >= 12 ? 'pm' : 'am';
+                    const formattedHours = hours % 12 || 12;
+                    const formattedMinutes = minutes.toString().padStart(2, '0');
+                    const day = date.getDate();
+                    const month = date.toLocaleString('default', { month: 'long' });
+                    const year = date.getFullYear();
+                    
+                    return `${formattedHours}:${formattedMinutes}${ampm} ${day} ${month} ${year}`;
+                },
+
                 async init() {
                     await this.fetchCommits();
                 },
