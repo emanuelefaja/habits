@@ -264,7 +264,7 @@ func main() {
 		middleware.SetFlash(r, "You have been logged out successfully!")
 
 		// Redirect to login page
-		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 	})))
 
 	// Habits API routes
