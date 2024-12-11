@@ -350,7 +350,7 @@
                                                     class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
                                                     ✅ Log amount
                                                 </button>
-                                                <button @click="
+                                                <button @click="(() => {
                                                     const dateStr = formatDate(day);
                                                     fetch('/api/habits/logs', {
                                                         method: 'POST',
@@ -358,7 +358,8 @@
                                                         body: JSON.stringify({
                                                             habit_id: {{ .Habit.ID }},
                                                             date: dateStr,
-                                                            status: 'missed'
+                                                            status: 'missed',
+                                                            value: { value: 0 }
                                                         })
                                                     })
                                                     .then(res => res.json())
@@ -366,12 +367,18 @@
                                                         if (result.success) {
                                                             habitLogs[dateStr] = result.data;
                                                             showTooltip = null;
+                                                            $dispatch('habit-log-updated', {
+                                                                habitId: {{ .Habit.ID }},
+                                                                date: dateStr,
+                                                                status: 'missed'
+                                                            });
                                                         }
-                                                    });"
+                                                    });
+                                                })()"
                                                     class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
                                                     ❌ Missed
                                                 </button>
-                                                <button @click="
+                                                <button @click="(() => {
                                                     const dateStr = formatDate(day);
                                                     fetch('/api/habits/logs', {
                                                         method: 'POST',
@@ -379,7 +386,8 @@
                                                         body: JSON.stringify({
                                                             habit_id: {{ .Habit.ID }},
                                                             date: dateStr,
-                                                            status: 'skipped'
+                                                            status: 'skipped',
+                                                            value: { value: 0 }
                                                         })
                                                     })
                                                     .then(res => res.json())
@@ -387,8 +395,14 @@
                                                         if (result.success) {
                                                             habitLogs[dateStr] = result.data;
                                                             showTooltip = null;
+                                                            $dispatch('habit-log-updated', {
+                                                                habitId: {{ .Habit.ID }},
+                                                                date: dateStr,
+                                                                status: 'skipped'
+                                                            });
                                                         }
-                                                    });"
+                                                    });
+                                                })()"
                                                     class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
                                                     ⏭️ Skipped
                                                 </button>
