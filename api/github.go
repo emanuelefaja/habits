@@ -98,7 +98,31 @@ func (g *GitHubSyncer) fetchFromGitHub() ([]*models.Commit, error) {
 
 		// Process commits for this page
 		for _, gc := range githubCommits {
-			message := gc.Commit.Message
+			// Fetch detailed commit information
+			detailURL := fmt.Sprintf("https://api.github.com/repos/%s/%s/commits/%s",
+				g.owner, g.repo, gc.SHA)
+
+			detailReq, err := http.NewRequest("GET", detailURL, nil)
+			if err != nil {
+				return nil, err
+			}
+
+			detailReq.Header.Set("Authorization", "token "+g.token)
+			detailReq.Header.Set("Accept", "application/vnd.github.v3+json")
+
+			detailResp, err := client.Do(detailReq)
+			if err != nil {
+				return nil, err
+			}
+			defer detailResp.Body.Close()
+
+			var detailedCommit GitHubCommit
+			if err := json.NewDecoder(detailResp.Body).Decode(&detailedCommit); err != nil {
+				return nil, err
+			}
+
+			// Use the detailed commit info instead of gc
+			message := detailedCommit.Commit.Message
 			title := message
 			description := ""
 			if idx := len(message); idx > 0 {
@@ -109,7 +133,7 @@ func (g *GitHubSyncer) fetchFromGitHub() ([]*models.Commit, error) {
 				}
 			}
 
-			date, err := time.Parse(time.RFC3339, gc.Commit.Author.Date)
+			date, err := time.Parse(time.RFC3339, detailedCommit.Commit.Author.Date)
 			if err != nil {
 				date = time.Now()
 			}
@@ -119,9 +143,9 @@ func (g *GitHubSyncer) fetchFromGitHub() ([]*models.Commit, error) {
 				Title:        title,
 				Description:  description,
 				Date:         date,
-				Additions:    gc.Stats.Additions,
-				Deletions:    gc.Stats.Deletions,
-				FilesAdded:   len(gc.Files),
+				Additions:    detailedCommit.Stats.Additions,
+				Deletions:    detailedCommit.Stats.Deletions,
+				FilesAdded:   len(detailedCommit.Files),
 				FilesRemoved: 0,
 			}
 			allCommits = append(allCommits, commit)
@@ -139,17 +163,20 @@ func (g *GitHubSyncer) fetchFromGitHub() ([]*models.Commit, error) {
 }
 
 func (g *GitHubSyncer) SyncCommits() error {
+	fmt.Println("Starting GitHub sync...")
 	commits, err := g.fetchFromGitHub()
 	if err != nil {
 		return err
 	}
 
+	fmt.Printf("Fetched %d commits, saving to database...\n", len(commits))
 	for _, commit := range commits {
 		err := models.SaveCommit(g.db, commit)
 		if err != nil {
 			return err
 		}
 	}
+	fmt.Println("GitHub sync completed")
 	return nil
 }
 
