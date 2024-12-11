@@ -36,6 +36,21 @@
                                 </div>
                             </template>
 
+                            <!-- Special Changelog card for Done column -->
+                            <template x-if="column.title === 'Done ✨'">
+                                <a href="/changelog" class="block">
+                                    <div class="bg-indigo-50 rounded-lg p-4 border-2 border-indigo-200 hover:bg-indigo-100 transition-colors duration-200">
+                                        <div class="flex items-start space-x-3">
+                                            <div class="text-2xl">📖</div>
+                                            <div>
+                                                <h3 class="font-medium">Check out our Changelog</h3>
+                                                <p class="text-sm text-gray-600 mt-1">See all our latest updates and improvements</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </template>
+
                             <!-- Regular cards -->
                             <template x-for="card in column.cards" :key="card.id">
                                 <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 relative">
@@ -103,17 +118,17 @@
             </div>
         </div>
         <!-- Flash Message -->
-<div x-show="showFlash" 
-x-transition:enter="transition ease-out duration-300"
-x-transition:enter-start="opacity-0 transform translate-y-2"
-x-transition:enter-end="opacity-100 transform translate-y-0"
-x-transition:leave="transition ease-in duration-300"
-x-transition:leave-start="opacity-100 transform translate-y-0"
-x-transition:leave-end="opacity-0 transform translate-y-2"
-class="fixed bottom-4 right-4 px-4 py-2 rounded-md text-white"
-:class="flashMessage.includes('successfully') ? 'bg-green-500' : 'bg-red-500'"
-x-text="flashMessage">
-</div>
+        <div x-show="showFlash" 
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform translate-y-2"
+            x-transition:enter-end="opacity-100 transform translate-y-0"
+            x-transition:leave="transition ease-in duration-300"
+            x-transition:leave-start="opacity-100 transform translate-y-0"
+            x-transition:leave-end="opacity-0 transform translate-y-2"
+            class="fixed bottom-4 right-4 px-4 py-2 rounded-md text-white"
+            :class="flashMessage.includes('successfully') ? 'bg-green-500' : 'bg-red-500'"
+            x-text="flashMessage">
+        </div>
     </div>
 
     <script>
@@ -142,7 +157,6 @@ x-text="flashMessage">
                             { id: 'chrome-extension', emoji: '🛜', title: 'Chrome Extension', description: 'Extension to open habits in new tab automatically' },
                             { id: 'database-backups', emoji: '🗄️', title: 'Database Backups', description: 'Live streaming database backups to block storage' },
                             { id: 'set-rep-weights', emoji: '💪', title: 'Set+Rep Weights', description: 'Optional weight for set-reps habits' }    
-                            
                         ]
                     },
                     {
@@ -170,9 +184,7 @@ x-text="flashMessage">
                             { id: 'set-rep-habits', emoji: '💪', title: 'Set+Rep Habits', description: 'Track exercises with sets and reps' },
                             { id: 'full-pwa', emoji: '📱', title: 'Full PWA', description: 'Full Progressive Web App for MacOS and Windows' },
                             { id: 'changelog', emoji: '🔁', title: 'Changelog', description: 'View the changelog of the app' },
-                            { id: 'github-changelog', emoji: '🔁', title: 'Detailed Changelog', description: 'View the detailed changelog of the app' },
-
-
+                            { id: 'github-changelog', emoji: '🔁', title: 'Detailed Changelog', description: 'View the detailed changelog of the app' }
                         ]
                     }
                 ],
@@ -315,4 +327,4 @@ x-text="flashMessage">
         });
     </script>
 </body>
-</html> 
+</html>
