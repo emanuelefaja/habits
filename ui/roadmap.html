@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-gray-50">
+<html lang="en" class="min-h-full bg-gray-50 dark:bg-gray-900">
 {{ template "head" . }}
-<body class="h-full">
+<body class="min-h-full bg-gray-50 dark:bg-gray-900">
     {{ template "header" dict "User" .User "Page" "roadmap" }}
 
     <!-- Roadmap component -->
@@ -15,8 +15,8 @@
         <div class="p-6 overflow-x-auto smooth-scroll">
             <div class="flex lg:grid lg:grid-cols-4 gap-4 min-w-max lg:min-w-0">
                 <template x-for="column in columns" :key="column.title">
-                    <div class="bg-white rounded-lg shadow p-4 w-80 lg:w-auto">
-                        <h2 class="text-lg font-semibold mb-4" x-text="column.title"></h2>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 w-80 lg:w-auto">
+                        <h2 class="text-lg font-semibold mb-4 dark:text-white" x-text="column.title"></h2>
                         <div class="space-y-3">
                             <!-- Special Submit Idea card for Ideas column -->
                             <template x-if="column.title === 'Ideas 💡'">
@@ -24,13 +24,14 @@
                                     @click="isAuthenticated && (feedbackOpen = true)"
                                     :class="!isAuthenticated ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'"
                                     :title="!isAuthenticated ? 'Sign in to submit ideas' : ''"
-                                    class="bg-[#e6f4ea] rounded-lg p-4 border-2 border-dashed border-[#2da44e] hover:bg-[#d3ebda] transition-colors duration-200">
+                                    class="bg-[#e6f4ea] dark:bg-[#1a332b] rounded-lg p-4 border-2 border-dashed border-[#2da44e] hover:bg-[#d3ebda] dark:hover:bg-[#234237] transition-colors duration-200">
                                     <div class="flex items-start space-x-3">
                                         <div class="text-2xl">✨</div>
                                         <div>
-                                            <h3 class="font-medium">Submit Your Idea</h3>
-                                            <p class="text-sm text-gray-600 mt-1">
-                                                <span x-text="isAuthenticated ? 'Share your feature suggestions with us!' : 'Sign in to submit ideas'"></p>
+                                            <h3 class="font-medium dark:text-white">Submit Your Idea</h3>
+                                            <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                                                <span x-text="isAuthenticated ? 'Share your feature suggestions with us!' : 'Sign in to submit ideas'"></span>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -39,12 +40,12 @@
                             <!-- Special Changelog card for Done column -->
                             <template x-if="column.title === 'Done ✨'">
                                 <a href="/changelog" class="block">
-                                    <div class="bg-indigo-50 rounded-lg p-4 border-2 border-indigo-200 hover:bg-indigo-100 transition-colors duration-200">
+                                    <div class="bg-indigo-50 dark:bg-indigo-900 rounded-lg p-4 border-2 border-indigo-200 dark:border-indigo-700 hover:bg-indigo-100 dark:hover:bg-indigo-800 transition-colors duration-200">
                                         <div class="flex items-start space-x-3">
                                             <div class="text-2xl">📖</div>
                                             <div>
-                                                <h3 class="font-medium">Check out our Changelog</h3>
-                                                <p class="text-sm text-gray-600 mt-1">See all our latest updates and improvements</p>
+                                                <h3 class="font-medium dark:text-white">Check out our Changelog</h3>
+                                                <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">See all our latest updates and improvements</p>
                                             </div>
                                         </div>
                                     </div>
@@ -53,14 +54,14 @@
 
                             <!-- Regular cards -->
                             <template x-for="card in column.cards" :key="card.id">
-                                <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 relative">
+                                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 border border-gray-200 dark:border-gray-600 hover:border-[#2da44e] transition-colors duration-200 relative">
                                     <!-- Like button -->
                                     <button 
                                         @click="isAuthenticated && column.title !== 'Done ✨' && toggleLike(card.id)"
                                         :class="!isAuthenticated || column.title === 'Done ✨' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'"
                                         class="absolute top-2 right-2 flex items-center space-x-1"
                                         :title="!isAuthenticated ? 'Sign in to vote on features' : ''">
-                                        <span class="text-sm text-gray-600" x-text="getLikeCount(card.id)"></span>
+                                        <span class="text-sm text-gray-600 dark:text-gray-300" x-text="getLikeCount(card.id)"></span>
                                         <span class="text-xl" x-text="isLiked(card.id) ? '❤️' : '🤍'"></span>
                                     </button>
 
@@ -68,8 +69,8 @@
                                     <div class="flex items-start space-x-3">
                                         <div class="text-2xl" x-text="card.emoji"></div>
                                         <div>
-                                            <h3 class="font-medium" x-text="card.title"></h3>
-                                            <p class="text-sm text-gray-600 mt-1" x-text="card.description"></p>
+                                            <h3 class="font-medium dark:text-white" x-text="card.title"></h3>
+                                            <p class="text-sm text-gray-600 dark:text-gray-300 mt-1" x-text="card.description"></p>
                                         </div>
                                     </div>
                                 </div>
@@ -87,10 +88,10 @@
                 x-cloak
                 class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
                 @click="feedbackOpen = false">
-                <div class="bg-white rounded-lg p-6 w-11/12 max-w-md"
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-11/12 max-w-md"
                      @click.stop>
                     <div class="flex justify-between items-center mb-4">
-                        <h2 class="text-xl font-bold">💡 Submit Your Idea</h2>
+                        <h2 class="text-xl font-bold dark:text-white">💡 Submit Your Idea</h2>
                         <button @click="feedbackOpen = false" class="text-gray-500 hover:text-gray-700">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
@@ -98,9 +99,9 @@
                             </svg>
                         </button>
                     </div>
-                    <p class="text-sm text-gray-600 mb-4">Share your thoughts on what you'd like to see next. <br> We don't reply to ideas, but we do read them all.</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">Share your thoughts on what you'd like to see next. <br> We don't reply to ideas, but we do read them all.</p>
                     <textarea 
-                        class="w-full border border-gray-300 rounded-md p-2 h-24 focus:border-[#2da44e] focus:ring-[#2da44e] focus:ring-1 focus:outline-none"
+                        class="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md p-2 h-24 focus:border-[#2da44e] focus:ring-[#2da44e] focus:ring-1 focus:outline-none"
                         placeholder="Enter your feedback..."></textarea>
                     <div class="flex justify-end space-x-4 mt-4">
                         <button 
