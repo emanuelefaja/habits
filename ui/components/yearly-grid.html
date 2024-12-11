@@ -432,11 +432,39 @@
                                             <!-- Numeric Input -->
                                             <div x-show="showNumericInput" class="px-2">
                                                 <div class="flex items-center gap-2">
-                                                    <button @click="numericValue = Math.max(0, parseInt(numericValue) - 1)"
+                                                    <button @click="numericValue = Math.max(0, parseFloat(numericValue) - 1)"
                                                         class="text-gray-500 hover:text-gray-700">-</button>
                                                     <input type="number" 
-                                                           x-model="numericValue"
-                                                           @keyup.enter="
+                                                           x-model.number="numericValue"
+                                                           @keyup.enter="(() => {
+                                                                const dateStr = formatDate(day);
+                                                                fetch('/api/habits/logs', {
+                                                                    method: 'POST',
+                                                                    headers: { 'Content-Type': 'application/json' },
+                                                                    body: JSON.stringify({
+                                                                        habit_id: {{ .Habit.ID }},
+                                                                        date: dateStr,
+                                                                        status: 'done',
+                                                                        value: { value: numericValue }
+                                                                    })
+                                                                })
+                                                                .then(res => res.json())
+                                                                .then(result => {
+                                                                    if (result.success) {
+                                                                        habitLogs[dateStr] = result.data;
+                                                                        showTooltip = null;
+                                                                        showNumericInput = false;
+                                                                        loadYearData();
+                                                                    }
+                                                                });
+                                                           })()"
+                                                           x-ref="numericInput"
+                                                           class="w-16 text-center border rounded-md"
+                                                           min="0"
+                                                           step="1">
+                                                    <button @click="numericValue = parseFloat(numericValue) + 1"
+                                                        class="text-gray-500 hover:text-gray-700">+</button>
+                                                    <button @click="(() => {
                                                             const dateStr = formatDate(day);
                                                             fetch('/api/habits/logs', {
                                                                 method: 'POST',
@@ -445,7 +473,7 @@
                                                                     habit_id: {{ .Habit.ID }},
                                                                     date: dateStr,
                                                                     status: 'done',
-                                                                    value: JSON.stringify({ value: numericValue })
+                                                                    value: { value: numericValue }
                                                                 })
                                                             })
                                                             .then(res => res.json())
@@ -454,34 +482,10 @@
                                                                     habitLogs[dateStr] = result.data;
                                                                     showTooltip = null;
                                                                     showNumericInput = false;
+                                                                    loadYearData();
                                                                 }
-                                                            });"
-                                                           x-ref="numericInput"
-                                                           class="w-16 text-center border rounded-md"
-                                                           min="0"
-                                                           step="1">
-                                                    <button @click="numericValue = parseInt(numericValue) + 1"
-                                                        class="text-gray-500 hover:text-gray-700">+</button>
-                                                    <button @click="
-                                                        const dateStr = formatDate(day);
-                                                        fetch('/api/habits/logs', {
-                                                            method: 'POST',
-                                                            headers: { 'Content-Type': 'application/json' },
-                                                            body: JSON.stringify({
-                                                                habit_id: {{ .Habit.ID }},
-                                                                date: dateStr,
-                                                                status: 'done',
-                                                                value: JSON.stringify({ value: numericValue })
-                                                            })
-                                                        })
-                                                        .then(res => res.json())
-                                                        .then(result => {
-                                                            if (result.success) {
-                                                                habitLogs[dateStr] = result.data;
-                                                                showTooltip = null;
-                                                                showNumericInput = false;
-                                                            }
-                                                        });"
+                                                            });
+                                                        })()"
                                                         class="px-2 py-1 bg-[#2da44e] hover:bg-[#2c974b] text-white rounded-md text-sm">
                                                         Log
                                                     </button>
