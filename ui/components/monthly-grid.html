@@ -2,7 +2,7 @@
 <template x-if="habits.length > 0">
     <div class="flex-grow flex items-center justify-center mb-8" x-data="monthlyGrid">
         <div class="w-full md:w-auto">
-            <div class="bg-white p-8 shadow sm:rounded-lg">
+            <div class="bg-white dark:bg-gray-800 p-8 shadow sm:rounded-lg">
                 <!-- Header with title and Create Habit button -->
                 <div class="flex justify-between items-center mb-6">
                     <div class="flex items-center gap-3">
@@ -40,7 +40,7 @@
                                 </svg>
                             </button>
                         </span>
-                        <h2 class="text-2xl font-semibold" x-text="`🗓️ ${monthNames[currentMonth-1]} ${currentYear}`"></h2>
+                        <h2 class="text-2xl font-semibold text-gray-900 dark:text-white" x-text="`🗓️ ${monthNames[currentMonth-1]} ${currentYear}`"></h2>
                     </div>
                     
                     <!-- Create Habit button moved to top right -->
@@ -60,7 +60,7 @@
                             <div :class="{ 
                                     'invisible': day > getDaysInMonth(),
                                     'bg-[#2da44e] text-white rounded-full inline-flex items-center justify-center px-2': isToday(day),
-                                    'text-sm text-center text-gray-600': !isToday(day)
+                                    'text-sm text-center text-gray-600 dark:text-gray-400': !isToday(day)
                                  }"
                                  style="width: 35px;" 
                                  :style="{ 
@@ -73,20 +73,20 @@
                             </div>
                         </template>
                         <div class="h-8 flex items-center justify-center">
-                            <span class="text-sm font-medium text-gray-600">Total</span>
+                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Total</span>
                         </div>
                     </div>
 
                     <!-- Sortable List of Habit Rows -->
                     <div x-ref="habitsListContainer" class="flex flex-col gap-1 min-w-fit">
                         <template x-for="habit in habits" :key="habit.id">
-                            <div class="grid bg-white group"
+                            <div class="grid bg-white dark:bg-gray-800 group"
                                  x-bind:data-habit-id="habit.id"
                                  style="gap: 3px; grid-template-columns: 150px repeat(31, 35px) 70px;"
-                                 class="border border-gray-200 rounded-sm">
+                                 class="border border-gray-200 dark:border-gray-700 rounded-sm">
                                  
                                 <!-- Habit Name Cell (drag handle) -->
-                                <div class="h-8 flex items-center font-medium text-sm text-gray-700 pr-4 habit-handle relative" 
+                                <div class="h-8 flex items-center font-medium text-sm text-gray-700 dark:text-gray-200 pr-4 habit-handle relative" 
                                      style="width: 150px; cursor: grab;">
                                     <div class="absolute left-0 top-0 bottom-0 flex items-center transition-opacity duration-150 opacity-0 group-hover:opacity-100 px-1">
                                         <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
@@ -119,7 +119,7 @@
                                             <div class="w-7 h-7 relative">
                                                 <!-- Option Display -->
                                                 <div @click="showTooltip = `${habit.id}_${formatDate(day)}`"
-                                                     class="w-7 h-7 rounded-sm cursor-pointer flex items-center justify-center bg-[#ebedf0] relative">
+                                                     class="w-7 h-7 rounded-sm cursor-pointer flex items-center justify-center bg-[#ebedf0] dark:bg-gray-700 relative">
                                                     <template x-if="habitLogs[`${habit.id}_${formatDate(day)}`]?.value?.Valid">
                                                         <div class="relative hover:z-20 group/cell">
                                                             <!-- Selected Option Display -->
@@ -388,7 +388,7 @@
 
                                 <!-- Totals Cell -->
                                 <div class="h-8 flex items-center justify-center">
-                                    <span class="text-sm font-bold text-gray-700" x-text="(() => {
+                                    <span class="text-sm font-bold text-gray-700 dark:text-gray-400" x-text="(() => {
                                         if (habit.habit_type === 'numeric') {
                                             let sum = 0;
                                             for (let d = 1; d <= getDaysInMonth(); d++) {
@@ -426,19 +426,19 @@
                 <div class="grid grid-cols-2 md:flex md:justify-center gap-4 md:gap-6 mt-6 justify-center">
                     <div class="flex items-center gap-2">
                         <div class="w-5 h-5 rounded-sm" style="background-color: #2da44e;"></div>
-                        <span class="text-sm text-gray-600">Done</span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">Done</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <div class="w-5 h-5 rounded-sm" style="background-color: #E3211a;"></div>
-                        <span class="text-sm text-gray-600">Missed</span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">Missed</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <div class="w-5 h-5 rounded-sm" style="background-color: #00a0d2;"></div>
-                        <span class="text-sm text-gray-600">Skipped</span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">Skipped</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <div class="w-5 h-5 rounded-sm" style="background-color: #ebedf0;"></div>
-                        <span class="text-sm text-gray-600">No Data</span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">No Data</span>
                     </div>
                 </div>
             </div>
@@ -703,7 +703,7 @@
                     'done': '#2da44e',
                     'missed': '#E3211a',
                     'skipped': '#00a0d2',
-                    'none': '#ebedf0'
+                    'none': document.documentElement.classList.contains('dark') ? '#374151' : '#ebedf0'
                 };
                 return colors[status] || colors.none;
             },
