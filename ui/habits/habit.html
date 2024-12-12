@@ -196,6 +196,8 @@
             {{ template "binary-habit" . }}
         {{ else if eq .Habit.HabitType "numeric" }}
             {{ template "numeric-habit" . }}
+        {{ else if eq .Habit.HabitType "option-select" }}
+            {{ template "choice-habit" . }}
         {{ end }}
     </div>
 </body>

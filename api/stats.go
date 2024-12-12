@@ -74,6 +74,8 @@ func HandleGetHabitStats(db *sql.DB) http.HandlerFunc {
 			stats, err = models.GetBinaryHabitStats(db, habitID)
 		case models.NumericHabit:
 			stats, err = models.GetNumericHabitStats(db, habitID)
+		case models.OptionSelectHabit:
+			stats, err = models.GetChoiceHabitStats(db, habitID)
 		default:
 			w.WriteHeader(http.StatusBadRequest)
 			json.NewEncoder(w).Encode(APIResponse{

@@ -2,7 +2,9 @@ package models
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -117,6 +119,118 @@ func GetNumericHabitStats(db *sql.DB, habitID int) (NumericHabitStats, error) {
 		parsedTime, err := time.Parse("2006-01-02", startDateStr.String)
 		if err != nil {
 			return NumericHabitStats{}, fmt.Errorf("error parsing start date: %v", err)
+		}
+		stats.StartDate = parsedTime
+	}
+
+	return stats, nil
+}
+
+type ChoiceOption struct {
+	Emoji string `json:"emoji"`
+	Label string `json:"label"`
+	Count int    `json:"count"`
+}
+
+type ChoiceHabitStats struct {
+	Options   []ChoiceOption `json:"options"`
+	TotalDays int            `json:"total_days"`
+	StartDate time.Time      `json:"start_date,omitempty"`
+}
+
+func GetChoiceHabitStats(db *sql.DB, habitID int) (ChoiceHabitStats, error) {
+	// First verify this is a choice habit
+	var habitType HabitType
+	var habitOptionsStr sql.NullString
+	err := db.QueryRow(`
+		SELECT habit_type, habit_options 
+		FROM habits 
+		WHERE id = ?`, habitID).Scan(&habitType, &habitOptionsStr)
+
+	if err != nil {
+		return ChoiceHabitStats{}, fmt.Errorf("habit not found: %v", err)
+	}
+
+	if habitType != OptionSelectHabit {
+		return ChoiceHabitStats{}, fmt.Errorf("habit is not option-select type")
+	}
+
+	// Parse habit options
+	var options []HabitOption
+	if err := json.Unmarshal([]byte(habitOptionsStr.String), &options); err != nil {
+		return ChoiceHabitStats{}, fmt.Errorf("invalid habit options format: %v", err)
+	}
+
+	// Initialize stats
+	stats := ChoiceHabitStats{
+		Options: make([]ChoiceOption, len(options)),
+	}
+
+	// Copy options and initialize counts
+	for i, opt := range options {
+		stats.Options[i] = ChoiceOption{
+			Emoji: opt.Emoji,
+			Label: opt.Label,
+			Count: 0,
+		}
+	}
+
+	// Get counts for each option and total days
+	rows, err := db.Query(`
+		SELECT 
+			value,
+			COUNT(*) as count
+		FROM habit_logs 
+		WHERE habit_id = ? AND status = 'done'
+		GROUP BY value`, habitID)
+	if err != nil {
+		return ChoiceHabitStats{}, fmt.Errorf("error getting habit stats: %v", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var valueStr string
+		var count int
+		if err := rows.Scan(&valueStr, &count); err != nil {
+			return ChoiceHabitStats{}, fmt.Errorf("error scanning row: %v", err)
+		}
+
+		var value struct {
+			Emoji string `json:"emoji"`
+			Label string `json:"label"`
+		}
+		if err := json.Unmarshal([]byte(valueStr), &value); err != nil {
+			continue // Skip invalid JSON
+		}
+
+		// Find matching option and update count
+		for i := range stats.Options {
+			if stats.Options[i].Emoji == value.Emoji && stats.Options[i].Label == value.Label {
+				stats.Options[i].Count = count
+				break
+			}
+		}
+	}
+
+	// Get total days and start date
+	var startDateStr sql.NullString
+	err = db.QueryRow(`
+		SELECT 
+			COUNT(DISTINCT date) as total_days,
+			MIN(date) as start_date
+		FROM habit_logs 
+		WHERE habit_id = ?`, habitID).Scan(&stats.TotalDays, &startDateStr)
+	if err != nil {
+		return ChoiceHabitStats{}, fmt.Errorf("error getting total days: %v", err)
+	}
+
+	// Parse start date if available
+	if startDateStr.Valid {
+		// First split the string to get just the date part
+		datePart := strings.Split(startDateStr.String, " ")[0]
+		parsedTime, err := time.Parse("2006-01-02", datePart)
+		if err != nil {
+			return ChoiceHabitStats{}, fmt.Errorf("error parsing start date: %v", err)
 		}
 		stats.StartDate = parsedTime
 	}

@@ -102,6 +102,7 @@ func main() {
 		"ui/habits/habit.html",
 		"ui/habits/binary.html",
 		"ui/habits/numeric.html",
+		"ui/habits/choice.html",
 		"ui/about.html",
 		"ui/guest-home.html",
 		"ui/admin.html",
