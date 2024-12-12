@@ -13,11 +13,9 @@
             this.modalState.selectedHabit = name;
             this.modalState.selectedHabitEmoji = emoji;
             this.modalState.selectedHabitType = type;
-        },
-        init() {
-            this.modalState.view = 'custom'
         }
     }"
+    x-init="$watch('modalState.isOpen', value => { if (value) modalState.view = 'custom' })"
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
     @click="closeModal()">
 
