@@ -60,96 +60,272 @@
         <!-- Health Tab -->
         <div x-show="activeTab === 'health'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="text-3xl mb-3">💪</div>
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">💪</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Sets & Reps Habit</span>
+                </div>
                 <h3 class="font-semibold text-gray-900 mb-2">Pushups</h3>
-                <span class="text-sm text-gray-500">Numeric Habit</span>
+                <p class="text-sm text-gray-500">Build upper body strength with daily pushups.</p>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="text-3xl mb-3">🏃‍♂️</div>
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">🏃‍♂️</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                </div>
                 <h3 class="font-semibold text-gray-900 mb-2">Running</h3>
-                <span class="text-sm text-gray-500">Numeric Habit</span>
+                <p class="text-sm text-gray-500">Track your daily running distance in kilometers.</p>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="text-3xl mb-3">💧</div>
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">💧</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                </div>
                 <h3 class="font-semibold text-gray-900 mb-2">Water Intake</h3>
-                <span class="text-sm text-gray-500">Numeric Habit</span>
+                <p class="text-sm text-gray-500">Stay hydrated by tracking glasses of water.</p>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="text-3xl mb-3">😴</div>
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">😴</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
+                </div>
                 <h3 class="font-semibold text-gray-900 mb-2">Sleep 8h</h3>
-                <span class="text-sm text-gray-500">Binary Habit</span>
+                <p class="text-sm text-gray-500">Maintain healthy sleep schedule of 8 hours.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">⏰</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Fasting Hours</h3>
+                <p class="text-sm text-gray-500">Track your daily fasting window duration.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">🍬</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">No Sugar Day</h3>
+                <p class="text-sm text-gray-500">Track days without consuming added sugars.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">👣</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Steps Per Day</h3>
+                <p class="text-sm text-gray-500">Track your daily step count goal.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">🍽️</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Calorie Tracking</h3>
+                <p class="text-sm text-gray-500">Monitor your daily caloric intake.</p>
             </div>
         </div>
 
         <!-- Work Tab -->
         <div x-show="activeTab === 'work'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="text-3xl mb-3">📚</div>
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">📚</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                </div>
                 <h3 class="font-semibold text-gray-900 mb-2">Deep Work</h3>
-                <span class="text-sm text-gray-500">Numeric Habit</span>
+                <p class="text-sm text-gray-500">Track focused work hours without distractions.</p>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="text-3xl mb-3">✍️</div>
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">✍️</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                </div>
                 <h3 class="font-semibold text-gray-900 mb-2">Writing</h3>
-                <span class="text-sm text-gray-500">Numeric Habit</span>
+                <p class="text-sm text-gray-500">Track your daily writing word count.</p>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="text-3xl mb-3">📧</div>
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">📧</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
+                </div>
                 <h3 class="font-semibold text-gray-900 mb-2">Inbox Zero</h3>
-                <span class="text-sm text-gray-500">Binary Habit</span>
+                <p class="text-sm text-gray-500">Keep your inbox empty by managing your emails.</p>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="text-3xl mb-3">👥</div>
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">👥</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
+                </div>
                 <h3 class="font-semibold text-gray-900 mb-2">Networking</h3>
-                <span class="text-sm text-gray-500">Binary Habit</span>
+                <p class="text-sm text-gray-500">Connect with others through networking activities.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">🍅</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Pomodoros</h3>
+                <p class="text-sm text-gray-500">Track completed 25-minute focus sessions.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">🤝</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Client Outreach</h3>
+                <p class="text-sm text-gray-500">Track number of meaningful client interactions.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">⚖️</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Choice Habit</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Work-Life Balance</h3>
+                <p class="text-sm text-gray-500">Rate your daily work-life balance feeling.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">✅</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Task Completion</h3>
+                <p class="text-sm text-gray-500">Track number of tasks completed daily.</p>
             </div>
         </div>
 
         <!-- Mind Tab -->
         <div x-show="activeTab === 'mind'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="text-3xl mb-3">🧘</div>
-                <h3 class="font-semibold text-gray-900 mb-2">Meditation</h3>
-                <span class="text-sm text-gray-500">Numeric Habit</span>
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">🌅</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Early Rise</h3>
+                <p class="text-sm text-gray-500">Wake up early to start your day right.</p>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="text-3xl mb-3">📝</div>
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">🎨</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Creative Time</h3>
+                <p class="text-sm text-gray-500">Allocate time for creative pursuits.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">🌱</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Nature Time</h3>
+                <p class="text-sm text-gray-500">Spend time in nature to recharge.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">🎯</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Goal Review</h3>
+                <p class="text-sm text-gray-500">Reflect on your progress towards your goals.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">✍️</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                </div>
                 <h3 class="font-semibold text-gray-900 mb-2">Journaling</h3>
-                <span class="text-sm text-gray-500">Binary Habit</span>
+                <p class="text-sm text-gray-500">Track minutes spent in self-reflection.</p>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="text-3xl mb-3">😊</div>
-                <h3 class="font-semibold text-gray-900 mb-2">Mood</h3>
-                <span class="text-sm text-gray-500">Option-Select Habit</span>
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">📱</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Digital Detox</h3>
+                <p class="text-sm text-gray-500">Take intentional breaks from screens.</p>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="text-3xl mb-3">📖</div>
-                <h3 class="font-semibold text-gray-900 mb-2">Reading</h3>
-                <span class="text-sm text-gray-500">Numeric Habit</span>
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">🧘</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Choice Habit</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Stress Level</h3>
+                <p class="text-sm text-gray-500">Monitor your daily stress levels.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">🌙</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Evening Routine</h3>
+                <p class="text-sm text-gray-500">Follow a calming nighttime ritual.</p>
             </div>
         </div>
 
         <!-- Lifestyle Tab -->
         <div x-show="activeTab === 'lifestyle'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="text-3xl mb-3">🌅</div>
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">🌅</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
+                </div>
                 <h3 class="font-semibold text-gray-900 mb-2">Early Rise</h3>
-                <span class="text-sm text-gray-500">Binary Habit</span>
+                <p class="text-sm text-gray-500">Wake up early to start your day right.</p>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="text-3xl mb-3">🎨</div>
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">🎨</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                </div>
                 <h3 class="font-semibold text-gray-900 mb-2">Creative Time</h3>
-                <span class="text-sm text-gray-500">Numeric Habit</span>
+                <p class="text-sm text-gray-500">Allocate time for creative pursuits.</p>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="text-3xl mb-3">🌱</div>
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">🌱</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
+                </div>
                 <h3 class="font-semibold text-gray-900 mb-2">Nature Time</h3>
-                <span class="text-sm text-gray-500">Binary Habit</span>
+                <p class="text-sm text-gray-500">Spend time in nature to recharge.</p>
             </div>
             <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="text-3xl mb-3">🎯</div>
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">🎯</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
+                </div>
                 <h3 class="font-semibold text-gray-900 mb-2">Goal Review</h3>
-                <span class="text-sm text-gray-500">Binary Habit</span>
+                <p class="text-sm text-gray-500">Reflect on your progress towards your goals.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">📈</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Choice Habit</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Personal Growth</h3>
+                <p class="text-sm text-gray-500">Rate your daily self-improvement progress.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">👨‍👩‍👧‍👦</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Family Time</h3>
+                <p class="text-sm text-gray-500">Track quality hours spent with family.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">🍳</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">New Recipe</h3>
+                <p class="text-sm text-gray-500">Try cooking something new today.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
+                <div class="flex justify-between items-start mb-3">
+                    <div class="text-3xl">🤝</div>
+                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                </div>
+                <h3 class="font-semibold text-gray-900 mb-2">Social Connection</h3>
+                <p class="text-sm text-gray-500">Track meaningful social interactions.</p>
             </div>
         </div>
     </div>
@@ -251,7 +427,7 @@
                     <div class="p-5">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
-                                <span class="text-2xl">📅</span>
+                                <span class="text-2xl">���</span>
                             </div>
                             <div class="ml-5 w-0 flex-1">
                                 <dl>
