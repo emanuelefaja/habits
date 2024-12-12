@@ -1,316 +1,731 @@
 {{ define "habit-modal" }}
-<!-- Add modal markup starts here -->
+<div 
+    x-show="modalState.isOpen" 
+    x-cloak
+    x-data="{
+        emojiSearch: '',
+        emojiResults: [],
+        optionEmojiSearch: '',
+        optionEmojiResults: [],
+        selectedOptionEmoji: '',
+        selectedOptionLabel: '',
+        selectHabitFromCategory(name, emoji, type) {
+            this.modalState.selectedHabit = name;
+            this.modalState.selectedHabitEmoji = emoji;
+            this.modalState.selectedHabitType = type;
+        },
+        init() {
+            this.modalState.view = 'custom'
+        }
+    }"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    @click="closeModal()">
 
-<div x-show="modalState.isOpen" 
-x-cloak
-class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-@click="closeModal()">
-<div class="bg-white rounded-lg p-8 w-11/12 max-w-2xl" 
-    @click.stop>
-   <!-- Header -->
-   <div class="flex justify-between items-center mb-6">
-       <h2 class="text-2xl font-bold">Create a Habit</h2>
-       <button @click="closeModal()" class="text-gray-500 hover:text-gray-700">
-           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-           </svg>
-       </button>
-   </div>
+    <div class="bg-white rounded-lg p-0 w-11/12 max-w-6xl flex flex-col h-[80vh]" 
+         @click.stop>
+        <!-- Top Bar -->
+        <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+            <h2 class="text-2xl font-bold">
+                <template x-if="modalState.view === 'custom'">
+                    <span>✨ Create a Habit</span>
+                </template>
+                <template x-if="modalState.view === 'health'">
+                    <span>❤️ Health Habits</span>
+                </template>
+                <template x-if="modalState.view === 'work'">
+                    <span>💼 Work Habits</span>
+                </template>
+                <template x-if="modalState.view === 'mind'">
+                    <span>🧠 Mind Habits</span>
+                </template>
+                <template x-if="modalState.view === 'lifestyle'">
+                    <span>🌟 Lifestyle Habits</span>
+                </template>
+            </h2>
+            <button @click="closeModal()" class="text-gray-500 hover:text-gray-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
 
-   <!-- Suggestions View -->
-   <div x-show="modalState.view === 'suggestions'">
-       <!-- Create Your Own -->
-       <button 
-           @click="modalState.view = 'custom'"
-           class="w-full mb-4 px-4 py-3 rounded-full border-2 border-gray-300 hover:border-gray-400 flex items-center justify-center space-x-2 transition-colors duration-200">
-           <span>✨</span>
-           <span>Create your own habit</span>
-       </button>
+        <div class="flex flex-1 overflow-hidden">
+            <!-- Sidebar Tabs -->
+            <div class="w-56 border-r border-gray-200 bg-gray-50 flex flex-col py-6">
+                <button 
+                    @click="modalState.view = 'custom'"
+                    :class="{'bg-white font-semibold': modalState.view === 'custom'}"
+                    class="px-4 py-3 text-left hover:bg-white transition-colors">
+                    ✨ Custom Habit
+                </button>
+                <button 
+                    @click="modalState.view = 'health'"
+                    :class="{'bg-white font-semibold': modalState.view === 'health'}"
+                    class="px-4 py-3 text-left hover:bg-white transition-colors">
+                    ❤️ Health
+                </button>
+                <button 
+                    @click="modalState.view = 'work'"
+                    :class="{'bg-white font-semibold': modalState.view === 'work'}"
+                    class="px-4 py-3 text-left hover:bg-white transition-colors">
+                    💼 Work
+                </button>
+                <button 
+                    @click="modalState.view = 'mind'"
+                    :class="{'bg-white font-semibold': modalState.view === 'mind'}"
+                    class="px-4 py-3 text-left hover:bg-white transition-colors">
+                    🧠 Mind
+                </button>
+                <button 
+                    @click="modalState.view = 'lifestyle'"
+                    :class="{'bg-white font-semibold': modalState.view === 'lifestyle'}"
+                    class="px-4 py-3 text-left hover:bg-white transition-colors">
+                    🌟 Lifestyle
+                </button>
+            </div>
 
-       <!-- Habit Suggestions -->
-       <div class="flex flex-wrap gap-3 mb-8">
-           <template x-for="suggestion in habitSuggestions.slice(1)" :key="suggestion.name">
-               <button 
-                   @click="modalState.selectedHabit = modalState.selectedHabit === suggestion.name ? null : suggestion.name"
-                   :class="{
-                       'bg-[#e6f4ea] text-[#2da44e] border-[#2da44e]': modalState.selectedHabit === suggestion.name,
-                       'bg-white text-gray-700 border-gray-300 hover:border-gray-400': modalState.selectedHabit !== suggestion.name
-                   }"
-                   class="px-4 py-2 rounded-full border transition-colors duration-200">
-                   <span x-text="suggestion.emoji"></span>
-                   <span x-text="suggestion.name" class="ml-2"></span>
-               </button>
-           </template>
-       </div>
+            <!-- Main Content Area -->
+            <div class="flex-1 overflow-y-auto p-6">
+                
+                <!-- Custom Habit View -->
+                <div x-show="modalState.view === 'custom'" class="space-y-6">
+                    <!-- Existing Custom Habit Code -->
+                    <!-- Main Emoji and Name Row -->
+                    <div class="grid grid-cols-2 gap-4 mt-6">
+                        <!-- Emoji Selector -->
+                        <div class="relative">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Choose Habit Emoji</label>
+                            <div class="relative">
+                                <input 
+                                    type="text"
+                                    x-model="emojiSearch"
+                                    @input="searchEmojis()"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-[#2da44e] focus:ring-0 transition duration-200"
+                                    placeholder="Search emoji..."
+                                >
+                                <!-- Selected Emoji Display -->
+                                <div x-show="modalState.customHabit.emoji" 
+                                     class="absolute right-2 top-1/2 -translate-y-1/2 text-xl">
+                                    <span x-text="modalState.customHabit.emoji"></span>
+                                </div>
+                            </div>
 
-       <!-- Footer Buttons -->
-       <div class="flex justify-end space-x-4 mt-8">
-           <button 
-               @click="closeModal()"
-               class="px-4 py-2 rounded-md bg-gray-300 text-gray-700 hover:bg-gray-200 transition-colors duration-200">
-               Cancel ❌
-           </button>
-           <button 
-               @click="
-                   if (modalState.selectedHabit) {
-                       const suggestion = habitSuggestions.find(s => s.name === modalState.selectedHabit);
-                       if (suggestion) {
-                           fetch('/api/habits', {
-                               method: 'POST',
-                               headers: {
-                                   'Content-Type': 'application/json',
-                               },
-                               body: JSON.stringify({
-                                   name: suggestion.name,
-                                   emoji: suggestion.emoji,
-                                   habit_type: suggestion.type
-                               })
-                           })
-                           .then(response => response.json())
-                           .then(result => {
-                               if (result.success) {
-                                   habits.push(result.data);
-                                   habits.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
-                                   closeModal();
-                                   flashMessage = result.message;
-                                   showFlash = true;
-                                   setTimeout(() => showFlash = false, 3000);
-                               } else {
-                                   flashMessage = result.message;
-                                   showFlash = true;
-                                   setTimeout(() => showFlash = false, 3000);
-                               }
-                           })
-                           .catch(error => {
-                               flashMessage = 'Error creating habit';
-                               showFlash = true;
-                               setTimeout(() => showFlash = false, 3000);
-                           });
-                       }
-                   }
-               "
-               :disabled="!modalState.selectedHabit"
-               :class="{'opacity-50 cursor-not-allowed': !modalState.selectedHabit}"
-               class="px-4 py-2 rounded-md bg-[#2da44e] text-white hover:bg-[#2c974b] transition-colors duration-200">
-               Create Habit ✨
-           </button>
-       </div>
-   </div>
+                            <!-- Emoji Search Results -->
+                            <div 
+                                x-show="emojiResults.length > 0"
+                                class="absolute z-50 mt-1 w-full bg-white border rounded-md shadow-lg max-h-40 overflow-y-auto">
+                                <div class="grid grid-cols-6 gap-1 p-2">
+                                    <template x-for="emoji in emojiResults" :key="emoji.id">
+                                        <button 
+                                            @click="
+                                                modalState.customHabit.emoji = emoji.skins[0].native;
+                                                emojiResults = [];
+                                                emojiSearch = '';
+                                            "
+                                            class="p-1.5 text-lg hover:bg-gray-100 rounded-md"
+                                            :title="emoji.name">
+                                            <span x-text="emoji.skins[0].native"></span>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
 
-   <!-- Custom Habit View -->
-   <div x-show="modalState.view === 'custom'" class="space-y-6">
-       <!-- Main Emoji and Name Row -->
-       <div class="grid grid-cols-2 gap-4 mt-6">
-           <!-- Emoji Selector -->
-           <div class="relative">
-               <label class="block text-sm font-medium text-gray-700 mb-1">Choose Habit Emoji</label>
-               <div class="relative">
-                   <input 
-                       type="text"
-                       x-model="emojiSearch"
-                       @input="searchEmojis()"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-[#2da44e] focus:ring-0 transition duration-200"
-                       placeholder="Search emoji..."
-                   >
-                   <!-- Selected Emoji Display -->
-                   <div x-show="modalState.customHabit.emoji" 
-                        class="absolute right-2 top-1/2 -translate-y-1/2 text-xl">
-                       <span x-text="modalState.customHabit.emoji"></span>
-                   </div>
-               </div>
+                        <!-- Habit Name Input -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Habit Name</label>
+                            <input 
+                                type="text"
+                                x-model="modalState.customHabit.name"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-[#2da44e] focus:ring-0 transition duration-200"
+                                placeholder="Enter habit name..."
+                            >
+                        </div>
+                    </div>
 
-               <!-- Emoji Search Results (smaller and contained) -->
-               <div 
-                   x-show="emojiResults.length > 0"
-                   class="absolute z-50 mt-1 w-full bg-white border rounded-md shadow-lg max-h-40 overflow-y-auto">
-                   <div class="grid grid-cols-6 gap-1 p-2">
-                       <template x-for="emoji in emojiResults" :key="emoji.id">
-                           <button 
-                               @click="
-                                   modalState.customHabit.emoji = emoji.skins[0].native;
-                                   emojiResults = [];
-                                   emojiSearch = '';
-                               "
-                               class="p-1.5 text-lg hover:bg-gray-100 rounded-md"
-                               :title="emoji.name">
-                               <span x-text="emoji.skins[0].native"></span>
-                           </button>
-                       </template>
-                   </div>
-               </div>
-           </div>
+                    <!-- Type Selection -->
+                    <div class="grid grid-cols-4 gap-4">
+                        <!-- Binary Card -->
+                        <button 
+                            @click="modalState.customHabit.type = 'binary'"
+                            :class="{
+                                'ring-2 ring-[#2da44e]': modalState.customHabit.type === 'binary',
+                                'hover:border-gray-400': modalState.customHabit.type !== 'binary'
+                            }"
+                            class="p-4 border rounded-lg text-center transition-all flex flex-col items-center">
+                            <div class="text-2xl h-12 flex items-center">✅</div>
+                            <h3 class="font-semibold mb-2">Yes/No</h3>
+                            <p class="text-sm text-gray-600">Did you do it or not?</p>
+                        </button>
 
-           <!-- Habit Name Input -->
-           <div>
-               <label class="block text-sm font-medium text-gray-700 mb-1">Habit Name</label>
-               <input 
-                   type="text"
-                   x-model="modalState.customHabit.name"
-                   class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:border-[#2da44e] focus:ring-0 transition duration-200"
-                   placeholder="Enter habit name..."
-               >
-           </div>
-       </div>
+                        <!-- Numeric Card -->
+                        <button 
+                            @click="modalState.customHabit.type = 'numeric'"
+                            :class="{
+                                'ring-2 ring-[#2da44e]': modalState.customHabit.type === 'numeric',
+                                'hover:border-gray-400': modalState.customHabit.type !== 'numeric'
+                            }"
+                            class="p-4 border rounded-lg text-center transition-all flex flex-col items-center">
+                            <div class="text-2xl h-12 flex items-center">🔢</div>
+                            <h3 class="font-semibold mb-2">Numbers</h3>
+                            <p class="text-sm text-gray-600">Track a number (e.g., pages read)</p>
+                        </button>
 
-       <!-- Type Selection -->
-       <div class="grid grid-cols-3 gap-4">
-           <!-- Binary Card -->
-           <button 
-               @click="modalState.customHabit.type = 'binary'"
-               :class="{
-                   'ring-2 ring-[#2da44e]': modalState.customHabit.type === 'binary',
-                   'hover:border-gray-400': modalState.customHabit.type !== 'binary'
-               }"
-               class="p-4 border rounded-lg text-center transition-all flex flex-col items-center">
-               <div class="text-2xl h-12 flex items-center">✅</div>
-               <h3 class="font-semibold mb-2">Yes/No</h3>
-               <p class="text-sm text-gray-600">Did you do it or not?</p>
-           </button>
+                        <!-- Option-Select Card -->
+                        <button 
+                            @click="modalState.customHabit.type = 'option-select'"
+                            :class="{
+                                'ring-2 ring-[#2da44e]': modalState.customHabit.type === 'option-select',
+                                'hover:border-gray-400': modalState.customHabit.type !== 'option-select'
+                            }"
+                            class="p-4 border rounded-lg text-center transition-all flex flex-col items-center">
+                            <div class="text-2xl h-12 flex items-center">🗳️</div>
+                            <h3 class="font-semibold mb-2">Choice</h3>
+                            <p class="text-sm text-gray-600">Select from a list of options</p>
+                        </button>
 
-           <!-- Numeric Card -->
-           <button 
-               @click="modalState.customHabit.type = 'numeric'"
-               :class="{
-                   'ring-2 ring-[#2da44e]': modalState.customHabit.type === 'numeric',
-                   'hover:border-gray-400': modalState.customHabit.type !== 'numeric'
-               }"
-               class="p-4 border rounded-lg text-center transition-all flex flex-col items-center">
-               <div class="text-2xl h-12 flex items-center">🔢</div>
-               <h3 class="font-semibold mb-2">Numbers</h3>
-               <p class="text-sm text-gray-600">Track a number (e.g., pages read)</p>
-           </button>
+                        <!-- Set-Reps Card -->
+                        <button 
+                            @click="modalState.customHabit.type = 'set-reps'"
+                            :class="{
+                                'ring-2 ring-[#2da44e]': modalState.customHabit.type === 'set-reps',
+                                'hover:border-gray-400': modalState.customHabit.type !== 'set-reps'
+                            }"
+                            class="p-4 border rounded-lg text-center transition-all flex flex-col items-center">
+                            <div class="text-2xl h-12 flex items-center">💪</div>
+                            <h3 class="font-semibold mb-2">Sets & Reps</h3>
+                            <p class="text-sm text-gray-600">Track exercises with sets and reps</p>
+                        </button>
+                    </div>
 
-           <!-- Option-Select Card -->
-           <button 
-               @click="modalState.customHabit.type = 'option-select'"
-               :class="{
-                   'ring-2 ring-[#2da44e]': modalState.customHabit.type === 'option-select',
-                   'hover:border-gray-400': modalState.customHabit.type !== 'option-select'
-               }"
-               class="p-4 border rounded-lg text-center transition-all flex flex-col items-center">
-               <div class="text-2xl h-12 flex items-center">🗳️</div>
-               <h3 class="font-semibold mb-2">Choice</h3>
-               <p class="text-sm text-gray-600">Select from a list of options</p>
-           </button>
+                    <!-- Option-Select Fields -->
+                    <div x-show="modalState.customHabit.type === 'option-select'" 
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 transform -translate-y-2"
+                         x-transition:enter-end="opacity-100 transform translate-y-0"
+                         class="mt-6 space-y-4">
+                        <h4 class="text-sm font-medium text-gray-700">Add options</h4>
 
-           <!-- Set-Reps Card -->
-           <button 
-               @click="modalState.customHabit.type = 'set-reps'"
-               :class="{
-                   'ring-2 ring-[#2da44e]': modalState.customHabit.type === 'set-reps',
-                   'hover:border-gray-400': modalState.customHabit.type !== 'set-reps'
-               }"
-               class="p-4 border rounded-lg text-center transition-all flex flex-col items-center">
-               <div class="text-2xl h-12 flex items-center">💪</div>
-               <h3 class="font-semibold mb-2">Sets & Reps</h3>
-               <p class="text-sm text-gray-600">Track exercises with sets and reps</p>
-           </button>
-       </div>
+                        <!-- Search for emoji to add as an option -->
+                        <div class="relative">
+                            <input 
+                                type="text"
+                                x-model="optionEmojiSearch"
+                                @input="searchOptionEmojis()"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                                placeholder="Search emoji to add..."
+                            >
 
-       <!-- Option-Select Fields -->
-       <div x-show="modalState.customHabit.type === 'option-select'" 
-            x-transition:enter="transition ease-out duration-200"
-            x-transition:enter-start="opacity-0 transform -translate-y-2"
-            x-transition:enter-end="opacity-100 transform translate-y-0"
-            class="mt-6 space-y-4">
-           <h4 class="text-sm font-medium text-gray-700">Add options</h4>
-           <!-- <p class="text-sm text-gray-500">Add multiple emoji/label pairs.</p> -->
+                            <!-- Option Emoji Results -->
+                            <div 
+                                x-show="optionEmojiResults.length > 0"
+                                class="absolute z-50 mt-1 w-full bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
+                                <div class="grid grid-cols-8 gap-1 p-2">
+                                    <template x-for="emoji in optionEmojiResults" :key="emoji.id">
+                                        <button 
+                                            @click="
+                                                selectedOptionEmoji = emoji.skins[0].native;
+                                                optionEmojiResults = [];
+                                                optionEmojiSearch = '';
+                                            "
+                                            class="p-2 text-xl hover:bg-gray-100 rounded-md"
+                                            :title="emoji.name">
+                                            <span x-text="emoji.skins[0].native"></span>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
 
-           <!-- Search for emoji to add as an option -->
-           <div class="relative">
-               <input 
-                   type="text"
-                   x-model="optionEmojiSearch"
-                   @input="searchOptionEmojis()"
-                   class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
-                   placeholder="Search emoji to add..."
-               >
+                        <!-- After selecting an emoji, add a label -->
+                        <div class="flex items-center gap-2" x-show="selectedOptionEmoji">
+                            <span class="text-2xl" x-text="selectedOptionEmoji"></span>
+                            <input 
+                                type="text"
+                                x-model="selectedOptionLabel"
+                                @keyup.enter="addOption()"
+                                class="flex-1 border px-2 py-1 rounded-md"
+                                placeholder="Label for this option..."
+                            >
+                            <button 
+                                @click="addOption()"
+                                class="px-3 py-1 bg-[#2da44e] text-white rounded-md hover:bg-[#2c974b]">
+                                Add Option
+                            </button>
+                        </div>
 
-               <!-- Option Emoji Results -->
-               <div 
-                   x-show="optionEmojiResults.length > 0"
-                   class="absolute z-50 mt-1 w-full bg-white border rounded-md shadow-lg max-h-60 overflow-y-auto">
-                   <div class="grid grid-cols-8 gap-1 p-2">
-                       <template x-for="emoji in optionEmojiResults" :key="emoji.id">
-                           <button 
-                               @click="
-                                   selectedOptionEmoji = emoji.skins[0].native;
-                                   optionEmojiResults = [];
-                                   optionEmojiSearch = '';
-                               "
-                               class="p-2 text-xl hover:bg-gray-100 rounded-md"
-                               :title="emoji.name">
-                               <span x-text="emoji.skins[0].native"></span>
-                           </button>
-                       </template>
-                   </div>
-               </div>
-           </div>
+                        <!-- Display current options -->
+                        <div class="border rounded-md p-4">
+                            <h5 class="text-sm font-medium text-gray-700 mb-2">Current Options:</h5>
+                            <template x-for="(opt, index) in modalState.customHabit.habitOptions" :key="index">
+                                <div class="flex items-center gap-2 mb-2 p-2 bg-gray-50 rounded">
+                                    <span x-text="opt.emoji" class="text-2xl"></span>
+                                    <span x-text="opt.label" class="text-sm text-gray-700 flex-1"></span>
+                                    <button 
+                                        @click="removeOption(index)"
+                                        class="text-red-500 hover:text-red-700">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </template>
+                            <div x-show="!modalState.customHabit.habitOptions?.length" class="text-sm text-gray-500 text-center py-2">
+                                No options added yet.
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-           <!-- After selecting an emoji, add a label -->
-           <div class="flex items-center gap-2" x-show="selectedOptionEmoji">
-               <span class="text-2xl" x-text="selectedOptionEmoji"></span>
-               <input 
-                   type="text"
-                   x-model="selectedOptionLabel"
-                   @keyup.enter="addOption()"
-                   class="flex-1 border px-2 py-1 rounded-md"
-                   placeholder="Label for this option..."
-               >
-               <button 
-                   @click="addOption()"
-                   class="px-3 py-1 bg-[#2da44e] text-white rounded-md hover:bg-[#2c974b]">
-                   Add Option
-               </button>
-           </div>
-
-           <!-- Display current options -->
-           <div class="border rounded-md p-4">
-               <h5 class="text-sm font-medium text-gray-700 mb-2">Current Options:</h5>
-               <template x-for="(opt, index) in modalState.customHabit.habitOptions" :key="index">
-                   <div class="flex items-center gap-2 mb-2 p-2 bg-gray-50 rounded">
-                       <span x-text="opt.emoji" class="text-2xl"></span>
-                       <span x-text="opt.label" class="text-sm text-gray-700 flex-1"></span>
-                       <button 
-                           @click="removeOption(index)"
-                           class="text-red-500 hover:text-red-700">
-                           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                           </svg>
-                       </button>
-                   </div>
-               </template>
-               <div x-show="!modalState.customHabit.habitOptions?.length" class="text-sm text-gray-500 text-center py-2">
-                   No options added yet.
-               </div>
-           </div>
-       </div>
-
-       <!-- Footer Buttons -->
-       <div class="flex justify-between space-x-4 mt-8">
-           <!-- Back Button -->
-           <button 
-               @click="modalState.view = 'suggestions'"
-               class="px-4 py-2 rounded-md bg-[#00a0d2] text-white hover:bg-[#008db8] transition-colors duration-200">
-               ← Back
-           </button>
-           
-           <div class="flex space-x-4">
-               <button 
-                   @click="closeModal()"
-                   class="px-4 py-2 rounded-md bg-gray-300 text-gray-700 hover:bg-gray-200 transition-colors duration-200">
-                   Cancel ❌
-               </button>
-               <button 
-                   @click="createCustomHabit()"
-                   :disabled="!modalState.customHabit.name || !modalState.customHabit.type || !modalState.customHabit.emoji"
-                   :class="{'opacity-50 cursor-not-allowed': !modalState.customHabit.name || !modalState.customHabit.type || !modalState.customHabit.emoji}"
-                   class="px-4 py-2 rounded-md bg-[#2da44e] text-white hover:bg-[#2c974b] transition-colors duration-200">
-                   Create Habit ✨
-               </button>
-           </div>
-       </div>
-   </div>
+                <!-- Health Category View -->
+                <div x-show="modalState.view === 'health'">
+                    <div class="grid grid-cols-3 gap-4">
+                         <!-- Existing Health Habits -->
+        <!-- Placeholder Habits for Health -->
+        <div 
+        @click="selectHabitFromCategory('Pushups', '💪', 'set-reps')"
+        :class="{
+            'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Pushups'
+        }"
+        class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+        <div class="flex justify-between items-start mb-3">
+            <div class="text-3xl">💪</div>
+            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Sets & Reps Habit</span>
+        </div>
+        <h3 class="font-semibold text-gray-900 mb-2">Pushups</h3>
+        <p class="text-sm text-gray-500">Build upper body strength with daily pushups.</p>
+    </div>
+    <div 
+        @click="selectHabitFromCategory('Running', '🏃‍♂️', 'numeric')"
+        :class="{
+            'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Running'
+        }"
+        class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+        <div class="flex justify-between items-start mb-3">
+            <div class="text-3xl">🏃‍♂️</div>
+            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+        </div>
+        <h3 class="font-semibold text-gray-900 mb-2">Running</h3>
+        <p class="text-sm text-gray-500">Track your daily running distance in kilometers.</p>
+    </div>
+    <div 
+        @click="selectHabitFromCategory('Water Intake', '💧', 'numeric')"
+        :class="{
+            'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Water Intake'
+        }"
+        class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+        <div class="flex justify-between items-start mb-3">
+            <div class="text-3xl">💧</div>
+            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+        </div>
+        <h3 class="font-semibold text-gray-900 mb-2">Water Intake</h3>
+        <p class="text-sm text-gray-500">Stay hydrated by tracking glasses of water.</p>
+    </div>
+    <div 
+        @click="selectHabitFromCategory('Sleep 8h', '😴', 'binary')"
+        :class="{
+            'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Sleep 8h'
+        }"
+        class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+        <div class="flex justify-between items-start mb-3">
+            <div class="text-3xl">😴</div>
+            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
+        </div>
+        <h3 class="font-semibold text-gray-900 mb-2">Sleep 8h</h3>
+        <p class="text-sm text-gray-500">Maintain healthy sleep schedule of 8 hours.</p>
+    </div>
+    <div 
+        @click="selectHabitFromCategory('Fasting Hours', '⏰', 'numeric')"
+        :class="{
+            'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Fasting Hours'
+        }"
+        class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+        <div class="flex justify-between items-start mb-3">
+            <div class="text-3xl">⏰</div>
+            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+        </div>
+        <h3 class="font-semibold text-gray-900 mb-2">Fasting Hours</h3>
+        <p class="text-sm text-gray-500">Track your daily fasting window duration.</p>
+    </div>
+    <div 
+        @click="selectHabitFromCategory('No Sugar Day', '🍬', 'binary')"
+        :class="{
+            'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'No Sugar Day'
+        }"
+        class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+        <div class="flex justify-between items-start mb-3">
+            <div class="text-3xl">🍬</div>
+            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
+        </div>
+        <h3 class="font-semibold text-gray-900 mb-2">No Sugar Day</h3>
+        <p class="text-sm text-gray-500">Track days without consuming added sugars.</p>
+    </div>
+    <div 
+        @click="selectHabitFromCategory('Steps Per Day', '👣', 'numeric')"
+        :class="{
+            'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Steps Per Day'
+        }"
+        class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+        <div class="flex justify-between items-start mb-3">
+            <div class="text-3xl">👣</div>
+            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+        </div>
+        <h3 class="font-semibold text-gray-900 mb-2">Steps Per Day</h3>
+        <p class="text-sm text-gray-500">Track your daily step count goal.</p>
+    </div>
+    <div 
+        @click="selectHabitFromCategory('Calorie Tracking', '🍽️', 'numeric')"
+        :class="{
+            'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Calorie Tracking'
+        }"
+        class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+        <div class="flex justify-between items-start mb-3">
+            <div class="text-3xl">🍽️</div>
+            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+        </div>
+        <h3 class="font-semibold text-gray-900 mb-2">Calorie Tracking</h3>
+        <p class="text-sm text-gray-500">Monitor your daily caloric intake.</p>
+    </div>
 </div>
 </div>
-{{ end }} 
+
+                <!-- Work Category View -->
+                <div x-show="modalState.view === 'work'">
+                    <div class="grid grid-cols-3 gap-4">
+                        <!-- Work Habits -->
+                        <div 
+                            @click="selectHabitFromCategory('Deep Work', '📚', 'numeric')"
+                            :class="{
+                                'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Deep Work'
+                            }"
+                            class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="text-3xl">📚</div>
+                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-2">Deep Work</h3>
+                            <p class="text-sm text-gray-500">Track focused work hours without distractions.</p>
+                        </div>
+                        <div 
+                            @click="selectHabitFromCategory('Writing', '✍️', 'numeric')"
+                            :class="{
+                                'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Writing'
+                            }"
+                            class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="text-3xl">✍️</div>
+                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-2">Writing</h3>
+                            <p class="text-sm text-gray-500">Track your daily writing word count.</p>
+                        </div>
+                        <div 
+                            @click="selectHabitFromCategory('Inbox Zero', '📧', 'binary')"
+                            :class="{
+                                'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Inbox Zero'
+                            }"
+                            class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="text-3xl">📧</div>
+                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-2">Inbox Zero</h3>
+                            <p class="text-sm text-gray-500">Keep your inbox empty by managing your emails.</p>
+                        </div>
+                        <div 
+                            @click="selectHabitFromCategory('Networking', '👥', 'binary')"
+                            :class="{
+                                'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Networking'
+                            }"
+                            class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="text-3xl">👥</div>
+                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-2">Networking</h3>
+                            <p class="text-sm text-gray-500">Connect with others through networking activities.</p>
+                        </div>
+                        <div 
+                            @click="selectHabitFromCategory('Pomodoros', '🍅', 'numeric')"
+                            :class="{
+                                'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Pomodoros'
+                            }"
+                            class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="text-3xl">🍅</div>
+                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-2">Pomodoros</h3>
+                            <p class="text-sm text-gray-500">Track completed 25-minute focus sessions.</p>
+                        </div>
+                        <div 
+                            @click="selectHabitFromCategory('Client Outreach', '🤝', 'numeric')"
+                            :class="{
+                                'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Client Outreach'
+                            }"
+                            class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="text-3xl">🤝</div>
+                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-2">Client Outreach</h3>
+                            <p class="text-sm text-gray-500">Track number of meaningful client interactions.</p>
+                        </div>
+                        <div 
+                            @click="selectHabitFromCategory('Work-Life Balance', '⚖️', 'option-select')"
+                            :class="{
+                                'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Work-Life Balance'
+                            }"
+                            class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="text-3xl">⚖️</div>
+                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Choice Habit</span>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-2">Work-Life Balance</h3>
+                            <p class="text-sm text-gray-500">Rate your daily work-life balance feeling.</p>
+                        </div>
+                        <div 
+                            @click="selectHabitFromCategory('Task Completion', '✅', 'numeric')"
+                            :class="{
+                                'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Task Completion'
+                            }"
+                            class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="text-3xl">✅</div>
+                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-2">Task Completion</h3>
+                            <p class="text-sm text-gray-500">Track number of tasks completed daily.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mind Category View -->
+                <div x-show="modalState.view === 'mind'">
+                    <div class="grid grid-cols-3 gap-4">
+                        <!-- Mind Habits -->
+                        <div 
+                            @click="selectHabitFromCategory('Meditation', '🧘‍♀️', 'numeric')"
+                            :class="{
+                                'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Meditation'
+                            }"
+                            class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="text-3xl">🧘‍♀️</div>
+                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-2">Meditation</h3>
+                            <p class="text-sm text-gray-500">Track the amount of time that you spend meditating.</p>
+                        </div>
+                        <div 
+                            @click="selectHabitFromCategory('Reading', '📚', 'numeric')"
+                            :class="{
+                                'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Reading'
+                            }"
+                            class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="text-3xl">📚</div>
+                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-2">Reading</h3>
+                            <p class="text-sm text-gray-500">Track pages or minutes reading.</p>
+                        </div>
+                        <div 
+                            @click="selectHabitFromCategory('Creative Writing', '✒️', 'numeric')"
+                            :class="{
+                                'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Creative Writing'
+                            }"
+                            class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="text-3xl">✒️</div>
+                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-2">Creative Writing</h3>
+                            <p class="text-sm text-gray-500">Track writing sessions.</p>
+                        </div>
+                        <div 
+                            @click="selectHabitFromCategory('Goal Review', '🎯', 'binary')"
+                            :class="{
+                                'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Goal Review'
+                            }"
+                            class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="text-3xl">🍳</div>
+                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-2">Goal Review</h3>
+                            <p class="text-sm text-gray-500">Reflect on your progress towards your goals.</p>
+                        </div>
+                        <div 
+                            @click="selectHabitFromCategory('Journaling', '✍️', 'numeric')"
+                            :class="{
+                                'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Journaling'
+                            }"
+                            class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="text-3xl">✍️</div>
+                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-2">Journaling</h3>
+                            <p class="text-sm text-gray-500">Track minutes spent in self-reflection.</p>
+                        </div>
+                        <div 
+                            @click="selectHabitFromCategory('Digital Detox', '📱', 'binary')"
+                            :class="{
+                                'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Digital Detox'
+                            }"
+                            class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="text-3xl">📱</div>
+                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-2">Digital Detox</h3>
+                            <p class="text-sm text-gray-500">Take intentional breaks from screens.</p>
+                        </div>
+                        <div 
+                            @click="selectHabitFromCategory('Stress Level', '🧘', 'option-select')"
+                            :class="{
+                                'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Stress Level'
+                            }"
+                            class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="text-3xl">🧘</div>
+                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Choice Habit</span>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-2">Stress Level</h3>
+                            <p class="text-sm text-gray-500">Monitor your daily stress levels.</p>
+                        </div>
+                        <div 
+                            @click="selectHabitFromCategory('Evening Routine', '🌙', 'binary')"
+                            :class="{
+                                'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Evening Routine'
+                            }"
+                            class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="text-3xl">🌙</div>
+                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-2">Evening Routine</h3>
+                            <p class="text-sm text-gray-500">Follow a calming nighttime ritual.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lifestyle Category View -->
+                <div x-show="modalState.view === 'lifestyle'">
+                    <div class="grid grid-cols-3 gap-4">
+                        <!-- Placeholder Habits for Lifestyle -->
+                        <div 
+                            @click="selectHabitFromCategory('Cooking', '🍳', 'binary')"
+                            :class="{
+                                'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Cooking'
+                            }"
+                            class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="text-3xl">🍳</div>
+                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-2">Cooking</h3>
+                            <p class="text-sm text-gray-500">Did you cook a meal today?</p>
+                        </div>
+
+                        <div 
+                            @click="selectHabitFromCategory('Gardening', '🌱', 'numeric')"
+                            :class="{
+                                'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Gardening'
+                            }"
+                            class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="text-3xl">🌱</div>
+                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-2">Gardening</h3>
+                            <p class="text-sm text-gray-500">Track minutes spent gardening.</p>
+                        </div>
+
+                        <div 
+                            @click="selectHabitFromCategory('Clean Up', '🧹', 'binary')"
+                            :class="{
+                                'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Clean Up'
+                            }"
+                            class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="text-3xl">🧹</div>
+                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-2">Clean Up</h3>
+                            <p class="text-sm text-gray-500">Did you clean or tidy up today?</p>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- Footer Buttons -->
+        <div class="flex justify-end space-x-4 px-6 py-4 border-t border-gray-200">
+            <button 
+                @click="closeModal()"
+                class="px-4 py-2 rounded-md bg-gray-300 text-gray-700 hover:bg-gray-200 transition-colors duration-200">
+                Cancel ❌
+            </button>
+            <button
+                @click="
+                    if (modalState.view === 'custom') {
+                        if (modalState.customHabit.name && modalState.customHabit.type && modalState.customHabit.emoji) {
+                            createCustomHabit();
+                        }
+                    } else if (modalState.selectedHabit) {
+                        const suggestion = { 
+                            name: modalState.selectedHabit, 
+                            emoji: modalState.selectedHabitEmoji, 
+                            type: modalState.selectedHabitType 
+                        };
+                        fetch('/api/habits', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                name: suggestion.name,
+                                emoji: suggestion.emoji,
+                                habit_type: suggestion.type
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(result => {
+                            if (result.success) {
+                                habits.push(result.data);
+                                habits.sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+                                closeModal();
+                                flashMessage = result.message;
+                                showFlash = true;
+                                setTimeout(() => showFlash = false, 3000);
+                            } else {
+                                flashMessage = result.message;
+                                showFlash = true;
+                                setTimeout(() => showFlash = false, 3000);
+                            }
+                        })
+                        .catch(error => {
+                            flashMessage = 'Error creating habit';
+                            showFlash = true;
+                            setTimeout(() => showFlash = false, 3000);
+                        });
+                    }
+                "
+                class="px-4 py-2 rounded-md text-white transition-colors duration-200"
+                :class="{
+                    'opacity-50 cursor-not-allowed bg-[#2da44e]': 
+                        (modalState.view === 'custom' && (!modalState.customHabit.name || !modalState.customHabit.type || !modalState.customHabit.emoji))
+                        || (modalState.view !== 'custom' && !modalState.selectedHabit),
+                    'bg-[#2da44e] hover:bg-[#2c974b]': 
+                        (modalState.view === 'custom' && modalState.customHabit.name && modalState.customHabit.type && modalState.customHabit.emoji)
+                        || (modalState.view !== 'custom' && modalState.selectedHabit)
+                }">
+                Create Habit ✨
+            </button>
+        </div>
+    </div>
+</div>
+{{ end }}
