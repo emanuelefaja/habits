@@ -59,15 +59,15 @@
                         <template x-for="day in 31" :key="day">
                             <div :class="{ 
                                     'invisible': day > getDaysInMonth(),
-                                    'bg-[#2da44e] text-white rounded-full inline-flex items-center justify-center': isToday(day),
+                                    'bg-[#2da44e] text-white rounded-full inline-flex items-center justify-center px-2': isToday(day),
                                     'text-sm text-center text-gray-600': !isToday(day)
                                  }"
                                  style="width: 35px;" 
                                  :style="{ 
-                                     width: isToday(day) ? '24px' : '35px', 
-                                     height: isToday(day) ? '24px' : '35px', 
-                                     lineHeight: isToday(day) ? '24px' : '35px',
-                                     margin: isToday(day) ? '5.5px auto' : '0'
+                                     width: isToday(day) ? '28px' : '35px', 
+                                     height: isToday(day) ? '28px' : '35px', 
+                                     lineHeight: isToday(day) ? '28px' : '35px',
+                                     margin: isToday(day) ? '3.5px auto' : '0'
                                  }"
                                  x-text="day">
                             </div>
