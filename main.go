@@ -94,6 +94,7 @@ func main() {
 		"ui/components/welcome.html",
 		"ui/components/yearly-grid.html",
 		"ui/components/head.html",
+		"ui/components/footer.html",
 		"ui/home.html",
 		"ui/settings.html",
 		"ui/login.html",

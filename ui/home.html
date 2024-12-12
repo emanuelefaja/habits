@@ -633,8 +633,6 @@
              x-text="flashMessage">
         </div>
 
-       
-
         <!-- First Time User View -->
         {{ template "welcome" . }}
 
@@ -644,6 +642,8 @@
         <!-- New Habit Modal -->
         {{ template "habit-modal" . }}
     </div>
+
+    {{ template "footer" . }}
 
     <script>
       if ('serviceWorker' in navigator) {
