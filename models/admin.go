@@ -19,3 +19,26 @@ func GetTotalHabits(db *sql.DB) (int, error) {
 	}
 	return count, nil
 }
+
+func GetAllUsers(db *sql.DB) ([]*User, error) {
+	rows, err := db.Query(`
+		SELECT id, first_name, last_name, email, created_at 
+		FROM users 
+		ORDER BY created_at DESC
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var users []*User
+	for rows.Next() {
+		user := &User{}
+		err := rows.Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+	return users, nil
+}

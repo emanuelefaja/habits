@@ -469,13 +469,23 @@ func main() {
 			totalHabits = 0
 		}
 
+		// Get all users
+		users, err := models.GetAllUsers(db)
+		if err != nil {
+			log.Printf("Error getting all users: %v", err)
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
 		data := struct {
 			User        *models.User
+			Users       []*models.User
 			TotalUsers  int
 			TotalHabits int
 			Page        string
 		}{
 			User:        user,
+			Users:       users,
 			TotalUsers:  totalUsers,
 			TotalHabits: totalHabits,
 			Page:        "admin",
