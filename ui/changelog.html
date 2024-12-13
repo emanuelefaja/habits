@@ -41,7 +41,7 @@
                         <div>
                             <p class="text-gray-600 dark:text-gray-300 mb-4" x-text="item.description"></p>
                             <template x-if="item.video">
-                                <video class="w-full rounded-lg shadow-lg" autoplay muted loop>
+                                <video class="w-full rounded-lg shadow-lg" controls>
                                     <source :src="item.video" type="video/mp4">
                                     Your browser does not support the video tag.
                                 </video>
@@ -113,7 +113,14 @@
             Alpine.data('changelog', () => ({
                 view: 'main',
                 changelogItems: [
-                {
+                    {
+                        version: 'v0.1.8',
+                        title: '🎙️ Random Footer Quotes',
+                        date: 'December 13, 2024',
+                        description: 'We have added a random quote to the footer of all pages that changes every time you refresh the page.',
+                        video: '/static/videos/randomfooterquote.mp4'
+                    },
+                    {
                         version: 'v0.1.7',
                         title: '🗳️ Choice Habits Individual View',
                         date: 'December 12, 2024',
