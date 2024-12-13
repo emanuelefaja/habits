@@ -26,7 +26,7 @@
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-4 mb-8">
         <!-- Dynamic Option Cards -->
         <template x-for="option in stats.options" :key="option.emoji + option.label">
-            <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
                 <div class="p-5">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
@@ -34,8 +34,8 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="text-sm font-semibold text-gray-900 truncate" x-text="option.label"></dt>
-                                <dd class="text-3xl font-semibold text-gray-900" x-text="option.count"></dd>
+                                <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate" x-text="option.label"></dt>
+                                <dd class="text-3xl font-semibold text-gray-900 dark:text-white" x-text="option.count"></dd>
                             </dl>
                         </div>
                     </div>
@@ -44,7 +44,7 @@
         </template>
 
         <!-- Total Days Card -->
-        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
@@ -52,8 +52,8 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-semibold text-gray-900 truncate">Total Days</dt>
-                            <dd class="text-3xl font-semibold text-gray-900" x-text="stats.total_days"></dd>
+                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Total Days</dt>
+                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white" x-text="stats.total_days"></dd>
                         </dl>
                     </div>
                 </div>

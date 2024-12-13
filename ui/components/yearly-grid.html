@@ -205,12 +205,12 @@
 <div x-data="yearlyGridData()" 
      class="flex justify-center mt-8"
      @click.away="showTooltip = false; showNumericInput = false">
-    <div class="bg-white p-8 shadow sm:rounded-lg w-full">
+    <div class="bg-white dark:bg-gray-800 p-8 shadow sm:rounded-lg w-full">
         <!-- Add year navigation -->
         <div class="flex items-center gap-3 mb-6">
             <span class="isolate inline-flex rounded-md shadow-sm">
                 <button type="button" 
-                        class="relative inline-flex items-center rounded-l-md bg-white px-1.5 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10"
+                        class="relative inline-flex items-center rounded-l-md bg-white dark:bg-gray-700 px-1.5 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 focus:z-10"
                         @click="previousYear">
                     <span class="sr-only">Previous Year</span>
                     <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -218,7 +218,7 @@
                     </svg>
                 </button>
                 <button type="button"
-                        class="relative -ml-px inline-flex items-center rounded-r-md bg-white px-1.5 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10"
+                        class="relative -ml-px inline-flex items-center rounded-r-md bg-white dark:bg-gray-700 px-1.5 py-1.5 text-gray-400 ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 focus:z-10"
                         @click="nextYear">
                     <span class="sr-only">Next Year</span>
                     <svg class="size-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -226,10 +226,10 @@
                     </svg>
                 </button>
             </span>
-            <h2 class="text-2xl font-semibold">🗓️ <span x-text="currentYear"></span>
+            <h2 class="text-2xl font-semibold text-gray-900 dark:text-white">🗓️ <span x-text="currentYear"></span>
                 <span x-show="hoverDate" 
                       x-text="hoverDate" 
-                      class="text-sm text-gray-400 ml-2"
+                      class="text-sm text-gray-400 dark:text-gray-500 ml-2"
                       style="font-weight: normal;">
                 </span>
             </h2>
@@ -245,9 +245,9 @@
                                  :style="{ 
                                      width: getMonthWidth(mIndex),
                                      marginLeft: mIndex === 0 ? '0' : '',
-                                     borderLeft: mIndex !== 0 ? '1px solid #eee' : ''
+                                     borderLeft: mIndex !== 0 ? document.documentElement.classList.contains('dark') ? '1px solid #374151' : '1px solid #eee' : ''
                                  }"
-                                 class="text-center text-xs font-semibold"
+                                 class="text-center text-xs font-semibold text-gray-600 dark:text-gray-400"
                                  x-text="month">
                             </div>
                         </template>
@@ -259,7 +259,7 @@
                     <!-- Day Labels -->
                     <div class="flex flex-col justify-center">
                         <template x-for="(dayLabel, index) in ['M', 'T', 'W', 'T', 'F', 'S', 'S']" :key="index">
-                            <div class="flex items-center justify-center text-sm font-medium text-gray-300"
+                            <div class="flex items-center justify-center text-sm font-medium text-gray-300 dark:text-gray-600"
                                  style="height: 17px; margin-bottom: 3px; width: 30px; margin-right: 8px; line-height: 15px;">
                                 <span x-text="dayLabel"></span>
                             </div>
@@ -336,9 +336,9 @@
                                         <div x-show="showTooltip === formatDate(day)" 
                                              @click.away="showTooltip = null; showNumericInput = false"
                                              x-transition:enter="transition ease-out duration-200"
-                                             class="absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 bg-white shadow-lg rounded-lg p-2 border border-gray-200 z-[100] w-44">
+                                             class="absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 bg-white dark:bg-gray-700 shadow-lg rounded-lg p-2 border border-gray-200 dark:border-gray-600 z-[100] w-44">
                                             <!-- Arrow -->
-                                            <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white transform rotate-45 border-r border-b border-gray-200"></div>
+                                            <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white dark:bg-gray-700 transform rotate-45 border-r border-b border-gray-200 dark:border-gray-600"></div>
                                             
                                             <!-- Options View -->
                                             <div x-show="!showNumericInput" class="flex flex-col gap-1">
@@ -347,7 +347,7 @@
                                                     const log = habitLogs[formatDate(day)];
                                                     numericValue = log?.value?.Valid ? JSON.parse(log.value.String).value : 0;
                                                 "
-                                                    class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
+                                                    class="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 rounded text-sm text-left text-gray-700 dark:text-gray-200">
                                                     ✅ Log amount
                                                 </button>
                                                 <button @click="(() => {
@@ -375,7 +375,7 @@
                                                         }
                                                     });
                                                 })()"
-                                                    class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
+                                                    class="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 rounded text-sm text-left text-gray-700 dark:text-gray-200">
                                                     ❌ Missed
                                                 </button>
                                                 <button @click="(() => {
@@ -403,7 +403,7 @@
                                                         }
                                                     });
                                                 })()"
-                                                    class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left">
+                                                    class="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 rounded text-sm text-left text-gray-700 dark:text-gray-200">
                                                     ⏭️ Skipped
                                                 </button>
                                                 
@@ -423,7 +423,7 @@
                                                             }
                                                         });
                                                     })()"
-                                                        class="px-2 py-1 hover:bg-gray-100 rounded text-sm text-left text-red-600">
+                                                        class="px-2 py-1 hover:bg-gray-100 dark:hover:bg-gray-600 rounded text-sm text-left text-red-600 text-gray-700 dark:text-gray-200">
                                                         🗑️ Delete
                                                     </button>
                                                 </template>
@@ -433,7 +433,7 @@
                                             <div x-show="showNumericInput" class="px-2">
                                                 <div class="flex items-center gap-2">
                                                     <button @click="numericValue = Math.max(0, parseFloat(numericValue) - 1)"
-                                                        class="text-gray-500 hover:text-gray-700">-</button>
+                                                        class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">-</button>
                                                     <input type="number" 
                                                            x-model.number="numericValue"
                                                            @keyup.enter="(() => {
@@ -459,11 +459,11 @@
                                                                 });
                                                            })()"
                                                            x-ref="numericInput"
-                                                           class="w-16 text-center border rounded-md"
+                                                           class="w-16 text-center border rounded-md dark:bg-gray-600 dark:border-gray-500 dark:text-white"
                                                            min="0"
                                                            step="1">
                                                     <button @click="numericValue = parseFloat(numericValue) + 1"
-                                                        class="text-gray-500 hover:text-gray-700">+</button>
+                                                        class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">+</button>
                                                     <button @click="(() => {
                                                             const dateStr = formatDate(day);
                                                             fetch('/api/habits/logs', {
@@ -508,45 +508,45 @@
                 <div class="flex gap-6">
                     <div class="flex items-center gap-2">
                         <div class="w-4 h-4 rounded-sm" style="background-color: #2da44e;"></div>
-                        <span class="text-sm text-gray-600">Done</span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">Done</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <div class="w-4 h-4 rounded-sm" style="background-color: #E3211a;"></div>
-                        <span class="text-sm text-gray-600">Missed</span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">Missed</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <div class="w-4 h-4 rounded-sm" style="background-color: #00a0d2;"></div>
-                        <span class="text-sm text-gray-600">Skipped</span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">Skipped</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <div class="w-4 h-4 rounded-sm" style="background-color: #ebedf0;"></div>
-                        <span class="text-sm text-gray-600">No Data</span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">No Data</span>
                     </div>
                 </div>
             {{ else if eq .Habit.HabitType "numeric" }}
                 <!-- Numeric habit legend -->
                 <div class="flex items-center gap-4">
                     <div class="flex items-center gap-1">
-                        <span class="text-sm text-gray-600 mr-1">Less</span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400 mr-1">Less</span>
                         <div class="flex gap-0.5">
                             <div class="w-4 h-4 rounded-sm" style="background-color: #39d353;"></div>
                             <div class="w-4 h-4 rounded-sm" style="background-color: #26a641;"></div>
                             <div class="w-4 h-4 rounded-sm" style="background-color: #006d32;"></div>
                             <div class="w-4 h-4 rounded-sm" style="background-color: #0a4429;"></div>
                         </div>
-                        <span class="text-sm text-gray-600 ml-1">More</span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400 ml-1">More</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <div class="w-4 h-4 rounded-sm" style="background-color: #E3211a;"></div>
-                        <span class="text-sm text-gray-600">Missed</span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">Missed</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <div class="w-4 h-4 rounded-sm" style="background-color: #00a0d2;"></div>
-                        <span class="text-sm text-gray-600">Skipped</span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">Skipped</span>
                     </div>
                     <div class="flex items-center gap-2">
                         <div class="w-4 h-4 rounded-sm" style="background-color: #ebedf0;"></div>
-                        <span class="text-sm text-gray-600">No Data</span>
+                        <span class="text-sm text-gray-600 dark:text-gray-400">No Data</span>
                     </div>
                 </div>
             {{ end }}

@@ -21,7 +21,7 @@
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-4 mb-8">
 
         <!-- Total Done Card -->
-        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
@@ -29,15 +29,15 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-semibold text-gray-900 truncate">Total Done</dt>
-                            <dd class="text-3xl font-semibold text-gray-900" x-text="stats?.total_done || 0"></dd>
+                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Total Done</dt>
+                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white" x-text="stats?.total_done || 0"></dd>
                         </dl>
                     </div>
                 </div>
             </div>
         </div>
         <!-- Total Reps Card -->
-        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
@@ -45,8 +45,8 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-semibold text-gray-900 truncate">Total Reps</dt>
-                            <dd class="text-3xl font-semibold text-gray-900" x-text="stats?.total_reps || 0"></dd>
+                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Total Reps</dt>
+                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white" x-text="stats?.total_reps || 0"></dd>
                         </dl>
                     </div>
                 </div>
@@ -54,7 +54,7 @@
         </div>
 
         <!-- Average per Set Card -->
-        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
@@ -62,8 +62,8 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-semibold text-gray-900 truncate">Average per Day</dt>
-                            <dd class="text-3xl font-semibold text-gray-900" x-text="stats?.average_per_day || 0"></dd>
+                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Average per Day</dt>
+                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white" x-text="stats?.average_per_day || 0"></dd>
                         </dl>
                     </div>
                 </div>
@@ -71,7 +71,7 @@
         </div>
 
         <!-- Total Days Card -->
-        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
@@ -79,8 +79,8 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-semibold text-gray-900 truncate">Total Days</dt>
-                            <dd class="text-3xl font-semibold text-gray-900" x-text="stats?.total_days || 0"></dd>
+                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Total Days</dt>
+                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white" x-text="stats?.total_days || 0"></dd>
                         </dl>
                     </div>
                 </div>
@@ -88,7 +88,7 @@
         </div>
 
         <!-- Total Missed Card -->
-        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
@@ -96,8 +96,8 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-semibold text-gray-900 truncate">Total Missed</dt>
-                            <dd class="text-3xl font-semibold text-gray-900" x-text="stats?.total_missed || 0"></dd>
+                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Total Missed</dt>
+                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white" x-text="stats?.total_missed || 0"></dd>
                         </dl>
                     </div>
                 </div>
@@ -105,7 +105,7 @@
         </div>
 
         <!-- Total Skipped Card -->
-        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
@@ -113,8 +113,8 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-semibold text-gray-900 truncate">Total Skipped</dt>
-                            <dd class="text-3xl font-semibold text-gray-900" x-text="stats?.total_skipped || 0"></dd>
+                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Total Skipped</dt>
+                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white" x-text="stats?.total_skipped || 0"></dd>
                         </dl>
                     </div>
                 </div>
@@ -122,7 +122,7 @@
         </div>
 
         <!-- Biggest Set Card -->
-        <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
@@ -130,8 +130,8 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-semibold text-gray-900 truncate">Biggest Day</dt>
-                            <dd class="text-3xl font-semibold text-gray-900" x-text="stats?.biggest_day || 0"></dd>
+                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Biggest Day</dt>
+                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white" x-text="stats?.biggest_day || 0"></dd>
                         </dl>
                     </div>
                 </div>
