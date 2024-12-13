@@ -1,4 +1,47 @@
 {{ define "footer" }}
+ <!-- Random Quote -->
+ <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-12" x-data="{ quotes: [
+    { text: 'We are what we repeatedly do. Excellence, then, is not an act, but a habit.', author: 'Aristotle' },
+    { text: 'The only way to achieve the impossible is to believe it is possible.', author: 'Charles Kingsleigh' },
+    { text: 'Don’t watch the clock; do what it does. Keep going.', author: 'Sam Levenson' },
+    { text: 'Keep your eyes on the stars, and your feet on the ground.', author: 'Theodore Roosevelt' },
+    { text: 'The future belongs to those who believe in the beauty of their dreams.', author: 'Eleanor Roosevelt' },
+    { text: 'The best way to predict the future is to create it.', author: 'Peter Drucker' },
+    { text: 'You miss 100% of the shots you don’t take.', author: 'Wayne Gretzky' },
+    { text: 'I have not failed. I’ve just found 10,000 ways that won’t work.', author: 'Thomas Edison' },
+    { text: 'Success is not the key to happiness. Happiness is the key to success.', author: 'Albert Schweitzer' },
+    { text: 'The only limit to our realization of tomorrow is our doubts of today.', author: 'Franklin D. Roosevelt' },
+    { text: 'Hard work beats talent when talent doesn’t work hard.', author: 'Tim Notke' },
+    { text: 'Success is the sum of small efforts, repeated day in and day out.', author: 'Robert Collier' },
+    { text: 'The difference between ordinary and extraordinary is that little extra.', author: 'Jimmy Johnson' },
+    { text: 'Motivation gets you going, but discipline keeps you growing.', author: 'John C. Maxwell' },
+    { text: 'Dream big. Start small. But most of all, start.', author: 'Simon Sinek' },
+    { text: 'The secret of getting ahead is getting started.', author: 'Mark Twain' },
+    { text: 'Don’t stop when you’re tired. Stop when you’re done.', author: 'Unknown' },
+    { text: 'The man who moves a mountain begins by carrying away small stones.', author: 'Confucius' },
+    { text: 'Discipline is choosing between what you want now and what you want most.', author: 'Abraham Lincoln' },
+    { text: 'If you are not willing to risk the usual, you will have to settle for the ordinary.', author: 'Jim Rohn' },
+    { text: 'Work like there is someone working twenty-four hours a day to take it away from you.', author: 'Mark Cuban' },
+    { text: 'Strive not to be a success, but rather to be of value.', author: 'Albert Einstein' },
+    { text: 'Effort only fully releases its reward after a person refuses to quit.', author: 'Napoleon Hill' },
+    { text: 'What you get by achieving your goals is not as important as what you become by achieving your goals.', author: 'Zig Ziglar' },
+    { text: 'Small daily improvements over time lead to stunning results.', author: 'Robin Sharma' },
+    { text: 'It’s not about having time. It’s about making time.', author: 'Unknown' },
+    { text: 'Success is walking from failure to failure with no loss of enthusiasm.', author: 'Winston Churchill' },
+    { text: 'Great things are not done by impulse, but by a series of small things brought together.', author: 'Vincent van Gogh' },
+    { text: 'An ounce of action is worth a ton of theory.', author: 'Ralph Waldo Emerson' }
+  ], 
+  randomQuote: function() {
+    return this.quotes[Math.floor(Math.random() * this.quotes.length)];
+  } 
+  }">
+  <blockquote class="text-center" x-init="quote = randomQuote()">
+      <p class="text-lg font-medium text-gray-700 dark:text-gray-300" x-text="quote.text"></p>
+      <footer class="mt-1">
+          <cite class="text-sm text-gray-500 dark:text-gray-400" x-text="`― ${quote.author}`"></cite>
+      </footer>
+  </blockquote>
+</div>
 <footer class="border-t border-gray-200 mt-auto bg-[#2da44e]">
     <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
         <div class="text-white text font-bold tracking-tight">
