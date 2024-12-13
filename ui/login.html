@@ -19,18 +19,6 @@
         }, 500);
     }
 }">
-    <!-- Flash Message -->
-    <div x-data="{ show: false }" 
-         x-init="
-            {{ if .Flash }}
-                show = true;
-                setTimeout(() => show = false, 5000);
-            {{ end }}
-         "
-         x-show="show"
-         class="fixed bottom-4 right-4 px-4 py-2 rounded-md text-white bg-[#2da44e]">
-        {{ .Flash }}
-    </div>
 
     <div class="flex min-h-full flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div class="sm:mx-auto sm:w-full sm:max-w-md">
