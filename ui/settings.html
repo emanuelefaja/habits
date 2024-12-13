@@ -57,6 +57,13 @@
                 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 this.emailValid = emailPattern.test(this.email);
             }, 500);
+        },
+        showConfetti: true,
+        saveAppearanceSettings() {
+            console.log('Saving appearance settings:', {
+                theme: $store.theme.current,
+                showConfetti: this.showConfetti
+            });
         }
     }">
         <!-- Header from home.html -->
@@ -109,32 +116,72 @@
                 </div>
             </div>
 
-            <!-- Dark Mode Section -->
+            <!-- Dark Mode & UI Settings Section -->
             <div class="bg-white dark:bg-gray-800 shadow sm:rounded-lg mb-8">
                 <div class="px-4 py-5 sm:p-6">
                     <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">🎨 Appearance</h3>
                     <div class="mt-2 max-w-xl text-sm text-gray-500 dark:text-gray-400">
-                        <p>Choose your preferred theme.</p>
+                        <p>Customize your visual preferences.</p>
                     </div>
-                    <div class="mt-5 flex flex-col sm:flex-row gap-4">
-                        <button type="button" 
-                            @click="$store.theme.setTheme('light')"
-                            :class="{'bg-[#2da44e] text-white': $store.theme.current === 'light', 'bg-white text-gray-700 hover:bg-gray-50': $store.theme.current !== 'light'}"
-                            class="flex items-center justify-center px-4 py-2 rounded-md border shadow-sm text-sm font-medium transition-colors">
-                            ☀️ Light
-                        </button>
-                        <button type="button"
-                            @click="$store.theme.setTheme('dark')"
-                            :class="{'bg-[#2da44e] text-white': $store.theme.current === 'dark', 'bg-white text-gray-700 hover:bg-gray-50': $store.theme.current !== 'dark'}"
-                            class="flex items-center justify-center px-4 py-2 rounded-md border shadow-sm text-sm font-medium transition-colors">
-                            🌙 Dark
-                        </button>
-                        <button type="button"
-                            @click="$store.theme.setTheme('system')"
-                            :class="{'bg-[#2da44e] text-white': $store.theme.current === 'system', 'bg-white text-gray-700 hover:bg-gray-50': $store.theme.current !== 'system'}"
-                            class="flex items-center justify-center px-4 py-2 rounded-md border shadow-sm text-sm font-medium transition-colors">
-                            💻 System
-                        </button>
+                    
+                    <!-- Theme Selection -->
+                    <div class="mt-5">
+                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">🌓 Theme</label>
+                        <div class="flex flex-col sm:flex-row gap-4 mt-2">
+                            <button type="button" 
+                                @click="$store.theme.setTheme('light')"
+                                :class="{'bg-[#2da44e] text-white': $store.theme.current === 'light', 'bg-white text-gray-700 hover:bg-gray-50': $store.theme.current !== 'light'}"
+                                class="flex items-center justify-center px-4 py-2 rounded-md border shadow-sm text-sm font-medium transition-colors">
+                                ☀️ Light
+                            </button>
+                            <button type="button"
+                                @click="$store.theme.setTheme('dark')"
+                                :class="{'bg-[#2da44e] text-white': $store.theme.current === 'dark', 'bg-white text-gray-700 hover:bg-gray-50': $store.theme.current !== 'dark'}"
+                                class="flex items-center justify-center px-4 py-2 rounded-md border shadow-sm text-sm font-medium transition-colors">
+                                🌙 Dark
+                            </button>
+                            <button type="button"
+                                @click="$store.theme.setTheme('system')"
+                                :class="{'bg-[#2da44e] text-white': $store.theme.current === 'system', 'bg-white text-gray-700 hover:bg-gray-50': $store.theme.current !== 'system'}"
+                                class="flex items-center justify-center px-4 py-2 rounded-md border shadow-sm text-sm font-medium transition-colors">
+                                💻 System
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Confetti Toggle -->
+                    <div class="mt-6">
+                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">🎊 Celebrations</label>
+                        <div class="mt-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600 dark:text-gray-400">
+                                    Show confetti celebrations when completing habits
+                                </span>
+                                <button type="button" 
+                                    @click="
+                                        showConfetti = !showConfetti;
+                                        saveAppearanceSettings();
+                                    "
+                                    :class="showConfetti ? 'bg-[#2da44e]' : 'bg-gray-200'"
+                                    class="relative inline-flex h-7 w-14 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out">
+                                    <span class="sr-only">Toggle confetti</span>
+                                    <span
+                                        :class="showConfetti ? 'translate-x-7' : 'translate-x-0'"
+                                        class="pointer-events-none relative inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out">
+                                        <span
+                                            :class="showConfetti ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in'"
+                                            class="absolute inset-0 flex h-full w-full items-center justify-center transition-opacity text-sm">
+                                            🚫
+                                        </span>
+                                        <span
+                                            :class="showConfetti ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out'"
+                                            class="absolute inset-0 flex h-full w-full items-center justify-center transition-opacity text-sm">
+                                            🎉
+                                        </span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
