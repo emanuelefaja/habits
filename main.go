@@ -573,6 +573,27 @@ func main() {
 		json.NewEncoder(w).Encode(commits)
 	})))
 
+	// Health check endpoint for monitoring
+	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		// Check if database connection is alive
+		if err := db.Ping(); err != nil {
+			log.Printf("Health check failed: %v", err)
+			w.WriteHeader(http.StatusServiceUnavailable)
+			json.NewEncoder(w).Encode(map[string]string{
+				"status":  "error",
+				"message": "Database connection failed",
+			})
+			return
+		}
+
+		// All checks passed
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]string{
+			"status": "healthy",
+		})
+	})
+
 	// Start server with dynamic port
 	port := os.Getenv("PORT")
 	if port == "" {
