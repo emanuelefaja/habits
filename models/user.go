@@ -10,21 +10,22 @@ import (
 )
 
 type User struct {
-	ID        int64     `json:"id"`
-	FirstName string    `json:"first_name"`
-	LastName  string    `json:"last_name"`
-	Email     string    `json:"email"`
-	CreatedAt time.Time `json:"created_at"`
+	ID           int64     `json:"id"`
+	FirstName    string    `json:"first_name"`
+	LastName     string    `json:"last_name"`
+	Email        string    `json:"email"`
+	ShowConfetti bool      `json:"show_confetti"`
+	CreatedAt    time.Time `json:"created_at"`
 }
 
 // GetUserByID retrieves a user from the database by their ID
 func GetUserByID(db *sql.DB, id int64) (*User, error) {
 	user := &User{}
 	err := db.QueryRow(`
-		SELECT id, first_name, last_name, email, created_at 
+		SELECT id, first_name, last_name, email, show_confetti, created_at 
 		FROM users 
 		WHERE id = ?
-	`, id).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.CreatedAt)
+	`, id).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.ShowConfetti, &user.CreatedAt)
 
 	if err != nil {
 		return nil, err
@@ -36,10 +37,10 @@ func GetUserByID(db *sql.DB, id int64) (*User, error) {
 func GetUserByEmail(db *sql.DB, email string) (*User, error) {
 	user := &User{}
 	err := db.QueryRow(`
-		SELECT id, first_name, last_name, email, created_at 
+		SELECT id, first_name, last_name, email, show_confetti, created_at 
 		FROM users 
 		WHERE email = ?
-	`, email).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.CreatedAt)
+	`, email).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.ShowConfetti, &user.CreatedAt)
 
 	if err != nil {
 		return nil, err
@@ -55,9 +56,9 @@ func (u *User) Create(db *sql.DB, passwordHash string) error {
 	u.Email = strings.ToLower(u.Email)
 
 	result, err := db.Exec(`
-		INSERT INTO users (first_name, last_name, email, password_hash, created_at) 
-		VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
-	`, u.FirstName, u.LastName, u.Email, passwordHash)
+		INSERT INTO users (first_name, last_name, email, password_hash, show_confetti, created_at) 
+		VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+	`, u.FirstName, u.LastName, u.Email, passwordHash, true)
 
 	if err != nil {
 		log.Println("Error executing insert:", err)
@@ -79,9 +80,9 @@ func (u *User) Create(db *sql.DB, passwordHash string) error {
 func (u *User) Update(db *sql.DB) error {
 	_, err := db.Exec(`
 		UPDATE users 
-		SET first_name = ?, last_name = ?, email = ? 
+		SET first_name = ?, last_name = ?, email = ?, show_confetti = ?
 		WHERE id = ?
-	`, u.FirstName, u.LastName, u.Email, u.ID)
+	`, u.FirstName, u.LastName, u.Email, u.ShowConfetti, u.ID)
 
 	return err
 }
@@ -116,6 +117,7 @@ func InitializeUsersDB(db *sql.DB) error {
 			last_name TEXT NOT NULL,
 			email TEXT UNIQUE NOT NULL,
 			password_hash TEXT NOT NULL,
+			show_confetti BOOLEAN NOT NULL DEFAULT 1,
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 		)
 	`)

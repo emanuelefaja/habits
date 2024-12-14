@@ -329,3 +329,47 @@ func ExportDataHandler(db *sql.DB) http.HandlerFunc {
 		}
 	}
 }
+
+// UpdateSettingsHandler handles updating user settings
+func UpdateSettingsHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		// Get user ID from session
+		userID := middleware.GetUserID(r)
+		if userID == 0 {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		// Parse JSON request
+		var settings struct {
+			ShowConfetti bool `json:"showConfetti"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&settings); err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
+
+		// Get current user
+		user, err := models.GetUserByID(db, int64(userID))
+		if err != nil {
+			http.Error(w, "Error finding user", http.StatusInternalServerError)
+			return
+		}
+
+		// Update settings
+		user.ShowConfetti = settings.ShowConfetti
+		if err := user.Update(db); err != nil {
+			http.Error(w, "Error updating settings", http.StatusInternalServerError)
+			return
+		}
+
+		// Return success response
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]bool{"success": true})
+	}
+}

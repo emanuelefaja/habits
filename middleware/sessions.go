@@ -74,3 +74,17 @@ func GetUserID(r *http.Request) int {
 func ClearSession(r *http.Request) error {
 	return SessionManager.Destroy(r.Context())
 }
+
+// SetUserConfettiPreference stores the user's confetti preference in the session
+func SetUserConfettiPreference(r *http.Request, showConfetti bool) {
+	SessionManager.Put(r.Context(), "showConfetti", showConfetti)
+}
+
+// GetUserConfettiPreference retrieves the user's confetti preference from the session
+func GetUserConfettiPreference(r *http.Request) bool {
+	showConfetti, ok := SessionManager.Get(r.Context(), "showConfetti").(bool)
+	if !ok {
+		return true // Default to true if not set
+	}
+	return showConfetti
+}

@@ -1,6 +1,6 @@
 {{ define "monthly-grid" }}
 <template x-if="habits.length > 0">
-    <div class="flex-grow flex items-center justify-center mb-8" x-data="monthlyGrid">
+    <div class="flex-grow flex items-center justify-center mb-8" x-data="monthlyGrid({ showConfetti: {{ .User.ShowConfetti }} })">
         <div class="w-full md:w-auto">
             <div class="bg-white dark:bg-gray-800 p-8 shadow sm:rounded-lg">
                 <!-- Header with title and Create Habit button -->
@@ -447,7 +447,8 @@
 </template>
 <script>
     document.addEventListener('alpine:init', () => {
-        Alpine.data('monthlyGrid', () => ({
+        Alpine.data('monthlyGrid', ({ showConfetti }) => ({
+            showConfetti,
             // Initialize component
             init() {
                 // Keep existing Sortable initialization
@@ -709,12 +710,12 @@
             },
 
             triggerConfetti(event) {
-                if (!event || Math.random() >= 0.25) return;
+                if (!this.showConfetti || !event || Math.random() >= 0.25) return;
 
                 // Get the clicked element's position
                 const rect = event.target.getBoundingClientRect();
                 
-                // Calculate origin points (as percentage of window width/height)
+                // Calculate origin points
                 const x = (rect.left + rect.width / 2) / window.innerWidth;
                 const y = (rect.top + rect.height / 2) / window.innerHeight;
                 
