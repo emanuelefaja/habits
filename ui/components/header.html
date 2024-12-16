@@ -45,7 +45,6 @@
                     Logout 👋
                 </button>
             </form>
-
         {{ else }}
             <a href="/about" 
                 class="rounded-md {{ if eq .Page "about" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
@@ -67,6 +66,14 @@
                 Register ✨
             </a>
         {{ end }}
+        
+        <a href="https://github.com/emanuelefaja/habits" 
+           target="_blank" 
+           rel="noopener noreferrer" 
+           class="text-gray-700 hover:text-gray-900 {{ if .User }}dark:text-gray-400 dark:hover:text-white{{ end }}"
+           aria-label="GitHub repository">
+            <img src="/static/github-mark.svg" alt="GitHub" class="w-6 h-6">
+        </a>
     </div>
 
     <!-- Mobile/Tablet Slide-in Menu -->
@@ -98,7 +105,6 @@
                     Logout 👋
                 </button>
             </form>
-
         {{ else }}
             <a href="/about" 
                 class="rounded-md {{ if eq .Page "about" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
@@ -120,6 +126,14 @@
                 Register ✨
             </a>
         {{ end }}
+        
+        <a href="https://github.com/emanuelefaja/habits" 
+           target="_blank" 
+           rel="noopener noreferrer" 
+           class="text-gray-700 hover:text-gray-900 {{ if .User }}dark:text-gray-400 dark:hover:text-white{{ end }}"
+           aria-label="GitHub repository">
+            <img src="/static/github-mark.svg" alt="GitHub" class="w-6 h-6">
+        </a>
     </div>
 
 </div>
