@@ -17,6 +17,11 @@ My name is Manny.
 I'm the founder of [Blue](https://blue.cc), a project and process management platform that's used by over 14,000 companies across the world. I'm also Senior Product Manager at the Executive Office of [UNDP (United Nations Development Programme)](https://undp.org).  
 
 ## Why I started a habit tracker
+
+This idea of mine is actually a few years old, and I even coded a command-line version of this a few years ago!
+
+![](/blog/media/habits-terminal.webp)
+
 I started to (re)track my habits a few months ago using plain old pen and paper, creating a monthly grid with the days running across the top, and my habits on the left as rows.
 
 The simple act of actually tracking what I wanted to achieve and turn into habits helped. However, I wanted to have a more visual way to track the data behind my habits.
@@ -67,6 +72,10 @@ You can export your data to CSV at any time.
 You can visualize your monthly progress across all your habits, and for each habit you can see your progress across the entire year plus some simple key statistics. 
 
 There are no ads, no tracking, no analytics, no upsells, or notifications. This latter point is something I am thinking about, likely there will be some form of reminders in the future. 
+
+## What's next?
+
+There is a [roadmap](/roadmap) where you can see what I'm working on. Key things are going to be adding a few more habit types, adding more visualizations within the individual habit view, and also adding notes to habit logs, which appears to be a popular feature in other habit trackers. 
 
 I believe in starting small and focusing on the essentials. Rather than building a feature-packed app that tries to do everything, I want to create something that does a few things really well.
 
