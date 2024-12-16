@@ -94,19 +94,42 @@ func LoginHandler(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
 			return
 		}
 
+		// Get IP address from request
+		ip := r.RemoteAddr
+		if forwardedFor := r.Header.Get("X-Forwarded-For"); forwardedFor != "" {
+			ip = forwardedFor
+		}
+
+		// Check if IP is blocked
+		if middleware.Limiter.IsBlocked(ip) {
+			tmpl.ExecuteTemplate(w, "login.html", TemplateData{
+				Error: "Too many login attempts. Please try again in 15 minutes ⏳",
+			})
+			return
+		}
+
 		email := r.FormValue("email")
 		password := r.FormValue("password")
 
 		// First validate the password
 		valid, err := models.ValidatePassword(db, email, password)
 		if err != nil || !valid {
+			// Record failed attempt
+			remaining := middleware.Limiter.GetRemainingAttempts(ip)
+			if !middleware.Limiter.RecordAttempt(ip) {
+				tmpl.ExecuteTemplate(w, "login.html", TemplateData{
+					Error: "Too many login attempts. Please try again in 15 minutes ⏳",
+				})
+				return
+			}
+
 			tmpl.ExecuteTemplate(w, "login.html", TemplateData{
-				Error: "Invalid email or password ❌",
+				Error: fmt.Sprintf("Invalid email or password ❌ (%d attempts remaining)", remaining),
 			})
 			return
 		}
 
-		// If password is valid, get the user
+		// If login successful, get the user
 		if valid {
 			// Get user for the session
 			if user, err := models.GetUserByEmail(db, email); err == nil {
