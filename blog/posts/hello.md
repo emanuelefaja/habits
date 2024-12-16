@@ -46,7 +46,7 @@ Beyond the technical challenges, it's taught me about my own habit-forming proce
 
 Taking money out of the equation takes a lot of pressure off. There is no "metric of success" here, I just want to make something that is useful to my life, and hopefully it can be useful to other people too. 
 
-The costs are pretty low as well. My main cost was $2,5000 for the domain habits.co. This was mostly as a forcing function to get myself to work on this project as I can be quite lazy without some form of motivation. 
+The costs are pretty low as well. My main cost was $2,500 for the domain habits.co. This was mostly as a forcing function to get myself to work on this project as I can be quite lazy without some form of motivation. 
 
 The hosting is pretty cheap ($7/month) and as this runs using Go, which is very efficient, I expect to be able to host thousands of users (nice problem to have!) for very little cost. 
 
