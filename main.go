@@ -108,6 +108,8 @@ func main() {
 		"ui/guest-home.html",
 		"ui/admin.html",
 		"ui/changelog.html",
+		"ui/blog/blog.html",
+		"ui/blog/post.html",
 	))
 
 	// Handle static files
@@ -593,6 +595,70 @@ func main() {
 			"status": "healthy",
 		})
 	})
+
+	// Blog route with session middleware
+	http.Handle("/blog/", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Get the path after /blog/
+		path := strings.TrimPrefix(r.URL.Path, "/blog")
+
+		// Get blog service
+		blogService := models.GetBlogService()
+
+		// Get current user (optional, for header display)
+		var user *models.User
+		if middleware.IsAuthenticated(r) {
+			userID := middleware.GetUserID(r)
+			user, _ = models.GetUserByID(db, int64(userID))
+		}
+
+		// If it's just /blog, show the list view
+		if path == "" || path == "/" {
+			posts := blogService.GetAllPosts()
+			data := struct {
+				User  *models.User
+				Posts []*models.BlogPost
+				Page  string
+			}{
+				User:  user,
+				Posts: posts,
+				Page:  "blog",
+			}
+
+			err := templates.ExecuteTemplate(w, "blog.html", data)
+			if err != nil {
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				return
+			}
+			return
+		}
+
+		// Otherwise, it's a single post view
+		// Remove the leading slash from path to get the slug
+		slug := strings.TrimPrefix(path, "/")
+
+		// Get the post
+		post, exists := blogService.GetPost(slug)
+		if !exists {
+			http.NotFound(w, r)
+			return
+		}
+
+		data := struct {
+			User *models.User
+			Post *models.BlogPost
+			Page string
+		}{
+			User: user,
+			Post: post,
+			Page: "blog",
+		}
+
+		err := templates.ExecuteTemplate(w, "post.html", data)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+	})))
 
 	// Start server with dynamic port
 	port := os.Getenv("PORT")

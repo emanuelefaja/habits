@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" class="min-h-full bg-gray-50 dark:bg-gray-900">
+{{ template "head" . }}
+<body class="min-h-full bg-gray-50 dark:bg-gray-900">
+    {{ template "header" . }}
+    
+    <main class="max-w-3xl mx-auto px-4 py-12">
+        <!-- Back to blog link -->
+        <a href="/blog" class="inline-flex items-center text-sm text-gray-500 dark:text-gray-400 hover:text-brand-green dark:hover:text-brand-green mb-8">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            Back to all posts
+        </a>
+
+        <!-- Post Header -->
+        <header class="mb-8">
+            <div class="flex items-center gap-4 mb-4">
+                <span class="text-6xl">{{ .Post.Emoji }}</span>
+                <h1 class="text-4xl font-bold text-gray-900 dark:text-white">
+                    {{ .Post.Title }}
+                </h1>
+            </div>
+            <time class="text-sm text-gray-500 dark:text-gray-400 mb-4 block">
+                {{ .Post.Date.Format "January 2, 2006" }}
+            </time>
+            <!-- {{ if .Post.Tags }}
+            <div class="flex gap-2">
+                {{ range .Post.Tags }}
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200">
+                    {{ . }}
+                </span>
+                {{ end }}
+            </div>
+            {{ end }} -->
+        </header>
+
+        <!-- Post Content -->
+        <article class="prose text-gray-900 dark:text-gray-100 max-w-none">
+            {{ .Post.HTML }}
+        </article>
+    </main>
+
+    {{ template "footer" . }}
+</body>
+</html>

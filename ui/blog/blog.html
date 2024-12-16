@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+{{ template "head" . }}
+<body class="bg-gray-50 dark:bg-gray-900">
+    {{template "header" .}}
+    
+    <main x-data="{ category: 'all' }" class="max-w-3xl mx-auto px-4 py-12">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-0">The Habits Journal 📖</h1>
+            <p class="text-lg text-gray-600 dark:text-gray-400">Insights on building better habits</p>
+        </div>
+
+        <div class="flex space-x-4 mb-8 overflow-x-auto pb-2">
+            <button 
+                @click="category = 'all'"
+                :class="{'bg-brand-green text-white': category === 'all', 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700': category !== 'all'}"
+                class="px-4 py-2 rounded-md font-medium shadow-sm border border-gray-200 dark:border-gray-700 transition-colors whitespace-nowrap">
+                🎯 All Posts
+            </button>
+            <button 
+                @click="category = 'building'"
+                :class="{'bg-brand-green text-white': category === 'building', 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700': category !== 'building'}"
+                class="px-4 py-2 rounded-md font-medium shadow-sm border border-gray-200 dark:border-gray-700 transition-colors whitespace-nowrap">
+                👀 Building in Public
+            </button>
+            <button 
+                @click="category = 'guides'"
+                :class="{'bg-brand-green text-white': category === 'guides', 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700': category !== 'guides'}"
+                class="px-4 py-2 rounded-md font-medium shadow-sm border border-gray-200 dark:border-gray-700 transition-colors whitespace-nowrap">
+                📚 Guides
+            </button>
+            <button 
+                @click="category = 'psychology'"
+                :class="{'bg-brand-green text-white': category === 'psychology', 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700': category !== 'psychology'}"
+                class="px-4 py-2 rounded-md font-medium shadow-sm border border-gray-200 dark:border-gray-700 transition-colors whitespace-nowrap">
+                🧠 Psychology
+            </button>
+            <button 
+                @click="category = 'productivity'"
+                :class="{'bg-brand-green text-white': category === 'productivity', 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700': category !== 'productivity'}"
+                class="px-4 py-2 rounded-md font-medium shadow-sm border border-gray-200 dark:border-gray-700 transition-colors whitespace-nowrap">
+                ⚡️ Productivity
+            </button>
+            <button 
+                @click="category = 'mindfulness'"
+                :class="{'bg-brand-green text-white': category === 'mindfulness', 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700': category !== 'mindfulness'}"
+                class="px-4 py-2 rounded-md font-medium shadow-sm border border-gray-200 dark:border-gray-700 transition-colors whitespace-nowrap">
+                🧘‍♀️ Mindfulness
+            </button>
+        </div>
+        
+        <div class="space-y-6">
+            {{ range .Posts }}
+            <article x-show="category === 'all' || category === '{{ index .Tags 0 }}'" 
+                     class="bg-white dark:bg-gray-800 rounded-lg shadow-sm hover:shadow-md transition-all group border border-gray-200 dark:border-gray-700">
+                <a href="/blog/{{ .Slug }}" class="flex outline-none focus:ring-2 focus:ring-brand-green focus:ring-offset-2 rounded-lg">
+                    <div class="flex items-center justify-center p-6 border-r border-gray-200 dark:border-gray-700">
+                        <span class="text-5xl">{{ .Emoji }}</span>
+                    </div>
+                    <div class="flex-1 p-6">
+                        <time class="text-sm text-gray-500 dark:text-gray-400 block mb-2">
+                            {{ .Date.Format "January 2, 2006" }}
+                        </time>
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-white group-hover:text-brand-green transition-colors">
+                            {{ .Title }}
+                        </h2>
+                        <!-- <p class="text-gray-600 dark:text-gray-400 mt-2">
+                            {{ .Description }}
+                        </p> 
+                        Hiding this for now, may bring it back in the future! 
+                        -->
+                    </div>
+                </a>
+            </article>
+            {{ end }}
+        </div>
+    </main>
+    {{ template "footer" . }}
+</body>
+</html>
