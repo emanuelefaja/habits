@@ -32,47 +32,37 @@ func main() {
 
 	dbPath := os.Getenv("DATABASE_PATH")
 	if dbPath == "" {
-		dbPath = "./habits.db" // default path if not specified
+		dbPath = "./habits.db"
 	}
 
-	// This will create the database file if it doesn't exist
+	// Open and verify DB connection
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		log.Fatal("Error opening database:", err)
 	}
 	defer db.Close()
-
-	// Verify the connection
 	if err := db.Ping(); err != nil {
 		log.Fatal("Error connecting to database:", err)
 	}
 
-	// Initialize tables
+	// Initialize DB and services
 	if err := models.InitDB(db); err != nil {
 		log.Fatal("Error initializing database:", err)
 	}
-
-	// Initialize habits table
-	err = models.InitializeHabitsDB(db)
-	if err != nil {
+	if err := models.InitializeHabitsDB(db); err != nil {
 		log.Fatal(err)
 	}
-
-	// Initialize session manager
-	err = middleware.InitializeSession(db)
-	if err != nil {
+	if err := middleware.InitializeSession(db); err != nil {
 		log.Fatal(err)
 	}
-
-	// Start GitHub sync
 	api.StartGitHubSync(db)
 
-	// Create templates with custom functions
+	// Template functions
 	funcMap := template.FuncMap{
 		"times": func(n int) []int {
-			var result []int
+			result := make([]int, n)
 			for i := 0; i < n; i++ {
-				result = append(result, i)
+				result[i] = i
 			}
 			return result
 		},
@@ -112,70 +102,49 @@ func main() {
 		"ui/blog/post.html",
 	))
 
-	// Handle static files
+	// Static files
 	fs := http.FileServer(http.Dir("static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
-
-	// Add specific handler for icons at root
 	http.Handle("/icons/", http.StripPrefix("/icons/", http.FileServer(http.Dir("static/icons"))))
 
-	// Add specific handler for manifest.json at root
+	// Manifest and Service Worker
 	http.HandleFunc("/manifest.json", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/manifest+json")
-		http.ServeFile(w, r, "static/manifest.json")
+		serveStaticFileWithContentType(w, r, "static/manifest.json", "application/manifest+json")
 	})
-
-	// Serve service worker at root path
 	http.HandleFunc("/sw.js", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Service-Worker-Allowed", "/")
 		http.ServeFile(w, r, "static/sw.js")
 	})
 
-	// Home route with session middleware
+	// Routes
 	http.Handle("/", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("Home handler: Received request for path: %s", r.URL.Path)
-
 		if r.URL.Path != "/" {
-			log.Printf("Home handler: Not root path, returning 404")
 			http.NotFound(w, r)
 			return
 		}
 
-		// Check if user is authenticated
 		if !middleware.IsAuthenticated(r) {
-			// Render guest home page for non-authenticated users
-			err := templates.ExecuteTemplate(w, "guest-home.html", nil)
-			if err != nil {
-				log.Printf("Home handler: Error executing guest template: %v", err)
+			// Guest
+			if err := templates.ExecuteTemplate(w, "guest-home.html", nil); err != nil {
 				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			}
 			return
 		}
 
-		// Get current user
-		userID := middleware.GetUserID(r)
-		log.Printf("Home handler: Got userID: %d", userID)
-
-		user, err := models.GetUserByID(db, int64(userID))
+		user, err := getAuthenticatedUser(r, db)
 		if err != nil {
-			log.Printf("Home handler: Error getting user: %v", err)
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-		log.Printf("Home handler: Successfully retrieved user: %s %s", user.FirstName, user.LastName)
-
-		// Get the habits
-		habits, err := models.GetHabitsByUserID(db, userID)
-		if err != nil {
-			log.Printf("Home handler: Error getting habits: %v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 
-		// JSON encode the habits
+		habits, err := models.GetHabitsByUserID(db, middleware.GetUserID(r))
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
 		habitsJSON, err := json.Marshal(habits)
 		if err != nil {
-			log.Printf("Home handler: Error encoding habits to JSON: %v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
@@ -189,26 +158,15 @@ func main() {
 			HabitsJSON: template.JS(habitsJSON),
 			Flash:      middleware.GetFlash(r),
 		}
-
-		err = templates.ExecuteTemplate(w, "home.html", data)
-		if err != nil {
-			log.Printf("Home handler: Error executing template: %v", err)
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-		log.Printf("Home handler: Successfully rendered home page")
+		renderTemplate(w, templates, "home.html", data)
 	})))
 
-	// Settings route with session middleware and authentication check
 	http.Handle("/settings", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Get current user
-		userID := middleware.GetUserID(r)
-		user, err := models.GetUserByID(db, int64(userID))
+		user, err := getAuthenticatedUser(r, db)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-
 		data := struct {
 			User  *models.User
 			Flash string
@@ -216,62 +174,46 @@ func main() {
 			User:  user,
 			Flash: middleware.GetFlash(r),
 		}
-
-		err = templates.ExecuteTemplate(w, "settings.html", data)
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
+		renderTemplate(w, templates, "settings.html", data)
 	}))))
 
-	// Register routes with session middleware
+	// Authentication Routes
 	http.Handle("/register", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
-			templates.ExecuteTemplate(w, "register.html", nil)
+			renderTemplate(w, templates, "register.html", nil)
 		case http.MethodPost:
 			api.RegisterHandler(db, templates)(w, r)
 		default:
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			handleNotAllowed(w, http.MethodGet, http.MethodPost)
 		}
 	})))
 
 	http.Handle("/login", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
-			flash := middleware.GetFlash(r)
-			templates.ExecuteTemplate(w, "login.html", TemplateData{
-				Flash: flash,
-			})
+			renderTemplate(w, templates, "login.html", TemplateData{Flash: middleware.GetFlash(r)})
 		case http.MethodPost:
 			api.LoginHandler(db, templates)(w, r)
 		default:
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			handleNotAllowed(w, http.MethodGet, http.MethodPost)
 		}
 	})))
 
-	// Logout route
 	http.Handle("/logout", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			handleNotAllowed(w, http.MethodPost)
 			return
 		}
-
-		// Destroy the session
-		err := middleware.ClearSession(r)
-		if err != nil {
+		if err := middleware.ClearSession(r); err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
-
-		// Set flash message
 		middleware.SetFlash(r, "You have been logged out successfully!")
-
-		// Redirect to login page
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	})))
 
-	// Habits API routes
+	// Habits API
 	http.Handle("/api/habits", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -279,11 +221,10 @@ func main() {
 		case http.MethodPost:
 			api.CreateHabitHandler(db)(w, r)
 		default:
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			handleNotAllowed(w, http.MethodGet, http.MethodPost)
 		}
 	}))))
 
-	// Habit Logs API routes
 	http.Handle("/api/habits/logs", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -291,52 +232,36 @@ func main() {
 		case http.MethodPost:
 			api.CreateOrUpdateHabitLogHandler(db)(w, r)
 		default:
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			handleNotAllowed(w, http.MethodGet, http.MethodPost)
 		}
 	}))))
 
-	// Habits API routes
 	http.Handle("/api/habits/bulk", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodPost:
+		if r.Method == http.MethodPost {
 			api.BulkCreateHabitsHandler(db)(w, r)
-		default:
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		} else {
+			handleNotAllowed(w, http.MethodPost)
 		}
 	}))))
 
-	// Add new reorder route here
 	http.Handle("/api/habits/reorder", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodPost:
+		if r.Method == http.MethodPost {
 			api.UpdateHabitOrderHandler(db)(w, r)
-		default:
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		} else {
+			handleNotAllowed(w, http.MethodPost)
 		}
 	}))))
 
-	// User API routes
+	// User API
 	http.Handle("/api/user/profile", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(api.UpdateProfileHandler(db))))
 	http.Handle("/api/user/password", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(api.UpdatePasswordHandler(db))))
 	http.Handle("/api/user/delete", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(api.DeleteAccountHandler(db))))
 	http.Handle("/api/user/export", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(api.ExportDataHandler(db))))
 	http.Handle("/api/user/settings", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(api.UpdateSettingsHandler(db))))
 
-	// Roadmap route with session middleware but no auth requirement
+	// Roadmap (no auth required, but session loaded)
 	http.Handle("/roadmap", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var user *models.User
-		var err error
-
-		// Check if user is authenticated
-		if middleware.IsAuthenticated(r) {
-			userID := middleware.GetUserID(r)
-			user, err = models.GetUserByID(db, int64(userID))
-			if err != nil {
-				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-				return
-			}
-		}
-
+		user, _ := getAuthenticatedUser(r, db)
 		data := struct {
 			User *models.User
 			Page string
@@ -344,40 +269,29 @@ func main() {
 			User: user,
 			Page: "roadmap",
 		}
-
-		err = templates.ExecuteTemplate(w, "roadmap.html", data)
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
+		renderTemplate(w, templates, "roadmap.html", data)
 	})))
 
-	// Habit view route with session middleware and authentication check
+	// Habit View
 	http.Handle("/habit/", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Extract habit ID from URL
 		habitID, err := strconv.Atoi(strings.TrimPrefix(r.URL.Path, "/habit/"))
 		if err != nil {
 			http.Error(w, "Invalid habit ID", http.StatusBadRequest)
 			return
 		}
 
-		// Get current user
-		userID := middleware.GetUserID(r)
-		user, err := models.GetUserByID(db, int64(userID))
+		user, err := getAuthenticatedUser(r, db)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 
-		// Get the habit
 		habit, err := models.GetHabitByID(db, habitID)
 		if err != nil {
 			http.Error(w, "Habit not found", http.StatusNotFound)
 			return
 		}
-
-		// Verify the habit belongs to the user
-		if habit.UserID != userID {
+		if habit.UserID != middleware.GetUserID(r) {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
@@ -389,31 +303,14 @@ func main() {
 		}{
 			User:  user,
 			Habit: habit,
-			Page:  "home", // This keeps the Habits button highlighted
+			Page:  "home",
 		}
-
-		err = templates.ExecuteTemplate(w, "habit.html", data)
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
+		renderTemplate(w, templates, "habit.html", data)
 	}))))
 
-	// About route with session middleware and authentication check
+	// About
 	http.Handle("/about", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var user *models.User
-		var err error
-
-		// Check if user is authenticated
-		if middleware.IsAuthenticated(r) {
-			userID := middleware.GetUserID(r)
-			user, err = models.GetUserByID(db, int64(userID))
-			if err != nil {
-				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-				return
-			}
-		}
-
+		user, _ := getAuthenticatedUser(r, db)
 		data := struct {
 			User *models.User
 			Page string
@@ -421,15 +318,10 @@ func main() {
 			User: user,
 			Page: "about",
 		}
-
-		err = templates.ExecuteTemplate(w, "about.html", data)
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
+		renderTemplate(w, templates, "about.html", data)
 	})))
 
-	// Roadmap API routes
+	// Roadmap API
 	http.Handle("/api/roadmap/likes", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -437,44 +329,38 @@ func main() {
 		case http.MethodPost:
 			api.ToggleRoadmapLikeHandler(db)(w, r)
 		default:
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			handleNotAllowed(w, http.MethodGet, http.MethodPost)
 		}
 	})))
 
-	// Roadmap API routes
 	http.Handle("/api/roadmap/ideas", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			api.SubmitRoadmapIdeaHandler(db)(w, r)
 		} else {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			handleNotAllowed(w, http.MethodPost)
 		}
 	})))
 
-	// Admin route with session middleware and authentication check
+	// Admin
 	http.Handle("/admin", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Get current user
-		userID := middleware.GetUserID(r)
-		user, err := models.GetUserByID(db, int64(userID))
+		user, err := getAuthenticatedUser(r, db)
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 
-		// Get total users count
 		totalUsers, err := models.GetTotalUsers(db)
 		if err != nil {
 			log.Printf("Error getting total users: %v", err)
 			totalUsers = 0
 		}
 
-		// Get total habits count
 		totalHabits, err := models.GetTotalHabits(db)
 		if err != nil {
 			log.Printf("Error getting total habits: %v", err)
 			totalHabits = 0
 		}
 
-		// Get all users
 		users, err := models.GetAllUsers(db)
 		if err != nil {
 			log.Printf("Error getting all users: %v", err)
@@ -495,59 +381,41 @@ func main() {
 			TotalHabits: totalHabits,
 			Page:        "admin",
 		}
-
-		err = templates.ExecuteTemplate(w, "admin.html", data)
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
+		renderTemplate(w, templates, "admin.html", data)
 	}))))
 
-	// Habit Logs API routes
+	// Habit Logs Deletion
 	http.Handle("/api/habits/logs/delete", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			handleNotAllowed(w, http.MethodDelete)
 			return
 		}
 		api.DeleteHabitLogHandler(db)(w, r)
 	}))))
 
-	// Add this route for deleting a habit
+	// Habit Deletion
 	http.Handle("/api/habits/delete", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			handleNotAllowed(w, http.MethodDelete)
 			return
 		}
 		api.DeleteHabitHandler(db)(w, r)
 	}))))
 
-	// Add with other routes
 	http.Handle("/api/habits/stats", middleware.SessionManager.LoadAndSave(http.HandlerFunc(api.HandleGetHabitStats(db))))
 
-	// Add this with the other habit routes
+	// Habit Name Update
 	http.Handle("/api/habits/update-name", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			handleNotAllowed(w, http.MethodPost)
 			return
 		}
 		api.UpdateHabitNameHandler(db)(w, r)
 	}))))
 
-	// Changelog route with session middleware but no auth requirement
+	// Changelog
 	http.Handle("/changelog", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var user *models.User
-		var err error
-
-		// Check if user is authenticated
-		if middleware.IsAuthenticated(r) {
-			userID := middleware.GetUserID(r)
-			user, err = models.GetUserByID(db, int64(userID))
-			if err != nil {
-				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-				return
-			}
-		}
-
+		user, _ := getAuthenticatedUser(r, db)
 		data := struct {
 			User *models.User
 			Page string
@@ -555,63 +423,36 @@ func main() {
 			User: user,
 			Page: "changelog",
 		}
-
-		err = templates.ExecuteTemplate(w, "changelog.html", data)
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
+		renderTemplate(w, templates, "changelog.html", data)
 	})))
 
-	// Add with your other routes
+	// Commits API
 	http.Handle("/api/commits", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		commits, err := models.GetCommits(db)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(commits)
+		respondJSON(w, commits)
 	})))
 
-	// Health check endpoint for monitoring
+	// Health Check
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		// Check if database connection is alive
 		if err := db.Ping(); err != nil {
-			log.Printf("Health check failed: %v", err)
 			w.WriteHeader(http.StatusServiceUnavailable)
-			json.NewEncoder(w).Encode(map[string]string{
-				"status":  "error",
-				"message": "Database connection failed",
-			})
+			respondJSON(w, map[string]string{"status": "error", "message": "Database connection failed"})
 			return
 		}
-
-		// All checks passed
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]string{
-			"status": "healthy",
-		})
+		respondJSON(w, map[string]string{"status": "healthy"})
 	})
 
-	// Blog route with session middleware
+	// Blog
 	http.Handle("/blog/", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Get the path after /blog/
 		path := strings.TrimPrefix(r.URL.Path, "/blog")
-
-		// Get blog service
 		blogService := models.GetBlogService()
 
-		// Get current user (optional, for header display)
-		var user *models.User
-		if middleware.IsAuthenticated(r) {
-			userID := middleware.GetUserID(r)
-			user, _ = models.GetUserByID(db, int64(userID))
-		}
+		user, _ := getAuthenticatedUser(r, db)
 
-		// If it's just /blog, show the list view
 		if path == "" || path == "/" {
 			posts := blogService.GetAllPosts()
 			data := struct {
@@ -623,20 +464,11 @@ func main() {
 				Posts: posts,
 				Page:  "blog",
 			}
-
-			err := templates.ExecuteTemplate(w, "blog.html", data)
-			if err != nil {
-				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-				return
-			}
+			renderTemplate(w, templates, "blog.html", data)
 			return
 		}
 
-		// Otherwise, it's a single post view
-		// Remove the leading slash from path to get the slug
 		slug := strings.TrimPrefix(path, "/")
-
-		// Get the post
 		post, exists := blogService.GetPost(slug)
 		if !exists {
 			http.NotFound(w, r)
@@ -652,34 +484,60 @@ func main() {
 			Post: post,
 			Page: "blog",
 		}
-
-		err := templates.ExecuteTemplate(w, "post.html", data)
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
+		renderTemplate(w, templates, "post.html", data)
 	})))
 
-	// Start server with dynamic port
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080" // Default port
+		port = "8080"
 	}
 	log.Printf("Server started at :%s", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
+// Helper functions
+
 func dict(values ...interface{}) (map[string]interface{}, error) {
 	if len(values)%2 != 0 {
 		return nil, errors.New("invalid dict call")
 	}
-	dict := make(map[string]interface{}, len(values)/2)
+	d := make(map[string]interface{}, len(values)/2)
 	for i := 0; i < len(values); i += 2 {
 		key, ok := values[i].(string)
 		if !ok {
 			return nil, errors.New("dict keys must be strings")
 		}
-		dict[key] = values[i+1]
+		d[key] = values[i+1]
 	}
-	return dict, nil
+	return d, nil
+}
+
+func renderTemplate(w http.ResponseWriter, templates *template.Template, name string, data interface{}) {
+	if err := templates.ExecuteTemplate(w, name, data); err != nil {
+		log.Printf("Error executing template %s: %v", name, err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
+}
+
+func respondJSON(w http.ResponseWriter, payload interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(payload)
+}
+
+func handleNotAllowed(w http.ResponseWriter, allowedMethods ...string) {
+	w.Header().Set("Allow", strings.Join(allowedMethods, ", "))
+	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+}
+
+func getAuthenticatedUser(r *http.Request, db *sql.DB) (*models.User, error) {
+	if !middleware.IsAuthenticated(r) {
+		return nil, nil
+	}
+	userID := middleware.GetUserID(r)
+	return models.GetUserByID(db, int64(userID))
+}
+
+func serveStaticFileWithContentType(w http.ResponseWriter, r *http.Request, filePath, contentType string) {
+	w.Header().Set("Content-Type", contentType)
+	http.ServeFile(w, r, filePath)
 }
