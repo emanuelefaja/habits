@@ -96,7 +96,7 @@
                 <div class="px-4 py-5 sm:p-6">
                     <div class="flex justify-between items-start">
                         <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">👤 Personal Information</h3>
-                        <span class="text-sm text-gray-500 dark:text-gray-400">ID: <b>{{ .User.ID }}</b></span>
+                        <span class="text-sm text-gray-500 dark:text-gray-400">🪪 ID: <b>{{ .User.ID }}</b></span>
                     </div>
                     <div class="mt-2 max-w-xl text-sm text-gray-500 dark:text-gray-400">
                         <p>Update your personal details.</p>
@@ -216,7 +216,7 @@
                     </div>
                     <form action="/api/user/password" method="POST" class="mt-5 space-y-6">
                         <div>
-                            <label for="current_password" class="block text-sm font-medium text-gray-400">Current Password</label>
+                            <label for="current_password" class="block text-sm font-medium text-gray-400">🔓 Current Password</label>
                             <div class="mt-1 relative">
                                 <input :type="showCurrentPassword ? 'text' : 'password'" 
                                     name="current_password" 
@@ -231,7 +231,7 @@
                         </div>
 
                         <div>
-                            <label for="new_password" class="block text-sm font-medium text-gray-400">New Password</label>
+                            <label for="new_password" class="block text-sm font-medium text-gray-400">🔑 New Password</label>
                             <div class="mt-1 relative">
                                 <input :type="showNewPassword ? 'text' : 'password'" 
                                     name="new_password" 
@@ -257,7 +257,7 @@
                         </div>
 
                         <div>
-                            <label for="confirm_password" class="block text-sm font-medium text-gray-400">Confirm New Password</label>
+                            <label for="confirm_password" class="block text-sm font-medium text-gray-400">🔒 Confirm New Password</label>
                             <div class="mt-1 relative">
                                 <input :type="showConfirmPassword ? 'text' : 'password'" 
                                     name="confirm_password" 
