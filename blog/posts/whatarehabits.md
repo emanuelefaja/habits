@@ -7,7 +7,7 @@ description: "Looking at habits from a first principles perspective."
 tags: ["announcement"]
 ---
 
-If I am building a habit tracker, it is logical to start by figuring out what are habits are! 
+If I am building a habit tracker, it is logical to start by figuring out what habits are! 
 
 So habits are actions that we do every day, or at least very often. But I think it goes deeper than that. I think it's the actions that we take by default. It's the behavior that we fall back into when life gets in the way. When we don't have time, or mental energy, to consciously decide what we're going to do. 
 
@@ -39,7 +39,9 @@ It's not just a repeated action, but something that has become part of your iden
 
 So when we change our habits, we're doing something profound: We're reshaping our identity.
 
-So then to answer the question: What are habits? They are the actions that make up our identity.
+So then to answer the original question: What are habits? 
+
+They are the daily actions that make up our identity.
 
 
 
