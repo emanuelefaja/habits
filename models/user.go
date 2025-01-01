@@ -179,3 +179,22 @@ func DeleteUserAndData(db *sql.DB, userID int64) error {
 	// Commit transaction
 	return tx.Commit()
 }
+
+// ResetUserData deletes all habits and their associated logs for a user
+func ResetUserData(db *sql.DB, userID int64) error {
+	// Start a transaction to ensure data consistency
+	tx, err := db.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback() // Rollback if anything fails
+
+	// Delete all habits (habit_logs will be deleted automatically due to ON DELETE CASCADE)
+	_, err = tx.Exec(`DELETE FROM habits WHERE user_id = ?`, userID)
+	if err != nil {
+		return err
+	}
+
+	// Commit the transaction
+	return tx.Commit()
+}

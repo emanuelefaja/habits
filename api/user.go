@@ -396,3 +396,33 @@ func UpdateSettingsHandler(db *sql.DB) http.HandlerFunc {
 		json.NewEncoder(w).Encode(map[string]bool{"success": true})
 	}
 }
+
+// ResetDataHandler handles resetting all user data
+func ResetDataHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		// Get user ID from session
+		userID := middleware.GetUserID(r)
+		if userID == 0 {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		// Reset user data
+		err := models.ResetUserData(db, int64(userID))
+		if err != nil {
+			log.Printf("Error resetting user data: %v", err)
+			middleware.SetFlash(r, "Error resetting data ❌")
+			http.Redirect(w, r, "/settings", http.StatusSeeOther)
+			return
+		}
+
+		// Set success flash message
+		middleware.SetFlash(r, "All habit data has been reset successfully ✨")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}
+}

@@ -100,6 +100,7 @@ func main() {
 		"ui/changelog.html",
 		"ui/blog/blog.html",
 		"ui/blog/post.html",
+		// "ui/books.html",
 	))
 
 	// Static files
@@ -258,6 +259,7 @@ func main() {
 	http.Handle("/api/user/delete", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(api.DeleteAccountHandler(db))))
 	http.Handle("/api/user/export", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(api.ExportDataHandler(db))))
 	http.Handle("/api/user/settings", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(api.UpdateSettingsHandler(db))))
+	http.Handle("/api/user/reset-data", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(api.ResetDataHandler(db))))
 
 	// Roadmap (no auth required, but session loaded)
 	http.Handle("/roadmap", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -486,6 +488,18 @@ func main() {
 		}
 		renderTemplate(w, templates, "post.html", data)
 	})))
+
+	// http.Handle("/books", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	// 	user, _ := getAuthenticatedUser(r, db)
+	// 	data := struct {
+	// 		User *models.User
+	// 		Page string
+	// 	}{
+	// 		User: user,
+	// 		Page: "books",
+	// 	}
+	// 	renderTemplate(w, templates, "books.html", data)
+	// })))
 
 	port := os.Getenv("PORT")
 	if port == "" {
