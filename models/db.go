@@ -15,7 +15,8 @@ func InitDB(db *sql.DB) error {
 			email TEXT UNIQUE NOT NULL,
 			password_hash TEXT NOT NULL,
 			show_confetti BOOLEAN NOT NULL DEFAULT 1,
-			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			is_admin BOOLEAN NOT NULL DEFAULT 0
 		)
 	`)
 	if err != nil {

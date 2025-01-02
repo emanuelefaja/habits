@@ -16,16 +16,25 @@ type User struct {
 	Email        string    `json:"email"`
 	ShowConfetti bool      `json:"show_confetti"`
 	CreatedAt    time.Time `json:"created_at"`
+	IsAdmin      bool      `json:"is_admin"`
 }
 
 // GetUserByID retrieves a user from the database by their ID
 func GetUserByID(db *sql.DB, id int64) (*User, error) {
 	user := &User{}
 	err := db.QueryRow(`
-		SELECT id, first_name, last_name, email, show_confetti, created_at 
+		SELECT id, first_name, last_name, email, show_confetti, created_at, is_admin 
 		FROM users 
 		WHERE id = ?
-	`, id).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.ShowConfetti, &user.CreatedAt)
+	`, id).Scan(
+		&user.ID,
+		&user.FirstName,
+		&user.LastName,
+		&user.Email,
+		&user.ShowConfetti,
+		&user.CreatedAt,
+		&user.IsAdmin,
+	)
 
 	if err != nil {
 		return nil, err
@@ -37,10 +46,10 @@ func GetUserByID(db *sql.DB, id int64) (*User, error) {
 func GetUserByEmail(db *sql.DB, email string) (*User, error) {
 	user := &User{}
 	err := db.QueryRow(`
-		SELECT id, first_name, last_name, email, show_confetti, created_at 
+		SELECT id, first_name, last_name, email, show_confetti, created_at, is_admin 
 		FROM users 
 		WHERE email = ?
-	`, email).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.ShowConfetti, &user.CreatedAt)
+	`, email).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.ShowConfetti, &user.CreatedAt, &user.IsAdmin)
 
 	if err != nil {
 		return nil, err
@@ -56,9 +65,9 @@ func (u *User) Create(db *sql.DB, passwordHash string) error {
 	u.Email = strings.ToLower(u.Email)
 
 	result, err := db.Exec(`
-		INSERT INTO users (first_name, last_name, email, password_hash, show_confetti, created_at) 
-		VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-	`, u.FirstName, u.LastName, u.Email, passwordHash, true)
+		INSERT INTO users (first_name, last_name, email, password_hash, show_confetti, created_at, is_admin) 
+		VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
+	`, u.FirstName, u.LastName, u.Email, passwordHash, true, false)
 
 	if err != nil {
 		log.Println("Error executing insert:", err)
@@ -117,6 +126,7 @@ func InitializeUsersDB(db *sql.DB) error {
 			last_name TEXT NOT NULL,
 			email TEXT UNIQUE NOT NULL,
 			password_hash TEXT NOT NULL,
+			is_admin BOOLEAN NOT NULL DEFAULT 0,
 			show_confetti BOOLEAN NOT NULL DEFAULT 1,
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 		)

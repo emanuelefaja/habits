@@ -56,6 +56,7 @@ func main() {
 		log.Fatal(err)
 	}
 	api.StartGitHubSync(db)
+	middleware.InitDB(db)
 
 	// Template functions
 	funcMap := template.FuncMap{
@@ -344,47 +345,48 @@ func main() {
 	})))
 
 	// Admin
-	http.Handle("/admin", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		user, err := getAuthenticatedUser(r, db)
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
+	http.Handle("/admin", middleware.SessionManager.LoadAndSave(
+		middleware.RequireAdmin(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			user, err := getAuthenticatedUser(r, db)
+			if err != nil {
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				return
+			}
 
-		totalUsers, err := models.GetTotalUsers(db)
-		if err != nil {
-			log.Printf("Error getting total users: %v", err)
-			totalUsers = 0
-		}
+			totalUsers, err := models.GetTotalUsers(db)
+			if err != nil {
+				log.Printf("Error getting total users: %v", err)
+				totalUsers = 0
+			}
 
-		totalHabits, err := models.GetTotalHabits(db)
-		if err != nil {
-			log.Printf("Error getting total habits: %v", err)
-			totalHabits = 0
-		}
+			totalHabits, err := models.GetTotalHabits(db)
+			if err != nil {
+				log.Printf("Error getting total habits: %v", err)
+				totalHabits = 0
+			}
 
-		users, err := models.GetAllUsers(db)
-		if err != nil {
-			log.Printf("Error getting all users: %v", err)
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
+			users, err := models.GetAllUsers(db)
+			if err != nil {
+				log.Printf("Error getting all users: %v", err)
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				return
+			}
 
-		data := struct {
-			User        *models.User
-			Users       []*models.User
-			TotalUsers  int
-			TotalHabits int
-			Page        string
-		}{
-			User:        user,
-			Users:       users,
-			TotalUsers:  totalUsers,
-			TotalHabits: totalHabits,
-			Page:        "admin",
-		}
-		renderTemplate(w, templates, "admin.html", data)
-	}))))
+			data := struct {
+				User        *models.User
+				Users       []*models.User
+				TotalUsers  int
+				TotalHabits int
+				Page        string
+			}{
+				User:        user,
+				Users:       users,
+				TotalUsers:  totalUsers,
+				TotalHabits: totalHabits,
+				Page:        "admin",
+			}
+			renderTemplate(w, templates, "admin.html", data)
+		}))))
 
 	// Habit Logs Deletion
 	http.Handle("/api/habits/logs/delete", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
