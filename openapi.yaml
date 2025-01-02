@@ -1,0 +1,648 @@
+openapi: 3.0.3
+info:
+  title: Habits API
+  description: |
+    API for managing habits and user data.
+    
+    ## Rate Limiting
+    All API endpoints are subject to rate limiting:
+    - 60 requests per minute per IP address
+    - 429 Too Many Requests response when limit is exceeded
+    - Includes `X-RateLimit-Remaining` and `X-RateLimit-Reset` headers
+  version: 1.0.0
+
+servers:
+  - url: https://habits.co/api
+    description: Production server
+  - url: http://localhost:8080/api
+    description: Local development server
+
+components:
+  securitySchemes:
+    sessionAuth:
+      type: apiKey
+      in: cookie
+      name: session
+
+  headers:
+    X-RateLimit-Remaining:
+      schema:
+        type: integer
+      description: The number of requests remaining in the current time window
+    X-RateLimit-Reset:
+      schema:
+        type: integer
+        format: unix-timestamp
+      description: The time when the current rate limit window resets
+
+  schemas:
+    APIResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        isAdmin:
+          type: boolean
+
+    Habit:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        name:
+          type: string
+        emoji:
+          type: string
+        habit_type:
+          type: string
+          enum: [binary, numeric, option-select, set-reps]
+        is_default:
+          type: boolean
+        display_order:
+          type: integer
+        habit_options:
+          type: array
+          items:
+            $ref: '#/components/schemas/HabitOption'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    HabitOption:
+      type: object
+      required:
+        - emoji
+        - label
+      properties:
+        emoji:
+          type: string
+        label:
+          type: string
+
+    HabitLog:
+      type: object
+      properties:
+        id:
+          type: integer
+        habit_id:
+          type: integer
+        date:
+          type: string
+          format: date
+        status:
+          type: string
+          enum: [done, missed, skipped]
+        value:
+          oneOf:
+            - type: 'null'
+            - type: object
+              properties:
+                value:
+                  type: number
+            - type: object
+              properties:
+                emoji:
+                  type: string
+                label:
+                  type: string
+            - type: object
+              properties:
+                sets:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      set:
+                        type: integer
+                      reps:
+                        type: integer
+                      value:
+                        type: number
+                unit:
+                  type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    HabitStats:
+      type: object
+      properties:
+        total_days:
+          type: integer
+        completed_days:
+          type: integer
+        completion_rate:
+          type: number
+          format: float
+        current_streak:
+          type: integer
+        longest_streak:
+          type: integer
+        average_value:
+          type: number
+          format: float
+        total_value:
+          type: number
+          format: float
+
+    CreateHabitRequest:
+      type: object
+      required:
+        - name
+        - emoji
+        - habit_type
+      properties:
+        name:
+          type: string
+        emoji:
+          type: string
+        habit_type:
+          type: string
+          enum: [binary, numeric, set_reps, option_select]
+        habit_options:
+          type: array
+          items:
+            $ref: '#/components/schemas/HabitOption'
+
+    BulkHabitRequest:
+      type: object
+      required:
+        - name
+        - emoji
+        - habit_type
+      properties:
+        name:
+          type: string
+        emoji:
+          type: string
+        habit_type:
+          type: string
+          enum: [binary, numeric, set_reps, option_select]
+
+    CreateHabitLogRequest:
+      type: object
+      required:
+        - habit_id
+        - date
+        - value
+      properties:
+        habit_id:
+          type: integer
+        date:
+          type: string
+          format: date
+        value:
+          oneOf:
+            - type: boolean  # For binary habits
+            - type: number   # For numeric habits
+            - type: object   # For set_reps habits
+              properties:
+                sets:
+                  type: integer
+                reps:
+                  type: integer
+            - type: object   # For option_select habits
+              properties:
+                emoji:
+                  type: string
+                label:
+                  type: string
+        notes:
+          type: string
+
+    SetRepsResponse:
+      allOf:
+        - $ref: '#/components/schemas/HabitLog'
+        - type: object
+          properties:
+            total_sets:
+              type: integer
+            total_reps:
+              type: integer
+
+    BinaryHabitStats:
+      type: object
+      properties:
+        total_done:
+          type: integer
+        total_missed:
+          type: integer
+        total_skipped:
+          type: integer
+        total_days:
+          type: integer
+        start_date:
+          type: string
+          format: date
+
+    NumericHabitStats:
+      type: object
+      properties:
+        total_done:
+          type: integer
+        total_reps:
+          type: integer
+        average_per_day:
+          type: number
+        total_days:
+          type: integer
+        total_missed:
+          type: integer
+        total_skipped:
+          type: integer
+        biggest_day:
+          type: integer
+        start_date:
+          type: string
+          format: date
+
+    ChoiceHabitStats:
+      type: object
+      properties:
+        options:
+          type: array
+          items:
+            type: object
+            properties:
+              emoji:
+                type: string
+              label:
+                type: string
+              count:
+                type: integer
+        total_days:
+          type: integer
+        start_date:
+          type: string
+          format: date
+
+paths:
+  /user/profile:
+    put:
+      summary: Update user profile
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIResponse'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+
+  /user/password:
+    put:
+      summary: Update user password
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                current_password:
+                  type: string
+                new_password:
+                  type: string
+      responses:
+        '200':
+          description: Password updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIResponse'
+        '401':
+          description: Unauthorized
+        '400':
+          description: Invalid password format
+        '500':
+          description: Internal server error
+
+  /user/delete:
+    delete:
+      summary: Delete user account
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: Account deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIResponse'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+
+  /user/export:
+    get:
+      summary: Export user data
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: Data exported successfully
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+
+  /user/settings:
+    put:
+      summary: Update user settings
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                show_confetti:
+                  type: boolean
+      responses:
+        '200':
+          description: Settings updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIResponse'
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+
+  /habits:
+    get:
+      summary: Get all habits for authenticated user
+      security:
+        - sessionAuth: []
+      responses:
+        '200':
+          description: List of habits
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIResponse'
+    post:
+      summary: Create a new habit
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateHabitRequest'
+      responses:
+        '201':
+          description: Habit created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIResponse'
+
+  /habits/bulk:
+    post:
+      summary: Create multiple habits at once
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/BulkHabitRequest'
+      responses:
+        '200':
+          description: Habits created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+
+  /habits/log:
+    post:
+      summary: Create or update a habit log
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateHabitLogRequest'
+      responses:
+        '200':
+          description: Log created/updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIResponse'
+
+  /habits/logs:
+    get:
+      summary: Get habit logs for a date range
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: start_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: List of habit logs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIResponse'
+    post:
+      summary: Create or update a habit log
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateHabitLogRequest'
+      responses:
+        '200':
+          description: Habit log created/updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIResponse'
+
+  /habits/delete:
+    delete:
+      summary: Delete a habit
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Habit deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIResponse'
+
+  /habits/update-name:
+    post:
+      summary: Update habit name
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+                - name
+              properties:
+                id:
+                  type: integer
+                name:
+                  type: string
+      responses:
+        '200':
+          description: Habit name updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIResponse'
+
+  /habits/reorder:
+    post:
+      summary: Update display order of habits
+      security:
+        - sessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: integer
+              description: Array of habit IDs in desired order
+      responses:
+        '200':
+          description: Habit order updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIResponse'
+
+  /habits/logs/delete:
+    delete:
+      summary: Delete a habit log
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Habit log deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIResponse'
+
+  /habits/stats:
+    get:
+      summary: Get statistics for a habit
+      security:
+        - sessionAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Habit statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIResponse'
