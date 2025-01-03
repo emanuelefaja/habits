@@ -269,125 +269,26 @@ func GetSetRepsHabitStats(db *sql.DB, habitID int) (SetRepsHabitStats, error) {
 	var stats SetRepsHabitStats
 	var startDateStr sql.NullString
 
+	// Query to get total_days and total_sets
 	err = db.QueryRow(`
 		SELECT 
-			COUNT(DISTINCT date) as total_days,
-			SUM(
-				json_array_length(
-					json_extract(value, '$.sets')
-				)
-			) as total_sets,
-			SUM(
-				(
-					SELECT SUM(CAST(json_extract(value2, '$.reps') AS INTEGER))
-					FROM json_each(json_extract(value, '$.sets')) as sets, 
-					json_each(sets.value) as value2
-					WHERE json_extract(value2, '$.reps') IS NOT NULL
-				)
-			) as total_reps,
+			COUNT(DISTINCT CASE WHEN status = 'done' THEN date END) as total_days,
 			COALESCE(
-				ROUND(
-					CAST(
-						(
-							SELECT SUM(CAST(json_extract(value2, '$.reps') AS INTEGER))
-							FROM json_each(json_extract(value, '$.sets')) as sets, 
-							json_each(sets.value) as value2
-							WHERE json_extract(value2, '$.reps') IS NOT NULL
-						)
-					AS FLOAT) /
-					NULLIF(
-						SUM(json_array_length(json_extract(value, '$.sets'))),
-						0
-					),
-				2),
-				0
-			) as average_reps_per_set,
-			COALESCE(MAX(CAST(json_extract(value, '$.reps') AS INTEGER)), 0) as highest_reps_in_set,
-			COALESCE(
-				ROUND(
-					CAST(COUNT(CASE WHEN status = 'done' THEN 1 END) AS FLOAT) /
-					NULLIF(COUNT(DISTINCT date), 0),
-				2),
-				0
-			) as average_sets_per_day,
-			COALESCE(
-				ROUND(
-					CAST(SUM(CAST(json_extract(value, '$.reps') AS INTEGER)) AS FLOAT) /
-					NULLIF(COUNT(DISTINCT date), 0),
-				2),
-				0
-			) as average_reps_per_day,
-			COALESCE(
-				(
-					SELECT SUM(CAST(json_extract(value, '$.reps') AS INTEGER))
-					FROM habit_logs hl2
-					WHERE hl2.habit_id = ? AND hl2.status = 'done'
-					GROUP BY date
-					ORDER BY SUM(CAST(json_extract(value, '$.reps') AS INTEGER)) DESC
-					LIMIT 1
+				SUM(
+					CASE 
+						WHEN status = 'done' THEN 
+							json_array_length(json_extract(value, '$.sets'))
+						ELSE 0 
+					END
 				),
 				0
-			) as biggest_day,
-			COUNT(CASE WHEN status = 'missed' THEN 1 END) as total_missed,
-			COUNT(CASE WHEN status = 'skipped' THEN 1 END) as total_skipped,
+			) as total_sets,
 			strftime('%Y-%m-%d', MIN(CASE WHEN status = 'done' THEN date END)) as start_date
-		FROM habit_logs 
+		FROM habit_logs
 		WHERE habit_id = ?
-	`, habitID, habitID).Scan(
-		&stats.TotalDays,
-		&stats.TotalSets,
-		&stats.TotalReps,
-		&stats.AverageRepsPerSet,
-		&stats.HighestRepsInSet,
-		&stats.AverageSetsPerDay,
-		&stats.AverageRepsPerDay,
-		&stats.BiggestDay,
-		&stats.TotalMissed,
-		&stats.TotalSkipped,
-		&startDateStr,
-	)
+	`, habitID).Scan(&stats.TotalDays, &stats.TotalSets, &startDateStr)
 	if err != nil {
 		return SetRepsHabitStats{}, fmt.Errorf("error getting habit stats: %v", err)
-	}
-
-	// Calculate longest streak
-	rows, err := db.Query(`
-		WITH dates AS (
-			SELECT date, 
-				   CASE WHEN status = 'done' THEN 1 ELSE 0 END as completed,
-				   date(date, '-1 day') as prev_date
-			FROM habit_logs
-			WHERE habit_id = ?
-			ORDER BY date
-		),
-		streaks AS (
-			SELECT date,
-				   completed,
-				   SUM(CASE WHEN completed = 1 THEN 1 ELSE 0 END) OVER (
-					   ORDER BY date
-					   ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-				   ) as streak_group
-			FROM dates
-		)
-		SELECT MAX(streak_length) as longest_streak
-		FROM (
-			SELECT streak_group, COUNT(*) as streak_length
-			FROM streaks
-			WHERE completed = 1
-			GROUP BY streak_group
-		)
-	`, habitID)
-	if err != nil {
-		return SetRepsHabitStats{}, fmt.Errorf("error calculating longest streak: %v", err)
-	}
-	defer rows.Close()
-
-	// Scan the longest streak value
-	if rows.Next() {
-		err = rows.Scan(&stats.LongestStreak)
-		if err != nil {
-			return SetRepsHabitStats{}, fmt.Errorf("error scanning longest streak: %v", err)
-		}
 	}
 
 	// Convert the date string to time.Time if it's not null
