@@ -196,6 +196,7 @@
             },
 
             formatDate(date) {
+                if (!date) return null;
                 return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
             }
         }
@@ -279,7 +280,7 @@
                                          @mouseenter="day && (hoverDate = monthNames[day.getMonth()] + ' ' + day.getDate())"
                                          @mouseleave="hoverDate = ''"
                                          @click="(() => {
-                                             if (day === null) return;
+                                             if (!day) return;
                                              
                                              if ('{{ .Habit.HabitType }}' === 'numeric') {
                                                  if (showTooltip !== formatDate(day)) {
@@ -333,7 +334,7 @@
                                          style="width: 17px; height: 17px; margin-bottom: 3px; border-radius: 2px;">
 
                                         <!-- Update tooltip to only show for the active cell -->
-                                        <div x-show="showTooltip === formatDate(day)" 
+                                        <div x-show="day && showTooltip === formatDate(day)" 
                                              @click.away="showTooltip = null; showNumericInput = false"
                                              x-transition:enter="transition ease-out duration-200"
                                              class="absolute bottom-[calc(100%+8px)] left-1/2 -translate-x-1/2 bg-white dark:bg-gray-700 shadow-lg rounded-lg p-2 border border-gray-200 dark:border-gray-600 z-[100] w-44">
