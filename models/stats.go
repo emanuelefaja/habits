@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"math"
 	"strings"
 	"time"
 )
@@ -254,7 +255,6 @@ type SetRepsHabitStats struct {
 	StartDate         time.Time `json:"start_date,omitempty"`
 }
 
-// GetSetRepsHabitStats retrieves statistics for a set-reps habit
 func GetSetRepsHabitStats(db *sql.DB, habitID int) (SetRepsHabitStats, error) {
 	// First verify this is a set-reps habit
 	var habitType HabitType
@@ -269,33 +269,130 @@ func GetSetRepsHabitStats(db *sql.DB, habitID int) (SetRepsHabitStats, error) {
 	var stats SetRepsHabitStats
 	var startDateStr sql.NullString
 
-	// Query to get total_days, total_sets, total_reps
-	err = db.QueryRow(`
+	/*
+	   Explanation of sub-selects:
+
+	   1) total_days = COUNT(DISTINCT CASE WHEN status='done' THEN date END)
+	      – Number of unique days on which the habit was done.
+
+	   2) total_sets = SUM( CASE WHEN status='done' THEN json_array_length(...) ELSE 0 END )
+	      – For each done entry, sum up the number of sets in the JSON.
+
+	   3) total_reps =
+	      SELECT SUM(json_extract(s.value, '$.reps'))
+	      FROM habit_logs hl, json_each(json_extract(hl.value, '$.sets')) AS s
+	      WHERE hl.habit_id = ?
+	      AND hl.status = 'done'
+	      – Sum of all reps across all sets for all done entries.
+
+	   4) biggest_day =
+	      SELECT MAX( sum_of_reps_in_that_day )
+	      – The largest single-day total of reps.
+	      (We do it by subselecting the SUM(...).)
+
+	   5) highest_reps_in_set =
+	      SELECT MAX( CAST(json_extract(s.value, '$.reps') as integer) )
+	      – The largest single set’s reps, across all days.
+
+	   6) total_missed, total_skipped =
+	      SELECT COUNT(*) with a CASE filter for each status.
+
+	   7) start_date = MIN(date) for done status
+	      – The earliest done date in YYYY-MM-DD format.
+
+	   We combine them all in one SELECT so we only do one round-trip.
+	*/
+
+	query := `
 		SELECT 
-			COUNT(DISTINCT CASE WHEN status = 'done' THEN date END) as total_days,
+			COUNT(DISTINCT CASE WHEN status = 'done' THEN date END) AS total_days,
+
 			SUM(
 				CASE 
 					WHEN status = 'done' THEN 
 						json_array_length(json_extract(value, '$.sets'))
-					ELSE 0 
+					ELSE 0
 				END
-			) as total_sets,
+			) AS total_sets,
+
 			(
 				SELECT SUM(json_extract(s.value, '$.reps'))
 				FROM habit_logs hl,
-					 json_each(json_extract(hl.value, '$.sets')) as s
-				WHERE hl.habit_id = ? 
+					 json_each(json_extract(hl.value, '$.sets')) AS s
+				WHERE hl.habit_id = ?
 				AND hl.status = 'done'
-			) as total_reps,
-			strftime('%Y-%m-%d', MIN(CASE WHEN status = 'done' THEN date END)) as start_date
+			) AS total_reps,
+
+			COALESCE(
+				(
+					SELECT MAX(
+						(
+							SELECT SUM(json_extract(s.value, '$.reps'))
+							FROM json_each(json_extract(value, '$.sets')) AS s
+						)
+					)
+					FROM habit_logs
+					WHERE habit_id = ?
+					AND status = 'done'
+				), 0
+			) AS biggest_day,
+
+			(
+				SELECT COALESCE(
+					MAX(
+						CAST(json_extract(s.value, '$.reps') AS INTEGER)
+					), 0
+				)
+				FROM habit_logs hl,
+					 json_each(json_extract(hl.value, '$.sets')) AS s
+				WHERE hl.habit_id = ?
+				AND hl.status = 'done'
+			) AS highest_reps_in_set,
+
+			(
+				SELECT COUNT(*)
+				FROM habit_logs
+				WHERE habit_id = ?
+				AND status = 'missed'
+			) AS total_missed,
+
+			(
+				SELECT COUNT(*)
+				FROM habit_logs
+				WHERE habit_id = ?
+				AND status = 'skipped'
+			) AS total_skipped,
+
+			strftime('%Y-%m-%d', MIN(CASE WHEN status = 'done' THEN date END)) AS start_date
+
 		FROM habit_logs
 		WHERE habit_id = ?
-	`, habitID, habitID).Scan(&stats.TotalDays, &stats.TotalSets, &stats.TotalReps, &startDateStr)
+	`
+
+	err = db.QueryRow(
+		query,
+		// The parameters in the sub-selects must be repeated in the correct order:
+		habitID, // for total_reps
+		habitID, // for biggest_day
+		habitID, // for highest_reps_in_set
+		habitID, // for total_missed
+		habitID, // for total_skipped
+		habitID, // final WHERE
+	).Scan(
+		&stats.TotalDays,
+		&stats.TotalSets,
+		&stats.TotalReps,
+		&stats.BiggestDay,
+		&stats.HighestRepsInSet,
+		&stats.TotalMissed,
+		&stats.TotalSkipped,
+		&startDateStr,
+	)
 	if err != nil {
 		return SetRepsHabitStats{}, fmt.Errorf("error getting habit stats: %v", err)
 	}
 
-	// Convert the date string to time.Time if it's not null
+	// Parse start_date if not null
 	if startDateStr.Valid {
 		parsedTime, err := time.Parse("2006-01-02", startDateStr.String)
 		if err != nil {
@@ -304,5 +401,29 @@ func GetSetRepsHabitStats(db *sql.DB, habitID int) (SetRepsHabitStats, error) {
 		stats.StartDate = parsedTime
 	}
 
+	// ==============
+	// Post-processing for averages and longest streak
+	// ==============
+
+	// Compute derived stats in Go (you can do them in SQL if you prefer).
+	if stats.TotalSets > 0 {
+		stats.AverageRepsPerSet = math.Round(float64(stats.TotalReps)/float64(stats.TotalSets)*100) / 100
+	}
+	if stats.TotalDays > 0 {
+		stats.AverageSetsPerDay = math.Round(float64(stats.TotalSets)/float64(stats.TotalDays)*100) / 100
+		stats.AverageRepsPerDay = math.Round(float64(stats.TotalReps)/float64(stats.TotalDays)*100) / 100
+	}
+
+	// If you want to calculate the LongestStreak in code, you could do:
+	//
+	//   longestStreak, err := getLongestStreak(db, habitID)
+	//   if err != nil { ... }
+	//   stats.LongestStreak = longestStreak
+	//
+	// Where getLongestStreak is a separate helper that:
+	// 1. SELECTs all done dates in ascending order
+	// 2. Iterates over them to figure out the maximum run of consecutive days
+
+	// Return the stats
 	return stats, nil
 }
