@@ -486,6 +486,9 @@
             showSetRepsInput: false,
             setReps: [{reps: 0}],
 
+            // Add new state for confetti timers
+            binaryConfettiTimers: {},
+
             // Option-Select Habit Methods
             getHabitOptions(habitId) {
                 const habit = this.habits.find(h => h.id === habitId);
@@ -687,7 +690,16 @@
                             })
                         };
                         this.showTooltip = null;
-                        if (status === 'done') {
+
+                        // Handle confetti based on habit type
+                        if (habit.habit_type === 'binary') {
+                            if (status === 'done') {
+                                this.scheduleBinaryConfetti(habitId, date, event);
+                            } else {
+                                this.clearBinaryConfettiTimer(habitId, date);
+                            }
+                        } else if (status === 'done') {
+                            // Non-binary habits trigger confetti immediately
                             this.triggerConfetti(event);
                         }
                     }
@@ -724,6 +736,32 @@
                     spread: 70,
                     origin: { x, y }
                 });
+            },
+
+            // Add new methods for managing confetti timers
+            scheduleBinaryConfetti(habitId, date, event, delay = 500) {
+                // Clear any existing timer first
+                this.clearBinaryConfettiTimer(habitId, date);
+
+                // Schedule new timer
+                const key = `${habitId}_${date}`;
+                this.binaryConfettiTimers[key] = setTimeout(() => {
+                    // Check if final status is still 'done'
+                    const finalStatus = this.getStatus(habitId, date);
+                    if (finalStatus === 'done') {
+                        this.triggerConfetti(event);
+                    }
+                    // Clean up timer reference
+                    delete this.binaryConfettiTimers[key];
+                }, delay);
+            },
+
+            clearBinaryConfettiTimer(habitId, date) {
+                const key = `${habitId}_${date}`;
+                if (this.binaryConfettiTimers[key]) {
+                    clearTimeout(this.binaryConfettiTimers[key]);
+                    delete this.binaryConfettiTimers[key];
+                }
             }
         }));
     });
