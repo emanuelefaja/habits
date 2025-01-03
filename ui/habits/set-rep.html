@@ -1,0 +1,214 @@
+{{ define "set-rep" }}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" 
+     x-data="{ 
+         stats: null,
+         habitId: {{ .Habit.ID }},
+         async loadStats() {
+             try {
+                 const response = await fetch(`/api/habits/stats?id=${this.habitId}`);
+                 const result = await response.json();
+                 if (result.success) {
+                     this.stats = result.data;
+                 }
+             } catch (error) {
+                 console.error('Error:', error);
+             }
+         }
+     }"
+     x-init="loadStats()"
+     @habit-log-updated.window="loadStats()">
+    
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-4 mb-8">
+        <!-- Total Days Card -->
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl">📅</span>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Total Days</dt>
+                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white" x-text="stats?.total_days || 0"></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Sets Card -->
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl">🎯</span>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Total Sets</dt>
+                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white" x-text="stats?.total_sets || 0"></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Reps Card -->
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl">💪</span>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Total Reps</dt>
+                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white" x-text="stats?.total_reps || 0"></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Average Reps per Set Card -->
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl">📊</span>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Avg Reps/Set</dt>
+                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white" x-text="stats?.average_reps_per_set || 0"></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Highest Reps in Set Card -->
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl">🥇</span>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Best Set</dt>
+                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white" x-text="stats?.highest_reps_in_set || 0"></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Average Sets per Day Card -->
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl">💯</span>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Avg Sets/Day</dt>
+                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white" x-text="stats?.average_sets_per_day || 0"></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Average Reps per Day Card -->
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl">📈</span>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Avg Reps/Day</dt>
+                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white" x-text="stats?.average_reps_per_day || 0"></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Biggest Day Card -->
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl">🏆</span>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Biggest Day</dt>
+                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white" x-text="stats?.biggest_day || 0"></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Longest Streak Card -->
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl">🔥</span>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Longest Streak</dt>
+                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white" x-text="stats?.longest_streak || 0"></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Missed Card -->
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl">❌</span>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Total Missed</dt>
+                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white" x-text="stats?.total_missed || 0"></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Skipped Card -->
+        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl">⏩</span>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Total Skipped</dt>
+                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white" x-text="stats?.total_skipped || 0"></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Yearly Grid -->
+   {{ template "yearly-grid" . }}  
+</div>
+{{ end }}

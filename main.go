@@ -95,6 +95,7 @@ func main() {
 		"ui/habits/binary.html",
 		"ui/habits/numeric.html",
 		"ui/habits/choice.html",
+		"ui/habits/set-rep.html",
 		"ui/about.html",
 		"ui/guest-home.html",
 		"ui/admin.html",

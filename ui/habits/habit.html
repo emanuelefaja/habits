@@ -198,6 +198,8 @@
             {{ template "numeric-habit" . }}
         {{ else if eq .Habit.HabitType "option-select" }}
             {{ template "choice-habit" . }}
+        {{ else if eq .Habit.HabitType "set-reps" }}
+            {{ template "set-rep" . }}
         {{ end }}
     </div>
 </body>
