@@ -269,24 +269,28 @@ func GetSetRepsHabitStats(db *sql.DB, habitID int) (SetRepsHabitStats, error) {
 	var stats SetRepsHabitStats
 	var startDateStr sql.NullString
 
-	// Query to get total_days and total_sets
+	// Query to get total_days, total_sets, total_reps
 	err = db.QueryRow(`
 		SELECT 
 			COUNT(DISTINCT CASE WHEN status = 'done' THEN date END) as total_days,
-			COALESCE(
-				SUM(
-					CASE 
-						WHEN status = 'done' THEN 
-							json_array_length(json_extract(value, '$.sets'))
-						ELSE 0 
-					END
-				),
-				0
+			SUM(
+				CASE 
+					WHEN status = 'done' THEN 
+						json_array_length(json_extract(value, '$.sets'))
+					ELSE 0 
+				END
 			) as total_sets,
+			(
+				SELECT SUM(json_extract(s.value, '$.reps'))
+				FROM habit_logs hl,
+					 json_each(json_extract(hl.value, '$.sets')) as s
+				WHERE hl.habit_id = ? 
+				AND hl.status = 'done'
+			) as total_reps,
 			strftime('%Y-%m-%d', MIN(CASE WHEN status = 'done' THEN date END)) as start_date
 		FROM habit_logs
 		WHERE habit_id = ?
-	`, habitID).Scan(&stats.TotalDays, &stats.TotalSets, &startDateStr)
+	`, habitID, habitID).Scan(&stats.TotalDays, &stats.TotalSets, &stats.TotalReps, &startDateStr)
 	if err != nil {
 		return SetRepsHabitStats{}, fmt.Errorf("error getting habit stats: %v", err)
 	}
