@@ -25,7 +25,7 @@
             <div class="p-5">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <span class="text-2xl">📅</span>
+                        <span class="text-2xl">🗓️</span>
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
@@ -71,6 +71,23 @@
             </div>
         </div>
 
+         <!-- Highest Reps in Set Card -->
+         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <span class="text-2xl">🥇</span>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Best Set</dt>
+                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white" x-text="stats?.highest_reps_in_set || 0"></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Average Reps per Set Card -->
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
             <div class="p-5">
@@ -82,23 +99,6 @@
                         <dl>
                             <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Avg Reps/Set</dt>
                             <dd class="text-3xl font-semibold text-gray-900 dark:text-white" x-text="stats?.average_reps_per_set || 0"></dd>
-                        </dl>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Highest Reps in Set Card -->
-        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
-            <div class="p-5">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <span class="text-2xl">🥇</span>
-                    </div>
-                    <div class="ml-5 w-0 flex-1">
-                        <dl>
-                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Best Set</dt>
-                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white" x-text="stats?.highest_reps_in_set || 0"></dd>
                         </dl>
                     </div>
                 </div>
