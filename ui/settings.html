@@ -405,9 +405,49 @@
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('settings', (user) => ({
+                showDeleteModal: false,
+                showResetModal: false,
+                deleteConfirmName: '',
+                resetConfirmName: '',
+                currentPassword: '',
+                newPassword: '',
+                confirmPassword: '',
+                showCurrentPassword: false,
+                showNewPassword: false,
+                showConfirmPassword: false,
+                flashMessage: '',
+                showFlash: false,
+                email: user.email,
+                emailValid: true,
+                emailTimer: null,
                 showConfetti: user.show_confetti,
                 showWeekdays: user.show_weekdays,
                 user: user,
+                checks: {
+                    length: false,
+                    uppercase: false,
+                    lowercase: false,
+                    number: false,
+                    special: false
+                },
+                validatePassword() {
+                    this.checks.length = this.newPassword.length >= 8;
+                    this.checks.uppercase = /[A-Z]/.test(this.newPassword);
+                    this.checks.lowercase = /[a-z]/.test(this.newPassword);
+                    this.checks.number = /[0-9]/.test(this.newPassword);
+                    this.checks.special = /[^A-Za-z0-9]/.test(this.newPassword);
+                },
+                validateEmail() {
+                    clearTimeout(this.emailTimer);
+                    this.emailTimer = setTimeout(() => {
+                        if (this.email === '') {
+                            this.emailValid = true;
+                            return;
+                        }
+                        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        this.emailValid = emailPattern.test(this.email);
+                    }, 500);
+                },
                 toggleSetting(setting) {
                     if (setting === 'showConfetti') {
                         this.showConfetti = !this.showConfetti;
