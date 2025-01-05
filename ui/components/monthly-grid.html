@@ -54,8 +54,8 @@
                 <!-- Add overflow wrapper with explicit width -->
                 <div class="w-full overflow-x-auto md:overflow-visible">
                     <!-- Grid Header Row -->
-                    <div class="grid mb-2 min-w-fit" style="gap: 3px; grid-template-columns: 150px repeat(31, 35px) 70px;">
-                        <div class="h-8"></div>
+                    <div class="grid mb-2 min-w-fit" style="gap: 3px; grid-template-columns: auto repeat(31, 35px) 70px;">
+                        <div class="h-8 min-w-[150px] max-w-[250px]"></div>
                         <template x-for="day in 31" :key="day">
                             <div :class="{ 
                                     'invisible': day > getDaysInMonth(),
@@ -82,12 +82,12 @@
                         <template x-for="habit in habits" :key="habit.id">
                             <div class="grid bg-white dark:bg-gray-800 group"
                                  x-bind:data-habit-id="habit.id"
-                                 style="gap: 3px; grid-template-columns: 150px repeat(31, 35px) 70px;"
+                                 style="gap: 3px; grid-template-columns: auto repeat(31, 35px) 70px;"
                                  class="border border-gray-200 dark:border-gray-700 rounded-sm">
                                  
                                 <!-- Habit Name Cell (drag handle) -->
-                                <div class="h-8 flex items-center font-medium text-sm text-gray-700 dark:text-gray-200 pr-4 habit-handle relative" 
-                                     style="width: 150px; cursor: grab;">
+                                <div class="h-8 flex items-center font-medium text-sm text-gray-700 dark:text-gray-200 pr-4 habit-handle relative overflow-hidden" 
+                                     style="min-width: 150px; max-width: 250px; cursor: grab;">
                                     <div class="absolute left-0 top-0 bottom-0 flex items-center transition-opacity duration-150 opacity-0 group-hover:opacity-100 px-1">
                                         <svg class="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                                             <circle cx="4" cy="4" r="1.5"></circle>
@@ -101,7 +101,7 @@
                                     <div class="flex items-center pl-7">
                                         <a :href="`/habit/${habit.id}`" class="flex items-center hover:text-[#2da44e] hover:underline" @click.stop>
                                             <span class="mr-2" x-text="habit.emoji"></span>
-                                            <span x-text="habit.name"></span>
+                                            <span x-text="habit.name.length > 25 ? habit.name.substring(0, 25) + '...' : habit.name"></span>
                                         </a>
                                     </div>
                                 </div>
