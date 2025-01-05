@@ -170,6 +170,10 @@ func main() {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
+
+		// Debug: Print user settings
+		log.Printf("User settings: confetti=%v, weekdays=%v", user.ShowConfetti, user.ShowWeekdays)
+
 		data := struct {
 			User  *models.User
 			Flash string

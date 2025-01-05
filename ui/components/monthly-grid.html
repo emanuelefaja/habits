@@ -1,6 +1,9 @@
 {{ define "monthly-grid" }}
 <template x-if="habits.length > 0">
-    <div class="flex-grow flex flex-col items-center justify-center mb-8" x-data="monthlyGrid({ showConfetti: {{ .User.ShowConfetti }} })">
+    <div class="flex-grow flex flex-col items-center justify-center mb-8" x-data="monthlyGrid({ 
+        showConfetti: {{ .User.ShowConfetti }},
+        user: {{ json .User }}
+    })">
         <!-- Greeting -->
         <div class="mb-8">
             <h2 class="text-2xl md:text-4xl font-semibold text-gray-900 dark:text-white"
@@ -72,29 +75,50 @@
                 <!-- Add overflow wrapper with explicit width -->
                 <div class="w-full overflow-x-auto md:overflow-visible">
                     <!-- Grid Header Row -->
-                    <div class="grid mb-2 min-w-fit" style="gap: 3px; grid-template-columns: auto repeat(31, 35px) 70px;">
+                    <div class="grid mb-2 min-w-fit relative" style="gap: 3px; grid-template-columns: auto repeat(31, 35px) 70px;">
+                        <!-- Empty space for habit names column -->
                         <div class="h-8 min-w-[150px] max-w-[250px]"></div>
-                        <template x-for="day in 31" :key="day">
-                            <div :class="{ 
-                                    'invisible': day > getDaysInMonth(),
-                                    'bg-[#2da44e] text-white rounded-full inline-flex items-center justify-center px-2': isToday(day),
-                                    'text-sm text-center text-gray-600 dark:text-gray-400': !isToday(day)
-                                 }"
-                                 style="width: 35px;" 
-                                 :style="{ 
-                                     width: isToday(day) ? '28px' : '35px', 
-                                     height: isToday(day) ? '28px' : '35px', 
-                                     lineHeight: isToday(day) ? '28px' : '35px',
-                                     margin: isToday(day) ? '3.5px auto' : '0'
-                                 }"
-                                 x-text="day">
-                            </div>
-                        </template>
+
+                        <!-- Day numbers and weekday letters together -->
+                        <div class="grid grid-cols-[repeat(31,35px)] gap-[3px]" style="grid-column: 2 / span 31">
+                            <!-- Weekday letters -->
+                            <template x-if="user.show_weekdays">
+                                <div class="absolute -top-4">
+                                    <div class="grid grid-cols-[repeat(31,35px)] gap-[3px]">
+                                        <template x-for="day in 31" :key="day">
+                                            <div class="text-center text-xs text-gray-400 w-[35px]" 
+                                                 x-show="day <= getDaysInMonth()"
+                                                 x-text="getWeekdayLetter(day)">
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- Day numbers -->
+                            <template x-for="day in 31" :key="day">
+                                <div :class="{ 
+                                        'invisible': day > getDaysInMonth(),
+                                        'bg-[#2da44e] text-white rounded-full inline-flex items-center justify-center px-2': isToday(day),
+                                        'text-sm text-center text-gray-600 dark:text-gray-400': !isToday(day)
+                                     }"
+                                     style="width: 35px;" 
+                                     :style="{ 
+                                         width: isToday(day) ? '28px' : '35px', 
+                                         height: isToday(day) ? '28px' : '35px', 
+                                         lineHeight: isToday(day) ? '28px' : '35px',
+                                         margin: isToday(day) ? '3.5px auto' : '0'
+                                     }"
+                                     x-text="day">
+                                </div>
+                            </template>
+                        </div>
+
+                        <!-- Total column header -->
                         <div class="h-8 flex items-center justify-center">
                             <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Total</span>
                         </div>
                     </div>
-
                     <!-- Sortable List of Habit Rows -->
                     <div x-ref="habitsListContainer" class="flex flex-col gap-1 min-w-fit">
                         <template x-for="habit in habits" :key="habit.id">
@@ -465,8 +489,11 @@
 </template>
 <script>
     document.addEventListener('alpine:init', () => {
-        Alpine.data('monthlyGrid', ({ showConfetti }) => ({
-            showConfetti,
+        Alpine.data('monthlyGrid', (props) => ({
+            showConfetti: props.showConfetti,
+            user: props.user,
+            currentMonth: new Date().getMonth() + 1,
+            currentYear: new Date().getFullYear(),
             // Initialize component
             init() {
                 // Keep existing Sortable initialization
@@ -780,10 +807,18 @@
                     clearTimeout(this.binaryConfettiTimers[key]);
                     delete this.binaryConfettiTimers[key];
                 }
+            },
+
+            getWeekdayLetter(day) {
+                const date = new Date(this.currentYear, this.currentMonth - 1, day);
+                const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+                return weekdays[date.getDay()];
             }
         }));
     });
 </script>
 
+<!-- Add this temporarily for debugging -->
+<div x-show="true" x-text="JSON.stringify(user)"></div>
 
 {{ end }}

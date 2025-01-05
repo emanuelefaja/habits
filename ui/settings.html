@@ -19,76 +19,7 @@
         {{ .Flash }}
     </div>
 
-    <div x-data="{ 
-        showDeleteModal: false,
-        showResetModal: false,
-        deleteConfirmName: '',
-        resetConfirmName: '',
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: '',
-        showCurrentPassword: false,
-        showNewPassword: false,
-        showConfirmPassword: false,
-        flashMessage: '',
-        showFlash: false,
-        email: '{{ .User.Email }}',
-        emailValid: true,
-        emailTimer: null,
-        checks: {
-            length: false,
-            uppercase: false,
-            lowercase: false,
-            number: false,
-            special: false
-        },
-        validatePassword() {
-            this.checks.length = this.newPassword.length >= 8;
-            this.checks.uppercase = /[A-Z]/.test(this.newPassword);
-            this.checks.lowercase = /[a-z]/.test(this.newPassword);
-            this.checks.number = /[0-9]/.test(this.newPassword);
-            this.checks.special = /[^A-Za-z0-9]/.test(this.newPassword);
-        },
-        validateEmail() {
-            clearTimeout(this.emailTimer);
-            this.emailTimer = setTimeout(() => {
-                if (this.email === '') {
-                    this.emailValid = true;
-                    return;
-                }
-                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                this.emailValid = emailPattern.test(this.email);
-            }, 500);
-        },
-        showConfetti: true,
-        saveAppearanceSettings() {
-            fetch('/api/user/settings', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    showConfetti: this.showConfetti
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Optional: Show success message
-                    this.flashMessage = 'Settings saved successfully! ✨';
-                    this.showFlash = true;
-                    setTimeout(() => this.showFlash = false, 3000);
-                }
-            })
-            .catch(error => {
-                console.error('Error saving settings:', error);
-                // Optional: Show error message
-                this.flashMessage = 'Error saving settings';
-                this.showFlash = true;
-                setTimeout(() => this.showFlash = false, 3000);
-            });
-        }
-    }">
+    <div x-data="settings({{ json .User }})">
         <!-- Header from home.html -->
         {{ template "header" dict "User" .User "Page" "settings" }}
 
@@ -181,10 +112,7 @@
                                     Show confetti celebrations when completing habits
                                 </span>
                                 <button type="button" 
-                                    @click="
-                                        showConfetti = !showConfetti;
-                                        saveAppearanceSettings();
-                                    "
+                                    @click="toggleSetting('showConfetti')"
                                     :class="showConfetti ? 'bg-[#2da44e]' : 'bg-gray-200'"
                                     class="relative inline-flex h-7 w-14 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out">
                                     <span class="sr-only">Toggle confetti</span>
@@ -200,6 +128,38 @@
                                             :class="showConfetti ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out'"
                                             class="absolute inset-0 flex h-full w-full items-center justify-center transition-opacity text-sm">
                                             🎉
+                                        </span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Weekdays Toggle -->
+                    <div class="mt-6">
+                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">📅 Weekdays</label>
+                        <div class="mt-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600 dark:text-gray-400">
+                                    Show weekday letters above the grid numbers
+                                </span>
+                                <button type="button" 
+                                    @click="toggleSetting('showWeekdays')"
+                                    :class="showWeekdays ? 'bg-[#2da44e]' : 'bg-gray-200'"
+                                    class="relative inline-flex h-7 w-14 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out">
+                                    <span class="sr-only">Toggle weekdays</span>
+                                    <span
+                                        :class="showWeekdays ? 'translate-x-7' : 'translate-x-0'"
+                                        class="pointer-events-none relative inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out">
+                                        <span
+                                            :class="showWeekdays ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in'"
+                                            class="absolute inset-0 flex h-full w-full items-center justify-center transition-opacity text-sm">
+                                            🚫
+                                        </span>
+                                        <span
+                                            :class="showWeekdays ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out'"
+                                            class="absolute inset-0 flex h-full w-full items-center justify-center transition-opacity text-sm">
+                                            📅
                                         </span>
                                     </span>
                                 </button>
@@ -441,5 +401,50 @@
     </div>
 
     {{ template "footer" . }}
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('settings', (user) => ({
+                showConfetti: user.show_confetti,
+                showWeekdays: user.show_weekdays,
+                user: user,
+                toggleSetting(setting) {
+                    if (setting === 'showConfetti') {
+                        this.showConfetti = !this.showConfetti;
+                    } else if (setting === 'showWeekdays') {
+                        this.showWeekdays = !this.showWeekdays;
+                    }
+                    
+                    fetch('/api/user/settings', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            showConfetti: this.showConfetti,
+                            showWeekdays: this.showWeekdays
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.success) {
+                            // Revert the toggle if the update failed
+                            if (setting === 'showConfetti') {
+                                this.showConfetti = !this.showConfetti;
+                            } else if (setting === 'showWeekdays') {
+                                this.showWeekdays = !this.showWeekdays;
+                            }
+                        }
+                    })
+                    .catch(() => {
+                        // Revert the toggle if there was an error
+                        if (setting === 'showConfetti') {
+                            this.showConfetti = !this.showConfetti;
+                        } else if (setting === 'showWeekdays') {
+                            this.showWeekdays = !this.showWeekdays;
+                        }
+                    });
+                }
+            }));
+        });
+    </script>
 </body>
 </html>

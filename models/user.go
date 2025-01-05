@@ -15,6 +15,7 @@ type User struct {
 	LastName     string    `json:"last_name"`
 	Email        string    `json:"email"`
 	ShowConfetti bool      `json:"show_confetti"`
+	ShowWeekdays bool      `json:"show_weekdays"`
 	CreatedAt    time.Time `json:"created_at"`
 	IsAdmin      bool      `json:"is_admin"`
 }
@@ -23,7 +24,7 @@ type User struct {
 func GetUserByID(db *sql.DB, id int64) (*User, error) {
 	user := &User{}
 	err := db.QueryRow(`
-		SELECT id, first_name, last_name, email, show_confetti, created_at, is_admin 
+		SELECT id, first_name, last_name, email, show_confetti, show_weekdays, created_at, is_admin 
 		FROM users 
 		WHERE id = ?
 	`, id).Scan(
@@ -32,6 +33,7 @@ func GetUserByID(db *sql.DB, id int64) (*User, error) {
 		&user.LastName,
 		&user.Email,
 		&user.ShowConfetti,
+		&user.ShowWeekdays,
 		&user.CreatedAt,
 		&user.IsAdmin,
 	)

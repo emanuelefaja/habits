@@ -371,22 +371,21 @@ func UpdateSettingsHandler(db *sql.DB) http.HandlerFunc {
 		// Parse JSON request
 		var settings struct {
 			ShowConfetti bool `json:"showConfetti"`
+			ShowWeekdays bool `json:"showWeekdays"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&settings); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
 
-		// Get current user
-		user, err := models.GetUserByID(db, int64(userID))
-		if err != nil {
-			http.Error(w, "Error finding user", http.StatusInternalServerError)
-			return
-		}
+		// Update settings in database
+		_, err := db.Exec(`
+			UPDATE users 
+			SET show_confetti = ?, show_weekdays = ?
+			WHERE id = ?
+		`, settings.ShowConfetti, settings.ShowWeekdays, userID)
 
-		// Update settings
-		user.ShowConfetti = settings.ShowConfetti
-		if err := user.Update(db); err != nil {
+		if err != nil {
 			http.Error(w, "Error updating settings", http.StatusInternalServerError)
 			return
 		}
