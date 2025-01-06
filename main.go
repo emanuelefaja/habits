@@ -370,6 +370,12 @@ func main() {
 				totalHabits = 0
 			}
 
+			totalHabitLogs, err := models.GetTotalHabitLogs(db)
+			if err != nil {
+				log.Printf("Error getting total habit logs: %v", err)
+				totalHabitLogs = 0
+			}
+
 			users, err := models.GetAllUsers(db)
 			if err != nil {
 				log.Printf("Error getting all users: %v", err)
@@ -378,17 +384,19 @@ func main() {
 			}
 
 			data := struct {
-				User        *models.User
-				Users       []*models.User
-				TotalUsers  int
-				TotalHabits int
-				Page        string
+				User           *models.User
+				Users          []*models.User
+				TotalUsers     int
+				TotalHabits    int
+				TotalHabitLogs int
+				Page           string
 			}{
-				User:        user,
-				Users:       users,
-				TotalUsers:  totalUsers,
-				TotalHabits: totalHabits,
-				Page:        "admin",
+				User:           user,
+				Users:          users,
+				TotalUsers:     totalUsers,
+				TotalHabits:    totalHabits,
+				TotalHabitLogs: totalHabitLogs,
+				Page:           "admin",
 			}
 			renderTemplate(w, templates, "admin.html", data)
 		}))))
