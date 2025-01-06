@@ -20,7 +20,7 @@
 
     <!-- Mobile menu button -->
     <button 
-        class="inline-block lg:hidden text-2xl"
+        class="inline-block lg:hidden text-2xl {{ if .User }}dark:text-white{{ end }}"
         @click="open = !open"
         aria-label="Toggle menu">
         <span x-text="open ? '❌' : '☰ '"></span>
