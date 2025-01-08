@@ -333,6 +333,8 @@ func (g *Goal) CalculateProgress(db *sql.DB) error {
 	switch {
 	case g.CurrentNumber >= g.TargetNumber:
 		g.Status = "done"
+	case today.After(endDate) && g.CurrentNumber < g.TargetNumber:
+		g.Status = "failed"
 	case g.CurrentNumber >= expectedProgress:
 		g.Status = "on_track"
 	case g.CurrentNumber >= expectedProgress*0.9:

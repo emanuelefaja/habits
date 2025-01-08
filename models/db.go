@@ -176,7 +176,7 @@ func InitDB(db *sql.DB) error {
 			end_date TEXT NOT NULL,
 			target_number REAL NOT NULL,
 			current_number REAL DEFAULT 0,
-			status TEXT CHECK(status IN ('on_track', 'at_risk', 'off_track', 'done')) DEFAULT 'on_track',
+			status TEXT CHECK(status IN ('on_track', 'at_risk', 'off_track', 'done', 'failed')) DEFAULT 'on_track',
 			position INTEGER NOT NULL,
 			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
