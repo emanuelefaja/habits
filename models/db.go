@@ -165,5 +165,38 @@ func InitDB(db *sql.DB) error {
 		return err
 	}
 
+	// Create goals table
+	_, err = db.Exec(`
+		CREATE TABLE IF NOT EXISTS goals (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			user_id INTEGER NOT NULL,
+			habit_id INTEGER NOT NULL,
+			name TEXT NOT NULL,
+			start_date TEXT NOT NULL,
+			end_date TEXT NOT NULL,
+			target_number REAL NOT NULL,
+			current_number REAL DEFAULT 0,
+			status TEXT CHECK(status IN ('on_track', 'at_risk', 'off_track', 'done')) DEFAULT 'on_track',
+			position INTEGER NOT NULL,
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+			FOREIGN KEY (habit_id) REFERENCES habits(id) ON DELETE CASCADE
+		)
+	`)
+	if err != nil {
+		return err
+	}
+
+	// Create indexes for goals table
+	_, err = db.Exec(`
+		CREATE INDEX IF NOT EXISTS idx_goals_user_id ON goals(user_id);
+		CREATE INDEX IF NOT EXISTS idx_goals_habit_id ON goals(habit_id);
+		CREATE INDEX IF NOT EXISTS idx_goals_position ON goals(position)
+	`)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

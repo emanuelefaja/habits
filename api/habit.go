@@ -547,6 +547,25 @@ func CreateOrUpdateHabitLogHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
+		// Add this block to recalculate goals
+		goals, err := models.GetGoalsByHabit(db, habitLog.HabitID)
+		if err != nil {
+			log.Printf("Error getting goals for habit %d: %v", habitLog.HabitID, err)
+			// Don't return error to client as the log was saved successfully
+		}
+		log.Printf("Found %d goals for habit %d", len(goals), habitLog.HabitID)
+
+		for _, goal := range goals {
+			log.Printf("Recalculating progress for goal %d (current: %f, target: %f)",
+				goal.ID, goal.CurrentNumber, goal.TargetNumber)
+			if err := goal.CalculateProgress(db); err != nil {
+				log.Printf("Error calculating progress for goal %d: %v", goal.ID, err)
+			} else {
+				log.Printf("Updated progress for goal %d: %f/%f",
+					goal.ID, goal.CurrentNumber, goal.TargetNumber)
+			}
+		}
+
 		// Return success response
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(APIResponse{
@@ -854,13 +873,14 @@ func DeleteHabitLogHandler(db *sql.DB) http.HandlerFunc {
 		// Get current user ID from session
 		userID := middleware.GetUserID(r)
 
-		// Verify the habit log belongs to the user
+		// Verify the habit log belongs to the user and get habit_id
+		var habitID int
 		var habitUserID int
 		err = db.QueryRow(`
-			SELECT h.user_id 
+			SELECT h.user_id, h.id
 			FROM habit_logs hl 
 			JOIN habits h ON hl.habit_id = h.id 
-			WHERE hl.id = ?`, logID).Scan(&habitUserID)
+			WHERE hl.id = ?`, logID).Scan(&habitUserID, &habitID)
 
 		if err == sql.ErrNoRows {
 			w.WriteHeader(http.StatusNotFound)
@@ -897,6 +917,19 @@ func DeleteHabitLogHandler(db *sql.DB) http.HandlerFunc {
 				Message: "Error deleting habit log",
 			})
 			return
+		}
+
+		// Recalculate goals
+		goals, err := models.GetGoalsByHabit(db, habitID)
+		if err != nil {
+			log.Printf("Error getting goals for habit %d: %v", habitID, err)
+			// Don't return error to client as the log was deleted successfully
+		}
+		for _, goal := range goals {
+			if err := goal.CalculateProgress(db); err != nil {
+				log.Printf("Error calculating progress for goal %d: %v", goal.ID, err)
+				// Don't return error to client as the log was deleted successfully
+			}
 		}
 
 		// Return success response

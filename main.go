@@ -102,7 +102,7 @@ func main() {
 		"ui/changelog.html",
 		"ui/blog/blog.html",
 		"ui/blog/post.html",
-		// "ui/books.html",
+		"ui/goals.html",
 	))
 
 	// Static files
@@ -515,6 +515,54 @@ func main() {
 	// 	}
 	// 	renderTemplate(w, templates, "books.html", data)
 	// })))
+
+	http.Handle("/goals", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user, _ := getAuthenticatedUser(r, db)
+		data := struct {
+			User *models.User
+			Page string
+		}{
+			User: user,
+			Page: "goals",
+		}
+		renderTemplate(w, templates, "goals.html", data)
+	}))))
+
+	// Goals API
+	http.Handle("/api/goals", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			api.GetGoalsHandler(db)(w, r)
+		case http.MethodPost:
+			api.CreateGoalHandler(db)(w, r)
+		default:
+			handleNotAllowed(w, http.MethodGet, http.MethodPost)
+		}
+	}))))
+
+	http.Handle("/api/goals/reorder", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			handleNotAllowed(w, http.MethodPut)
+			return
+		}
+		api.ReorderGoalsHandler(db)(w, r)
+	}))))
+
+	http.Handle("/api/goals/delete", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodDelete {
+			handleNotAllowed(w, http.MethodDelete)
+			return
+		}
+		api.DeleteGoalHandler(db)(w, r)
+	}))))
+
+	http.Handle("/api/goals/update", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			handleNotAllowed(w, http.MethodPut)
+			return
+		}
+		api.UpdateGoalHandler(db)(w, r)
+	}))))
 
 	port := os.Getenv("PORT")
 	if port == "" {
