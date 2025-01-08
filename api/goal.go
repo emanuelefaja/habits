@@ -79,6 +79,26 @@ func CreateGoalHandler(db *sql.DB) http.HandlerFunc {
 			TargetNumber: req.TargetNumber,
 		}
 
+		// Validate the goal before creating it
+		if err := goal.Validate(); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: err.Error(),
+			})
+			return
+		}
+
+		// Validate the habit type
+		if err := goal.ValidateHabitType(db); err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(APIResponse{
+				Success: false,
+				Message: err.Error(),
+			})
+			return
+		}
+
 		if err := goal.Create(db); err != nil {
 			log.Printf("Error creating goal: %v", err)
 			w.WriteHeader(http.StatusInternalServerError)
@@ -87,6 +107,12 @@ func CreateGoalHandler(db *sql.DB) http.HandlerFunc {
 				Message: "Error creating goal",
 			})
 			return
+		}
+
+		// Calculate initial progress and status
+		if err := goal.CalculateProgress(db); err != nil {
+			log.Printf("Error calculating initial goal progress: %v", err)
+			// Don't fail the request, just log the error
 		}
 
 		json.NewEncoder(w).Encode(APIResponse{
