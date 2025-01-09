@@ -254,7 +254,7 @@ x-init="loadHabits(); loadGoals()">
                     
                     <div class="relative flex items-center gap-4">
                         <span class="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap" 
-                              x-text="'🗓️ ' + new Date(goal.start_date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})">
+                              x-text="'🏁 ' + new Date(goal.start_date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})">
                         </span>
                         <div class="flex-grow relative">
                             <!-- Today Marker -->
@@ -276,11 +276,11 @@ x-init="loadHabits(); loadGoals()">
                             </div>
                             <div class="absolute -bottom-6 text-sm text-gray-600 dark:text-gray-400" 
                                  :style="'left: ' + Math.min((goal.current_number / goal.target_number * 100), 100) + '%; transform: translateX(-50%)'">
-                                <span x-text="'🎯 ' + goal.current_number + '/' + goal.target_number"></span>
+                                <span x-text="goal.habit_emoji + ' ' + goal.current_number + '/' + goal.target_number"></span>
                             </div>
                         </div>
                         <span class="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap" 
-                              x-text="'🏁 ' + new Date(goal.end_date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})">
+                              x-text="'🎯' + new Date(goal.end_date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})">
                         </span>
                     </div>
                 </div>
