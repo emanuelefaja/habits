@@ -252,31 +252,36 @@ x-init="loadHabits(); loadGoals()">
                         </span>
                     </div>
                     
-                    <div class="relative flex items-center gap-4">
+                    <div class="relative flex items-center gap-4 pb-4">
                         <span class="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap" 
                               x-text="'🏁 ' + new Date(goal.start_date).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})">
                         </span>
-                        <div class="flex-grow relative">
+                        <div class="flex-grow relative ">
                             <!-- Today Marker -->
                             <div class="absolute -top-5 text-xs text-orange-500" 
                                  x-show="new Date() <= new Date(goal.end_date)"
-                                 :style="'left: ' + calculateTodayPosition(goal.start_date, goal.end_date) + '%; transform: translateX(-50%)'">
+                                 :style="'left: ' + calculateTodayPosition(goal.start_date, goal.end_date) + '%; transform: translateX(-50%); z-index: 5'">
                                 Today
                             </div>
                             <div class="absolute h-3 w-0.5 bg-orange-500" 
                                  x-show="new Date() <= new Date(goal.end_date)"
-                                 :style="'left: ' + calculateTodayPosition(goal.start_date, goal.end_date) + '%; top: -4px; transform: translateX(-50%)'">
+                                 :style="'left: ' + calculateTodayPosition(goal.start_date, goal.end_date) + '%; top: -4px; transform: translateX(-50%); z-index: 5'">
                             </div>
                             
                             <!-- Progress Bar -->
-                            <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full">
-                                <div class="h-2 bg-emerald-500 rounded-full" 
+                            <div class="h-2 bg-gray-200 dark:bg-gray-700 rounded-full relative">
+                                <div class="h-2 bg-[#2da44e] rounded-full relative" 
                                      :style="'width: ' + Math.min((goal.current_number / goal.target_number * 100), 100) + '%'">
+                                    <!-- Emoji Circle -->
+                                    <div class="absolute -right-3 -top-2 size-6 bg-white dark:bg-gray-800 rounded-full border-2 border-[#2da44e] flex items-center justify-center" style="z-index: 10">
+                                        <span class="text-xs" x-text="goal.habit_emoji"></span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="absolute -bottom-6 text-sm text-gray-600 dark:text-gray-400" 
+                            <!-- Numbers below -->
+                            <div class="absolute -bottom-8 text-sm text-gray-600 dark:text-gray-400" 
                                  :style="'left: ' + Math.min((goal.current_number / goal.target_number * 100), 100) + '%; transform: translateX(-50%)'">
-                                <span x-text="goal.habit_emoji + ' ' + goal.current_number + '/' + goal.target_number"></span>
+                                <span x-text="goal.current_number + '/' + goal.target_number"></span>
                             </div>
                         </div>
                         <span class="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap" 
