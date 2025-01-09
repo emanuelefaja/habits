@@ -20,6 +20,15 @@ func GetTotalHabits(db *sql.DB) (int, error) {
 	return count, nil
 }
 
+func GetTotalGoals(db *sql.DB) (int, error) {
+	var count int
+	err := db.QueryRow("SELECT COUNT(*) FROM goals").Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
 func GetTotalHabitLogs(db *sql.DB) (int, error) {
 	var count int
 	err := db.QueryRow("SELECT COUNT(*) FROM habit_logs").Scan(&count)

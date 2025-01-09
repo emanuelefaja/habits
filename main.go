@@ -376,6 +376,12 @@ func main() {
 				totalHabitLogs = 0
 			}
 
+			totalGoals, err := models.GetTotalGoals(db)
+			if err != nil {
+				log.Printf("Error getting total goals: %v", err)
+				totalGoals = 0
+			}
+
 			users, err := models.GetAllUsers(db)
 			if err != nil {
 				log.Printf("Error getting all users: %v", err)
@@ -389,6 +395,7 @@ func main() {
 				TotalUsers     int
 				TotalHabits    int
 				TotalHabitLogs int
+				TotalGoals     int
 				Page           string
 			}{
 				User:           user,
@@ -396,6 +403,7 @@ func main() {
 				TotalUsers:     totalUsers,
 				TotalHabits:    totalHabits,
 				TotalHabitLogs: totalHabitLogs,
+				TotalGoals:     totalGoals,
 				Page:           "admin",
 			}
 			renderTemplate(w, templates, "admin.html", data)
