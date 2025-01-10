@@ -246,6 +246,7 @@ type SetRepsHabitStats struct {
 	TotalReps         int       `json:"total_reps"`
 	AverageRepsPerSet float64   `json:"average_reps_per_set"`
 	HighestRepsInSet  int       `json:"highest_reps_in_set"`
+	BestSetDate       time.Time `json:"best_set_date,omitempty"`
 	AverageSetsPerDay float64   `json:"average_sets_per_day"`
 	AverageRepsPerDay float64   `json:"average_reps_per_day"`
 	BiggestDay        int       `json:"biggest_day"`
@@ -350,6 +351,22 @@ func GetSetRepsHabitStats(db *sql.DB, habitID int) (SetRepsHabitStats, error) {
 			) AS highest_reps_in_set,
 
 			(
+				SELECT date
+				FROM habit_logs hl,
+					 json_each(json_extract(hl.value, '$.sets')) AS s
+				WHERE hl.habit_id = ?
+				AND hl.status = 'done'
+				AND CAST(json_extract(s.value, '$.reps') AS INTEGER) = (
+					SELECT MAX(CAST(json_extract(s2.value, '$.reps') AS INTEGER))
+					FROM habit_logs hl2,
+						 json_each(json_extract(hl2.value, '$.sets')) AS s2
+					WHERE hl2.habit_id = ?
+					AND hl2.status = 'done'
+				)
+				LIMIT 1
+			) AS best_set_date,
+
+			(
 				SELECT COUNT(*)
 				FROM habit_logs
 				WHERE habit_id = ?
@@ -375,6 +392,8 @@ func GetSetRepsHabitStats(db *sql.DB, habitID int) (SetRepsHabitStats, error) {
 		habitID, // for total_reps
 		habitID, // for biggest_day
 		habitID, // for highest_reps_in_set
+		habitID, // for best_set_date first subquery
+		habitID, // for best_set_date second subquery
 		habitID, // for total_missed
 		habitID, // for total_skipped
 		habitID, // final WHERE
@@ -384,6 +403,7 @@ func GetSetRepsHabitStats(db *sql.DB, habitID int) (SetRepsHabitStats, error) {
 		&stats.TotalReps,
 		&stats.BiggestDay,
 		&stats.HighestRepsInSet,
+		&stats.BestSetDate,
 		&stats.TotalMissed,
 		&stats.TotalSkipped,
 		&startDateStr,

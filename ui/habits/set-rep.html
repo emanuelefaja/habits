@@ -73,7 +73,7 @@
 
          <!-- Highest Reps in Set Card -->
          <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
-            <div class="p-5">
+            <div class="p-5 relative">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
                         <span class="text-2xl">🥇</span>
@@ -85,6 +85,7 @@
                         </dl>
                     </div>
                 </div>
+                <div class="absolute bottom-2 right-3 text-xs text-gray-500" x-show="stats?.best_set_date" x-text="new Date(stats?.best_set_date).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })"></div>
             </div>
         </div>
 
