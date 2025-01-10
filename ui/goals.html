@@ -2,7 +2,7 @@
 <html lang="en" class="min-h-full bg-gray-50 dark:bg-gray-900">
 {{ template "head" . }}
 <body class="min-h-full bg-gray-50 dark:bg-gray-900" x-data="{ 
-    gridLayout: true,
+    gridLayout: localStorage.getItem('goalsGridLayout') === 'false' ? false : true,
     showCreateGoal: false,
     showDeleteGoalModal: false,
     showEditGoalModal: false,
@@ -186,7 +186,7 @@ x-init="loadHabits(); loadGoals()">
             <div class="flex items-center gap-4">
                 <h1 class="text-3xl font-bold text-gray-900 dark:text-white">🎯 Goals</h1>
                 <button 
-                    @click="gridLayout = !gridLayout" 
+                    @click="gridLayout = !gridLayout; localStorage.setItem('goalsGridLayout', gridLayout)"
                     class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
                     x-text="gridLayout ? '⬇️' : '➡️'"
                 ></button>
