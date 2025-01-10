@@ -277,7 +277,22 @@
                                             'cursor-pointer relative': day !== null,
                                             'transition-transform duration-150 hover:-translate-y-0.5': day !== null && showTooltip !== formatDate(day)
                                          }"
-                                         @mouseenter="day && (hoverDate = monthNames[day.getMonth()] + ' ' + day.getDate())"
+                                         @mouseenter="(() => {
+                                             if (!day) return;
+                                             let displayText = monthNames[day.getMonth()] + ' ' + day.getDate();
+                                             
+                                             // For numeric and set-rep habits, add the value if it exists
+                                             if (('{{ .Habit.HabitType }}' === 'numeric' || '{{ .Habit.HabitType }}' === 'set-rep') && habitLogs[formatDate(day)]?.status === 'done') {
+                                                 try {
+                                                     const valueObj = JSON.parse(habitLogs[formatDate(day)].value.String);
+                                                     displayText += ` (${valueObj.value})`;
+                                                 } catch (e) {
+                                                     console.error('Error parsing value:', e);
+                                                 }
+                                             }
+                                             
+                                             hoverDate = displayText;
+                                         })"
                                          @mouseleave="hoverDate = ''"
                                          @click="(() => {
                                              if (!day) return;
