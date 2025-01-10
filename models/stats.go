@@ -58,14 +58,15 @@ func GetBinaryHabitStats(db *sql.DB, habitID int) (BinaryHabitStats, error) {
 
 // NumericHabitStats represents statistics for a numeric habit
 type NumericHabitStats struct {
-	TotalDone     int       `json:"total_done"`
-	TotalReps     int       `json:"total_reps"`
-	AveragePerDay float64   `json:"average_per_day"`
-	TotalDays     int       `json:"total_days"`
-	TotalMissed   int       `json:"total_missed"`
-	TotalSkipped  int       `json:"total_skipped"`
-	BiggestDay    int       `json:"biggest_day"`
-	StartDate     time.Time `json:"start_date,omitempty"`
+	TotalDone      int       `json:"total_done"`
+	TotalReps      int       `json:"total_reps"`
+	AveragePerDay  float64   `json:"average_per_day"`
+	TotalDays      int       `json:"total_days"`
+	TotalMissed    int       `json:"total_missed"`
+	TotalSkipped   int       `json:"total_skipped"`
+	BiggestDay     int       `json:"biggest_day"`
+	BiggestDayDate time.Time `json:"biggest_day_date,omitempty"`
+	StartDate      time.Time `json:"start_date,omitempty"`
 }
 
 // GetNumericHabitStats retrieves statistics for a numeric habit
@@ -98,10 +99,23 @@ func GetNumericHabitStats(db *sql.DB, habitID int) (NumericHabitStats, error) {
 			COUNT(CASE WHEN status = 'missed' THEN 1 END) as total_missed,
 			COUNT(CASE WHEN status = 'skipped' THEN 1 END) as total_skipped,
 			COALESCE(MAX(CAST(json_extract(value, '$.value') AS INTEGER)), 0) as biggest_day,
+			(
+				SELECT date
+				FROM habit_logs
+				WHERE habit_id = ?
+				AND status = 'done'
+				AND CAST(json_extract(value, '$.value') AS INTEGER) = (
+					SELECT MAX(CAST(json_extract(value, '$.value') AS INTEGER))
+					FROM habit_logs
+					WHERE habit_id = ?
+					AND status = 'done'
+				)
+				LIMIT 1
+			) as biggest_day_date,
 			strftime('%Y-%m-%d', MIN(CASE WHEN json_extract(value, '$.value') > 0 THEN date END)) as start_date
 		FROM habit_logs 
 		WHERE habit_id = ?
-	`, habitID).Scan(
+	`, habitID, habitID, habitID).Scan(
 		&stats.TotalDone,
 		&stats.TotalReps,
 		&stats.AveragePerDay,
@@ -109,6 +123,7 @@ func GetNumericHabitStats(db *sql.DB, habitID int) (NumericHabitStats, error) {
 		&stats.TotalMissed,
 		&stats.TotalSkipped,
 		&stats.BiggestDay,
+		&stats.BiggestDayDate,
 		&startDateStr,
 	)
 	if err != nil {
