@@ -258,14 +258,14 @@ x-init="loadHabits(); loadGoals()">
                         </span>
                         <div class="flex-grow relative ">
                             <!-- Today Marker -->
-                            <div class="absolute -top-5 text-xs text-orange-500" 
+                            <div class="absolute -top-6 text-xs text-orange-500" 
                                  x-show="new Date() <= new Date(goal.end_date)"
                                  :style="'left: ' + calculateTodayPosition(goal.start_date, goal.end_date) + '%; transform: translateX(-50%); z-index: 5'">
                                 Today
                             </div>
-                            <div class="absolute h-3 w-0.5 bg-orange-500" 
+                            <div class="absolute h-4 w-0.5 bg-orange-500" 
                                  x-show="new Date() <= new Date(goal.end_date)"
-                                 :style="'left: ' + calculateTodayPosition(goal.start_date, goal.end_date) + '%; top: -4px; transform: translateX(-50%); z-index: 5'">
+                                 :style="'left: ' + calculateTodayPosition(goal.start_date, goal.end_date) + '%; top: -8px; transform: translateX(-50%); z-index: 5'">
                             </div>
                             
                             <!-- Progress Bar -->
