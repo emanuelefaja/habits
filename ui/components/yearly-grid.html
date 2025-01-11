@@ -282,10 +282,15 @@
                                              let displayText = monthNames[day.getMonth()] + ' ' + day.getDate();
                                              
                                              // For numeric and set-rep habits, add the value if it exists
-                                             if (('{{ .Habit.HabitType }}' === 'numeric' || '{{ .Habit.HabitType }}' === 'set-rep') && habitLogs[formatDate(day)]?.status === 'done') {
+                                             if (('{{ .Habit.HabitType }}' === 'numeric' || '{{ .Habit.HabitType }}' === 'set-reps') && habitLogs[formatDate(day)]?.status === 'done') {
                                                  try {
                                                      const valueObj = JSON.parse(habitLogs[formatDate(day)].value.String);
-                                                     displayText += ` (${valueObj.value})`;
+                                                     if ('{{ .Habit.HabitType }}' === 'numeric') {
+                                                         displayText += ` (${valueObj.value})`;
+                                                     } else if ('{{ .Habit.HabitType }}' === 'set-reps') {
+                                                         const totalReps = valueObj.sets.reduce((sum, set) => sum + set.reps, 0);
+                                                         displayText += ` (${totalReps})`;
+                                                     }
                                                  } catch (e) {
                                                      console.error('Error parsing value:', e);
                                                  }
