@@ -201,6 +201,12 @@
         {{ else if eq .Habit.HabitType "set-reps" }}
             {{ template "set-rep" . }}
         {{ end }}
+
+        <!-- Include the sum line graph component -->
+        {{ if ne .Habit.HabitType "option-select" }}
+            {{ template "sum-line-graph" . }}
+        {{ end }}
     </div>
+    {{ template "footer" . }}
 </body>
 </html>

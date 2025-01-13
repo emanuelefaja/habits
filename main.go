@@ -86,6 +86,7 @@ func main() {
 		"ui/components/yearly-grid.html",
 		"ui/components/head.html",
 		"ui/components/footer.html",
+		"ui/components/sum-line-graph.html",
 		"ui/home.html",
 		"ui/settings.html",
 		"ui/login.html",

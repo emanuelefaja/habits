@@ -1,0 +1,166 @@
+{{ define "sum-line-graph" }}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white dark:bg-gray-800 p-8 shadow sm:rounded-lg w-full mt-8"
+         x-data="{
+            chart: null,
+            habitLogs: [],
+            async initChart() {
+                const now = new Date();
+                
+                // First get all logs without date restriction to find the true earliest date
+                // Use a far past date and current date as the range
+                const initialResponse = await fetch(`/api/habits/logs?habit_id={{ .Habit.ID }}&start_date=2020-01-01&end_date=${now.getFullYear()}-12-31`);
+                const initialResult = await initialResponse.json();
+                
+                if (initialResult.success && initialResult.data && initialResult.data.length > 0) {
+                    this.habitLogs = initialResult.data;
+                    
+                    // Find the earliest log date
+                    const dates = this.habitLogs.map(log => new Date(log.date));
+                    const earliestDate = new Date(Math.min(...dates));
+                    const startDate = `${earliestDate.getFullYear()}-${String(earliestDate.getMonth() + 1).padStart(2, '0')}-${String(earliestDate.getDate()).padStart(2, '0')}`;
+                    const endDate = `${now.getFullYear()}-12-31`;
+                    
+                    console.log('Using date range:', startDate, 'to', endDate);
+                    
+                    // Process data based on habit type
+                    let chartData = this.processData(this.habitLogs);
+                    console.log('Processed chart data:', chartData);
+                    
+                    // Create chart
+                    const ctx = document.getElementById('habitChart').getContext('2d');
+                    
+                    // Create gradient
+                    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+                    gradient.addColorStop(0, 'rgba(45, 164, 78, 0.4)');   // Darker brand green at top
+                    gradient.addColorStop(1, 'rgba(45, 164, 78, 0.1)');   // Lighter brand green at bottom
+                    
+                    this.chart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            datasets: [{
+                                data: chartData,
+                                borderColor: '#2da44e',
+                                backgroundColor: gradient,
+                                fill: true,
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        title: function(context) {
+                                            const date = new Date(context[0].parsed.x);
+                                            return date.toLocaleDateString('en-US', {
+                                                weekday: 'long',
+                                                day: 'numeric',
+                                                month: 'long',
+                                                year: 'numeric'
+                                            });
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                x: {
+                                    type: 'time',
+                                    time: {
+                                        unit: 'day'
+                                    },
+                                    grid: {
+                                        display: false
+                                    },
+                                    ticks: {
+                                        color: 'rgb(156, 163, 175)'
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        display: false
+                                    },
+                                    ticks: {
+                                        color: 'rgb(156, 163, 175)'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    console.error('Failed to fetch habit logs:', initialResult);
+                }
+            },
+            processData(logs) {
+                if (!logs || logs.length === 0) return [];
+                
+                let data = [];
+                let cumSum = 0;
+                
+                logs.sort((a, b) => new Date(a.date) - new Date(b.date));
+                
+                logs.forEach(log => {
+                    let value = 0;
+                    console.log('Processing log:', log);
+                    
+                    // Calculate value based on habit type
+                    switch ('{{ .Habit.HabitType }}') {
+                        case 'binary':
+                            value = log.status === 'done' ? 1 : 0;
+                            break;
+                        case 'numeric':
+                            try {
+                                if (log.status === 'done' && log.value && log.value.Valid) {
+                                    const valueObj = JSON.parse(log.value.String);
+                                    console.log('Parsed value object:', valueObj);
+                                    value = parseFloat(valueObj.value) || 0;
+                                }
+                            } catch (e) {
+                                console.error('Error parsing numeric value:', e, 'Raw value:', log.value);
+                                value = 0;
+                            }
+                            break;
+                        case 'set-reps':
+                            try {
+                                if (log.status === 'done' && log.value && log.value.Valid) {
+                                    const valueObj = JSON.parse(log.value.String);
+                                    const totalReps = valueObj.sets.reduce((sum, set) => sum + set.reps, 0);
+                                    value = totalReps;
+                                }
+                            } catch (e) {
+                                console.error('Error parsing set-reps value:', e);
+                                value = 0;
+                            }
+                            break;
+                    }
+                    
+                    console.log('Calculated value:', value);
+                    
+                    // Only add to the graph if status is 'done'
+                    if (log.status === 'done') {
+                        cumSum += value;
+                        data.push({
+                            x: new Date(log.date),
+                            y: cumSum
+                        });
+                    }
+                });
+                
+                return data;
+            }
+         }"
+         x-init="initChart">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-2xl font-semibold text-gray-900 dark:text-white">Progress Over Time</h3>
+        </div>
+        <div class="h-64">
+            <canvas id="habitChart"></canvas>
+        </div>
+    </div>
+</div>
+{{ end }} 
