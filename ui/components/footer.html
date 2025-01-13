@@ -1,6 +1,7 @@
 {{ define "footer" }}
- <!-- Random Quote -->
- <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-12" x-data="{ quotes: [
+<div class="bg-gray-50 w-full py-12">
+  <!-- Random Quote -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" x-data="{ quotes: [
     { text: 'We are what we repeatedly do. Excellence, then, is not an act, but a habit.', author: 'Aristotle' },
     { text: 'The only way to achieve the impossible is to believe it is possible.', author: 'Charles Kingsleigh' },
     { text: 'Don’t watch the clock; do what it does. Keep going.', author: 'Sam Levenson' },
@@ -35,14 +36,15 @@
     return this.quotes[Math.floor(Math.random() * this.quotes.length)];
   } 
   }">
-  <blockquote class="text-center" x-init="quote = randomQuote()">
-      <p class="text-lg font-medium text-gray-700 dark:text-gray-300" x-text="quote.text"></p>
-      <footer class="mt-1">
-          <cite class="text-sm text-gray-500 dark:text-gray-400" x-text="`― ${quote.author}`"></cite>
-      </footer>
-  </blockquote>
+    <blockquote class="text-center" x-init="quote = randomQuote()">
+        <p class="text-lg font-medium text-gray-700 dark:text-gray-300" x-text="quote.text"></p>
+        <footer class="mt-1">
+            <cite class="text-sm text-gray-500 dark:text-gray-400" x-text="`― ${quote.author}`"></cite>
+        </footer>
+    </blockquote>
+  </div>
 </div>
-<footer class="border-t border-gray-200 mt-auto bg-[#2da44e]">
+<footer class="border-t border-gray-200 bg-[#2da44e]">
     <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
         <div class="text-white text font-bold tracking-tight">
             habits
