@@ -32,7 +32,7 @@ func InitializeSession(db *sql.DB) error {
 	SessionManager.Store = sessionStore
 
 	// Configure session settings
-	SessionManager.Lifetime = 24 * time.Hour
+	SessionManager.Lifetime = 7 * 24 * time.Hour
 	SessionManager.Cookie.Secure = false // Changed to false for development
 	SessionManager.Cookie.SameSite = http.SameSiteLaxMode
 	SessionManager.Cookie.HttpOnly = true
