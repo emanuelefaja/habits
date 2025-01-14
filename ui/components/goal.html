@@ -88,11 +88,13 @@
             <span class="text-3xl" x-text="goal.habit_emoji"></span>
             <div class="flex flex-col">
                 <!-- Goal Name -->
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white hover:text-[#2da44e] dark:hover:text-[#2da44e] transition-colors cursor-pointer">
+                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
                     <span x-text="goal.name"></span>
                 </h2>
                 <!-- Habit Name -->
-                <span class="text-sm text-gray-500 dark:text-gray-400" x-text="goal.habit_name"></span>
+                <a :href="'/habit/' + goal.habit_id" 
+                   class="text-sm text-gray-500 dark:text-gray-400 hover:text-[#2da44e] dark:hover:text-[#2da44e] transition-colors cursor-pointer" 
+                   x-text="goal.habit_name"></a>
             </div>
             <div class="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
                 <button 
