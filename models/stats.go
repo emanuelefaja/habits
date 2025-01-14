@@ -265,6 +265,7 @@ type SetRepsHabitStats struct {
 	AverageSetsPerDay float64   `json:"average_sets_per_day"`
 	AverageRepsPerDay float64   `json:"average_reps_per_day"`
 	BiggestDay        int       `json:"biggest_day"`
+	BiggestDayDate    time.Time `json:"biggest_day_date,omitempty"`
 	LongestStreak     int       `json:"longest_streak"`
 	TotalMissed       int       `json:"total_missed"`
 	TotalSkipped      int       `json:"total_skipped"`
@@ -284,6 +285,8 @@ func GetSetRepsHabitStats(db *sql.DB, habitID int) (SetRepsHabitStats, error) {
 
 	var stats SetRepsHabitStats
 	var startDateStr sql.NullString
+	var biggestDayDate sql.NullTime
+	var bestSetDate sql.NullTime
 
 	/*
 	   Explanation of sub-selects:
@@ -339,19 +342,42 @@ func GetSetRepsHabitStats(db *sql.DB, habitID int) (SetRepsHabitStats, error) {
 				AND hl.status = 'done'
 			) AS total_reps,
 
-			COALESCE(
-				(
-					SELECT MAX(
-						(
-							SELECT SUM(json_extract(s.value, '$.reps'))
-							FROM json_each(json_extract(value, '$.sets')) AS s
-						)
-					)
-					FROM habit_logs
-					WHERE habit_id = ?
-					AND status = 'done'
-				), 0
+			(
+				WITH sets(date, reps) AS (
+					SELECT hl.date, CAST(json_extract(json_each.value, '$.reps') AS INTEGER)
+					FROM habit_logs hl, json_each(json_extract(hl.value, '$.sets'))
+					WHERE hl.habit_id = ? AND hl.status = 'done'
+				)
+				SELECT COALESCE(MAX(daily_reps), 0)
+				FROM (
+					SELECT SUM(reps) as daily_reps
+					FROM sets
+					GROUP BY date
+				)
 			) AS biggest_day,
+
+			(
+				WITH sets(date, reps) AS (
+					SELECT hl.date, CAST(json_extract(json_each.value, '$.reps') AS INTEGER)
+					FROM habit_logs hl, json_each(json_extract(hl.value, '$.sets'))
+					WHERE hl.habit_id = ? AND hl.status = 'done'
+				)
+				SELECT date
+				FROM (
+					SELECT date, SUM(reps) as daily_reps
+					FROM sets
+					GROUP BY date
+				)
+				WHERE daily_reps = (
+					SELECT MAX(daily_reps)
+					FROM (
+						SELECT SUM(reps) as daily_reps
+						FROM sets
+						GROUP BY date
+					)
+				)
+				LIMIT 1
+			) AS biggest_day_date,
 
 			(
 				SELECT COALESCE(
@@ -406,6 +432,8 @@ func GetSetRepsHabitStats(db *sql.DB, habitID int) (SetRepsHabitStats, error) {
 		// The parameters in the sub-selects must be repeated in the correct order:
 		habitID, // for total_reps
 		habitID, // for biggest_day
+		habitID, // for biggest_day_date first subquery
+		habitID, // for biggest_day_date second subquery
 		habitID, // for highest_reps_in_set
 		habitID, // for best_set_date first subquery
 		habitID, // for best_set_date second subquery
@@ -417,8 +445,9 @@ func GetSetRepsHabitStats(db *sql.DB, habitID int) (SetRepsHabitStats, error) {
 		&stats.TotalSets,
 		&stats.TotalReps,
 		&stats.BiggestDay,
+		&biggestDayDate,
 		&stats.HighestRepsInSet,
-		&stats.BestSetDate,
+		&bestSetDate,
 		&stats.TotalMissed,
 		&stats.TotalSkipped,
 		&startDateStr,
@@ -434,6 +463,14 @@ func GetSetRepsHabitStats(db *sql.DB, habitID int) (SetRepsHabitStats, error) {
 			return SetRepsHabitStats{}, fmt.Errorf("error parsing start date: %v", err)
 		}
 		stats.StartDate = parsedTime
+	}
+
+	// Set the dates if they are valid
+	if biggestDayDate.Valid {
+		stats.BiggestDayDate = biggestDayDate.Time
+	}
+	if bestSetDate.Valid {
+		stats.BestSetDate = bestSetDate.Time
 	}
 
 	// ==============
