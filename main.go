@@ -87,6 +87,7 @@ func main() {
 		"ui/components/head.html",
 		"ui/components/footer.html",
 		"ui/components/sum-line-graph.html",
+		"ui/components/goal.html",
 		"ui/home.html",
 		"ui/settings.html",
 		"ui/login.html",
