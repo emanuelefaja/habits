@@ -32,8 +32,9 @@
                     
                     // Create gradient
                     const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                    gradient.addColorStop(0, 'rgba(45, 164, 78, 0.4)');   // Darker brand green at top
-                    gradient.addColorStop(1, 'rgba(45, 164, 78, 0.1)');   // Lighter brand green at bottom
+                    gradient.addColorStop(0, 'rgba(45, 164, 78, 0.4)');    // Less opaque at top
+                    gradient.addColorStop(0.5, 'rgba(45, 164, 78, 0.1)'); // Very subtle in middle
+                    gradient.addColorStop(1, 'rgba(45, 164, 78, 0.01)');   // Almost transparent at bottom
                     
                     this.chart = new Chart(ctx, {
                         type: 'line',
