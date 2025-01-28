@@ -1,10 +1,43 @@
 {{ define "footer" }}
 <div class="bg-gray-50 w-full py-12">
   <!-- Random Quote -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" x-data="{ quotes: [
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" x-data="{ 
+    quotes: [
     { text: 'We are what we repeatedly do. Excellence, then, is not an act, but a habit.', author: 'Aristotle' },
+    { text: 'Your beliefs become your thoughts, your thoughts become your words, your words become your actions, your actions become your habits, your habits become your values, your values become your destiny.', author: 'Mahatma Gandhi' },
+    { text: 'Successful people are simply those with successful habits.', author: 'Brian Tracy' },
+    { text: 'Motivation is what gets you started. Habit is what keeps you going.', author: 'Jim Rohn' },
+    { text: 'Good habits formed at youth make all the difference.', author: 'Aristotle' },
+    { text: 'Habit is a cable; we weave a thread of it each day, and at last we cannot break it.', author: 'Horace Mann' },
+    { text: 'The chains of habit are too weak to be felt until they are too strong to be broken.', author: 'Samuel Johnson' },
+    { text: 'The only way to break a bad habit is to replace it with a good one.', author: 'Jack Dixon' },
+    { text: 'We first make our habits, and then our habits make us.', author: 'John Dryden' },
+    { text: 'A habit cannot be tossed out the window; it must be coaxed down the stairs a step at a time.', author: 'Mark Twain' },
+    { text: 'And once you understand that habits can change, you have the freedom and the responsibility to remake them.', author: 'Charles Duhigg' },
+    { text: 'Drop by drop is the water pot filled.', author: 'Buddha' },
+    { text: 'Feeling sorry for yourself, and your present condition is not only a waste of energy but the worst habit you could possibly have.', author: 'Dale Carnegie' },
+    { text: 'First forget inspiration. Habit is more dependable. Habit will sustain you whether you’re inspired or not.', author: 'Octavia Butler' },
+    { text: 'Good habits are worth being fanatical about.', author: 'John Irving' },
+    { text: 'Habit is the intersection of knowledge (what to do), skill (how to do), and desire (want to do).', author: 'Stephen R. Covey' },
+    { text: 'Habits change into character.', author: 'Ovid' },
+    { text: 'I fear not the man who has practiced 10,000 kicks, but I do fear the man who has practiced one kick 10,000 times.', author: 'Bruce Lee' },
+    { text: 'If you are going to achieve excellence in big things, you develop the habit in little matters. Excellence is not an exception, it is a prevailing attitude.', author: 'Colin Powell' },
+    { text: 'In essence, if we want to direct our lives, we must take control of our consistent actions. It\'s not what we do once in a while that shapes our lives, but what we do consistently.', author: 'Tony Robbins' },
+    { text: 'Let today be the day you give up who you\'ve been for who you can become.', author: 'Hal Elrod' },
+    { text: 'Life is habit. Or rather life is a succession of habits.', author: 'Samuel Beckett' },
+    { text: 'The trick to success is to choose the right habit and bring just enough discipline to establish it.', author: 'Gary Keller and Jay Papasan' },
+    { text: 'The world as we have created it is a process of our thinking. It cannot be changed without changing our thinking.', author: 'Albert Einstein' },
+    { text: 'Tis easier to prevent bad habits than to break them.', author: 'Benjamin Franklin' },
+    { text: 'We are our own potters; for our habits make us, and we make our habits.', author: 'Frederick Langbridge' },
+    { text: 'Happiness is a habit—cultivate it.', author: 'Elbert Hubbard' },
+    { text: 'Success is the sum of small efforts, repeated day in and day out.', author: 'Robert Collier' },
+    { text: 'Winning is not a sometime thing; it’s an all-time thing. You don’t win once in a while, you don’t do things right once in a while, you do them right all the time. Winning is a habit. Unfortunately, so is losing.', author: 'Vince Lombardi' },
+    { text: 'Wouldn\'t it be great to be gifted? In fact... It turns out that choices lead to habits. Habits become talents. Talents are labeled gifts. You\'re not born this way, you get this way.', author: 'Seth Godin' },
+    { text: 'You’ll never change your life until you change something you do daily. The secret of your success is found in your daily routine.', author: 'John C. Maxwell' },
     { text: 'The only way to achieve the impossible is to believe it is possible.', author: 'Charles Kingsleigh' },
     { text: 'Don’t watch the clock; do what it does. Keep going.', author: 'Sam Levenson' },
+    { text: 'Discipline is choosing between what you want now and what you want most.', author: 'Abraham Lincoln' },
+    { text: 'Motivation gets you going, but discipline keeps you growing.', author: 'John C. Maxwell' },
     { text: 'Keep your eyes on the stars, and your feet on the ground.', author: 'Theodore Roosevelt' },
     { text: 'The future belongs to those who believe in the beauty of their dreams.', author: 'Eleanor Roosevelt' },
     { text: 'The best way to predict the future is to create it.', author: 'Peter Drucker' },
@@ -13,14 +46,11 @@
     { text: 'Success is not the key to happiness. Happiness is the key to success.', author: 'Albert Schweitzer' },
     { text: 'The only limit to our realization of tomorrow is our doubts of today.', author: 'Franklin D. Roosevelt' },
     { text: 'Hard work beats talent when talent doesn’t work hard.', author: 'Tim Notke' },
-    { text: 'Success is the sum of small efforts, repeated day in and day out.', author: 'Robert Collier' },
     { text: 'The difference between ordinary and extraordinary is that little extra.', author: 'Jimmy Johnson' },
-    { text: 'Motivation gets you going, but discipline keeps you growing.', author: 'John C. Maxwell' },
     { text: 'Dream big. Start small. But most of all, start.', author: 'Simon Sinek' },
     { text: 'The secret of getting ahead is getting started.', author: 'Mark Twain' },
     { text: 'Don’t stop when you’re tired. Stop when you’re done.', author: 'Unknown' },
     { text: 'The man who moves a mountain begins by carrying away small stones.', author: 'Confucius' },
-    { text: 'Discipline is choosing between what you want now and what you want most.', author: 'Abraham Lincoln' },
     { text: 'If you are not willing to risk the usual, you will have to settle for the ordinary.', author: 'Jim Rohn' },
     { text: 'Work like there is someone working twenty-four hours a day to take it away from you.', author: 'Mark Cuban' },
     { text: 'Strive not to be a success, but rather to be of value.', author: 'Albert Einstein' },
@@ -58,4 +88,4 @@
         </nav>
     </div>
 </footer>
-{{ end }} 
+{{ end }}
