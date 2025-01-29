@@ -75,12 +75,19 @@
                                 x: {
                                     type: 'time',
                                     time: {
-                                        unit: 'day'
+                                        unit: this.calculateTimeUnit(this.habitLogs),
+                                        displayFormats: {
+                                            day: 'MMM d',
+                                            week: 'MMM d',
+                                            month: 'MMM yyyy'
+                                        }
                                     },
                                     grid: {
                                         display: false
                                     },
                                     ticks: {
+                                        autoSkip: true,
+                                        maxTicksLimit: 12,
                                         color: 'rgb(156, 163, 175)'
                                     }
                                 },
@@ -156,6 +163,29 @@
                 });
                 
                 return data;
+            },
+            calculateTimeUnit(logs) {
+                if (!logs || logs.length < 2) return 'day';
+                
+                // Get earliest and latest dates
+                const dates = logs.map(log => new Date(log.date));
+                const earliestDate = new Date(Math.min(...dates));
+                const latestDate = new Date(Math.max(...dates));
+                
+                // Calculate the difference in days
+                const diffTime = Math.abs(latestDate - earliestDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                console.log('Date range in days:', diffDays);
+                
+                // Apply the breakpoints
+                if (diffDays <= 31) {
+                    return 'day';
+                } else if (diffDays <= 180) { // 6 months
+                    return 'week';
+                } else {
+                    return 'month';
+                }
             }
          }"
          x-init="initChart">
