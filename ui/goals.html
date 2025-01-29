@@ -13,6 +13,35 @@
         endDate: '',
         targetNumber: ''
     },
+    statusFilters: (() => {
+        try {
+            const defaultFilters = {
+                'on_track': true,
+                'at_risk': true,
+                'off_track': true,
+                'done': true,
+                'failed': true
+            };
+            const stored = localStorage.getItem('goalsStatusFilters');
+            if (!stored) return defaultFilters;
+            
+            const parsedFilters = JSON.parse(stored);
+            // Ensure all required filters exist
+            return {
+                ...defaultFilters,
+                ...parsedFilters
+            };
+        } catch (e) {
+            console.error('Error loading status filters:', e);
+            return {
+                'on_track': true,
+                'at_risk': true,
+                'off_track': true,
+                'done': true,
+                'failed': true
+            };
+        }
+    })(),
     async loadHabits() {
         try {
             const response = await fetch('/api/habits');
@@ -82,6 +111,13 @@
         } catch (error) {
             console.error('Error creating goal:', error);
         }
+    },
+    saveFilters() {
+        try {
+            localStorage.setItem('goalsStatusFilters', JSON.stringify(this.statusFilters));
+        } catch (e) {
+            console.error('Error saving status filters:', e);
+        }
     }
 }"
 x-init="loadHabits(); loadGoals()"
@@ -99,7 +135,40 @@ x-init="loadHabits(); loadGoals()"
                     x-text="gridLayout ? '⬇️' : '➡️'"
                 ></button>
             </div>
-            <div class="flex space-x-2">
+            <div class="flex items-center gap-4">
+                <!-- Status Filter Buttons -->
+                <div class="flex gap-2">
+                    <button
+                        @click="statusFilters.on_track = !statusFilters.on_track; saveFilters()"
+                        class="inline-flex items-center rounded-md px-2 py-1 text-sm ring-1 ring-inset transition-colors"
+                        :class="statusFilters.on_track ? 'bg-green-50 text-green-700 ring-green-600/20 dark:bg-green-900/50 dark:text-green-200' : 'bg-gray-50 text-gray-600 ring-gray-500/20 dark:bg-gray-800 dark:text-gray-400'">
+                        🎯 On Track
+                    </button>
+                    <button
+                        @click="statusFilters.at_risk = !statusFilters.at_risk; saveFilters()"
+                        class="inline-flex items-center rounded-md px-2 py-1 text-sm ring-1 ring-inset transition-colors"
+                        :class="statusFilters.at_risk ? 'bg-orange-50 text-orange-700 ring-orange-600/20 dark:bg-orange-900/50 dark:text-orange-200' : 'bg-gray-50 text-gray-600 ring-gray-500/20 dark:bg-gray-800 dark:text-gray-400'">
+                        👀 At Risk
+                    </button>
+                    <button
+                        @click="statusFilters.off_track = !statusFilters.off_track; saveFilters()"
+                        class="inline-flex items-center rounded-md px-2 py-1 text-sm ring-1 ring-inset transition-colors"
+                        :class="statusFilters.off_track ? 'bg-red-50 text-red-700 ring-red-600/20 dark:bg-red-900/50 dark:text-red-200' : 'bg-gray-50 text-gray-600 ring-gray-500/20 dark:bg-gray-800 dark:text-gray-400'">
+                        🚨 Off Track
+                    </button>
+                    <button
+                        @click="statusFilters.done = !statusFilters.done; saveFilters()"
+                        class="inline-flex items-center rounded-md px-2 py-1 text-sm ring-1 ring-inset transition-colors"
+                        :class="statusFilters.done ? 'bg-[#2da44e]/20 text-[#2da44e] ring-[#2da44e]/20 dark:bg-[#2da44e]/30 dark:text-[#4fff7f]' : 'bg-gray-50 text-gray-600 ring-gray-500/20 dark:bg-gray-800 dark:text-gray-400'">
+                        ✅ Done
+                    </button>
+                    <button
+                        @click="statusFilters.failed = !statusFilters.failed; saveFilters()"
+                        class="inline-flex items-center rounded-md px-2 py-1 text-sm ring-1 ring-inset transition-colors"
+                        :class="statusFilters.failed ? 'bg-red-100 text-red-800 ring-red-600/20 dark:bg-red-900/50 dark:text-red-200' : 'bg-gray-50 text-gray-600 ring-gray-500/20 dark:bg-gray-800 dark:text-gray-400'">
+                        ❌ Failed
+                    </button>
+                </div>
                 <button 
                     @click="showCreateGoal = true"
                     class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#2da44e] hover:bg-[#2c974b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2da44e]">
@@ -114,7 +183,7 @@ x-init="loadHabits(); loadGoals()"
             :class="gridLayout ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'">
             
             <!-- Dynamic Goal Cards -->
-            <template x-for="goal in goals" :key="goal.id">
+            <template x-for="goal in goals.filter(goal => goal.status && statusFilters[goal.status])" :key="goal.id">
                 {{ template "goal" . }}
             </template>
         </div>
