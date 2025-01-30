@@ -30,15 +30,35 @@ func GetBinaryHabitStats(db *sql.DB, habitID int) (BinaryHabitStats, error) {
 			COUNT(CASE WHEN status = 'missed' THEN 1 END) as total_missed,
 			COUNT(CASE WHEN status = 'skipped' THEN 1 END) as total_skipped,
 			COUNT(*) as total_days,
-			strftime('%Y-%m-%d', MIN(CASE WHEN status = 'done' THEN date END)) as start_date
+			strftime('%Y-%m-%d', MIN(CASE WHEN status = 'done' THEN date END)) as start_date,
+			(
+				WITH ordered_dates AS (
+					SELECT date,
+						   LAG(date) OVER (ORDER BY date) AS prev_date
+					FROM habit_logs
+					WHERE habit_id = ? AND status = 'done'
+				),
+				streaks AS (
+					SELECT SUM(CASE WHEN JULIANDAY(date) - JULIANDAY(prev_date) > 1 THEN 1 ELSE 0 END) 
+							  OVER (ORDER BY date) AS streak_group
+					FROM ordered_dates
+				)
+				SELECT MAX(streak_length)
+				FROM (
+					SELECT streak_group, COUNT(*) as streak_length
+					FROM streaks
+					GROUP BY streak_group
+				)
+			) as longest_streak
 		FROM habit_logs 
 		WHERE habit_id = ?
-	`, habitID).Scan(
+	`, habitID, habitID).Scan(
 		&stats.TotalDone,
 		&stats.TotalMissed,
 		&stats.TotalSkipped,
 		&stats.TotalDays,
 		&startDateStr,
+		&stats.LongestStreak,
 	)
 	if err != nil {
 		return BinaryHabitStats{}, fmt.Errorf("error getting habit stats: %v", err)
