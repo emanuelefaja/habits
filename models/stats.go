@@ -67,6 +67,7 @@ type NumericHabitStats struct {
 	BiggestDay     int       `json:"biggest_day"`
 	BiggestDayDate time.Time `json:"biggest_day_date,omitempty"`
 	StartDate      time.Time `json:"start_date,omitempty"`
+	LongestStreak  int       `json:"longest_streak"`
 }
 
 // GetNumericHabitStats retrieves statistics for a numeric habit
@@ -137,6 +138,30 @@ func GetNumericHabitStats(db *sql.DB, habitID int) (NumericHabitStats, error) {
 			return NumericHabitStats{}, fmt.Errorf("error parsing start date: %v", err)
 		}
 		stats.StartDate = parsedTime
+	}
+
+	// Update the SQL query to calculate the longest streak
+	err = db.QueryRow(`
+		WITH ordered_dates AS (
+			SELECT date,
+				   LAG(date) OVER (ORDER BY date) AS prev_date
+			FROM habit_logs
+			WHERE habit_id = ? AND status = 'done'
+		),
+		streaks AS (
+			SELECT SUM(CASE WHEN JULIANDAY(date) - JULIANDAY(prev_date) > 1 THEN 1 ELSE 0 END) 
+					  OVER (ORDER BY date) AS streak_group
+			FROM ordered_dates
+		)
+		SELECT MAX(streak_length)
+		FROM (
+			SELECT streak_group, COUNT(*) as streak_length
+			FROM streaks
+			GROUP BY streak_group
+		)
+	`, habitID).Scan(&stats.LongestStreak)
+	if err != nil {
+		return NumericHabitStats{}, fmt.Errorf("error getting habit stats: %v", err)
 	}
 
 	return stats, nil
@@ -311,7 +336,7 @@ func GetSetRepsHabitStats(db *sql.DB, habitID int) (SetRepsHabitStats, error) {
 
 	   5) highest_reps_in_set =
 	      SELECT MAX( CAST(json_extract(s.value, '$.reps') as integer) )
-	      – The largest single set’s reps, across all days.
+	      – The largest single set's reps, across all days.
 
 	   6) total_missed, total_skipped =
 	      SELECT COUNT(*) with a CASE filter for each status.
