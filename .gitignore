@@ -6,3 +6,5 @@ users.db
 .env
 ideas.md
 bugs.md
+*.db-shm
+*.db-wal
