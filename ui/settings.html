@@ -368,7 +368,10 @@
                             <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                                 <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white" id="reset-modal-title">Reset All Habit Data</h3>
                                 <div class="mt-2">
-                                    <p class="text-sm text-gray-500 dark:text-gray-400">Are you sure you want to reset all your habit data? This will remove all your habits and habit history. This action cannot be undone.</p>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                                        Are you sure you want to reset all your habit data? This will remove all your habits and habit history. 
+                                        A CSV backup of your current data will be downloaded automatically before resetting. This action cannot be undone.
+                                    </p>
                                     <div class="mt-4">
                                         <label for="reset_confirm_name" class="block text-sm font-medium text-gray-400">Please type your first name to confirm:</label>
                                         <input type="text" 
@@ -380,7 +383,7 @@
                             </div>
                         </div>
                         <div class="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-                            <form action="/api/user/reset-data" method="POST">
+                            <form @submit.prevent="handleReset" id="reset-form">
                                 <button type="submit"
                                     :disabled="resetConfirmName !== '{{ .User.FirstName }}'"
                                     :class="{'opacity-50 cursor-not-allowed': resetConfirmName !== '{{ .User.FirstName }}'}"
@@ -501,6 +504,31 @@
                             this.showWeekdays = !this.showWeekdays;
                         }
                     });
+                },
+                async handleReset() {
+                    try {
+                        // First trigger CSV download
+                        const response = await fetch('/api/user/export');
+                        const blob = await response.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `habits-backup-${new Date().toISOString().split('T')[0]}.csv`;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(a);
+
+                        // Then submit reset request
+                        await fetch('/api/user/reset-data', {
+                            method: 'POST',
+                            credentials: 'include'
+                        });
+                        
+                        window.location.reload();
+                    } catch (error) {
+                        console.error('Reset failed:', error);
+                    }
                 }
             }));
         });
