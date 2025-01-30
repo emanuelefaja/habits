@@ -450,7 +450,26 @@
                 },
                 toggleSetting(setting) {
                     if (setting === 'showConfetti') {
+                        const wasOff = !this.showConfetti;
                         this.showConfetti = !this.showConfetti;
+                        
+                        // Trigger confetti animation if turning ON
+                        if (wasOff && this.showConfetti) {
+                            // Get the toggle button position
+                            const toggleBtn = event.currentTarget;
+                            const rect = toggleBtn.getBoundingClientRect();
+                            
+                            // Calculate origin points relative to window
+                            const x = (rect.left + rect.width / 2) / window.innerWidth;
+                            const y = (rect.top + rect.height / 2) / window.innerHeight;
+                            
+                            // Trigger confetti with same settings as monthly-grid
+                            confetti({
+                                particleCount: 100,
+                                spread: 70,
+                                origin: { x, y }
+                            });
+                        }
                     } else if (setting === 'showWeekdays') {
                         this.showWeekdays = !this.showWeekdays;
                     }
