@@ -9,6 +9,15 @@ import (
 	"time"
 )
 
+type BinaryHabitStats struct {
+	TotalDone     int       `json:"total_done"`
+	TotalMissed   int       `json:"total_missed"`
+	TotalSkipped  int       `json:"total_skipped"`
+	TotalDays     int       `json:"total_days"`
+	StartDate     time.Time `json:"start_date,omitempty"` // omitempty in case no done logs exist
+	LongestStreak int       `json:"longest_streak"`
+}
+
 // GetBinaryHabitStats retrieves statistics for a binary habit
 func GetBinaryHabitStats(db *sql.DB, habitID int) (BinaryHabitStats, error) {
 	// First verify this is a binary habit
