@@ -172,7 +172,7 @@ x-init="loadHabits(); loadGoals()"
                 <button 
                     @click="showCreateGoal = true"
                     class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#2da44e] hover:bg-[#2c974b] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2da44e]">
-                    Create Goal ✨
+                    Create Goal 🎯 
                 </button>
             </div>
         </div>
@@ -182,6 +182,31 @@ x-init="loadHabits(); loadGoals()"
             class="mt-6 grid gap-6"
             :class="gridLayout ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'">
             
+            <!-- Empty State -->
+            <template x-if="goals.filter(goal => goal.status && statusFilters[goal.status]).length === 0">
+                <div class="flex-grow flex items-center justify-center col-span-full py-12">
+                    <div class="flex flex-col items-start gap-4">
+                        <h2 class="text-xl text-gray-600 dark:text-gray-400 font-medium ml-2">
+                            A goal without a plan is just a wish.
+                        </h2>
+                        </h2>
+                        
+                        <div class="flex items-center gap-16">
+                            <button 
+                                @click="showCreateGoal = true"
+                                class="px-6 py-3 text-lg rounded-lg bg-[#2da44e] text-white hover:bg-[#2c974b] transition-colors duration-200 flex items-center gap-2">
+                                <span>Create Goal</span>
+                                <span>🎯</span>
+                            </button>
+                            
+                            <div class="text-9xl">
+                                👀
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+
             <!-- Dynamic Goal Cards -->
             <template x-for="goal in goals.filter(goal => goal.status && statusFilters[goal.status])" :key="goal.id">
                 {{ template "goal" . }}
@@ -307,7 +332,7 @@ x-init="loadHabits(); loadGoals()"
                     @click="createGoal()"
                     class="px-4 py-2 text-sm font-medium text-white bg-[#2da44e] hover:bg-[#2c974b] rounded-md"
                     :class="{ 'opacity-50 cursor-not-allowed': !isValidGoal }">
-                    Create Goal ✨
+                    Create Goal 🎯 
                 </button>
             </div>
         </div>
