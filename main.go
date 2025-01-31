@@ -105,7 +105,6 @@ func main() {
 		"ui/blog/blog.html",
 		"ui/blog/post.html",
 		"ui/goals.html",
-		"ui/profile.html",
 	))
 
 	// Static files
