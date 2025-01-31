@@ -105,6 +105,7 @@ func main() {
 		"ui/blog/blog.html",
 		"ui/blog/post.html",
 		"ui/goals.html",
+		"ui/profile.html",
 	))
 
 	// Static files
@@ -572,6 +573,29 @@ func main() {
 			return
 		}
 		api.UpdateGoalHandler(db)(w, r)
+	}))))
+
+	// // Profile
+	// http.Handle("/profile", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	// 	user, _ := getAuthenticatedUser(r, db)
+	// 	data := struct {
+	// 		User *models.User
+	// 	}{
+	// 		User: user,
+	// 	}
+	// 	renderTemplate(w, templates, "profile.html", data)
+	// })))
+
+	// Admin Download DB
+	http.Handle("/admin/download-db", middleware.SessionManager.LoadAndSave(middleware.RequireAdmin(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		dbPath := os.Getenv("DATABASE_PATH")
+		if dbPath == "" {
+			dbPath = "habits.db"
+		}
+
+		w.Header().Set("Content-Type", "application/octet-stream")
+		w.Header().Set("Content-Disposition", "attachment; filename=habits.db")
+		http.ServeFile(w, r, dbPath)
 	}))))
 
 	port := os.Getenv("PORT")
