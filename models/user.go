@@ -18,6 +18,8 @@ type User struct {
 	ShowWeekdays bool      `json:"show_weekdays"`
 	CreatedAt    time.Time `json:"created_at"`
 	IsAdmin      bool      `json:"is_admin"`
+	HabitsCount  int       `json:"habits_count"`
+	LogsCount    int       `json:"logs_count"`
 }
 
 // GetUserByID retrieves a user from the database by their ID
