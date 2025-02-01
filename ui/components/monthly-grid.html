@@ -270,8 +270,8 @@
                                                     <!-- Numeric Input -->
                                                     <div x-show="showNumericInput" class="px-2">
                                                         <div class="flex items-center gap-2">
-                                                            <button @click="numericValue = Math.max(0, parseInt(numericValue) - 1)"
-                                                                class="text-gray-500 hover:text-gray-700">-</button>
+                                                            <button @click="numericValue = Math.max(0, parseInt(numericValue || 0) - 1)"
+                                                                class="text-gray-500 hover:text-gray-700 transition-colors duration-100 active:text-[#2da44e]">-</button>
                                                             <input type="number" 
                                                                    x-model="numericValue"
                                                                    @keyup.enter="handleNumericSubmit(habit.id, formatDate(day), $event)"
@@ -279,8 +279,8 @@
                                                                    class="w-16 text-center border rounded-md"
                                                                    min="0"
                                                                    step="1">
-                                                            <button @click="numericValue = parseInt(numericValue) + 1)"
-                                                                class="text-gray-500 hover:text-gray-700">+</button>
+                                                            <button @click="numericValue = parseInt(numericValue || 0) + 1"
+                                                                class="text-gray-500 hover:text-gray-700 transition-colors duration-100 active:text-[#2da44e]">+</button>
                                                             <button @click="handleNumericSubmit(habit.id, formatDate(day), $event)"
                                                                 class="px-2 py-1 bg-[#2da44e] hover:bg-[#2c974b] text-white rounded-md text-sm">
                                                                 Log
