@@ -170,7 +170,6 @@
           // Add these new methods
           init() {
               this.initHabitOptions();
-              this.loadMonthLogs();
           },
 
           initHabitOptions() {
@@ -258,46 +257,6 @@
                 'skipped': '#00a0d2'
             },
             statusCycle: ['none', 'done', 'missed', 'skipped'],
-
-            // Initialize with current month's logs
-            async init() {
-                await this.loadMonthLogs();
-            },
-
-            // Load habit logs for the current month
-            async loadMonthLogs() {
-                this.isLoading = true;
-                try {
-                    const startDate = this.formatDate(1);
-                    const endDate = this.formatDate(this.getDaysInMonth());
-
-                    // Clear existing logs for the month
-                    this.habitLogs = {};
-
-                    // Create array of fetch promises
-                    const fetchPromises = this.habits.map(habit => 
-                        fetch(`/api/habits/logs?habit_id=${habit.id}&start_date=${startDate}&end_date=${endDate}`)
-                            .then(response => response.json())
-                    );
-
-                    // Wait for all requests to complete
-                    const results = await Promise.all(fetchPromises);
-
-                    // Process all results
-                    results.forEach(result => {
-                        if (result.success) {
-                            result.data.forEach(log => {
-                                const key = `${log.habit_id}_${log.date.split('T')[0]}`;
-                                this.habitLogs[key] = log;
-                            });
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error loading habit logs:', error);
-                } finally {
-                    this.isLoading = false;
-                }
-            },
 
             // Get status for a habit on a specific date
             getStatus(habitId, date) {
@@ -465,7 +424,6 @@
                             this.flashMessage = 'Habits added successfully';
                             this.showFlash = true;
                             setTimeout(() => this.showFlash = false, 3000);
-                            await this.loadMonthLogs(); // Reload logs for new habits
                         }
                     } else {
                         this.flashMessage = 'Error adding habits';

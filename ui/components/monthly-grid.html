@@ -497,6 +497,7 @@
             // Initialize component
             init() {
                 // Keep existing Sortable initialization
+                this.loadMonthLogs();
                 Sortable.create(this.$refs.habitsListContainer, {
                     animation: 150,
                     handle: '.habit-handle',
@@ -829,7 +830,42 @@
 
             get daysArray() {
                 return Array.from({ length: this.getDaysInMonth() }, (_, i) => i + 1);
-            }
+            },
+
+            // Moved from home.html
+            async loadMonthLogs() {
+                this.isLoading = true;
+                try {
+                    const startDate = this.formatDate(1);
+                    const endDate = this.formatDate(this.getDaysInMonth());
+
+                    // Clear existing logs for the month
+                    this.habitLogs = {};
+
+                    // Create array of fetch promises
+                    const fetchPromises = this.habits.map(habit => 
+                        fetch(`/api/habits/logs?habit_id=${habit.id}&start_date=${startDate}&end_date=${endDate}`)
+                            .then(response => response.json())
+                    );
+
+                    // Wait for all requests to complete
+                    const results = await Promise.all(fetchPromises);
+
+                    // Process all results
+                    results.forEach(result => {
+                        if (result.success) {
+                            result.data.forEach(log => {
+                                const key = `${log.habit_id}_${log.date.split('T')[0]}`;
+                                this.habitLogs[key] = log;
+                            });
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error loading habit logs:', error);
+                } finally {
+                    this.isLoading = false;
+                }
+            },
         }));
     });
 </script>
