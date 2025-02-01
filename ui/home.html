@@ -236,44 +236,7 @@
             habitLogs: {},
             flashMessage: '',
             showFlash: false,
-
-            // Month navigation state
-            currentMonth: new Date().getMonth() + 1,
-            currentYear: new Date().getFullYear(),
-            monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 
-                        'July', 'August', 'September', 'October', 'November', 'December'],
             isLoading: false,
-
-            // Format date string
-            formatDate(day) {
-                return `${this.currentYear}-${String(this.currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            },
-
-            // Status cycling
-            statusColors: {
-                'none': '#ebedf0',
-                'done': '#2da44e',
-                'missed': '#E3211a',
-                'skipped': '#00a0d2'
-            },
-            statusCycle: ['none', 'done', 'missed', 'skipped'],
-
-            // Get status for a habit on a specific date
-            getStatus(habitId, date) {
-                const key = `${habitId}_${date}`;
-                return this.habitLogs[key]?.status || 'none';
-            },
-
-            // Get color for a status
-            getStatusColor(status) {
-                return this.statusColors[status];
-            },
-
-            // Get next status in cycle
-            getNextStatus(currentStatus) {
-                const currentIndex = this.statusCycle.indexOf(currentStatus);
-                return this.statusCycle[(currentIndex + 1) % this.statusCycle.length];
-            },
 
             // Handle square click
             async handleSquareClick(habitId, date, status = null) {
