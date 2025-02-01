@@ -408,20 +408,7 @@
                                         <!-- Binary Habit Type -->
                                         <template x-if="habit.habit_type === 'binary'">
                                             <div class="w-7 h-7 rounded-sm cursor-pointer flex items-center justify-center"
-                                                 @click="(() => {
-                                                     const currentStatus = getStatus(habit.id, formatDate(day));
-                                                     let newStatus = 'done';
-                                                     
-                                                     // Cycle through states
-                                                     switch(currentStatus) {
-                                                         case 'none': newStatus = 'done'; break;
-                                                         case 'done': newStatus = 'missed'; break;
-                                                         case 'missed': newStatus = 'skipped'; break;
-                                                         case 'skipped': newStatus = 'none'; break;
-                                                     }
-                                                     
-                                                     handleSquareClick(habit.id, formatDate(day), newStatus, $event);
-                                                 })()"
+                                                 @click="handleSquareClick(habit.id, formatDate(day))"
                                                  :style="{ backgroundColor: getStatusColor(getStatus(habit.id, formatDate(day))) }">
                                             </div>
                                         </template>
@@ -700,59 +687,96 @@
             },
 
             // Binary Habit Methods
-            handleSquareClick(habitId, date, status = 'done', event) {
-                const habit = this.habits.find(h => h.id === habitId);
-                let payload = {
-                    habit_id: habitId,
-                    date: date,
-                    status: status
-                };
-
-                // Add empty value for numeric and set-reps habits when missed/skipped
-                if ((habit.habit_type === 'numeric' || habit.habit_type === 'set-reps') && 
-                    (status === 'missed' || status === 'skipped')) {
-                    if (habit.habit_type === 'numeric') {
-                        payload.value = { value: 0 };
+            async handleSquareClick(habitId, date, status = null, event) {
+                if (status) {
+                    // For numeric habits, set value to 0 for missed/skipped
+                    const habit = this.habits.find(h => h.id === habitId);
+                    if (habit?.habit_type === 'numeric') {
+                        fetch('/api/habits/logs', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                habit_id: habitId,
+                                date: date,
+                                status: status,
+                                value: { value: 0 }
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(result => {
+                            if (result.success) {
+                                const key = `${habitId}_${date}`;
+                                this.habitLogs[key] = {
+                                    habit_id: habitId,
+                                    date: date,
+                                    status: status,
+                                    value: { String: JSON.stringify({ value: 0 }), Valid: true }
+                                };
+                                this.showTooltip = null;
+                            }
+                        });
                     } else {
-                        payload.value = JSON.stringify({ sets: [] });
+                        // Binary habit with explicit status
+                        fetch('/api/habits/logs', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                habit_id: habitId,
+                                date: date,
+                                status: status
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(result => {
+                            if (result.success) {
+                                const key = `${habitId}_${date}`;
+                                this.habitLogs[key] = {
+                                    habit_id: habitId,
+                                    date: date,
+                                    status: status
+                                };
+                            }
+                        });
+                    }
+                } else {
+                    // Click-to-cycle logic for binary habits
+                    const habit = this.habits.find(h => h.id === habitId);
+                    if (habit?.habit_type === 'binary') {
+                        const currentStatus = this.getStatus(habitId, date);
+                        const nextStatus = this.getNextStatus(currentStatus);
+                        
+                        fetch('/api/habits/logs', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                habit_id: habitId,
+                                date: date,
+                                status: nextStatus
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(result => {
+                            if (result.success) {
+                                const key = `${habitId}_${date}`;
+                                this.habitLogs[key] = {
+                                    habit_id: habitId,
+                                    date: date,
+                                    status: nextStatus
+                                };
+                                this.triggerConfetti(event);
+                            }
+                        });
+                    } else if (habit?.habit_type === 'numeric') {
+                        this.showTooltip = `${habitId}_${date}`;
+                        this.showNumericInput = false;
                     }
                 }
-
-                fetch('/api/habits/logs', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                })
-                .then(res => res.json())
-                .then(result => {
-                    if (result.success) {
-                        const key = `${habitId}_${date}`;
-                        this.habitLogs[key] = {
-                            habit_id: habitId,
-                            date: date,
-                            status: status,
-                            ...(payload.value && {
-                                value: {
-                                    String: payload.value,
-                                    Valid: true
-                                }
-                            })
-                        };
-                        this.showTooltip = null;
-
-                        // Handle confetti based on habit type
-                        if (habit.habit_type === 'binary') {
-                            if (status === 'done') {
-                                this.scheduleBinaryConfetti(habitId, date, event);
-                            } else {
-                                this.clearBinaryConfettiTimer(habitId, date);
-                            }
-                        } else if (status === 'done') {
-                            // Non-binary habits trigger confetti immediately
-                            this.triggerConfetti(event);
-                        }
-                    }
-                });
             },
 
             // Utility Methods
