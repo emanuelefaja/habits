@@ -84,34 +84,39 @@
 
                         <!-- Weekday Letters Row -->
                         <template x-if="user.show_weekdays">
-                            <template x-for="day in getDaysInMonth()" :key="day">
-                                <div class="h-4 flex items-center justify-center text-xs text-gray-400"
-                                     x-text="getWeekdayLetter(day)">
-                                </div>
-                            </template>
-                        </template>
-                        <div class="h-4"></div> <!-- Spacer for when weekdays are hidden -->
-
-                        <!-- Day numbers (direct grid children) -->
-                        <template x-for="day in getDaysInMonth()" :key="day">
-                            <div :class="{ 
-                                    'bg-[#2da44e] text-white rounded-full inline-flex items-center justify-center px-2': isToday(day),
-                                    'text-sm text-center text-gray-600 dark:text-gray-400': !isToday(day)
-                                 }"
-                                    class="h-8"
-                                    :style="{ 
-                                        width: isToday(day) ? '28px' : '35px', 
-                                        height: isToday(day) ? '28px' : '35px', 
-                                        lineHeight: isToday(day) ? '28px' : '35px',
-                                        margin: isToday(day) ? '3.5px auto' : '0'
-                                    }"
-                                    x-text="day">
+                            <div class="contents">
+                                <template x-for="day in getDaysInMonth()" :key="day">
+                                    <div class="h-4 flex items-center justify-center text-xs text-gray-400"
+                                         x-text="getWeekdayLetter(day)">
+                                    </div>
+                                </template>
+                                <div></div> <!-- Spacer for grid alignment -->
                             </div>
                         </template>
 
-                        <!-- Total column header -->
-                        <div class="row-span-2 h-full flex items-center justify-center">
-                            <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Total</span>
+                        <!-- Day numbers row -->
+                        <div class="contents">
+                            <template x-for="day in getDaysInMonth()" :key="day">
+                                <div :class="{ 
+                                        'bg-[#2da44e] text-white rounded-full inline-flex items-center justify-center px-2': isToday(day),
+                                        'text-sm text-center text-gray-600 dark:text-gray-400': !isToday(day)
+                                     }"
+                                     class="h-8"
+                                     :style="{ 
+                                         width: isToday(day) ? '28px' : '35px', 
+                                         height: isToday(day) ? '28px' : '35px', 
+                                         lineHeight: isToday(day) ? '28px' : '35px',
+                                         margin: isToday(day) ? '3.5px auto' : '0'
+                                     }"
+                                     x-text="day">
+                                </div>
+                            </template>
+                            
+                            <!-- Total column header -->
+                            <div class="h-full flex items-center justify-center"
+                                 :class="user.show_weekdays ? 'row-span-2' : 'row-span-1'">
+                                <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Total</span>
+                            </div>
                         </div>
                     </div>
                     <!-- Sortable List of Habit Rows -->
