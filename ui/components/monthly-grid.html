@@ -113,9 +113,13 @@
                             </template>
                             
                             <!-- Total column header -->
-                            <div class="h-full flex items-center justify-center"
+                            <div class="h-full flex items-center justify-center relative group/total"
                                  :class="user.show_weekdays ? 'row-span-2' : 'row-span-1'">
-                                <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Total</span>
+                                <span class="text-xl font-medium text-gray-600 dark:text-gray-400">🧮</span>
+                                <!-- Total Tooltip -->
+                                <div class="absolute bottom-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-2 py-1 rounded text-sm whitespace-nowrap opacity-0 group-hover/total:opacity-100 transition-opacity duration-200 pointer-events-none">
+                                    Totals
+                                </div>
                             </div>
                         </div>
                     </div>
