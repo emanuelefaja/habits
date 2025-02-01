@@ -813,6 +813,22 @@
                 const date = new Date(this.currentYear, this.currentMonth - 1, day);
                 const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
                 return weekdays[date.getDay()];
+            },
+
+            // Moved functions
+            isToday(day) {
+                const today = new Date();
+                return today.getDate() === day && 
+                       today.getMonth() + 1 === this.currentMonth && 
+                       today.getFullYear() === this.currentYear;
+            },
+
+            getDaysInMonth() {
+                return new Date(this.currentYear, this.currentMonth, 0).getDate();
+            },
+
+            get daysArray() {
+                return Array.from({ length: this.getDaysInMonth() }, (_, i) => i + 1);
             }
         }));
     });

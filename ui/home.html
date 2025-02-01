@@ -245,24 +245,6 @@
                         'July', 'August', 'September', 'October', 'November', 'December'],
             isLoading: false,
 
-            // Add this new method
-            isToday(day) {
-                const today = new Date();
-                return today.getDate() === day && 
-                       today.getMonth() + 1 === this.currentMonth && 
-                       today.getFullYear() === this.currentYear;
-            },
-
-            // Get days in current month
-            getDaysInMonth() {
-                return new Date(this.currentYear, this.currentMonth, 0).getDate();
-            },
-
-            // Generate array of days for current month
-            get daysArray() {
-                return Array.from({ length: this.getDaysInMonth() }, (_, i) => i + 1);
-            },
-
             // Format date string
             formatDate(day) {
                 return `${this.currentYear}-${String(this.currentMonth).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
