@@ -478,16 +478,16 @@
 </template>
 <script>
     document.addEventListener('alpine:init', () => {
-        Alpine.data('monthlyGrid', (props) => ({
-            showConfetti: props.showConfetti,
-            user: props.user,
+        Alpine.data('monthlyGrid', (config) => ({
+            showConfetti: config.showConfetti,
+            user: config.user,
             currentMonth: new Date().getMonth() + 1,
             currentYear: new Date().getFullYear(),
             monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 
                         'July', 'August', 'September', 'October', 'November', 'December'],
             // Initialize component
             init() {
-                // Keep existing Sortable initialization
+                this.habitOptions = [];
                 this.loadMonthLogs();
                 Sortable.create(this.$refs.habitsListContainer, {
                     animation: 150,
@@ -625,19 +625,22 @@
             },
 
             formatSetRepsDisplay(habitId, date) {
-                const log = this.habitLogs[`${habitId}_${date}`];
-                if (!log?.value?.Valid) return '';
+                const key = `${habitId}_${date}`;
+                const log = this.habitLogs[key] || {};
+                const status = log.status || 'none';
                 
-                // Return '0' for missed/skipped status
-                if (log.status === 'missed' || log.status === 'skipped') {
+                if (status === 'missed' || status === 'skipped') {
                     return '0';
                 }
                 
                 try {
-                    return log.total_reps || '';
+                    if (log.value?.Valid) {
+                        return log.total_reps?.toString() || '';
+                    }
+                    return '\u00A0'; // Non-breaking space to maintain cell size
                 } catch (error) {
                     console.error('Error displaying set-reps:', error);
-                    return '';
+                    return '\u00A0'; // Non-breaking space
                 }
             },
 
@@ -878,9 +881,9 @@
                     const results = await Promise.all(fetchPromises);
 
                     // Process all results
-                    results.forEach(result => {
-                        if (result.success) {
-                            result.data.forEach(log => {
+                    (results || []).forEach(result => {
+                        if (result?.success) {
+                            (result.data || []).forEach(log => {
                                 const key = `${log.habit_id}_${log.date.split('T')[0]}`;
                                 this.habitLogs[key] = log;
                             });
@@ -939,6 +942,6 @@
 </script>
 
 <!-- Add this temporarily for debugging -->
-<div x-show="true" x-text="JSON.stringify(user)"></div>
+<div x-show="false" x-text="JSON.stringify(user)"></div>
 
 {{ end }}
