@@ -163,7 +163,8 @@
                                             <div class="w-7 h-7 relative">
                                                 <!-- Option Display -->
                                                 <div @click="showTooltip = `${habit.id}_${formatDate(day)}`"
-                                                     class="w-7 h-7 rounded-sm cursor-pointer flex items-center justify-center bg-[#ebedf0] dark:bg-gray-700 relative">
+                                                     class="w-7 h-7 rounded-sm cursor-pointer flex items-center justify-center relative"
+                                                     :style="{ backgroundColor: getStatusColor(getStatus(habit.id, formatDate(day))) }">
                                                     <template x-if="habitLogs[`${habit.id}_${formatDate(day)}`]?.value?.Valid">
                                                         <div class="relative hover:z-20 group/cell">
                                                             <!-- Selected Option Display -->
