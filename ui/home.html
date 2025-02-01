@@ -14,16 +14,6 @@
                   habitOptions: []
               } 
           },
-          formatNumericValue(value) {
-              if (value >= 1000000) {
-                  return Math.floor(value/100000)/10 + 'M';
-              } else if (value >= 1000) {
-                  return (value % 1000 === 0) ? 
-                      Math.floor(value/1000) + 'k' : 
-                      Math.floor(value/100)/10 + 'k';
-              }
-              return value;
-          },
           emojiSearch: '',
           emojiResults: [],
           
@@ -209,14 +199,6 @@
                       this.showTooltip = null;
                   }
               });
-          },
-
-          formatNumericDisplay(habitId, date) {
-              const log = this.habitLogs[`${habitId}_${date}`];
-              if (log?.value?.Valid) {
-                  return this.formatNumericValue(JSON.parse(log.value.String).value);
-              }
-              return '';
           }
       }">
     <div x-init="

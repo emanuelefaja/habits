@@ -611,12 +611,10 @@
 
             formatNumericDisplay(habitId, date) {
                 const log = this.habitLogs[`${habitId}_${date}`];
-                if (!log?.value?.Valid) return '';
-                try {
-                    return JSON.parse(log.value.String).value;
-                } catch (error) {
-                    return '';
+                if (log?.value?.Valid) {
+                    return this.formatNumericValue(JSON.parse(log.value.String).value);
                 }
+                return '';
             },
 
             // Set-Reps Habit Methods
@@ -923,6 +921,17 @@
             getNextStatus(currentStatus) {
                 const currentIndex = this.statusCycle.indexOf(currentStatus);
                 return this.statusCycle[(currentIndex + 1) % this.statusCycle.length];
+            },
+
+            formatNumericValue(value) {
+                if (value >= 1000000) {
+                    return Math.floor(value/100000)/10 + 'M';
+                } else if (value >= 1000) {
+                    return (value % 1000 === 0) ? 
+                        Math.floor(value/1000) + 'k' : 
+                        Math.floor(value/100)/10 + 'k';
+                }
+                return value;
             },
         }));
     });
