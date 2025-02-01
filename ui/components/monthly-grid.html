@@ -76,47 +76,41 @@
                 <!-- Add overflow wrapper with explicit width -->
                 <div class="w-full overflow-x-auto md:overflow-visible">
                     <!-- Grid Header Row -->
-                    <div class="grid mb-2 mt-8 min-w-fit relative" style="gap: 3px; grid-template-columns: auto repeat(31, 35px) 70px;">
-                        <!-- Empty space for habit names column -->
-                        <div class="h-8 min-w-[150px] max-w-[250px]"></div>
+                    <div class="grid mb-2 mt-8 min-w-fit relative" 
+                         style="gap: 1px;" 
+                         x-bind:style="`grid-template-columns: auto repeat(${getDaysInMonth()}, 35px) 70px;`">
+                        <!-- Header Columns -->
+                        <div class="grid row-span-2 min-w-[150px] max-w-[250px]"></div>
 
-                        <!-- Day numbers and weekday letters together -->
-                        <div class="grid grid-cols-[repeat(31,35px)] gap-[3px]" style="grid-column: 2 / span 31">
-                            <!-- Weekday letters -->
-                            <template x-if="user.show_weekdays">
-                                <div class="absolute -top-4">
-                                    <div class="grid grid-cols-[repeat(31,35px)] gap-[3px]">
-                                        <template x-for="day in 31" :key="day">
-                                            <div class="text-center text-xs text-gray-400 w-[35px]" 
-                                                 x-show="day <= getDaysInMonth()"
-                                                 x-text="getWeekdayLetter(day)">
-                                            </div>
-                                        </template>
-                                    </div>
+                        <!-- Weekday Letters Row -->
+                        <template x-if="user.show_weekdays">
+                            <template x-for="day in getDaysInMonth()" :key="day">
+                                <div class="h-4 flex items-center justify-center text-xs text-gray-400"
+                                     x-text="getWeekdayLetter(day)">
                                 </div>
                             </template>
+                        </template>
+                        <div class="h-4"></div> <!-- Spacer for when weekdays are hidden -->
 
-                            <!-- Day numbers -->
-                            <template x-for="day in 31" :key="day">
-                                <div :class="{ 
-                                        'invisible': day > getDaysInMonth(),
-                                        'bg-[#2da44e] text-white rounded-full inline-flex items-center justify-center px-2': isToday(day),
-                                        'text-sm text-center text-gray-600 dark:text-gray-400': !isToday(day)
-                                     }"
-                                     style="width: 35px;" 
-                                     :style="{ 
-                                         width: isToday(day) ? '28px' : '35px', 
-                                         height: isToday(day) ? '28px' : '35px', 
-                                         lineHeight: isToday(day) ? '28px' : '35px',
-                                         margin: isToday(day) ? '3.5px auto' : '0'
-                                     }"
-                                     x-text="day">
-                                </div>
-                            </template>
-                        </div>
+                        <!-- Day numbers (direct grid children) -->
+                        <template x-for="day in getDaysInMonth()" :key="day">
+                            <div :class="{ 
+                                    'bg-[#2da44e] text-white rounded-full inline-flex items-center justify-center px-2': isToday(day),
+                                    'text-sm text-center text-gray-600 dark:text-gray-400': !isToday(day)
+                                 }"
+                                    class="h-8"
+                                    :style="{ 
+                                        width: isToday(day) ? '28px' : '35px', 
+                                        height: isToday(day) ? '28px' : '35px', 
+                                        lineHeight: isToday(day) ? '28px' : '35px',
+                                        margin: isToday(day) ? '3.5px auto' : '0'
+                                    }"
+                                    x-text="day">
+                            </div>
+                        </template>
 
                         <!-- Total column header -->
-                        <div class="h-8 flex items-center justify-center">
+                        <div class="row-span-2 h-full flex items-center justify-center">
                             <span class="text-sm font-medium text-gray-600 dark:text-gray-400">Total</span>
                         </div>
                     </div>
@@ -125,7 +119,8 @@
                         <template x-for="habit in habits" :key="habit.id">
                             <div class="grid bg-white dark:bg-gray-800 group"
                                  x-bind:data-habit-id="habit.id"
-                                 style="gap: 3px; grid-template-columns: auto repeat(31, 35px) 70px;"
+                                 style="gap: 1px;"
+                                 x-bind:style="`grid-template-columns: auto repeat(${getDaysInMonth()}, 35px) 70px;`"
                                  class="border border-gray-200 dark:border-gray-700 rounded-sm">
                                  
                                 <!-- Habit Name Cell (drag handle) -->
@@ -150,12 +145,9 @@
                                 </div>
                                 
                                 <!-- Day Cells - Reorganized by Habit Type -->
-                                <template x-for="day in 31" :key="day">
-                                    <div class="h-8 flex items-center justify-center relative"
-                                         :class="{
-                                             'invisible': day > getDaysInMonth(),
-                                             'transition-transform duration-150 hover:-translate-y-0.5': !showTooltip || showTooltip !== `${habit.id}_${formatDate(day)}`
-                                         }">
+                                <template x-for="day in getDaysInMonth()" :key="day">
+                                    <div class="h-8 flex items-center justify-center relative
+                                                transition-transform duration-150 hover:-translate-y-0.5">
                                         
                                         <!-- Option-Select Habit Type -->
                                         <template x-if="habit.habit_type === 'option-select'">
