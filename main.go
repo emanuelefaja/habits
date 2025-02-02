@@ -55,6 +55,15 @@ func main() {
 	if err := middleware.InitializeSession(db); err != nil {
 		log.Fatal(err)
 	}
+
+	// Only seed users if in development environment
+	if os.Getenv("APP_ENV") == "development" {
+		err = models.SeedUsers(db)
+		if err != nil {
+			log.Println("Warning: Could not seed users:", err)
+		}
+	}
+
 	api.StartGitHubSync(db)
 	middleware.InitDB(db)
 
@@ -410,6 +419,9 @@ func main() {
 			}
 			renderTemplate(w, templates, "admin.html", data)
 		}))))
+
+	// Admin APIs
+	http.Handle("/admin/api/user/password", middleware.SessionManager.LoadAndSave(middleware.RequireAdmin(api.AdminResetPasswordHandler(db))))
 
 	// Habit Logs Deletion
 	http.Handle("/api/habits/logs/delete", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
