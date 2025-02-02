@@ -12,7 +12,7 @@ With habits, you can track various different types of habits, including:
 
 For each habit type, you also have the ability to drill down into the habit to see your progress over time and some interesting statistics:
 
-![Habits Stats](/static/images/habit-stats.png)
+![Habits Stats](/static/images/habit-statistics.png)
 
 # License
 
