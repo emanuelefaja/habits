@@ -10,18 +10,22 @@ With habits, you can track various different types of habits, including:
 - Number: Track a number (i.e. how many times you did the habit)
 - Set-Reps: Track a set of reps (i.e. how many sets and reps you did)
 
-For each habit type, you also have the ability to drill down into the habit to see your progress over time and some interesting statistics. 
+For each habit type, you also have the ability to drill down into the habit to see your progress over time and some interesting statistics:
+
+![Habits Stats](/static/images/habit-stats.png)
 
 # License
 
-This project is licensed under the AGPL-3.0 license. See the [LICENSE.txt](LICENSE.txt) file for more details.
+This project is open source and licensed under the AGPL-3.0 license. See the [LICENSE.txt](LICENSE.txt) file for more details. 
+
+Feel free to contribute to the project by opening a PR or by reporting an issue.
 
 
 # Self Host Locally
 
-git clone https://github.com/emanuelefaja/habits
-go build -o habits
-./habits
+- git clone https://github.com/emanuelefaja/habits
+- go build -o habits
+- ./habits
 
 
 **Start your journey** ➡️ [habits.co](https://habits.co)
