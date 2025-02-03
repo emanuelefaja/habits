@@ -170,8 +170,8 @@
                                                             <!-- Selected Option Display -->
                                                             <span x-text="JSON.parse(habitLogs[`${habit.id}_${formatDate(day)}`].value.String).emoji"></span>
                                                             
-                                                            <!-- Option Hover Tooltip -->
-                                                            <div class="absolute z-[50] top-full mt-2 bg-gray-800 text-white px-2 py-1 rounded text-sm whitespace-nowrap opacity-0 group-hover/cell:opacity-100 transition-opacity duration-200 pointer-events-none">
+                                                            <!-- Fixed Tooltip Positioning -->
+                                                            <div class="absolute z-[50] bottom-full mb-2 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-2 py-1 rounded text-sm whitespace-nowrap opacity-0 group-hover/cell:opacity-100 transition-opacity duration-200 pointer-events-none">
                                                                 <span x-text="JSON.parse(habitLogs[`${habit.id}_${formatDate(day)}`].value.String).label"></span>
                                                                 <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-800 transform rotate-45"></div>
                                                             </div>
