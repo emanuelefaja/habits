@@ -149,14 +149,14 @@
                                                 </svg>
                                             </button>
 
-                                            <!-- Dropdown menu -->
+                                            <!-- Updated dropdown menu -->
                                             <div 
                                                 x-show="open{{.ID}}"
                                                 @click.away="open{{.ID}} = false"
-                                                class="fixed right-4 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5 z-50"
+                                                class="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-700 ring-1 ring-black ring-opacity-5 z-50"
                                                 style="display: none;"
                                                 x-ref="menu{{.ID}}"
-                                            >
+                                                x-cloak>
                                                 <div class="py-1" role="menu">
                                                     <button 
                                                         class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 w-full text-left"
