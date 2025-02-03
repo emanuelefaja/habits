@@ -2,6 +2,8 @@ package models
 
 import (
 	"database/sql"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 // InitDB initializes the database and creates tables if they don't exist
@@ -199,4 +201,48 @@ func InitDB(db *sql.DB) error {
 	}
 
 	return nil
+}
+
+// Add this new function after the InitDB function
+func SeedUsers(db *sql.DB) error {
+	// Admin user
+	adminPass := "adminpassword"
+	adminHash, err := bcrypt.GenerateFromPassword([]byte(adminPass), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec(`
+		INSERT INTO users (first_name, last_name, email, password_hash, is_admin, show_confetti)
+		VALUES (?, ?, ?, ?, ?, ?)`,
+		"Admin",
+		"User",
+		"admin@example.com",
+		string(adminHash),
+		1,
+		1,
+	)
+	if err != nil {
+		return err
+	}
+
+	// Normal user
+	userPass := "password"
+	userHash, err := bcrypt.GenerateFromPassword([]byte(userPass), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec(`
+		INSERT INTO users (first_name, last_name, email, password_hash, is_admin, show_confetti)
+		VALUES (?, ?, ?, ?, ?, ?)`,
+		"Normal",
+		"User",
+		"user@example.com",
+		string(userHash),
+		0,
+		1,
+	)
+
+	return err
 }
