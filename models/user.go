@@ -212,3 +212,14 @@ func ResetUserData(db *sql.DB, userID int64) error {
 	// Commit the transaction
 	return tx.Commit()
 }
+
+// AdminUpdateUserPassword updates a user's password without requiring current password (admin only)
+func AdminUpdateUserPassword(db *sql.DB, userID int64, newPassword string) error {
+	newHash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec("UPDATE users SET password_hash = ? WHERE id = ?", newHash, userID)
+	return err
+}
