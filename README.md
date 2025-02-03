@@ -16,20 +16,43 @@ For each habit type, you also have the ability to drill down into the habit to s
 ## Project Structure
 ```
 ├── api/               - API handlers and routes
-│   ├── github.go     - GitHub synchronization logic
-├── models/           - Database models and ORM layer
-│   ├── user.go       - User model and DB operations
+│   ├── admin.go      - Admin endpoints
+│   ├── github.go     - GitHub synchronization
+│   ├── goal.go       - Goal management
+│   ├── habit.go      - Habit operations
+│   ├── roadmap.go    - Product roadmap
+│   ├── stats.go      - Statistics endpoints
+│   └── user.go       - User profile API
+├── blog/              - Blog content and templates
+│   ├── media/        - Blog images/videos
+│   └── posts/        - Markdown blog posts
+├── models/            - Database models and ORM
+│   ├── admin.go      - Admin models
+│   ├── blog.go       - Blog models
+│   ├── db.go         - Database connection
+│   ├── goal.go       - Goal models
 │   ├── habit.go      - Habit tracking logic
-│   └── goal.go       - Goal management
-├── middleware/       - Authentication and session management
-│   ├── auth.go       - Authorization middleware
-│   └── session.go    - Session configuration
-├── ui/               - User interface components
-│   ├── components/   - Reusable template components
-│   ├── layouts/      - Base page layouts
-│   └── static/       - Static assets (CSS, JS, images)
-├── main.go           - Application entry point
-└── .env.example      - Environment configuration template
+│   ├── stats.go      - Statistics models
+│   └── user.go       - User models
+├── middleware/        - Request processing
+│   ├── auth.go       - Authentication
+│   ├── ratelimit.go  - Rate limiting
+│   └── sessions.go   - Session management
+├── static/            - Static assets
+│   ├── icons/        - Application icons
+│   ├── images/       - Screenshots/illustrations
+│   ├── sounds/       - Notification sounds
+│   ├── videos/       - Demo videos
+│   ├── manifest.json - PWA manifest
+│   └── sw.js         - Service worker
+├── ui/                - User interface
+│   ├── components/   - Reusable templates
+│   ├── habits/       - Habit-type views
+│   ├── blog/         - Blog templates
+│   ├── *.html        - Core application pages
+├── main.go           - Application entry
+├── openapi.yaml      - API documentation
+└── .env.example      - Environment template
 ```
 
 ## Key Components:
@@ -42,13 +65,10 @@ This project is open source and licensed under the AGPL-3.0 license. See the [LI
 
 Feel free to contribute to the project by opening a PR or by reporting an issue.
 
-# Self Host Locally
 
-- git clone https://github.com/emanuelefaja/habits
-- go build -o habits
-- ./habits
+## Self Host Locally
 
-## System Setup
+You can self host habits on your own server or computer.
 
 1. Install Go 1.20 or later
 2. Clone the repository
