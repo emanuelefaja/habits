@@ -4,7 +4,13 @@
          x-data="{
             chart: null,
             habitLogs: [],
+            chartType: 'cumulative',
             async initChart() {
+                // Destroy existing chart if it exists
+                if (this.chart) {
+                    this.chart.destroy();
+                }
+
                 const now = new Date();
                 
                 // First get all logs without date restriction to find the true earliest date
@@ -37,17 +43,18 @@
                     gradient.addColorStop(1, 'rgba(45, 164, 78, 0.01)');   // Almost transparent at bottom
                     
                     this.chart = new Chart(ctx, {
-                        type: 'line',
+                        type: this.chartType === 'daily' ? 'bar' : 'line',
                         data: {
                             datasets: [{
                                 data: chartData,
                                 borderColor: '#2da44e',
-                                backgroundColor: gradient,
-                                fill: true,
+                                backgroundColor: this.chartType === 'daily' ? '#2da44e' : gradient,
+                                fill: this.chartType !== 'daily',
                                 tension: 0.4,
                                 pointBackgroundColor: '#2da44e',
-                                pointRadius: 4,
-                                pointHoverRadius: 6
+                                pointRadius: this.chartType === 'daily' ? 0 : 4,
+                                pointHoverRadius: this.chartType === 'daily' ? 0 : 6,
+                                borderWidth: this.chartType === 'daily' ? 1 : 2
                             }]
                         },
                         options: {
@@ -112,6 +119,7 @@
                 
                 let data = [];
                 let cumSum = 0;
+                const dailyValues = new Map();
                 
                 logs.sort((a, b) => new Date(a.date) - new Date(b.date));
                 
@@ -154,13 +162,22 @@
                     
                     // Only add to the graph if status is 'done'
                     if (log.status === 'done') {
-                        cumSum += value;
-                        data.push({
-                            x: new Date(log.date),
-                            y: cumSum
-                        });
+                        if (this.chartType === 'cumulative') {
+                            cumSum += value;
+                            data.push({ x: new Date(log.date), y: cumSum });
+                        } else {
+                            const dateKey = new Date(log.date).toISOString().split('T')[0];
+                            dailyValues.set(dateKey, (dailyValues.get(dateKey) || 0) + value);
+                        }
                     }
                 });
+
+                if (this.chartType === 'daily') {
+                    dailyValues.forEach((value, date) => {
+                        data.push({ x: new Date(date), y: value });
+                    });
+                    data.sort((a, b) => a.x - b.x);
+                }
                 
                 return data;
             },
@@ -191,6 +208,18 @@
          x-init="initChart">
         <div class="flex justify-between items-center mb-4">
             <h3 class="text-2xl font-semibold text-gray-900 dark:text-white">Progress Over Time</h3>
+            <div class="flex gap-2 bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
+                <button @click="chartType = 'cumulative'; initChart()" 
+                        :class="{ 'bg-white dark:bg-gray-600 shadow-sm': chartType === 'cumulative' }" 
+                        class="px-3 py-1 rounded-md text-sm flex items-center gap-2 transition-colors">
+                    <span :class="{ 'opacity-50': chartType !== 'cumulative' }">📈</span> Total
+                </button>
+                <button @click="chartType = 'daily'; initChart()" 
+                        :class="{ 'bg-white dark:bg-gray-600 shadow-sm': chartType === 'daily' }" 
+                        class="px-3 py-1 rounded-md text-sm flex items-center gap-2 transition-colors">
+                    <span :class="{ 'opacity-50': chartType !== 'daily' }">📊</span> Daily
+                </button>
+            </div>
         </div>
         <div class="h-64">
             <canvas id="habitChart"></canvas>
