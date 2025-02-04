@@ -42,7 +42,7 @@ For each habit type, you also have the ability to drill down into the habit to s
 │   ├── icons/        - Application icons
 │   ├── images/       - Screenshots/illustrations
 │   ├── sounds/       - Notification sounds
-│   ├── videos/       - Demo videos
+│   ├── videos/       - Changelog videos
 │   ├── manifest.json - PWA manifest
 │   └── sw.js         - Service worker
 ├── ui/                - User interface
