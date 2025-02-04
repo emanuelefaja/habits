@@ -384,6 +384,98 @@
         <h3 class="font-semibold text-gray-900 mb-2">Calorie Tracking</h3>
         <p class="text-sm text-gray-500">Monitor your daily caloric intake.</p>
     </div>
+    <!-- Add these new habit cards inside the Health category grid -->
+    <div 
+        @click="selectHabitFromCategory('OMAD Cycling', '🍴', 'binary')"
+        :class="{
+            'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'OMAD Cycling'
+        }"
+        class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+        <div class="flex justify-between items-start mb-3">
+            <div class="text-3xl">🍴</div>
+            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
+        </div>
+        <h3 class="font-semibold text-gray-900 mb-2">OMAD Cycling</h3>
+        <p class="text-sm text-gray-500">Track days following the OMAD eating pattern.</p>
+    </div>
+    <div 
+        @click="selectHabitFromCategory('Squats', '🏋️', 'set-reps')"
+        :class="{
+            'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Squats'
+        }"
+        class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+        <div class="flex justify-between items-start mb-3">
+            <div class="text-3xl">🏋️</div>
+            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Sets & Reps Habit</span>
+        </div>
+        <h3 class="font-semibold text-gray-900 mb-2">Squats</h3>
+        <p class="text-sm text-gray-500">Build lower body strength with daily squats.</p>
+    </div>
+    <div 
+        @click="selectHabitFromCategory('Situps', '🧘', 'set-reps')"
+        :class="{
+            'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Situps'
+        }"
+        class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+        <div class="flex justify-between items-start mb-3">
+            <div class="text-3xl">🧘</div>
+            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Sets & Reps Habit</span>
+        </div>
+        <h3 class="font-semibold text-gray-900 mb-2">Situps</h3>
+        <p class="text-sm text-gray-500">Strengthen core muscles with daily sit-ups.</p>
+    </div>
+    <div 
+        @click="selectHabitFromCategory('Calisthenics', '🤸', 'set-reps')"
+        :class="{
+            'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Calisthenics'
+        }"
+        class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+        <div class="flex justify-between items-start mb-3">
+            <div class="text-3xl">🤸</div>
+            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Sets & Reps Habit</span>
+        </div>
+        <h3 class="font-semibold text-gray-900 mb-2">Calisthenics</h3>
+        <p class="text-sm text-gray-500">Bodyweight exercises for overall fitness.</p>
+    </div>
+    <div 
+        @click="selectHabitFromCategory('Rowing', '🛶', 'numeric')"
+        :class="{
+            'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Rowing'
+        }"
+        class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+        <div class="flex justify-between items-start mb-3">
+            <div class="text-3xl">🛶</div>
+            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+        </div>
+        <h3 class="font-semibold text-gray-900 mb-2">Rowing</h3>
+        <p class="text-sm text-gray-500">Track rowing machine sessions in minutes.</p>
+    </div>
+    <div 
+        @click="selectHabitFromCategory('Gym Workout', '🏋️', 'binary')"
+        :class="{
+            'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Gym Workout'
+        }"
+        class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+        <div class="flex justify-between items-start mb-3">
+            <div class="text-3xl">🏋️</div>
+            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
+        </div>
+        <h3 class="font-semibold text-gray-900 mb-2">Gym Workout</h3>
+        <p class="text-sm text-gray-500">Track days with a gym workout session.</p>
+    </div>
+    <div 
+        @click="selectHabitFromCategory('Vitamins', '💊', 'binary')"
+        :class="{
+            'border-[#2da44e] bg-[#e6f4ea]': modalState.selectedHabit === 'Vitamins'
+        }"
+        class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 cursor-pointer">
+        <div class="flex justify-between items-start mb-3">
+            <div class="text-3xl">💊</div>
+            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
+        </div>
+        <h3 class="font-semibold text-gray-900 mb-2">Vitamins</h3>
+        <p class="text-sm text-gray-500">Remember to take daily vitamins/supplements.</p>
+    </div>
 </div>
 </div>
 
