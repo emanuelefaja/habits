@@ -78,7 +78,7 @@
                     <!-- Grid Header Row -->
                     <div class="grid mb-2 mt-8 min-w-fit relative" 
                          style="gap: 1px;" 
-                         x-bind:style="`grid-template-columns: auto repeat(${getDaysInMonth()}, 35px) 70px;`">
+                         x-bind:style="`grid-template-columns: auto repeat(${getDaysInMonth()}, 35px) 50px 50px;`">
                         <!-- Header Columns -->
                         <div class="grid row-span-2 min-w-[150px] max-w-[250px]"></div>
 
@@ -90,6 +90,7 @@
                                          x-text="getWeekdayLetter(day)">
                                     </div>
                                 </template>
+                                <div></div> <!-- Spacer for grid alignment -->
                                 <div></div> <!-- Spacer for grid alignment -->
                             </div>
                         </template>
@@ -121,6 +122,14 @@
                                     Totals
                                 </div>
                             </div>
+                            
+                            <!-- New Streak column header -->
+                            <div class="h-full flex items-center justify-center relative group/streak">
+                                <span class="text-xl font-medium text-gray-600 dark:text-gray-400">🔥</span>
+                                <div class="absolute bottom-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-2 py-1 rounded text-sm whitespace-nowrap opacity-0 group-hover/streak:opacity-100 transition-opacity duration-200 pointer-events-none">
+                                    Consecutive day streak
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <!-- Sortable List of Habit Rows -->
@@ -129,7 +138,7 @@
                             <div class="grid bg-white dark:bg-gray-800 group"
                                  x-bind:data-habit-id="habit.id"
                                  style="gap: 1px;"
-                                 x-bind:style="`grid-template-columns: auto repeat(${getDaysInMonth()}, 35px) 70px;`"
+                                 x-bind:style="`grid-template-columns: auto repeat(${getDaysInMonth()}, 35px) 50px 50px;`"
                                  class="border border-gray-200 dark:border-gray-700 rounded-sm">
                                  
                                 <!-- Habit Name Cell (drag handle) -->
@@ -443,6 +452,13 @@
                                                 ).length;
                                         }
                                     })()">
+                                    </span>
+                                </div>
+
+                                <!-- New Streak Cell -->
+                                <div class="h-8 flex items-center justify-center">
+                                    <span class="text-sm font-bold text-gray-700 dark:text-gray-400" 
+                                          x-text="habit.current_streak">
                                     </span>
                                 </div>
                             </div>

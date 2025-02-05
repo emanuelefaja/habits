@@ -18,15 +18,16 @@ const (
 )
 
 type Habit struct {
-	ID           int            `json:"id"`
-	UserID       int            `json:"user_id"`
-	Name         string         `json:"name"`
-	Emoji        string         `json:"emoji"`
-	CreatedAt    time.Time      `json:"created_at"`
-	HabitType    HabitType      `json:"habit_type"`
-	IsDefault    bool           `json:"is_default"`
-	DisplayOrder int            `json:"display_order"`
-	HabitOptions sql.NullString `json:"habit_options"`
+	ID            int            `json:"id"`
+	UserID        int            `json:"user_id"`
+	Name          string         `json:"name"`
+	Emoji         string         `json:"emoji"`
+	CreatedAt     time.Time      `json:"created_at"`
+	HabitType     HabitType      `json:"habit_type"`
+	IsDefault     bool           `json:"is_default"`
+	DisplayOrder  int            `json:"display_order"`
+	HabitOptions  sql.NullString `json:"habit_options"`
+	CurrentStreak int            `json:"current_streak"`
 }
 
 type HabitOption struct {
@@ -395,6 +396,14 @@ func GetHabitsByUserID(db *sql.DB, userID int) ([]Habit, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		// Calculate streak for each habit
+		if err := habit.CalculateCurrentStreak(db); err != nil {
+			// Log the error but don't fail the whole request
+			log.Printf("Error calculating streak for habit %d: %v", habit.ID, err)
+			habit.CurrentStreak = 0
+		}
+
 		habits = append(habits, habit)
 	}
 	return habits, nil
@@ -558,4 +567,66 @@ type SetRep struct {
 type SetRepsValue struct {
 	Sets []SetRep `json:"sets"`
 	Unit string   `json:"unit,omitempty"` // kg or lbs
+}
+
+func (h *Habit) CalculateCurrentStreak(db *sql.DB) error {
+	query := `
+	WITH RECURSIVE dates(check_date) AS (
+		-- Start with today if we have a log, otherwise try yesterday
+		SELECT 
+			CASE 
+				WHEN EXISTS (
+					SELECT 1 FROM habit_logs 
+					WHERE habit_id = ? 
+					AND date(date) = date('now')
+					AND status IN ('done', 'skipped')
+				)
+				THEN date('now')
+				WHEN EXISTS (
+					SELECT 1 FROM habit_logs 
+					WHERE habit_id = ? 
+					AND date(date) = date('now', '-1 day')
+					AND status IN ('done', 'skipped')
+				)
+				THEN date('now', '-1 day')
+			END
+		WHERE EXISTS (
+			SELECT 1 FROM habit_logs 
+			WHERE habit_id = ? 
+			AND date(date) = 
+				CASE 
+					WHEN EXISTS (
+						SELECT 1 FROM habit_logs 
+						WHERE habit_id = ? 
+						AND date(date) = date('now')
+						AND status IN ('done', 'skipped')
+					)
+					THEN date('now')
+					ELSE date('now', '-1 day')
+				END
+			AND status IN ('done', 'skipped')
+		)
+		
+		UNION ALL
+		
+		SELECT date(dates.check_date, '-1 day')
+		FROM dates
+		WHERE EXISTS (
+			SELECT 1 
+			FROM habit_logs h 
+			WHERE date(h.date) = date(dates.check_date, '-1 day')
+			AND h.habit_id = ?
+			AND h.status IN ('done', 'skipped')
+		)
+		LIMIT 366  -- Reasonable limit for recursion (full year)
+	)
+	SELECT COUNT(*) as streak
+	FROM dates`
+
+	err := db.QueryRow(query, h.ID, h.ID, h.ID, h.ID, h.ID).Scan(&h.CurrentStreak)
+	if err != nil {
+		return fmt.Errorf("error calculating streak: %v", err)
+	}
+
+	return nil
 }
