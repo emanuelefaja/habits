@@ -73,8 +73,8 @@ func (bs *BlogService) LoadPosts() error {
 		),
 	)
 
-	// Walk through all .md files in the posts directory
-	postsDir := "blog/posts"
+	// Walk through all .md files in the blog directory
+	postsDir := "content/blog"
 	err := filepath.Walk(postsDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err

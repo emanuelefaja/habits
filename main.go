@@ -120,6 +120,7 @@ func main() {
 	fs := http.FileServer(http.Dir("static"))
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
 	http.Handle("/icons/", http.StripPrefix("/icons/", http.FileServer(http.Dir("static/icons"))))
+	http.Handle("/content/media/", http.StripPrefix("/content/media/", http.FileServer(http.Dir("content/media"))))
 
 	// Manifest and Service Worker
 	http.HandleFunc("/manifest.json", func(w http.ResponseWriter, r *http.Request) {

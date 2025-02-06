@@ -23,9 +23,9 @@ For each habit type, you also have the ability to drill down into the habit to s
 │   ├── roadmap.go    - Product roadmap
 │   ├── stats.go      - Statistics endpoints
 │   └── user.go       - User profile API
-├── blog/              - Blog content and templates
-│   ├── media/        - Blog images/videos
-│   └── posts/        - Markdown blog posts
+├── content/           - Content files
+│   ├── blog/         - Blog posts (.md files)
+│   └── media/        - Media files (images, videos, etc.)
 ├── models/            - Database models and ORM
 │   ├── admin.go      - Admin models
 │   ├── blog.go       - Blog models
