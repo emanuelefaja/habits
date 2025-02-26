@@ -131,6 +131,11 @@ func main() {
 		http.ServeFile(w, r, "static/sw.js")
 	})
 
+	// Sitemap
+	http.HandleFunc("/sitemap.xml", func(w http.ResponseWriter, r *http.Request) {
+		serveStaticFileWithContentType(w, r, "static/sitemap.xml", "application/xml")
+	})
+
 	// Routes
 	http.Handle("/", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
