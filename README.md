@@ -23,6 +23,8 @@ For each habit type, you also have the ability to drill down into the habit to s
 │   ├── roadmap.go    - Product roadmap
 │   ├── stats.go      - Statistics endpoints
 │   └── user.go       - User profile API
+├── cmd/              - Command-line tools
+│   └── send_email/   - Email testing tool
 ├── content/           - Content files
 │   ├── blog/         - Blog posts (.md files)
 │   └── media/        - Media files (images, videos, etc.)
@@ -30,6 +32,11 @@ For each habit type, you also have the ability to drill down into the habit to s
 │   ├── admin.go      - Admin models
 │   ├── blog.go       - Blog models
 │   ├── db.go         - Database connection
+│   ├── email/        - Email functionality
+│   │   ├── email.go      - Core email types
+│   │   ├── templates.go  - Template rendering
+│   │   ├── smtp.go       - SMTP implementation
+│   │   └── email_test.go - Email tests
 │   ├── goal.go       - Goal models
 │   ├── habit.go      - Habit tracking logic
 │   ├── stats.go      - Statistics models
@@ -47,6 +54,7 @@ For each habit type, you also have the ability to drill down into the habit to s
 │   └── sw.js         - Service worker
 ├── ui/                - User interface
 │   ├── components/   - Reusable templates
+│   ├── email/        - Email templates (txt and html)
 │   ├── habits/       - Habit-type views
 │   ├── blog/         - Blog templates
 │   ├── *.html        - Core application pages

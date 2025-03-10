@@ -7,15 +7,23 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"mad/middleware"
+	"mad/models"
+	"mad/models/email"
 	"net/http"
 	"strings"
 	"time"
 
-	"mad/middleware"
-	"mad/models"
-
 	"golang.org/x/crypto/bcrypt"
 )
+
+// Global email service
+var emailService email.EmailService
+
+// InitEmailService initializes the email service for the API package
+func InitEmailService(service email.EmailService) {
+	emailService = service
+}
 
 // RegisterHandler handles user registration
 func RegisterHandler(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
@@ -77,6 +85,18 @@ func RegisterHandler(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
 		}
 
 		log.Println("User registered successfully:", email)
+
+		// Send welcome email
+		if emailService != nil {
+			go func() {
+				err := emailService.SendWelcomeEmail(email, firstName)
+				if err != nil {
+					log.Printf("Failed to send welcome email to %s: %v", email, err)
+				} else {
+					log.Printf("Welcome email sent to %s", email)
+				}
+			}()
+		}
 
 		// Set user session immediately after registration
 		middleware.SetUserID(r, int(user.ID))

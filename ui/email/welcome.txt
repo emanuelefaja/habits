@@ -1,0 +1,20 @@
+Welcome to {{.AppName}}, {{.Username}}!
+
+Thank you for joining our community of habit builders. We're excited to help you create and maintain positive habits that will transform your life.
+
+With Habits, you can:
+- Track your daily habits
+- Set goals and monitor your progress
+- Visualize your consistency with beautiful charts
+- Build a streak of successful days
+
+Ready to get started? Log in now at https://habits.co/login
+
+Good luck!
+
+Best regards,
+The Habits Team
+
+---
+© {{.AppName}} | Privacy Policy: https://habits.co/privacy | Terms of Service: https://habits.co/terms
+This email was sent to you because you signed up for {{.AppName}}. 

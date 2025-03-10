@@ -14,6 +14,7 @@ import (
 	"mad/api"
 	"mad/middleware"
 	"mad/models"
+	"mad/models/email"
 
 	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
@@ -55,6 +56,25 @@ func main() {
 	if err := middleware.InitializeSession(db); err != nil {
 		log.Fatal(err)
 	}
+
+	// Initialize email service
+	emailService, err := email.NewSMTPEmailService(email.SMTPConfig{
+		Host:        os.Getenv("SMTP_HOST"),
+		Port:        587, // Default SMTP port
+		Username:    os.Getenv("SMTP_USERNAME"),
+		Password:    os.Getenv("SMTP_PASSWORD"),
+		FromName:    os.Getenv("SMTP_FROM_NAME"),
+		FromEmail:   os.Getenv("SMTP_FROM_EMAIL"),
+		TemplateDir: "./ui/email",
+		Secure:      true,
+		RequireTLS:  true,
+	})
+	if err != nil {
+		log.Printf("Warning: Could not initialize email service: %v", err)
+	}
+
+	// Pass the email service to the API handlers
+	api.InitEmailService(emailService)
 
 	// Only seed users if in development environment
 	if os.Getenv("APP_ENV") == "development" {
