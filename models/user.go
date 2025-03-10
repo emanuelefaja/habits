@@ -184,6 +184,24 @@ func DeleteUserAndData(db *sql.DB, userID int64) error {
 		return err
 	}
 
+	// Delete goals (should cascade automatically, but let's be explicit)
+	_, err = tx.Exec("DELETE FROM goals WHERE user_id = ?", userID)
+	if err != nil {
+		return err
+	}
+
+	// Delete roadmap ideas
+	_, err = tx.Exec("DELETE FROM roadmap_ideas WHERE user_id = ?", userID)
+	if err != nil {
+		return err
+	}
+
+	// Delete roadmap likes
+	_, err = tx.Exec("DELETE FROM roadmap_likes WHERE user_id = ?", userID)
+	if err != nil {
+		return err
+	}
+
 	// Delete user
 	_, err = tx.Exec("DELETE FROM users WHERE id = ?", userID)
 	if err != nil {

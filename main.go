@@ -428,6 +428,7 @@ func main() {
 
 	// Admin APIs
 	http.Handle("/admin/api/user/password", middleware.SessionManager.LoadAndSave(middleware.RequireAdmin(api.AdminResetPasswordHandler(db))))
+	http.Handle("/admin/api/user/delete", middleware.SessionManager.LoadAndSave(middleware.RequireAdmin(api.AdminDeleteUserHandler(db))))
 
 	// Habit Logs Deletion
 	http.Handle("/api/habits/logs/delete", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
