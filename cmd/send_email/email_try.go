@@ -11,6 +11,38 @@ import (
 	"github.com/wneessen/go-mail"
 )
 
+func testSMTPConnection(host string, port int, username, password string, fromEmail, fromName string) error {
+	client, err := mail.NewClient(host,
+		mail.WithPort(port),
+		mail.WithSMTPAuth(mail.SMTPAuthPlain),
+		mail.WithUsername(username),
+		mail.WithPassword(password),
+		mail.WithTLSPolicy(mail.TLSOpportunistic),
+	)
+	if err != nil {
+		return fmt.Errorf("failed to create client: %v", err)
+	}
+
+	// Create a test message
+	msg := mail.NewMsg()
+	if err := msg.From(fmt.Sprintf("%s <%s>", fromName, fromEmail)); err != nil {
+		return fmt.Errorf("failed to set from address: %v", err)
+	}
+	// Set recipient to the from address for testing
+	if err := msg.To(fromEmail); err != nil {
+		return fmt.Errorf("failed to set to address: %v", err)
+	}
+	msg.Subject("SMTP Test")
+	msg.SetBodyString(mail.TypeTextPlain, "This is a test email to verify SMTP settings.")
+
+	// Try to connect and send
+	if err := client.DialAndSend(msg); err != nil {
+		return fmt.Errorf("connection test failed: %v", err)
+	}
+
+	return nil
+}
+
 func main() {
 	// Load .env file from project root
 	projectRoot := filepath.Join("..", "..")
@@ -51,6 +83,15 @@ func main() {
 		fmt.Println("- SMTP_FROM_NAME")
 		return
 	}
+
+	// Test SMTP connection before proceeding
+	fmt.Println("Testing SMTP connection...")
+	err := testSMTPConnection(smtpHost, 587, smtpUsername, smtpPassword, fromEmail, fromName)
+	if err != nil {
+		fmt.Printf("SMTP Connection Test Failed: %v\n", err)
+		return
+	}
+	fmt.Println("SMTP Connection Test Successful!")
 
 	// Create new mail client
 	client, err := mail.NewClient(smtpHost,
