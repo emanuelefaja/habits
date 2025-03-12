@@ -2,7 +2,7 @@ package email
 
 import "time"
 
-// EmailTemplate defines a specific email type
+// EmailTemplate represents an email template with its name and subject
 type EmailTemplate struct {
 	Name    string
 	Subject string
@@ -15,27 +15,43 @@ type WelcomeEmailData struct {
 }
 
 type PasswordResetEmailData struct {
-	ResetToken string
-	Expiry     time.Time
-	AppName    string
+	ResetLink   string
+	ExpiryHours string
+	Username    string
+	AppName     string
+}
+
+type PasswordResetSuccessEmailData struct {
+	Username  string
+	AppName   string
+	LoginLink string
 }
 
 // Predefined Email Templates
 var (
+	// WelcomeEmail template for new user registration
 	WelcomeEmail = EmailTemplate{
 		Name:    "welcome",
 		Subject: "Welcome to Habits!",
 	}
 
+	// PasswordResetEmail template for password reset requests
 	PasswordResetEmail = EmailTemplate{
-		Name:    "password-reset",
-		Subject: "Reset Your Habits Password",
+		Name:    "reset-password",
+		Subject: "Reset Your Password",
+	}
+
+	// PasswordResetSuccessEmail template for successful password resets
+	PasswordResetSuccessEmail = EmailTemplate{
+		Name:    "reset-password-success",
+		Subject: "Your Password Has Been Reset",
 	}
 )
 
-// EmailService interface
+// EmailService defines the interface for sending emails
 type EmailService interface {
 	SendTypedEmail(to string, template EmailTemplate, data interface{}) error
 	SendWelcomeEmail(to, username string) error
-	SendPasswordResetEmail(to, resetToken string, expiry time.Time) error
+	SendPasswordResetEmail(to, resetLink string, expiry time.Time) error
+	SendPasswordResetSuccessEmail(to, username string) error
 }

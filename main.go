@@ -21,8 +21,11 @@ import (
 )
 
 type TemplateData struct {
-	Flash string
-	Error string
+	Flash      string
+	Error      string
+	Token      string
+	IsLoggedIn bool
+	Email      string
 }
 
 func main() {
@@ -134,6 +137,8 @@ func main() {
 		"ui/blog/blog.html",
 		"ui/blog/post.html",
 		"ui/goals.html",
+		"ui/forgot.html",
+		"ui/reset.html",
 	))
 
 	// Static files
@@ -244,6 +249,23 @@ func main() {
 		}
 	})))
 
+	http.Handle("/forgot", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			handleNotAllowed(w, http.MethodGet)
+			return
+		}
+		data := TemplateData{
+			IsLoggedIn: middleware.IsAuthenticated(r),
+		}
+		if data.IsLoggedIn {
+			user, err := getAuthenticatedUser(r, db)
+			if err == nil {
+				data.Email = user.Email
+			}
+		}
+		renderTemplate(w, templates, "forgot.html", data)
+	})))
+
 	http.Handle("/logout", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			handleNotAllowed(w, http.MethodPost)
@@ -256,6 +278,27 @@ func main() {
 		middleware.SetFlash(r, "You have been logged out successfully!")
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	})))
+
+	// Password Reset Routes
+	http.Handle("/reset", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			token := r.URL.Query().Get("token")
+			if token == "" {
+				http.Redirect(w, r, "/forgot", http.StatusSeeOther)
+				return
+			}
+			renderTemplate(w, templates, "reset.html", TemplateData{
+				Token: token,
+				Flash: middleware.GetFlash(r),
+			})
+		default:
+			handleNotAllowed(w, http.MethodGet)
+		}
+	})))
+
+	http.Handle("/api/forgot-password", middleware.SessionManager.LoadAndSave(http.HandlerFunc(api.ForgotPasswordHandler(db))))
+	http.Handle("/api/reset-password", middleware.SessionManager.LoadAndSave(http.HandlerFunc(api.ResetPasswordHandler(db))))
 
 	// Habits API
 	http.Handle("/api/habits", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -1,95 +1,82 @@
 package middleware
 
 import (
+	"net/http"
 	"sync"
 	"time"
 )
 
+// LoginAttempt represents a login attempt
 type LoginAttempt struct {
-	Count     int
-	FirstTry  time.Time
-	BlockedAt time.Time
+	Count int
+	First time.Time
 }
 
+// RateLimiter handles rate limiting for different endpoints
 type RateLimiter struct {
 	attempts map[string]*LoginAttempt
 	mu       sync.RWMutex
+	window   time.Duration
+	limit    int
 }
 
-var Limiter = &RateLimiter{
-	attempts: make(map[string]*LoginAttempt),
-}
-
-const (
-	maxAttempts    = 5
-	blockDuration  = 15 * time.Minute
-	windowDuration = 5 * time.Minute
+var (
+	LoginLimiter         = NewRateLimiter(5, 15*time.Minute) // 5 attempts per 15 minutes
+	PasswordResetLimiter = NewRateLimiter(3, 24*time.Hour)   // 3 attempts per 24 hours
 )
 
-func (rl *RateLimiter) IsBlocked(ip string) bool {
-	rl.mu.RLock()
-	defer rl.mu.RUnlock()
-
-	attempt, exists := rl.attempts[ip]
-	if !exists {
-		return false
+// NewRateLimiter creates a new rate limiter
+func NewRateLimiter(limit int, window time.Duration) *RateLimiter {
+	return &RateLimiter{
+		attempts: make(map[string]*LoginAttempt),
+		window:   window,
+		limit:    limit,
 	}
-
-	// If blocked and block duration hasn't expired
-	if !attempt.BlockedAt.IsZero() && time.Since(attempt.BlockedAt) < blockDuration {
-		return true
-	}
-
-	return false
 }
 
-func (rl *RateLimiter) RecordAttempt(ip string) bool {
+// CheckLimit checks if the request should be rate limited
+func (rl *RateLimiter) CheckLimit(r *http.Request) (int, time.Time, error) {
+	ip := r.RemoteAddr
+	now := time.Now()
+
 	rl.mu.Lock()
 	defer rl.mu.Unlock()
 
-	now := time.Now()
-	attempt, exists := rl.attempts[ip]
+	// Clean up old attempts
+	rl.cleanup(now)
 
+	// Get or create attempt for this IP
+	attempt, exists := rl.attempts[ip]
 	if !exists {
-		rl.attempts[ip] = &LoginAttempt{
-			Count:    1,
-			FirstTry: now,
+		attempt = &LoginAttempt{
+			Count: 0,
+			First: now,
 		}
-		return true
+		rl.attempts[ip] = attempt
 	}
 
-	// Reset if window duration has passed
-	if time.Since(attempt.FirstTry) > windowDuration {
-		attempt.Count = 1
-		attempt.FirstTry = now
-		attempt.BlockedAt = time.Time{}
-		return true
+	// Check if blocked
+	if attempt.Count >= rl.limit {
+		blockUntil := attempt.First.Add(rl.window)
+		if now.Before(blockUntil) {
+			return 0, blockUntil, nil
+		}
+		// Reset if window has passed
+		attempt.Count = 0
+		attempt.First = now
 	}
 
 	// Increment attempt count
 	attempt.Count++
 
-	// Block if exceeded max attempts
-	if attempt.Count > maxAttempts {
-		attempt.BlockedAt = now
-		return false
-	}
-
-	return true
+	return rl.limit - attempt.Count, attempt.First.Add(rl.window), nil
 }
 
-func (rl *RateLimiter) GetRemainingAttempts(ip string) int {
-	rl.mu.RLock()
-	defer rl.mu.RUnlock()
-
-	attempt, exists := rl.attempts[ip]
-	if !exists {
-		return maxAttempts
+// cleanup removes old attempts
+func (rl *RateLimiter) cleanup(now time.Time) {
+	for ip, attempt := range rl.attempts {
+		if now.Sub(attempt.First) > rl.window {
+			delete(rl.attempts, ip)
+		}
 	}
-
-	if time.Since(attempt.FirstTry) > windowDuration {
-		return maxAttempts
-	}
-
-	return maxAttempts - attempt.Count
 }

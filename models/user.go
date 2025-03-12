@@ -241,3 +241,76 @@ func AdminUpdateUserPassword(db *sql.DB, userID int64, newPassword string) error
 	_, err = db.Exec("UPDATE users SET password_hash = ? WHERE id = ?", newHash, userID)
 	return err
 }
+
+// ResetToken represents a password reset token
+type ResetToken struct {
+	Token     string
+	UserID    int64
+	Email     string
+	Username  string
+	Expiry    time.Time
+	Used      bool
+	CreatedAt time.Time
+}
+
+// InvalidateExistingTokens invalidates any existing reset tokens for a user
+func InvalidateExistingTokens(db *sql.DB, email string) error {
+	_, err := db.Exec(`
+		DELETE FROM password_reset_tokens 
+		WHERE email = ? AND used = FALSE
+	`, email)
+	return err
+}
+
+// CreateResetToken creates a new password reset token
+func CreateResetToken(db *sql.DB, userID int64, email string, token string, expiry time.Time) error {
+	_, err := db.Exec(`
+		INSERT INTO password_reset_tokens (token, user_id, email, expiry)
+		VALUES (?, ?, ?, ?)
+	`, token, userID, email, expiry)
+	return err
+}
+
+// GetResetToken retrieves a reset token
+func GetResetToken(db *sql.DB, token string) (*ResetToken, error) {
+	var rt ResetToken
+	err := db.QueryRow(`
+		SELECT t.token, t.user_id, t.email, t.expiry, t.used, t.created_at, u.first_name
+		FROM password_reset_tokens t
+		JOIN users u ON t.user_id = u.id
+		WHERE t.token = ?
+	`, token).Scan(&rt.Token, &rt.UserID, &rt.Email, &rt.Expiry, &rt.Used, &rt.CreatedAt, &rt.Username)
+	if err != nil {
+		return nil, err
+	}
+	return &rt, nil
+}
+
+// MarkTokenUsed marks a reset token as used
+func MarkTokenUsed(db *sql.DB, token string) error {
+	_, err := db.Exec(`
+		UPDATE password_reset_tokens
+		SET used = TRUE
+		WHERE token = ?
+	`, token)
+	return err
+}
+
+// UpdateUserPassword updates a user's password
+func UpdateUserPassword(db *sql.DB, userID int64, hashedPassword string) error {
+	_, err := db.Exec(`
+		UPDATE users
+		SET password_hash = ?
+		WHERE id = ?
+	`, hashedPassword, userID)
+	return err
+}
+
+// HashPassword generates a bcrypt hash of the password
+func HashPassword(password string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	return string(hash), nil
+}

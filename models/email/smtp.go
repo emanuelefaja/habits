@@ -2,6 +2,7 @@ package email
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/wneessen/go-mail"
@@ -80,11 +81,33 @@ func (s *SMTPEmailService) SendWelcomeEmail(to, username string) error {
 }
 
 // SendPasswordResetEmail sends a password reset email
-func (s *SMTPEmailService) SendPasswordResetEmail(to, resetToken string, expiry time.Time) error {
+func (s *SMTPEmailService) SendPasswordResetEmail(to, resetLink string, expiry time.Time) error {
+	log.Printf("📧 Preparing password reset email for: %s", to)
+
 	data := PasswordResetEmailData{
-		ResetToken: resetToken,
-		Expiry:     expiry,
-		AppName:    "Habits",
+		ResetLink:   resetLink,
+		ExpiryHours: "1",     // Token expires in 1 hour
+		Username:    "there", // Generic greeting since we don't have the username here
+		AppName:     "Habits",
 	}
-	return s.SendTypedEmail(to, PasswordResetEmail, data)
+	log.Printf("📝 Email data prepared: %+v", data)
+
+	err := s.SendTypedEmail(to, PasswordResetEmail, data)
+	if err != nil {
+		log.Printf("❌ Failed to send password reset email: %v", err)
+		return err
+	}
+
+	log.Printf("✅ Password reset email sent successfully to: %s", to)
+	return nil
+}
+
+// SendPasswordResetSuccessEmail sends a password reset success email
+func (s *SMTPEmailService) SendPasswordResetSuccessEmail(to, username string) error {
+	data := PasswordResetSuccessEmailData{
+		Username:  username,
+		AppName:   "Habits",
+		LoginLink: "https://habits.co/login",
+	}
+	return s.SendTypedEmail(to, PasswordResetSuccessEmail, data)
 }

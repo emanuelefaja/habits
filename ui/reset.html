@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+{{template "head" .}}
+
+<body class="bg-gray-50 dark:bg-gray-900">
+    {{template "header.html" .}}
+
+    <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-[80vh] lg:py-0">
+        <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+            <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+                <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white">
+                    Reset your password 🔑
+                </h1>
+
+                <form x-data="{
+                    password: '',
+                    confirmPassword: '',
+                    showPassword: false,
+                    loading: false,
+                    message: '',
+                    error: '',
+                    token: '{{.Token}}',
+                    checks: {
+                        length: false,
+                        uppercase: false,
+                        lowercase: false,
+                        number: false,
+                        special: false
+                    },
+                    validatePassword() {
+                        this.checks.length = this.password.length >= 8;
+                        this.checks.uppercase = /[A-Z]/.test(this.password);
+                        this.checks.lowercase = /[a-z]/.test(this.password);
+                        this.checks.number = /[0-9]/.test(this.password);
+                        this.checks.special = /[^A-Za-z0-9]/.test(this.password);
+                    },
+                    generatePassword() {
+                        const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+                        const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                        const numbers = '0123456789';
+                        const special = '!@#$%^&*()_+';
+                        
+                        let result = '';
+                        result += lowercase.charAt(Math.floor(Math.random() * lowercase.length));
+                        result += uppercase.charAt(Math.floor(Math.random() * uppercase.length));
+                        result += numbers.charAt(Math.floor(Math.random() * numbers.length));
+                        result += special.charAt(Math.floor(Math.random() * special.length));
+                        
+                        const allChars = lowercase + uppercase + numbers + special;
+                        const remainingLength = 12;
+                        
+                        for (let i = 0; i < remainingLength; i++) {
+                            result += allChars.charAt(Math.floor(Math.random() * allChars.length));
+                        }
+                        
+                        result = result.split('').sort(() => Math.random() - 0.5).join('');
+                        this.password = result;
+                        this.confirmPassword = result;
+                        this.validatePassword();
+                        return result;
+                    },
+                    async submit() {
+                        if (this.password !== this.confirmPassword) {
+                            this.error = 'Passwords do not match ❌';
+                            return;
+                        }
+                        if (!Object.values(this.checks).every(Boolean)) {
+                            this.error = 'Please meet all password requirements ❌';
+                            return;
+                        }
+                        this.loading = true;
+                        this.error = '';
+                        this.message = '';
+                        
+                        try {
+                            const response = await fetch('/api/reset-password', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    token: this.token,
+                                    password: this.password
+                                })
+                            });
+                            
+                            if (response.ok) {
+                                this.message = 'Password reset successful! Redirecting to login... ✨';
+                                setTimeout(() => {
+                                    window.location.href = '/login';
+                                }, 2000);
+                            } else {
+                                const data = await response.json();
+                                this.error = data.error || 'Failed to reset password ❌';
+                            }
+                        } catch (err) {
+                            this.error = 'An error occurred ❌';
+                        } finally {
+                            this.loading = false;
+                        }
+                    }
+                }" class="space-y-4 md:space-y-6" @submit.prevent="submit">
+                    {{if .Flash}}
+                    <div x-data x-init="$nextTick(() => { message = '{{.Flash}}' })" class="text-green-600 dark:text-green-400"></div>
+                    {{end}}
+                    
+                    <div x-show="message" x-text="message" class="text-green-600 dark:text-green-400"></div>
+                    <div x-show="error" x-text="error" class="text-red-600 dark:text-red-400"></div>
+
+                    <div>
+                        <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">🔑 New Password</label>
+                        <div class="relative flex">
+                            <div class="relative flex-1">
+                                <input :type="showPassword ? 'text' : 'password'" name="password" id="password" 
+                                    x-model="password" 
+                                    @input="validatePassword"
+                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6"
+                                    required>
+                                <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500">
+                                    <span x-show="!showPassword">🔒</span>
+                                    <span x-show="showPassword">👀</span>
+                                </button>
+                            </div>
+                            <button type="button" 
+                                @click="generatePassword()"
+                                class="ml-2 px-3 py-1.5 rounded-md bg-gray-100 text-sm text-gray-700 hover:bg-gray-200 flex-shrink-0">
+                                🎲 Generate
+                            </button>
+                        </div>
+                        <!-- Password Requirements Checklist -->
+                        <div class="mt-2 space-y-2">
+                            <ul class="text-sm text-gray-600 space-y-1">
+                                <li x-text="checks.length ? '✅ At least 8 characters' : '❌ At least 8 characters'"></li>
+                                <li x-text="checks.uppercase ? '✅ At least one uppercase letter' : '❌ At least one uppercase letter'"></li>
+                                <li x-text="checks.lowercase ? '✅ At least one lowercase letter' : '❌ At least one lowercase letter'"></li>
+                                <li x-text="checks.number ? '✅ At least one number' : '❌ At least one number'"></li>
+                                <li x-text="checks.special ? '✅ At least one special character' : '❌ At least one special character'"></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="confirm-password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">🔄 Confirm Password</label>
+                        <div class="relative">
+                            <input :type="showPassword ? 'text' : 'password'" name="confirm-password" id="confirm-password" 
+                                x-model="confirmPassword"
+                                class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6"
+                                required>
+                        </div>
+                    </div>
+
+                    <button type="submit" :disabled="loading"
+                        class="flex w-full justify-center rounded-md bg-[#2da44e] px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-[#2c974b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2da44e] disabled:opacity-50">
+                        <span x-show="!loading">Reset Password</span>
+                        <span x-show="loading">Resetting...</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {{template "footer.html" .}}
+</body>
+
+</html> 

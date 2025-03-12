@@ -167,6 +167,30 @@ func InitDB(db *sql.DB) error {
 		return err
 	}
 
+	// Create password_reset_tokens table
+	_, err = db.Exec(`
+		CREATE TABLE IF NOT EXISTS password_reset_tokens (
+			token TEXT PRIMARY KEY,
+			user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+			email TEXT NOT NULL,
+			expiry TIMESTAMP NOT NULL,
+			used BOOLEAN DEFAULT FALSE,
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+		)
+	`)
+	if err != nil {
+		return err
+	}
+
+	// Add indexes for password_reset_tokens
+	_, err = db.Exec(`
+		CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_email ON password_reset_tokens(email);
+		CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_user_id ON password_reset_tokens(user_id)
+	`)
+	if err != nil {
+		return err
+	}
+
 	// Create goals table
 	_, err = db.Exec(`
 		CREATE TABLE IF NOT EXISTS goals (

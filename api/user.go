@@ -121,9 +121,10 @@ func LoginHandler(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
 		}
 
 		// Check if IP is blocked
-		if middleware.Limiter.IsBlocked(ip) {
+		remaining, _, err := middleware.LoginLimiter.CheckLimit(&http.Request{RemoteAddr: ip})
+		if err != nil || remaining <= 0 {
 			tmpl.ExecuteTemplate(w, "login.html", TemplateData{
-				Error: "Too many login attempts. Please try again in 15 minutes ⏳",
+				Error: "Too many login attempts. Please try again later ⏳",
 			})
 			return
 		}
@@ -134,11 +135,11 @@ func LoginHandler(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
 		// First validate the password
 		valid, err := models.ValidatePassword(db, email, password)
 		if err != nil || !valid {
-			// Record failed attempt
-			remaining := middleware.Limiter.GetRemainingAttempts(ip)
-			if !middleware.Limiter.RecordAttempt(ip) {
+			// Record failed attempt and check remaining attempts
+			remaining, _, _ := middleware.LoginLimiter.CheckLimit(&http.Request{RemoteAddr: ip})
+			if remaining <= 0 {
 				tmpl.ExecuteTemplate(w, "login.html", TemplateData{
-					Error: "Too many login attempts. Please try again in 15 minutes ⏳",
+					Error: "Too many login attempts. Please try again later ⏳",
 				})
 				return
 			}
