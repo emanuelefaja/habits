@@ -20,6 +20,7 @@ For each habit type, you also have the ability to drill down into the habit to s
 │   ├── github.go     - GitHub synchronization
 │   ├── goal.go       - Goal management
 │   ├── habit.go      - Habit operations
+│   ├── password_reset.go - Password reset functionality
 │   ├── roadmap.go    - Product roadmap
 │   ├── stats.go      - Statistics endpoints
 │   └── user.go       - User profile API
@@ -43,7 +44,7 @@ For each habit type, you also have the ability to drill down into the habit to s
 │   └── user.go       - User models
 ├── middleware/        - Request processing
 │   ├── auth.go       - Authentication
-│   ├── ratelimit.go  - Rate limiting
+│   ├── ratelimit.go  - Rate limiting (auth & password reset)
 │   └── sessions.go   - Session management
 ├── static/            - Static assets
 │   ├── icons/        - Application icons
@@ -54,10 +55,18 @@ For each habit type, you also have the ability to drill down into the habit to s
 │   └── sw.js         - Service worker
 ├── ui/                - User interface
 │   ├── components/   - Reusable templates
-│   ├── email/        - Email templates (txt and html)
+│   ├── email/        - Email templates
+│   │   ├── reset-password.html    - Password reset email
+│   │   ├── reset-password.txt     - Plain text version
+│   │   ├── reset-success.html     - Reset confirmation
+│   │   ├── reset-success.txt      - Plain text version
+│   │   ├── welcome.html          - Welcome email
+│   │   └── welcome.txt           - Plain text version
 │   ├── habits/       - Habit-type views
 │   ├── blog/         - Blog templates
-│   ├── *.html        - Core application pages
+│   ├── forgot.html   - Forgot password page
+│   ├── reset.html    - Password reset page
+│   └── *.html        - Core application pages
 ├── main.go           - Application entry
 ├── openapi.yaml      - API documentation
 └── .env.example      - Environment template
