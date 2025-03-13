@@ -109,8 +109,8 @@ func CreateGoalHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Calculate initial progress and status
-		if err := goal.CalculateProgress(db); err != nil {
+		// Calculate initial progress and status in memory
+		if err := goal.CalculateProgressInMemory(db); err != nil {
 			log.Printf("Error calculating initial goal progress: %v", err)
 			// Don't fail the request, just log the error
 		}

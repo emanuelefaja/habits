@@ -439,8 +439,13 @@
                                             let totalReps = 0;
                                             for (let d = 1; d <= getDaysInMonth(); d++) {
                                                 const log = habitLogs[`${habit.id}_${formatDate(d)}`];
-                                                if (log?.total_reps) {
-                                                    totalReps += parseInt(log.total_reps);
+                                                if (log?.value?.Valid && log.status === 'done') {
+                                                    try {
+                                                        const valueObj = JSON.parse(log.value.String);
+                                                        totalReps += valueObj.sets.reduce((sum, set) => sum + (parseInt(set.reps) || 0), 0);
+                                                    } catch (error) {
+                                                        console.error('Error calculating total reps:', error);
+                                                    }
                                                 }
                                             }
                                             return totalReps;
