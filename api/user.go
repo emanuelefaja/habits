@@ -33,6 +33,20 @@ func RegisterHandler(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
 			return
 		}
 
+		// Check if signups are allowed
+		allowSignups, err := models.GetSignupStatus(db)
+		if err != nil {
+			log.Printf("Error checking signup status: %v", err)
+			// Default to allowing signups if there's an error
+		} else if !allowSignups {
+			log.Printf("Registration attempt when signups are disabled")
+			w.WriteHeader(http.StatusForbidden)
+			tmpl.ExecuteTemplate(w, "register.html", map[string]interface{}{
+				"Error": "Registration is currently disabled ❌",
+			})
+			return
+		}
+
 		// Get the real IP address using our helper function
 		ip := middleware.GetClientIP(r)
 		log.Printf("Registration attempt from IP: %s", ip)

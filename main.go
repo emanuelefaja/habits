@@ -230,6 +230,18 @@ func main() {
 	http.Handle("/register", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
+			// Check if signups are allowed
+			allowSignups, err := models.GetSignupStatus(db)
+			if err != nil {
+				log.Printf("Error checking signup status: %v", err)
+				// Default to allowing signups if there's an error
+			} else if !allowSignups {
+				// Redirect to login page with a message
+				middleware.SetFlash(r, "Registration is currently disabled ❌")
+				http.Redirect(w, r, "/login", http.StatusSeeOther)
+				return
+			}
+
 			renderTemplate(w, templates, "register.html", nil)
 		case http.MethodPost:
 			api.RegisterHandler(db, templates)(w, r)
@@ -465,8 +477,14 @@ func main() {
 			users, err := models.GetAllUsers(db)
 			if err != nil {
 				log.Printf("Error getting all users: %v", err)
-				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-				return
+				users = []*models.User{}
+			}
+
+			// Get signup status
+			allowSignups, err := models.GetSignupStatus(db)
+			if err != nil {
+				log.Printf("Error getting signup status: %v", err)
+				allowSignups = true // Default to allowing signups
 			}
 
 			data := struct {
@@ -476,7 +494,7 @@ func main() {
 				TotalHabits    int
 				TotalHabitLogs int
 				TotalGoals     int
-				Page           string
+				AllowSignups   bool
 			}{
 				User:           user,
 				Users:          users,
@@ -484,14 +502,16 @@ func main() {
 				TotalHabits:    totalHabits,
 				TotalHabitLogs: totalHabitLogs,
 				TotalGoals:     totalGoals,
-				Page:           "admin",
+				AllowSignups:   allowSignups,
 			}
+
 			renderTemplate(w, templates, "admin.html", data)
 		}))))
 
 	// Admin APIs
 	http.Handle("/admin/api/user/password", middleware.SessionManager.LoadAndSave(middleware.RequireAdmin(api.AdminResetPasswordHandler(db))))
 	http.Handle("/admin/api/user/delete", middleware.SessionManager.LoadAndSave(middleware.RequireAdmin(api.AdminDeleteUserHandler(db))))
+	http.Handle("/admin/api/toggle-signups", middleware.SessionManager.LoadAndSave(middleware.RequireAdmin(api.ToggleSignupStatusHandler(db))))
 
 	// Habit Logs Deletion
 	http.Handle("/api/habits/logs/delete", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

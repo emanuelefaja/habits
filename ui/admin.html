@@ -184,6 +184,41 @@
                 </div>
             </div>
         </div>
+
+        <div class="mt-8">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
+                <div class="p-6">
+                    <h2 class="text-xl font-semibold mb-4 dark:text-white">⚙️ Site Settings</h2>
+                    
+                    <div class="space-y-4">
+                        <!-- Signup Toggle -->
+                        <div x-data="{ allowSignups: {{ .AllowSignups }} }" class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-white">User Registration</h3>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    Toggle whether new users can sign up for the site
+                                </p>
+                            </div>
+                            <div class="flex items-center">
+                                <button 
+                                    @click="allowSignups = !allowSignups; toggleSignups(allowSignups)"
+                                    :class="allowSignups ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'"
+                                    class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                                    role="switch"
+                                    :aria-checked="allowSignups"
+                                >
+                                    <span 
+                                        :class="allowSignups ? 'translate-x-5' : 'translate-x-0'"
+                                        class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                                    ></span>
+                                </button>
+                                <span class="ml-3 text-sm font-medium text-gray-900 dark:text-white" x-text="allowSignups ? 'Enabled' : 'Disabled'"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Add this before the closing </body> tag -->
@@ -471,6 +506,42 @@
                 flashComponent.showFlash = false;
                 flashComponent.flashMessage = '';
             }, 5000);
+        }
+    }
+
+    async function toggleSignups(allowSignups) {
+        try {
+            const response = await fetch(`/admin/api/toggle-signups`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ allow_signups: allowSignups }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update signup status');
+            }
+
+            const data = await response.json();
+            
+            // Show flash message
+            window.dispatchEvent(new CustomEvent('show-flash', {
+                detail: {
+                    message: `Signups ${allowSignups ? 'enabled' : 'disabled'} successfully!`,
+                    type: 'success'
+                }
+            }));
+        } catch (error) {
+            console.error('Error:', error);
+            
+            // Show error message
+            window.dispatchEvent(new CustomEvent('show-flash', {
+                detail: {
+                    message: 'Failed to update signup status',
+                    type: 'error'
+                }
+            }));
         }
     }
     </script>

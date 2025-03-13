@@ -78,3 +78,73 @@ func GetAllUsers(db *sql.DB) ([]*User, error) {
 	}
 	return users, nil
 }
+
+// GetSignupStatus retrieves the current signup status from the database
+func GetSignupStatus(db *sql.DB) (bool, error) {
+	// Check if the settings table exists
+	var tableExists int
+	err := db.QueryRow("SELECT count(*) FROM sqlite_master WHERE type='table' AND name='settings'").Scan(&tableExists)
+	if err != nil {
+		return true, err
+	}
+
+	// Create settings table if it doesn't exist
+	if tableExists == 0 {
+		_, err = db.Exec(`CREATE TABLE settings (
+			key TEXT PRIMARY KEY,
+			value TEXT NOT NULL
+		)`)
+		if err != nil {
+			return true, err
+		}
+
+		// Default to allowing signups
+		_, err = db.Exec("INSERT INTO settings (key, value) VALUES ('allow_signups', 'true')")
+		if err != nil {
+			return true, err
+		}
+		return true, nil
+	}
+
+	// Get the current signup status
+	var value string
+	err = db.QueryRow("SELECT value FROM settings WHERE key = 'allow_signups'").Scan(&value)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			// If the setting doesn't exist, create it with default value (true)
+			_, err = db.Exec("INSERT INTO settings (key, value) VALUES ('allow_signups', 'true')")
+			if err != nil {
+				return true, err
+			}
+			return true, nil
+		}
+		return true, err
+	}
+
+	return value == "true", nil
+}
+
+// SetSignupStatus updates the signup status in the database
+func SetSignupStatus(db *sql.DB, allow bool) error {
+	value := "false"
+	if allow {
+		value = "true"
+	}
+
+	// Check if the setting exists
+	var count int
+	err := db.QueryRow("SELECT COUNT(*) FROM settings WHERE key = 'allow_signups'").Scan(&count)
+	if err != nil {
+		return err
+	}
+
+	if count > 0 {
+		// Update existing setting
+		_, err = db.Exec("UPDATE settings SET value = ? WHERE key = 'allow_signups'", value)
+	} else {
+		// Insert new setting
+		_, err = db.Exec("INSERT INTO settings (key, value) VALUES ('allow_signups', ?)", value)
+	}
+
+	return err
+}

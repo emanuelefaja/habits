@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
@@ -111,5 +112,42 @@ func AdminDeleteUserHandler(db *sql.DB) http.HandlerFunc {
 
 		// Return success
 		w.WriteHeader(http.StatusOK)
+	}
+}
+
+// ToggleSignupStatusHandler handles toggling the signup status
+func ToggleSignupStatusHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		// Parse the request body
+		var requestData struct {
+			AllowSignups bool `json:"allow_signups"`
+		}
+
+		err := json.NewDecoder(r.Body).Decode(&requestData)
+		if err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
+
+		// Update the signup status
+		err = models.SetSignupStatus(db, requestData.AllowSignups)
+		if err != nil {
+			log.Printf("Error updating signup status: %v", err)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		// Return success response
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success":       true,
+			"message":       "Signup status updated successfully",
+			"allow_signups": requestData.AllowSignups,
+		})
 	}
 }
