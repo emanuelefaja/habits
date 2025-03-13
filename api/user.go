@@ -33,6 +33,22 @@ func RegisterHandler(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
 			return
 		}
 
+		// Get the real IP address using our helper function
+		ip := middleware.GetClientIP(r)
+		log.Printf("Registration attempt from IP: %s", ip)
+
+		// Check IP rate limiting - pass the original request
+		remaining, resetTime, err := middleware.RegistrationLimiter.CheckLimit(r)
+		if err != nil || remaining <= 0 {
+			log.Printf("Registration rate limit exceeded for IP: %s. Reset at: %v", ip, resetTime)
+			w.WriteHeader(http.StatusTooManyRequests)
+			tmpl.ExecuteTemplate(w, "register.html", map[string]interface{}{
+				"Error": "Too many registration attempts. Please try again later ⏳",
+			})
+			return
+		}
+		log.Printf("Registration attempt allowed for IP: %s. Remaining attempts: %d", ip, remaining)
+
 		firstName := r.FormValue("first_name")
 		lastName := r.FormValue("last_name")
 		email := r.FormValue("email")
@@ -114,15 +130,14 @@ func LoginHandler(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
 			return
 		}
 
-		// Get IP address from request
-		ip := r.RemoteAddr
-		if forwardedFor := r.Header.Get("X-Forwarded-For"); forwardedFor != "" {
-			ip = forwardedFor
-		}
+		// Get IP address from request using our helper function
+		ip := middleware.GetClientIP(r)
+		log.Printf("Login attempt from IP: %s", ip)
 
-		// Check if IP is blocked
-		remaining, _, err := middleware.LoginLimiter.CheckLimit(&http.Request{RemoteAddr: ip})
+		// Check if IP is blocked - use the original request
+		remaining, resetTime, err := middleware.LoginLimiter.CheckLimit(r)
 		if err != nil || remaining <= 0 {
+			log.Printf("Login rate limit exceeded for IP: %s. Reset at: %v", ip, resetTime)
 			tmpl.ExecuteTemplate(w, "login.html", TemplateData{
 				Error: "Too many login attempts. Please try again later ⏳",
 			})
@@ -135,9 +150,10 @@ func LoginHandler(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
 		// First validate the password
 		valid, err := models.ValidatePassword(db, email, password)
 		if err != nil || !valid {
-			// Record failed attempt and check remaining attempts
-			remaining, _, _ := middleware.LoginLimiter.CheckLimit(&http.Request{RemoteAddr: ip})
+			// Record failed attempt and check remaining attempts - use the original request
+			remaining, resetTime, _ := middleware.LoginLimiter.CheckLimit(r)
 			if remaining <= 0 {
+				log.Printf("Login rate limit exceeded after failed attempt for IP: %s. Reset at: %v", ip, resetTime)
 				tmpl.ExecuteTemplate(w, "login.html", TemplateData{
 					Error: "Too many login attempts. Please try again later ⏳",
 				})
