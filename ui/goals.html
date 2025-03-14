@@ -255,53 +255,162 @@ x-init="loadHabits(); loadGoals()"
                 </div>
 
                 <!-- Habit Selection -->
-                <div x-data="{ open: false, selectedHabit: null }">
+                <div x-data="{
+                    selectOpen: false,
+                    selectedItem: null,
+                    selectableItems: [],
+                    selectableItemActive: null,
+                    selectId: $id('habit-select'),
+                    selectKeydownValue: '',
+                    selectKeydownTimeout: 1000,
+                    selectKeydownClearTimeout: null,
+                    selectDropdownPosition: 'bottom',
+                    
+                    // Initialize items from habits
+                    initItems() {
+                        this.selectableItems = habits.filter(h => h.habit_type !== 'option-select').map(habit => ({
+                            title: `${habit.emoji} ${habit.name}`,
+                            value: habit.id,
+                            disabled: false,
+                            habit: habit
+                        }));
+                    },
+                    
+                    selectableItemIsActive(item) {
+                        return this.selectableItemActive && this.selectableItemActive.value == item.value;
+                    },
+                    selectableItemActiveNext(){
+                        let index = this.selectableItems.indexOf(this.selectableItemActive);
+                        if(index < this.selectableItems.length-1){
+                            this.selectableItemActive = this.selectableItems[index+1];
+                            this.selectScrollToActiveItem();
+                        }
+                    },
+                    selectableItemActivePrevious(){
+                        let index = this.selectableItems.indexOf(this.selectableItemActive);
+                        if(index > 0){
+                            this.selectableItemActive = this.selectableItems[index-1];
+                            this.selectScrollToActiveItem();
+                        }
+                    },
+                    selectScrollToActiveItem(){
+                        if(this.selectableItemActive){
+                            activeElement = document.getElementById(this.selectableItemActive.value + '-' + this.selectId)
+                            newScrollPos = (activeElement.offsetTop + activeElement.offsetHeight) - this.$refs.selectableItemsList.offsetHeight;
+                            if(newScrollPos > 0){
+                                this.$refs.selectableItemsList.scrollTop=newScrollPos;
+                            } else {
+                                this.$refs.selectableItemsList.scrollTop=0;
+                            }
+                        }
+                    },
+                    selectKeydown(event){
+                        if (event.keyCode >= 65 && event.keyCode <= 90) {
+                            this.selectKeydownValue += event.key;
+                            selectedItemBestMatch = this.selectItemsFindBestMatch();
+                            if(selectedItemBestMatch){
+                                if(this.selectOpen){
+                                    this.selectableItemActive = selectedItemBestMatch;
+                                    this.selectScrollToActiveItem();
+                                } else {
+                                    this.selectedItem = this.selectableItemActive = selectedItemBestMatch;
+                                }
+                            }
+                            
+                            if(this.selectKeydownValue != ''){
+                                clearTimeout(this.selectKeydownClearTimeout);
+                                this.selectKeydownClearTimeout = setTimeout(() => {
+                                    this.selectKeydownValue = '';
+                                }, this.selectKeydownTimeout);
+                            }
+                        }
+                    },
+                    selectItemsFindBestMatch(){
+                        typedValue = this.selectKeydownValue.toLowerCase();
+                        var bestMatch = null;
+                        var bestMatchIndex = -1;
+                        for (var i = 0; i < this.selectableItems.length; i++) {
+                            var title = this.selectableItems[i].title.toLowerCase();
+                            var index = title.indexOf(typedValue);
+                            if (index > -1 && (bestMatchIndex == -1 || index < bestMatchIndex) && !this.selectableItems[i].disabled) {
+                                bestMatch = this.selectableItems[i];
+                                bestMatchIndex = index;
+                            }
+                        }
+                        return bestMatch;
+                    },
+                    selectPositionUpdate(){
+                        selectDropdownBottomPos = this.$refs.selectButton.getBoundingClientRect().top + this.$refs.selectButton.offsetHeight + parseInt(window.getComputedStyle(this.$refs.selectableItemsList).maxHeight);
+                        if(window.innerHeight < selectDropdownBottomPos){
+                            this.selectDropdownPosition = 'top';
+                        } else {
+                            this.selectDropdownPosition = 'bottom';
+                        }
+                    },
+                    selectHabit(item) {
+                        this.selectedItem = item;
+                        newGoal.habitId = item.value;
+                        this.selectOpen = false;
+                    }
+                }"
+                x-init="
+                    initItems();
+                    $watch('selectOpen', function(){
+                        if(!selectedItem && selectableItems.length > 0){ 
+                            selectableItemActive = selectableItems[0];
+                        } else {
+                            selectableItemActive = selectedItem;
+                        }
+                        setTimeout(function(){
+                            selectScrollToActiveItem();
+                        }, 10);
+                        selectPositionUpdate();
+                        window.addEventListener('resize', (event) => { selectPositionUpdate(); });
+                    });
+                    $watch('habits', function() {
+                        initItems();
+                    });
+                "
+                @keydown.escape="if(selectOpen){ selectOpen=false; }"
+                @keydown.down="if(selectOpen){ selectableItemActiveNext(); } else { selectOpen=true; } event.preventDefault();"
+                @keydown.up="if(selectOpen){ selectableItemActivePrevious(); } else { selectOpen=true; } event.preventDefault();"
+                @keydown.enter="if(selectableItemActive){ selectHabit(selectableItemActive); }"
+                @keydown="selectKeydown($event);"
+                class="relative w-full">
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Select Habit</label>
-                    <div class="relative">
-                        <button 
-                            type="button" 
-                            @click="open = !open"
-                            class="inline-flex w-full justify-between items-center gap-x-1.5 rounded-md bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 shadow-sm"
-                            :class="{ 'ring-2 ring-[#2da44e] border-transparent': open }"
-                            id="habit-menu-button" 
-                            aria-expanded="true" 
-                            aria-haspopup="true">
-                            <span x-text="selectedHabit ? `${selectedHabit.emoji} ${selectedHabit.name}` : 'Select a habit...'" class="text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500" :class="{ 'text-gray-400 dark:text-gray-500': !selectedHabit }"></span>
-                            <svg class="-mr-1 size-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
+                    
+                    <button x-ref="selectButton" @click="selectOpen=!selectOpen"
+                        :class="{ 'focus:ring-2 focus:ring-offset-2 focus:ring-[#2da44e]' : !selectOpen }"
+                        class="relative min-h-[38px] flex items-center justify-between w-full py-2 pl-3 pr-10 text-left bg-white dark:bg-gray-700 border rounded-md shadow-sm cursor-default border-gray-300 dark:border-gray-600 focus:outline-none text-sm text-gray-900 dark:text-white">
+                        <span x-text="selectedItem ? selectedItem.title : 'Select a habit...'" class="truncate" :class="{ 'text-gray-400 dark:text-gray-500': !selectedItem }">Select a habit...</span>
+                        <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="w-5 h-5 text-gray-400"><path fill-rule="evenodd" d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z" clip-rule="evenodd"></path></svg>
+                        </span>
+                    </button>
 
-                        <!-- Dropdown menu -->
-                        <div 
-                            x-show="open"
-                            @click.away="open = false"
-                            x-transition:enter="transition ease-out duration-100"
-                            x-transition:enter-start="transform opacity-0 scale-95"
-                            x-transition:enter-end="transform opacity-100 scale-100"
-                            x-transition:leave="transition ease-in duration-75"
-                            x-transition:leave-start="transform opacity-100 scale-100"
-                            x-transition:leave-end="transform opacity-0 scale-95"
-                            class="absolute left-0 z-10 mt-2 w-full origin-top-right rounded-md bg-white dark:bg-gray-700 shadow-lg ring-1 ring-black/5 dark:ring-white/5 focus:outline-none max-h-60 overflow-y-auto"
-                            role="menu" 
-                            aria-orientation="vertical" 
-                            aria-labelledby="habit-menu-button" 
-                            tabindex="-1">
-                            <div class="py-1" role="none">
-                                <template x-for="habit in habits.filter(h => h.habit_type !== 'option-select')" :key="habit.id">
-                                    <a 
-                                        href="#" 
-                                        @click.prevent="selectedHabit = habit; newGoal.habitId = habit.id; open = false"
-                                        class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600"
-                                        :class="{ 'bg-gray-100 dark:bg-gray-600': selectedHabit?.id === habit.id }"
-                                        role="menuitem" 
-                                        tabindex="-1">
-                                        <span x-text="`${habit.emoji} ${habit.name}`"></span>
-                                    </a>
-                                </template>
-                            </div>
-                        </div>
-                    </div>
+                    <ul x-show="selectOpen"
+                        x-ref="selectableItemsList"
+                        @click.away="selectOpen = false"
+                        x-transition:enter="transition ease-out duration-50"
+                        x-transition:enter-start="opacity-0 -translate-y-1"
+                        x-transition:enter-end="opacity-100"
+                        :class="{ 'bottom-0 mb-10' : selectDropdownPosition == 'top', 'top-0 mt-10' : selectDropdownPosition == 'bottom' }"
+                        class="absolute z-10 w-full py-1 mt-1 overflow-auto text-sm bg-white dark:bg-gray-700 rounded-md shadow-lg max-h-60 ring-1 ring-black/5 dark:ring-white/5 focus:outline-none"
+                        x-cloak>
+
+                        <template x-for="item in selectableItems" :key="item.value">
+                            <li 
+                                @click="selectHabit(item); $refs.selectButton.focus();"
+                                :id="item.value + '-' + selectId"
+                                :data-disabled="item.disabled"
+                                :class="{ 'bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white' : selectableItemIsActive(item), 'text-gray-700 dark:text-gray-200' : !selectableItemIsActive(item) }"
+                                @mousemove="selectableItemActive=item"
+                                class="relative flex items-center h-full py-2 pl-8 cursor-default select-none data-[disabled]:opacity-50 data-[disabled]:pointer-events-none hover:bg-gray-100 dark:hover:bg-gray-600">
+                                <svg x-show="selectedItem && selectedItem.value==item.value" class="absolute left-0 w-4 h-4 ml-2 stroke-current text-[#2da44e]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                <span class="block font-medium truncate" x-text="item.title"></span>
+                            </li>
+                        </template>
+                    </ul>
                 </div>
 
                 <!-- Target Value -->
