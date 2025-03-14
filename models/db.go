@@ -224,6 +224,26 @@ func InitDB(db *sql.DB) error {
 		return err
 	}
 
+	// Create settings table
+	_, err = db.Exec(`
+		CREATE TABLE IF NOT EXISTS settings (
+			key TEXT PRIMARY KEY,
+			value TEXT NOT NULL
+		)
+	`)
+	if err != nil {
+		return err
+	}
+
+	// Insert default settings if they don't exist
+	_, err = db.Exec(`
+		INSERT OR IGNORE INTO settings (key, value) 
+		VALUES ('allow_signups', 'true')
+	`)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
