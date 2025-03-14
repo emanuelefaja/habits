@@ -73,9 +73,10 @@
         }
     },
     get isValidGoal() {
+        
         return this.newGoal.name && 
                this.newGoal.habitId &&
-               this.newGoal.target > 0 && 
+               this.newGoal.targetNumber > 0 && 
                this.newGoal.endDate && 
                new Date(this.newGoal.endDate) > new Date(this.newGoal.startDate);
     },
@@ -87,7 +88,7 @@
             name: this.newGoal.name,
             start_date: this.newGoal.startDate,
             end_date: this.newGoal.endDate,
-            target_number: parseFloat(this.newGoal.target)
+            target_number: parseFloat(this.newGoal.targetNumber)
         };
 
         try {
@@ -418,7 +419,7 @@ x-init="loadHabits(); loadGoals()"
                     <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Target Value</label>
                     <input 
                         type="number" 
-                        x-model="newGoal.target"
+                        x-model="newGoal.targetNumber"
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white"
                         placeholder="Enter target value">
                 </div>
@@ -427,17 +428,261 @@ x-init="loadHabits(); loadGoals()"
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Date</label>
-                        <input 
-                            type="date" 
-                            x-model="newGoal.startDate"
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white">
+                        <div x-data="{
+                            datePickerOpen: false,
+                            datePickerValue: newGoal.startDate,
+                            datePickerFormat: 'YYYY-MM-DD',
+                            datePickerMonth: '',
+                            datePickerYear: '',
+                            datePickerDay: '',
+                            datePickerDaysInMonth: [],
+                            datePickerBlankDaysInMonth: [],
+                            datePickerMonthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                            datePickerDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+                            init() {
+                                if (this.newGoal.startDate) {
+                                    const [year, month, day] = this.newGoal.startDate.split('-');
+                                    this.datePickerYear = parseInt(year);
+                                    this.datePickerMonth = parseInt(month) - 1;
+                                    this.datePickerDay = parseInt(day);
+                                } else {
+                                    const currentDate = new Date();
+                                    this.datePickerMonth = currentDate.getMonth();
+                                    this.datePickerYear = currentDate.getFullYear();
+                                }
+                                this.datePickerCalculateDays();
+                            },
+                            datePickerDayClicked(day) {
+                                const selectedDate = new Date(this.datePickerYear, this.datePickerMonth, day);
+                                this.datePickerValue = this.datePickerFormatDate(selectedDate);
+                                this.datePickerOpen = false;
+                            },
+                            datePickerPreviousMonth() {
+                                if (this.datePickerMonth === 0) {
+                                    this.datePickerYear--;
+                                    this.datePickerMonth = 11;
+                                } else {
+                                    this.datePickerMonth--;
+                                }
+                                this.datePickerCalculateDays();
+                            },
+                            datePickerNextMonth() {
+                                if (this.datePickerMonth === 11) {
+                                    this.datePickerYear++;
+                                    this.datePickerMonth = 0;
+                                } else {
+                                    this.datePickerMonth++;
+                                }
+                                this.datePickerCalculateDays();
+                            },
+                            datePickerIsSelectedDate(day) {
+                                const d = new Date(this.datePickerYear, this.datePickerMonth, day);
+                                return this.datePickerValue === this.datePickerFormatDate(d);
+                            },
+                            datePickerIsToday(day) {
+                                const today = new Date();
+                                const d = new Date(this.datePickerYear, this.datePickerMonth, day);
+                                return today.toDateString() === d.toDateString();
+                            },
+                            datePickerCalculateDays() {
+                                const daysInMonth = new Date(this.datePickerYear, this.datePickerMonth + 1, 0).getDate();
+                                const dayOfWeek = new Date(this.datePickerYear, this.datePickerMonth).getDay();
+                                this.datePickerBlankDaysInMonth = Array.from({length: dayOfWeek}, (_, i) => i + 1);
+                                this.datePickerDaysInMonth = Array.from({length: daysInMonth}, (_, i) => i + 1);
+                            },
+                            datePickerFormatDate(date) {
+                                const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+                                return formattedDate;
+                            }
+                        }" 
+                        x-modelable="datePickerValue" 
+                        x-model="newGoal.startDate">
+                            <div class="relative w-full">
+                                <input x-ref="datePickerInput" 
+                                    type="text" 
+                                    @click="datePickerOpen = !datePickerOpen" 
+                                    x-model="datePickerValue" 
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white" 
+                                    readonly>
+                                <div class="absolute top-0 right-0 px-3 py-2 cursor-pointer text-gray-400" @click="datePickerOpen = !datePickerOpen">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <div x-show="datePickerOpen" x-cloak 
+                                    class="absolute z-10 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4 w-full">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div>
+                                            <span x-text="datePickerMonthNames[datePickerMonth]" class="text-sm font-semibold dark:text-white"></span>
+                                            <span x-text="datePickerYear" class="ml-1 text-sm dark:text-gray-300"></span>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <button @click="datePickerPreviousMonth()" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                                </svg>
+                                            </button>
+                                            <button @click="datePickerNextMonth()" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-7 gap-1 mb-2">
+                                        <template x-for="day in datePickerDays" :key="day">
+                                            <div class="text-center text-xs font-medium text-gray-600 dark:text-gray-400" x-text="day"></div>
+                                        </template>
+                                    </div>
+                                    <div class="grid grid-cols-7 gap-1">
+                                        <template x-for="blankDay in datePickerBlankDaysInMonth">
+                                            <div class="text-center"></div>
+                                        </template>
+                                        <template x-for="day in datePickerDaysInMonth" :key="day">
+                                            <button @click="datePickerDayClicked(day)"
+                                                class="w-8 h-8 rounded-full text-sm flex items-center justify-center transition-colors"
+                                                :class="{
+                                                    'bg-[#2da44e] text-white': datePickerIsSelectedDate(day),
+                                                    'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700': !datePickerIsSelectedDate(day),
+                                                    'font-semibold': datePickerIsToday(day)
+                                                }">
+                                                <span x-text="day"></span>
+                                            </button>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                    
+                    <!-- Repeat the same structure for End Date -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">End Date</label>
-                        <input 
-                            type="date" 
-                            x-model="newGoal.endDate"
-                            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white">
+                        <div x-data="{
+                            datePickerOpen: false,
+                            datePickerValue: newGoal.endDate,
+                            datePickerFormat: 'YYYY-MM-DD',
+                            datePickerMonth: '',
+                            datePickerYear: '',
+                            datePickerDay: '',
+                            datePickerDaysInMonth: [],
+                            datePickerBlankDaysInMonth: [],
+                            datePickerMonthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                            datePickerDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+                            init() {
+                                if (this.newGoal.endDate) {
+                                    const [year, month, day] = this.newGoal.endDate.split('-');
+                                    this.datePickerYear = parseInt(year);
+                                    this.datePickerMonth = parseInt(month) - 1;
+                                    this.datePickerDay = parseInt(day);
+                                } else {
+                                    const currentDate = new Date();
+                                    this.datePickerMonth = currentDate.getMonth();
+                                    this.datePickerYear = currentDate.getFullYear();
+                                }
+                                this.datePickerCalculateDays();
+                            },
+                            datePickerDayClicked(day) {
+                                const selectedDate = new Date(this.datePickerYear, this.datePickerMonth, day);
+                                this.datePickerValue = this.datePickerFormatDate(selectedDate);
+                                this.datePickerOpen = false;
+                            },
+                            datePickerPreviousMonth() {
+                                if (this.datePickerMonth === 0) {
+                                    this.datePickerYear--;
+                                    this.datePickerMonth = 11;
+                                } else {
+                                    this.datePickerMonth--;
+                                }
+                                this.datePickerCalculateDays();
+                            },
+                            datePickerNextMonth() {
+                                if (this.datePickerMonth === 11) {
+                                    this.datePickerYear++;
+                                    this.datePickerMonth = 0;
+                                } else {
+                                    this.datePickerMonth++;
+                                }
+                                this.datePickerCalculateDays();
+                            },
+                            datePickerIsSelectedDate(day) {
+                                const d = new Date(this.datePickerYear, this.datePickerMonth, day);
+                                return this.datePickerValue === this.datePickerFormatDate(d);
+                            },
+                            datePickerIsToday(day) {
+                                const today = new Date();
+                                const d = new Date(this.datePickerYear, this.datePickerMonth, day);
+                                return today.toDateString() === d.toDateString();
+                            },
+                            datePickerCalculateDays() {
+                                const daysInMonth = new Date(this.datePickerYear, this.datePickerMonth + 1, 0).getDate();
+                                const dayOfWeek = new Date(this.datePickerYear, this.datePickerMonth).getDay();
+                                this.datePickerBlankDaysInMonth = Array.from({length: dayOfWeek}, (_, i) => i + 1);
+                                this.datePickerDaysInMonth = Array.from({length: daysInMonth}, (_, i) => i + 1);
+                            },
+                            datePickerFormatDate(date) {
+                                const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+                                return formattedDate;
+                            }
+                        }" 
+                        x-modelable="datePickerValue" 
+                        x-model="newGoal.endDate">
+                            <div class="relative w-full">
+                                <input x-ref="datePickerInput" 
+                                    type="text" 
+                                    @click="datePickerOpen = !datePickerOpen" 
+                                    x-model="datePickerValue" 
+                                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm dark:bg-gray-700 dark:text-white" 
+                                    readonly>
+                                <div class="absolute top-0 right-0 px-3 py-2 cursor-pointer text-gray-400" @click="datePickerOpen = !datePickerOpen">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <div x-show="datePickerOpen" x-cloak 
+                                    class="absolute z-10 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4 w-full">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div>
+                                            <span x-text="datePickerMonthNames[datePickerMonth]" class="text-sm font-semibold dark:text-white"></span>
+                                            <span x-text="datePickerYear" class="ml-1 text-sm dark:text-gray-300"></span>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <button @click="datePickerPreviousMonth()" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                                </svg>
+                                            </button>
+                                            <button @click="datePickerNextMonth()" class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                <svg class="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="grid grid-cols-7 gap-1 mb-2">
+                                        <template x-for="day in datePickerDays" :key="day">
+                                            <div class="text-center text-xs font-medium text-gray-600 dark:text-gray-400" x-text="day"></div>
+                                        </template>
+                                    </div>
+                                    <div class="grid grid-cols-7 gap-1">
+                                        <template x-for="blankDay in datePickerBlankDaysInMonth">
+                                            <div class="text-center"></div>
+                                        </template>
+                                        <template x-for="day in datePickerDaysInMonth" :key="day">
+                                            <button @click="datePickerDayClicked(day)"
+                                                class="w-8 h-8 rounded-full text-sm flex items-center justify-center transition-colors"
+                                                :class="{
+                                                    'bg-[#2da44e] text-white': datePickerIsSelectedDate(day),
+                                                    'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700': !datePickerIsSelectedDate(day),
+                                                    'font-semibold': datePickerIsToday(day)
+                                                }">
+                                                <span x-text="day"></span>
+                                            </button>
+                                        </template>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
