@@ -78,6 +78,36 @@ For each habit type, you also have the ability to drill down into the habit to s
 - `middleware/`: Authentication flow and session management
 - `ui/`: HTML templates and frontend assets using Go's template engine
 
+## Tech Stack
+
+### Backend
+- **Go**: Fast, scalable and reliable backend
+- **alexedwards/scs**: Session management
+- **mattn/go-sqlite3**: SQLite driver
+- **golang.org/x/crypto**: Secure password hashing
+- **joho/godotenv**: Environment variables management
+- **yuin/goldmark**: Markdown processing
+- **Air**: Live reload development
+
+### Frontend
+- **AlpineJS**: Lightweight interactivity
+- **Tailwind CSS**: Modern, responsive styling
+- **Chart.js**: Data visualization
+- **SortableJS**: Drag-and-drop functionality
+- **Emoji Mart**: Emoji picker and search
+- **Google Fonts**: Modern typography (Inter)
+- **Canvas Confetti**: Celebration animations
+- **PinesUI**: Alpine & Tailwind UI component library
+
+### Database
+- **SQLite**: Reliable, zero-dependency data storage
+- **Litestream**: Continuous SQLite replication
+
+### Infrastructure
+- **Cloudflare**: DNS and DDoS protection
+- **Render**: Cloud & database hosting
+- **Github**: Version control
+
 This project is open source and licensed under the AGPL-3.0 license. See the [LICENSE.txt](LICENSE.txt) file for more details. 
 
 Feel free to contribute to the project by opening a PR or by reporting an issue.
