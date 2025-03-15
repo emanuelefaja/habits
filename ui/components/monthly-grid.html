@@ -505,6 +505,7 @@
                         'July', 'August', 'September', 'October', 'November', 'December'],
             // Initialize component
             init() {
+                console.log('Monthly grid initialized with showConfetti:', this.showConfetti);
                 this.habitOptions = [];
                 this.loadMonthLogs();
                 Sortable.create(this.$refs.habitsListContainer, {
@@ -540,9 +541,6 @@
             showNumericInput: false,
             showSetRepsInput: false,
             setReps: [{reps: 0}],
-
-            // Add new state for confetti timers
-            binaryConfettiTimers: {},
 
             // Option-Select Habit Methods
             getHabitOptions(habitId) {
@@ -587,7 +585,27 @@
                             }
                         };
                         this.showTooltip = null;
-                        this.triggerConfetti(event);
+                        
+                        // Direct confetti call that doesn't rely on the event object
+                        if (this.showConfetti) {
+                            setTimeout(() => {
+                                console.log('Triggering direct confetti for option-select habit');
+                                // Position the confetti in the center-top of the screen
+                                const x = 0.5;
+                                const y = 0.3;
+                                
+                                try {
+                                    confetti({
+                                        particleCount: 150,
+                                        spread: 90,
+                                        origin: { x, y }
+                                    });
+                                    console.log('Direct confetti triggered successfully');
+                                } catch (error) {
+                                    console.error('Direct confetti error:', error);
+                                }
+                            }, 100);
+                        }
                     }
                 });
             },
@@ -623,7 +641,27 @@
                         };
                         this.showTooltip = null;
                         this.showNumericInput = false;
-                        this.triggerConfetti(event);
+                        
+                        // Direct confetti call that doesn't rely on the event object
+                        if (this.showConfetti) {
+                            setTimeout(() => {
+                                console.log('Triggering direct confetti for numeric habit');
+                                // Position the confetti in the center-top of the screen
+                                const x = 0.5;
+                                const y = 0.3;
+                                
+                                try {
+                                    confetti({
+                                        particleCount: 150,
+                                        spread: 90,
+                                        origin: { x, y }
+                                    });
+                                    console.log('Direct confetti triggered successfully');
+                                } catch (error) {
+                                    console.error('Direct confetti error:', error);
+                                }
+                            }, 100);
+                        }
                     }
                 });
             },
@@ -698,7 +736,27 @@
                         this.showTooltip = null;
                         this.showSetRepsInput = false;
                         this.setReps = [{reps: 0}];
-                        this.triggerConfetti(event);
+                        
+                        // Direct confetti call that doesn't rely on the event object
+                        if (this.showConfetti) {
+                            setTimeout(() => {
+                                console.log('Triggering direct confetti for set-reps habit');
+                                // Position the confetti in the center-top of the screen
+                                const x = 0.5;
+                                const y = 0.3;
+                                
+                                try {
+                                    confetti({
+                                        particleCount: 150,
+                                        spread: 90,
+                                        origin: { x, y }
+                                    });
+                                    console.log('Direct confetti triggered successfully');
+                                } catch (error) {
+                                    console.error('Direct confetti error:', error);
+                                }
+                            }, 100);
+                        }
                     }
                 })
                 .catch(err => {
@@ -789,7 +847,47 @@
                                     date: date,
                                     status: nextStatus
                                 };
-                                this.triggerConfetti(event);
+                                if (nextStatus === 'done') {
+                                    console.log('Binary habit set to done, scheduling confetti with delay', { habitId, date });
+                                    
+                                    // Store the timestamp when the status was set to 'done'
+                                    const doneTimestamp = Date.now();
+                                    const key = `${habitId}_${date}`;
+                                    
+                                    // Set a longer delay (0.5 seconds) to allow user to cycle through statuses
+                                    if (this.showConfetti) {
+                                        setTimeout(() => {
+                                            // Check if the status is still 'done' after the delay
+                                            const currentStatus = this.getStatus(habitId, date);
+                                            console.log('Checking status after delay:', { 
+                                                habitId, 
+                                                date, 
+                                                currentStatus,
+                                                timeSinceDone: Date.now() - doneTimestamp + 'ms'
+                                            });
+                                            
+                                            if (currentStatus === 'done') {
+                                                console.log('Status is still done, triggering confetti');
+                                                // Position the confetti in the center-top of the screen
+                                                const x = 0.5;
+                                                const y = 0.3;
+                                                
+                                                try {
+                                                    confetti({
+                                                        particleCount: 150,
+                                                        spread: 90,
+                                                        origin: { x, y }
+                                                    });
+                                                    console.log('Direct confetti triggered successfully');
+                                                } catch (error) {
+                                                    console.error('Direct confetti error:', error);
+                                                }
+                                            } else {
+                                                console.log('Status changed, skipping confetti');
+                                            }
+                                        }, 500); // 0.5 second delay
+                                    }
+                                }
                             }
                         });
                     } else if (habit?.habit_type === 'numeric') {
@@ -812,49 +910,6 @@
                     'none': document.documentElement.classList.contains('dark') ? '#374151' : '#ebedf0'
                 };
                 return colors[status] || colors.none;
-            },
-
-            triggerConfetti(event) {
-                if (!this.showConfetti || !event || Math.random() >= 0.25) return;
-
-                // Get the clicked element's position
-                const rect = event.target.getBoundingClientRect();
-                
-                // Calculate origin points
-                const x = (rect.left + rect.width / 2) / window.innerWidth;
-                const y = (rect.top + rect.height / 2) / window.innerHeight;
-                
-                confetti({
-                    particleCount: 100,
-                    spread: 70,
-                    origin: { x, y }
-                });
-            },
-
-            // Add new methods for managing confetti timers
-            scheduleBinaryConfetti(habitId, date, event, delay = 500) {
-                // Clear any existing timer first
-                this.clearBinaryConfettiTimer(habitId, date);
-
-                // Schedule new timer
-                const key = `${habitId}_${date}`;
-                this.binaryConfettiTimers[key] = setTimeout(() => {
-                    // Check if final status is still 'done'
-                    const finalStatus = this.getStatus(habitId, date);
-                    if (finalStatus === 'done') {
-                        this.triggerConfetti(event);
-                    }
-                    // Clean up timer reference
-                    delete this.binaryConfettiTimers[key];
-                }, delay);
-            },
-
-            clearBinaryConfettiTimer(habitId, date) {
-                const key = `${habitId}_${date}`;
-                if (this.binaryConfettiTimers[key]) {
-                    clearTimeout(this.binaryConfettiTimers[key]);
-                    delete this.binaryConfettiTimers[key];
-                }
             },
 
             getWeekdayLetter(day) {
@@ -927,17 +982,6 @@
                 'skipped': '#00a0d2'
             },
             statusCycle: ['none', 'done', 'missed', 'skipped'],
-
-            // Get status for a habit on a specific date
-            getStatus(habitId, date) {
-                const key = `${habitId}_${date}`;
-                return this.habitLogs[key]?.status || 'none';
-            },
-
-            // Get color for a status
-            getStatusColor(status) {
-                return this.statusColors[status];
-            },
 
             // Get next status in cycle
             getNextStatus(currentStatus) {
