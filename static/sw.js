@@ -6,7 +6,9 @@ const ASSETS_TO_CACHE = [
   'https://cdn.tailwindcss.com',
   'https://unpkg.com/@emoji-mart/data@latest/sets/14/native.json',
   'https://unpkg.com/emoji-mart@latest/dist/browser.js',
-  'https://unpkg.com/sortablejs@latest/Sortable.min.js'
+  'https://unpkg.com/sortablejs@latest/Sortable.min.js',
+  '/static/js/browser.js',
+  '/static/js/native.json'
 ];
 
 // Install event

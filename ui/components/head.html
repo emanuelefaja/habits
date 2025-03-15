@@ -19,9 +19,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-
-    <!-- Emoji Libraries -->
-    <script src="https://unpkg.com/emoji-mart@latest/dist/browser.js"></script>
+    <!-- Emoji Libraries - Using local file with defer attribute -->
+    <script defer src="/static/js/browser.js"></script>
 
     <!-- Combined Styles -->
     <style>
@@ -42,13 +41,26 @@
         }
     </style>
 
-    <!-- Emoji Initialization -->
+    <!-- Emoji Initialization with timeout and error handling -->
     <script>
         document.addEventListener('DOMContentLoaded', async () => {
+            // Add timeout for emoji loading
+            const emojiLoadTimeout = setTimeout(() => {
+                console.warn('Emoji-mart load timed out, continuing without emoji support');
+                // Initialize with empty implementation as fallback
+                Alpine.store('emoji', {
+                    async search(value) {
+                        return [];
+                    }
+                });
+            }, 5000); // 5 second timeout
+            
             try {
                 await EmojiMart.init({ 
-                    data: await fetch('https://unpkg.com/@emoji-mart/data@latest/sets/14/native.json').then(r => r.json()) 
+                    data: await fetch('/static/js/native.json').then(r => r.json()) 
                 });
+                clearTimeout(emojiLoadTimeout); // Clear timeout on success
+                
                 Alpine.store('emoji', {
                     async search(value) {
                         if (!value) return [];
@@ -56,7 +68,14 @@
                     }
                 });
             } catch (error) {
+                clearTimeout(emojiLoadTimeout);
                 console.error('Error initializing emoji-mart:', error);
+                // Initialize with empty implementation as fallback
+                Alpine.store('emoji', {
+                    async search(value) {
+                        return [];
+                    }
+                });
             }
         });
     </script>
