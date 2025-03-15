@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"html/template"
 	"log"
 	"math/rand"
@@ -30,6 +32,37 @@ type TemplateData struct {
 	Email      string
 }
 
+// timeoutResponseWriter is a custom ResponseWriter that adds timeout functionality
+type timeoutResponseWriter struct {
+	http.ResponseWriter
+	timeout time.Duration
+	start   time.Time
+}
+
+func newTimeoutResponseWriter(w http.ResponseWriter, timeout time.Duration) *timeoutResponseWriter {
+	return &timeoutResponseWriter{
+		ResponseWriter: w,
+		timeout:        timeout,
+		start:          time.Now(),
+	}
+}
+
+func (w *timeoutResponseWriter) Write(b []byte) (int, error) {
+	// Check if we've exceeded the timeout
+	if time.Since(w.start) > w.timeout {
+		return 0, fmt.Errorf("response timeout exceeded")
+	}
+	return w.ResponseWriter.Write(b)
+}
+
+func (w *timeoutResponseWriter) WriteHeader(statusCode int) {
+	// Check if we've exceeded the timeout
+	if time.Since(w.start) > w.timeout {
+		return
+	}
+	w.ResponseWriter.WriteHeader(statusCode)
+}
+
 func main() {
 	// Initialize random seed for Go versions before 1.20
 	// In Go 1.20+ this is no longer needed as it's done automatically
@@ -48,7 +81,7 @@ func main() {
 	}
 
 	// Open and verify DB connection
-	db, err := sql.Open("sqlite3", dbPath)
+	db, err := sql.Open("sqlite3", dbPath+"?_busy_timeout=5000&_journal_mode=WAL")
 	if err != nil {
 		log.Fatal("Error opening database:", err)
 	}
@@ -56,6 +89,11 @@ func main() {
 	if err := db.Ping(); err != nil {
 		log.Fatal("Error connecting to database:", err)
 	}
+
+	// Configure connection pool
+	db.SetMaxOpenConns(25)
+	db.SetMaxIdleConns(25)
+	db.SetConnMaxLifetime(5 * time.Minute)
 
 	// Initialize DB and services
 	if err := models.InitDB(db); err != nil {
@@ -171,34 +209,50 @@ func main() {
 
 	// Routes
 	http.Handle("/", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Wrap the response writer with a timeout
+		tw := newTimeoutResponseWriter(w, 10*time.Second)
+
 		if r.URL.Path != "/" {
-			http.NotFound(w, r)
+			http.NotFound(tw, r)
 			return
 		}
 
 		if !middleware.IsAuthenticated(r) {
 			// Guest
-			if err := templates.ExecuteTemplate(w, "guest-home.html", nil); err != nil {
-				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			if err := templates.ExecuteTemplate(tw, "guest-home.html", nil); err != nil {
+				// Check if the error is due to a client disconnection
+				if strings.Contains(err.Error(), "write: broken pipe") ||
+					strings.Contains(err.Error(), "client disconnected") ||
+					strings.Contains(err.Error(), "connection reset by peer") ||
+					strings.Contains(err.Error(), "response timeout exceeded") {
+					log.Printf("Client disconnected while rendering guest-home.html: %v", err)
+					return
+				}
+				http.Error(tw, "Internal Server Error", http.StatusInternalServerError)
 			}
 			return
 		}
 
 		user, err := getAuthenticatedUser(r, db)
 		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			log.Printf("Error getting authenticated user: %v", err)
+			http.Error(tw, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 
+		// Only get necessary habit data for the current view
 		habits, err := models.GetHabitsByUserID(db, middleware.GetUserID(r))
 		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			log.Printf("Error getting habits: %v", err)
+			http.Error(tw, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 
+		// Limit the amount of data sent to the template
 		habitsJSON, err := json.Marshal(habits)
 		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			log.Printf("Error marshaling habits: %v", err)
+			http.Error(tw, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 
@@ -211,7 +265,7 @@ func main() {
 			HabitsJSON: template.JS(habitsJSON),
 			Flash:      middleware.GetFlash(r),
 		}
-		renderTemplate(w, templates, "home.html", data)
+		renderTemplate(tw, templates, "home.html", data)
 	})))
 
 	http.Handle("/settings", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -747,9 +801,32 @@ func dict(values ...interface{}) (map[string]interface{}, error) {
 }
 
 func renderTemplate(w http.ResponseWriter, templates *template.Template, name string, data interface{}) {
-	if err := templates.ExecuteTemplate(w, name, data); err != nil {
+	// Use a buffer to render the template first
+	var buf bytes.Buffer
+	if err := templates.ExecuteTemplate(&buf, name, data); err != nil {
 		log.Printf("Error executing template %s: %v", name, err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	// Log the size of the response
+	responseSize := buf.Len()
+	log.Printf("Template %s rendered with size: %d bytes", name, responseSize)
+
+	// Then write the buffered content to the response writer
+	_, err := buf.WriteTo(w)
+	if err != nil {
+		// Check if the error is due to a client disconnection
+		if strings.Contains(err.Error(), "write: broken pipe") ||
+			strings.Contains(err.Error(), "client disconnected") ||
+			strings.Contains(err.Error(), "connection reset by peer") {
+			log.Printf("Client disconnected while sending template %s: %v", name, err)
+			return // Don't try to write an error response to a disconnected client
+		}
+
+		log.Printf("Error writing template %s to response: %v", name, err)
+		// At this point, we may not be able to write an error response
+		// since we've already started writing the response
 	}
 }
 
