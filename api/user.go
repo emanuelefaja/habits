@@ -10,7 +10,9 @@ import (
 	"mad/middleware"
 	"mad/models"
 	"mad/models/email"
+	"math/rand"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -63,6 +65,88 @@ func RegisterHandler(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
 		}
 		log.Printf("Registration attempt allowed for IP: %s. Remaining attempts: %d", ip, remaining)
 
+		// Validate math problem answer
+		mathAnswer := r.FormValue("math_answer")
+		if mathAnswer == "" {
+			log.Println("Math answer is missing")
+			w.WriteHeader(http.StatusBadRequest)
+
+			// Generate new math problem
+			num1 := rand.Intn(20) + 1
+			num2 := rand.Intn(20) + 1
+			sum := num1 + num2
+			middleware.SetMathProblem(r, num1, num2, sum)
+
+			tmpl.ExecuteTemplate(w, "register.html", map[string]interface{}{
+				"Error":    "Please answer the math verification question ❌",
+				"MathNum1": num1,
+				"MathNum2": num2,
+			})
+			return
+		}
+
+		// Convert answer to int
+		userAnswer, err := strconv.Atoi(mathAnswer)
+		if err != nil {
+			log.Println("Invalid math answer format:", err)
+			w.WriteHeader(http.StatusBadRequest)
+
+			// Generate new math problem
+			num1 := rand.Intn(20) + 1
+			num2 := rand.Intn(20) + 1
+			sum := num1 + num2
+			middleware.SetMathProblem(r, num1, num2, sum)
+
+			tmpl.ExecuteTemplate(w, "register.html", map[string]interface{}{
+				"Error":    "Invalid answer format ❌",
+				"MathNum1": num1,
+				"MathNum2": num2,
+			})
+			return
+		}
+
+		// Get expected answer from session
+		num1, num2, expectedSum, ok := middleware.GetMathProblem(r)
+		if !ok {
+			log.Println("Math problem not found in session")
+			w.WriteHeader(http.StatusBadRequest)
+
+			// Generate new math problem
+			num1 = rand.Intn(20) + 1
+			num2 = rand.Intn(20) + 1
+			sum := num1 + num2
+			middleware.SetMathProblem(r, num1, num2, sum)
+
+			tmpl.ExecuteTemplate(w, "register.html", map[string]interface{}{
+				"Error":    "Session expired, please try again ❌",
+				"MathNum1": num1,
+				"MathNum2": num2,
+			})
+			return
+		}
+
+		// Validate answer
+		if userAnswer != expectedSum {
+			log.Printf("Incorrect math answer: got %d, expected %d", userAnswer, expectedSum)
+			w.WriteHeader(http.StatusBadRequest)
+
+			// Generate new math problem
+			num1 = rand.Intn(20) + 1
+			num2 = rand.Intn(20) + 1
+			sum := num1 + num2
+			middleware.SetMathProblem(r, num1, num2, sum)
+
+			tmpl.ExecuteTemplate(w, "register.html", map[string]interface{}{
+				"Error":    "Incorrect answer. Please try again ❌",
+				"MathNum1": num1,
+				"MathNum2": num2,
+			})
+			return
+		}
+
+		// Clear math problem from session after successful validation
+		middleware.ClearMathProblem(r)
+
 		firstName := r.FormValue("first_name")
 		lastName := r.FormValue("last_name")
 		email := r.FormValue("email")
@@ -74,8 +158,17 @@ func RegisterHandler(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
 		if firstName == "" || lastName == "" || email == "" || password == "" {
 			log.Println("Validation failed: missing fields")
 			w.WriteHeader(http.StatusBadRequest)
+
+			// Generate new math problem
+			num1 = rand.Intn(20) + 1
+			num2 = rand.Intn(20) + 1
+			sum := num1 + num2
+			middleware.SetMathProblem(r, num1, num2, sum)
+
 			tmpl.ExecuteTemplate(w, "register.html", map[string]interface{}{
-				"Error": "All fields are required ❌",
+				"Error":    "All fields are required ❌",
+				"MathNum1": num1,
+				"MathNum2": num2,
 			})
 			return
 		}
@@ -91,8 +184,17 @@ func RegisterHandler(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
 		if err != nil {
 			log.Println("Error generating password hash:", err)
 			w.WriteHeader(http.StatusInternalServerError)
+
+			// Generate new math problem
+			num1 := rand.Intn(20) + 1
+			num2 := rand.Intn(20) + 1
+			sum := num1 + num2
+			middleware.SetMathProblem(r, num1, num2, sum)
+
 			tmpl.ExecuteTemplate(w, "register.html", map[string]interface{}{
-				"Error": "Internal server error ❌",
+				"Error":    "Internal server error ❌",
+				"MathNum1": num1,
+				"MathNum2": num2,
 			})
 			return
 		}
@@ -102,14 +204,32 @@ func RegisterHandler(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
 			log.Println("Error creating user:", err)
 			if strings.Contains(err.Error(), "UNIQUE constraint failed") {
 				w.WriteHeader(http.StatusConflict)
+
+				// Generate new math problem
+				num1 := rand.Intn(20) + 1
+				num2 := rand.Intn(20) + 1
+				sum := num1 + num2
+				middleware.SetMathProblem(r, num1, num2, sum)
+
 				tmpl.ExecuteTemplate(w, "register.html", map[string]interface{}{
-					"Error": "This email is already registered ✉️",
+					"Error":    "This email is already registered ✉️",
+					"MathNum1": num1,
+					"MathNum2": num2,
 				})
 				return
 			}
 			w.WriteHeader(http.StatusInternalServerError)
+
+			// Generate new math problem
+			num1 := rand.Intn(20) + 1
+			num2 := rand.Intn(20) + 1
+			sum := num1 + num2
+			middleware.SetMathProblem(r, num1, num2, sum)
+
 			tmpl.ExecuteTemplate(w, "register.html", map[string]interface{}{
-				"Error": "Error creating account ❌",
+				"Error":    "Error creating account ❌",
+				"MathNum1": num1,
+				"MathNum2": num2,
 			})
 			return
 		}

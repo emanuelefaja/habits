@@ -88,3 +88,28 @@ func GetUserConfettiPreference(r *http.Request) bool {
 	}
 	return showConfetti
 }
+
+// Math problem verification helpers
+
+// SetMathProblem stores the math problem data in the session
+func SetMathProblem(r *http.Request, num1, num2, sum int) {
+	SessionManager.Put(r.Context(), "mathNum1", num1)
+	SessionManager.Put(r.Context(), "mathNum2", num2)
+	SessionManager.Put(r.Context(), "mathSum", sum)
+}
+
+// GetMathProblem retrieves the math problem data from the session
+func GetMathProblem(r *http.Request) (num1, num2, expectedSum int, ok bool) {
+	num1, ok1 := SessionManager.Get(r.Context(), "mathNum1").(int)
+	num2, ok2 := SessionManager.Get(r.Context(), "mathNum2").(int)
+	expectedSum, ok3 := SessionManager.Get(r.Context(), "mathSum").(int)
+
+	return num1, num2, expectedSum, ok1 && ok2 && ok3
+}
+
+// ClearMathProblem removes the math problem data from the session
+func ClearMathProblem(r *http.Request) {
+	SessionManager.Remove(r.Context(), "mathNum1")
+	SessionManager.Remove(r.Context(), "mathNum2")
+	SessionManager.Remove(r.Context(), "mathSum")
+}

@@ -6,10 +6,12 @@ import (
 	"errors"
 	"html/template"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"mad/api"
 	"mad/middleware"
@@ -29,9 +31,15 @@ type TemplateData struct {
 }
 
 func main() {
-	// Load .env file
-	if err := godotenv.Load(); err != nil {
-		log.Printf("Warning: .env file not found")
+	// Initialize random seed for Go versions before 1.20
+	// In Go 1.20+ this is no longer needed as it's done automatically
+	// This is kept for backward compatibility
+	rand.Seed(time.Now().UnixNano())
+
+	// Load environment variables
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("Error loading .env file, using default environment variables")
 	}
 
 	dbPath := os.Getenv("DATABASE_PATH")
@@ -242,7 +250,21 @@ func main() {
 				return
 			}
 
-			renderTemplate(w, templates, "register.html", nil)
+			// Generate math problem for human verification
+			num1 := rand.Intn(20) + 1 // Random number between 1-20
+			num2 := rand.Intn(20) + 1 // Random number between 1-20
+			sum := num1 + num2
+
+			// Store in session
+			middleware.SetMathProblem(r, num1, num2, sum)
+
+			// Pass to template
+			data := map[string]interface{}{
+				"MathNum1": num1,
+				"MathNum2": num2,
+			}
+
+			renderTemplate(w, templates, "register.html", data)
 		case http.MethodPost:
 			api.RegisterHandler(db, templates)(w, r)
 		default:

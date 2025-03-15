@@ -7,6 +7,8 @@
     email: '',
     emailValid: true,
     emailTimer: null,
+    mathAnswer: '',
+    mathValid: true,
     checks: {
         length: false,
         uppercase: false,
@@ -31,6 +33,9 @@
             const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             this.emailValid = emailPattern.test(this.email);
         }, 1000);
+    },
+    validateMathAnswer() {
+        this.mathValid = this.mathAnswer !== '';
     },
     generatePassword() {
         // Define character sets
@@ -63,6 +68,13 @@
     },
     async handleSubmit(event) {
         event.preventDefault();
+        
+        // Validate math answer
+        this.validateMathAnswer();
+        if (!this.mathValid) {
+            return;
+        }
+        
         const form = event.target;
         const formData = new FormData(form);
 
@@ -195,6 +207,27 @@
                                 <li x-text="checks.number ? '✅ At least one number' : '❌ At least one number'"></li>
                                 <li x-text="checks.special ? '✅ At least one special character' : '❌ At least one special character'"></li>
                             </ul>
+                        </div>
+                    </div>
+
+                    <!-- Math Problem Verification -->
+                    <div>
+                        <label for="math_answer" class="block text-sm/6 font-medium text-gray-900">🧮 Human Verification</label>
+                        <div class="mt-2">
+                            <div class="flex items-center mb-2">
+                                <span class="text-sm text-gray-700 mr-2">What is {{ .MathNum1 }} + {{ .MathNum2 }}?</span>
+                                <input 
+                                    id="math_answer" 
+                                    name="math_answer" 
+                                    type="number" 
+                                    required 
+                                    x-model="mathAnswer"
+                                    @input="validateMathAnswer"
+                                    :class="{'outline-red-500': !mathValid, 'outline-gray-300': mathValid}"
+                                    class="block w-20 rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6">
+                            </div>
+                            <p class="text-xs text-gray-500">This helps us prevent automated spam registrations.</p>
+                            <p x-show="!mathValid" class="mt-1 text-sm text-red-600">❌ Please answer the math question.</p>
                         </div>
                     </div>
 
