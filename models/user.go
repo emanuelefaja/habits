@@ -10,23 +10,24 @@ import (
 )
 
 type User struct {
-	ID           int64     `json:"id"`
-	FirstName    string    `json:"first_name"`
-	LastName     string    `json:"last_name"`
-	Email        string    `json:"email"`
-	ShowConfetti bool      `json:"show_confetti"`
-	ShowWeekdays bool      `json:"show_weekdays"`
-	CreatedAt    time.Time `json:"created_at"`
-	IsAdmin      bool      `json:"is_admin"`
-	HabitsCount  int       `json:"habits_count"`
-	LogsCount    int       `json:"logs_count"`
+	ID                  int64     `json:"id"`
+	FirstName           string    `json:"first_name"`
+	LastName            string    `json:"last_name"`
+	Email               string    `json:"email"`
+	ShowConfetti        bool      `json:"show_confetti"`
+	ShowWeekdays        bool      `json:"show_weekdays"`
+	CreatedAt           time.Time `json:"created_at"`
+	IsAdmin             bool      `json:"is_admin"`
+	HabitsCount         int       `json:"habits_count"`
+	LogsCount           int       `json:"logs_count"`
+	NotificationEnabled bool      `json:"notification_enabled"`
 }
 
 // GetUserByID retrieves a user from the database by their ID
 func GetUserByID(db *sql.DB, id int64) (*User, error) {
 	user := &User{}
 	err := db.QueryRow(`
-		SELECT id, first_name, last_name, email, show_confetti, show_weekdays, created_at, is_admin 
+		SELECT id, first_name, last_name, email, show_confetti, show_weekdays, created_at, is_admin, notification_enabled 
 		FROM users 
 		WHERE id = ?
 	`, id).Scan(
@@ -38,11 +39,14 @@ func GetUserByID(db *sql.DB, id int64) (*User, error) {
 		&user.ShowWeekdays,
 		&user.CreatedAt,
 		&user.IsAdmin,
+		&user.NotificationEnabled,
 	)
 
 	if err != nil {
 		return nil, err
 	}
+
+	log.Printf("GetUserByID(%d): notification_enabled=%v", id, user.NotificationEnabled)
 	return user, nil
 }
 
@@ -50,10 +54,10 @@ func GetUserByID(db *sql.DB, id int64) (*User, error) {
 func GetUserByEmail(db *sql.DB, email string) (*User, error) {
 	user := &User{}
 	err := db.QueryRow(`
-		SELECT id, first_name, last_name, email, show_confetti, created_at, is_admin 
+		SELECT id, first_name, last_name, email, show_confetti, created_at, is_admin, notification_enabled 
 		FROM users 
 		WHERE email = ?
-	`, email).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.ShowConfetti, &user.CreatedAt, &user.IsAdmin)
+	`, email).Scan(&user.ID, &user.FirstName, &user.LastName, &user.Email, &user.ShowConfetti, &user.CreatedAt, &user.IsAdmin, &user.NotificationEnabled)
 
 	if err != nil {
 		return nil, err
@@ -69,9 +73,9 @@ func (u *User) Create(db *sql.DB, passwordHash string) error {
 	u.Email = strings.ToLower(u.Email)
 
 	result, err := db.Exec(`
-		INSERT INTO users (first_name, last_name, email, password_hash, show_confetti, created_at, is_admin) 
-		VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)
-	`, u.FirstName, u.LastName, u.Email, passwordHash, true, false)
+		INSERT INTO users (first_name, last_name, email, password_hash, show_confetti, created_at, is_admin, notification_enabled) 
+		VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?)
+	`, u.FirstName, u.LastName, u.Email, passwordHash, true, false, true)
 
 	if err != nil {
 		log.Println("Error executing insert:", err)
@@ -93,9 +97,9 @@ func (u *User) Create(db *sql.DB, passwordHash string) error {
 func (u *User) Update(db *sql.DB) error {
 	_, err := db.Exec(`
 		UPDATE users 
-		SET first_name = ?, last_name = ?, email = ?, show_confetti = ?
+		SET first_name = ?, last_name = ?, email = ?, show_confetti = ?, notification_enabled = ?
 		WHERE id = ?
-	`, u.FirstName, u.LastName, u.Email, u.ShowConfetti, u.ID)
+	`, u.FirstName, u.LastName, u.Email, u.ShowConfetti, u.NotificationEnabled, u.ID)
 
 	return err
 }
@@ -313,4 +317,118 @@ func HashPassword(password string) (string, error) {
 		return "", err
 	}
 	return string(hash), nil
+}
+
+// GetUsersWithNotificationsEnabled retrieves all users who have notifications enabled
+func GetUsersWithNotificationsEnabled(db *sql.DB) ([]*User, error) {
+	rows, err := db.Query(`
+		SELECT id, first_name, last_name, email, show_confetti, show_weekdays, created_at, is_admin, notification_enabled
+		FROM users
+		WHERE notification_enabled = true
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var users []*User
+	for rows.Next() {
+		user := &User{}
+		err := rows.Scan(
+			&user.ID,
+			&user.FirstName,
+			&user.LastName,
+			&user.Email,
+			&user.ShowConfetti,
+			&user.ShowWeekdays,
+			&user.CreatedAt,
+			&user.IsAdmin,
+			&user.NotificationEnabled,
+		)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+	return users, nil
+}
+
+// GetUsersWithHabitsAndNotificationsEnabled retrieves all users who have habits and notifications enabled
+func GetUsersWithHabitsAndNotificationsEnabled(db *sql.DB) ([]*User, error) {
+	rows, err := db.Query(`
+		SELECT DISTINCT u.id, u.first_name, u.last_name, u.email, u.show_confetti, u.show_weekdays, u.created_at, u.is_admin, u.notification_enabled
+		FROM users u
+		JOIN habits h ON u.id = h.user_id
+		WHERE u.notification_enabled = true
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var users []*User
+	for rows.Next() {
+		user := &User{}
+		err := rows.Scan(
+			&user.ID,
+			&user.FirstName,
+			&user.LastName,
+			&user.Email,
+			&user.ShowConfetti,
+			&user.ShowWeekdays,
+			&user.CreatedAt,
+			&user.IsAdmin,
+			&user.NotificationEnabled,
+		)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+	return users, nil
+}
+
+// GetUsersWithNoHabitsAndNotificationsEnabled retrieves all users who have no habits but have notifications enabled
+func GetUsersWithNoHabitsAndNotificationsEnabled(db *sql.DB) ([]*User, error) {
+	rows, err := db.Query(`
+		SELECT u.id, u.first_name, u.last_name, u.email, u.show_confetti, u.show_weekdays, u.created_at, u.is_admin, u.notification_enabled
+		FROM users u
+		LEFT JOIN habits h ON u.id = h.user_id
+		WHERE h.id IS NULL AND u.notification_enabled = true
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var users []*User
+	for rows.Next() {
+		user := &User{}
+		err := rows.Scan(
+			&user.ID,
+			&user.FirstName,
+			&user.LastName,
+			&user.Email,
+			&user.ShowConfetti,
+			&user.ShowWeekdays,
+			&user.CreatedAt,
+			&user.IsAdmin,
+			&user.NotificationEnabled,
+		)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+	return users, nil
+}
+
+// UpdateNotificationPreference updates a user's notification preference
+func UpdateNotificationPreference(db *sql.DB, userID int64, enabled bool) error {
+	_, err := db.Exec(`
+		UPDATE users
+		SET notification_enabled = ?
+		WHERE id = ?
+	`, enabled, userID)
+	return err
 }

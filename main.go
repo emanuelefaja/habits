@@ -99,6 +99,12 @@ func main() {
 	if err := models.InitDB(db); err != nil {
 		log.Fatal("Error initializing database:", err)
 	}
+
+	// Run database migrations
+	if err := models.MigrateDB(db); err != nil {
+		log.Fatal("Error migrating database:", err)
+	}
+
 	if err := models.InitializeHabitsDB(db); err != nil {
 		log.Fatal(err)
 	}
@@ -124,6 +130,14 @@ func main() {
 
 	// Pass the email service to the API handlers
 	api.InitEmailService(emailService)
+
+	// Initialize and start the scheduler for email notifications
+	scheduler := models.NewScheduler(db, emailService)
+	if err := scheduler.Start(); err != nil {
+		log.Printf("Warning: Could not start email scheduler: %v", err)
+	} else {
+		log.Println("Email notification scheduler started successfully")
+	}
 
 	// Only seed users if in development environment
 	if os.Getenv("APP_ENV") == "development" {
@@ -276,7 +290,7 @@ func main() {
 		}
 
 		// Debug: Print user settings
-		log.Printf("User settings: confetti=%v, weekdays=%v", user.ShowConfetti, user.ShowWeekdays)
+		log.Printf("User settings: confetti=%v, weekdays=%v, notifications=%v", user.ShowConfetti, user.ShowWeekdays, user.NotificationEnabled)
 
 		data := struct {
 			User  *models.User
@@ -434,6 +448,7 @@ func main() {
 	http.Handle("/api/user/export", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(api.ExportDataHandler(db))))
 	http.Handle("/api/user/settings", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(api.UpdateSettingsHandler(db))))
 	http.Handle("/api/user/reset-data", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(api.ResetDataHandler(db))))
+	http.Handle("/api/user/notifications", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(api.UpdateNotificationPreferenceHandler(db))))
 
 	// Roadmap (no auth required, but session loaded)
 	http.Handle("/roadmap", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

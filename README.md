@@ -26,6 +26,7 @@ For each habit type, you also have the ability to drill down into the habit to s
 │   └── user.go       - User profile API
 ├── cmd/              - Command-line tools
 │   └── send_email/   - Email testing tool
+│       └── main.go   - Email testing utility
 ├── content/           - Content files
 │   ├── blog/         - Blog posts (.md files)
 │   └── media/        - Media files (images, videos, etc.)
@@ -40,7 +41,9 @@ For each habit type, you also have the ability to drill down into the habit to s
 │   │   └── email_test.go - Email tests
 │   ├── goal.go       - Goal models
 │   ├── habit.go      - Habit tracking logic
+│   ├── quotes.go     - Motivational quotes functionality
 │   ├── stats.go      - Statistics models
+│   ├── scheduler.go  - Email notification scheduler
 │   └── user.go       - User models
 ├── middleware/        - Request processing
 │   ├── auth.go       - Authentication
@@ -51,6 +54,7 @@ For each habit type, you also have the ability to drill down into the habit to s
 │   ├── images/       - Screenshots/illustrations
 │   ├── sounds/       - Notification sounds
 │   ├── videos/       - Changelog videos
+│   ├── quotes.json   - Motivational quotes collection
 │   ├── manifest.json - PWA manifest
 │   └── sw.js         - Service worker
 ├── ui/                - User interface
@@ -61,7 +65,11 @@ For each habit type, you also have the ability to drill down into the habit to s
 │   │   ├── reset-success.html     - Reset confirmation
 │   │   ├── reset-success.txt      - Plain text version
 │   │   ├── welcome.html          - Welcome email
-│   │   └── welcome.txt           - Plain text version
+│   │   ├── welcome.txt           - Plain text version
+│   │   ├── reminder.html         - Daily habit reminder email
+│   │   ├── reminder.txt          - Plain text version
+│   │   ├── first-habit.html      - First habit creation email
+│   │   └── first-habit.txt       - Plain text version
 │   ├── habits/       - Habit-type views
 │   ├── blog/         - Blog templates
 │   ├── forgot.html   - Forgot password page
@@ -88,6 +96,7 @@ For each habit type, you also have the ability to drill down into the habit to s
 - **joho/godotenv**: Environment variables management
 - **yuin/goldmark**: Markdown processing
 - **Air**: Live reload development
+- **robfig/cron**: Scheduled email notifications
 
 ### Frontend
 - **AlpineJS**: Lightweight interactivity

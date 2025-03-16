@@ -18,6 +18,7 @@ func InitDB(db *sql.DB) error {
 			password_hash TEXT NOT NULL,
 			show_confetti BOOLEAN NOT NULL DEFAULT 1,
 			show_weekdays BOOLEAN NOT NULL DEFAULT false,
+			notification_enabled BOOLEAN NOT NULL DEFAULT true,
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			is_admin BOOLEAN NOT NULL DEFAULT 0
 		)
@@ -257,12 +258,13 @@ func SeedUsers(db *sql.DB) error {
 	}
 
 	_, err = db.Exec(`
-		INSERT INTO users (first_name, last_name, email, password_hash, is_admin, show_confetti)
-		VALUES (?, ?, ?, ?, ?, ?)`,
+		INSERT INTO users (first_name, last_name, email, password_hash, is_admin, show_confetti, notification_enabled)
+		VALUES (?, ?, ?, ?, ?, ?, ?)`,
 		"Admin",
 		"User",
 		"admin@example.com",
 		string(adminHash),
+		1,
 		1,
 		1,
 	)
@@ -278,15 +280,44 @@ func SeedUsers(db *sql.DB) error {
 	}
 
 	_, err = db.Exec(`
-		INSERT INTO users (first_name, last_name, email, password_hash, is_admin, show_confetti)
-		VALUES (?, ?, ?, ?, ?, ?)`,
+		INSERT INTO users (first_name, last_name, email, password_hash, is_admin, show_confetti, notification_enabled)
+		VALUES (?, ?, ?, ?, ?, ?, ?)`,
 		"Normal",
 		"User",
 		"user@example.com",
 		string(userHash),
 		0,
 		1,
+		1,
 	)
 
 	return err
+}
+
+// MigrateDB handles database schema migrations
+func MigrateDB(db *sql.DB) error {
+	// Check if notification_enabled column exists in users table
+	var columnExists bool
+	err := db.QueryRow(`
+		SELECT COUNT(*) > 0 
+		FROM pragma_table_info('users') 
+		WHERE name = 'notification_enabled'
+	`).Scan(&columnExists)
+
+	if err != nil {
+		return err
+	}
+
+	// Add notification_enabled column if it doesn't exist
+	if !columnExists {
+		_, err = db.Exec(`
+			ALTER TABLE users 
+			ADD COLUMN notification_enabled BOOLEAN NOT NULL DEFAULT true
+		`)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

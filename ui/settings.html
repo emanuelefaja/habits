@@ -169,6 +169,48 @@
                 </div>
             </div>
 
+            <!-- Notifications Section -->
+            <div class="bg-white dark:bg-gray-800 shadow sm:rounded-lg mb-8">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">📧 Notifications</h3>
+                    <div class="mt-2 max-w-xl text-sm text-gray-500 dark:text-gray-400">
+                        <p>Customize notification preferences.</p>
+                    </div>
+                    
+                    <!-- Email Notifications Toggle -->
+                    <div class="mt-5">
+                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300">📬 Email Reminders</label>
+                        <div class="mt-2">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600 dark:text-gray-400">
+                                    Receive daily habit reminders and weekly suggestions
+                                </span>
+                                <button type="button" 
+                                    @click="toggleSetting('notificationEnabled')"
+                                    :class="notificationEnabled ? 'bg-[#2da44e]' : 'bg-gray-200'"
+                                    class="relative inline-flex h-7 w-14 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out">
+                                    <span class="sr-only">Toggle notifications</span>
+                                    <span
+                                        :class="notificationEnabled ? 'translate-x-7' : 'translate-x-0'"
+                                        class="pointer-events-none relative inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out">
+                                        <span
+                                            :class="notificationEnabled ? 'opacity-0 duration-100 ease-out' : 'opacity-100 duration-200 ease-in'"
+                                            class="absolute inset-0 flex h-full w-full items-center justify-center transition-opacity text-sm">
+                                            🚫
+                                        </span>
+                                        <span
+                                            :class="notificationEnabled ? 'opacity-100 duration-200 ease-in' : 'opacity-0 duration-100 ease-out'"
+                                            class="absolute inset-0 flex h-full w-full items-center justify-center transition-opacity text-sm">
+                                            📧
+                                        </span>
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Password Change Section -->
             <div class="bg-white dark:bg-gray-800 shadow sm:rounded-lg mb-8">
                 <div class="px-4 py-5 sm:p-6">
@@ -430,6 +472,7 @@
                 emailTimer: null,
                 showConfetti: user.show_confetti,
                 showWeekdays: user.show_weekdays,
+                notificationEnabled: user.notification_enabled,
                 user: user,
                 checks: {
                     length: false,
@@ -480,6 +523,8 @@
                         }
                     } else if (setting === 'showWeekdays') {
                         this.showWeekdays = !this.showWeekdays;
+                    } else if (setting === 'notificationEnabled') {
+                        this.notificationEnabled = !this.notificationEnabled;
                     }
                     
                     fetch('/api/user/settings', {
@@ -487,7 +532,8 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             showConfetti: this.showConfetti,
-                            showWeekdays: this.showWeekdays
+                            showWeekdays: this.showWeekdays,
+                            notificationEnabled: this.notificationEnabled
                         })
                     })
                     .then(response => response.json())
@@ -498,6 +544,8 @@
                                 this.showConfetti = !this.showConfetti;
                             } else if (setting === 'showWeekdays') {
                                 this.showWeekdays = !this.showWeekdays;
+                            } else if (setting === 'notificationEnabled') {
+                                this.notificationEnabled = !this.notificationEnabled;
                             }
                         }
                     })
@@ -507,6 +555,8 @@
                             this.showConfetti = !this.showConfetti;
                         } else if (setting === 'showWeekdays') {
                             this.showWeekdays = !this.showWeekdays;
+                        } else if (setting === 'notificationEnabled') {
+                            this.notificationEnabled = !this.notificationEnabled;
                         }
                     });
                 },

@@ -111,3 +111,38 @@ func (s *SMTPEmailService) SendPasswordResetSuccessEmail(to, username string) er
 	}
 	return s.SendTypedEmail(to, PasswordResetSuccessEmail, data)
 }
+
+// SendReminderEmail sends a daily habit reminder email
+func (s *SMTPEmailService) SendReminderEmail(to string, firstName string, habits []HabitInfo, quote QuoteInfo) error {
+	data := ReminderEmailData{
+		FirstName: firstName,
+		Habits:    habits,
+		Quote:     quote,
+		AppName:   "Habits",
+	}
+	return s.SendTypedEmail(to, ReminderEmail, data)
+}
+
+// SendFirstHabitEmail sends an email encouraging users to create their first habit
+func (s *SMTPEmailService) SendFirstHabitEmail(to string, firstName string, quote QuoteInfo) error {
+	data := FirstHabitEmailData{
+		FirstName: firstName,
+		Quote:     quote,
+		AppName:   s.config.FromName,
+	}
+	return s.SendTypedEmail(to, FirstHabitEmail, data)
+}
+
+// SendSimpleEmail sends a simple email with custom subject and content
+func (s *SMTPEmailService) SendSimpleEmail(to, subject, content string) error {
+	// Create a custom template for the simple email
+	customTemplate := EmailTemplate{
+		Name:    "custom",
+		Subject: subject,
+	}
+
+	// Send the email with the content as data
+	return s.SendTypedEmail(to, customTemplate, map[string]string{
+		"Content": content,
+	})
+}

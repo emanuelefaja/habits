@@ -1,0 +1,31 @@
+Start Your First Habit
+
+Hi {{.FirstName}},
+
+We noticed you haven't created any habits yet. Building positive habits is the key to long-term success and well-being!
+
+Here are some popular habits to get you started:
+
+💧 Drink Water
+Stay hydrated by drinking at least 8 glasses of water daily.
+
+🏃 Exercise
+Move your body for at least 30 minutes each day.
+
+📚 Read
+Read for 20 minutes daily to expand your knowledge.
+
+The journey of a thousand miles begins with a single step. Start with just one habit that you can commit to daily.
+
+Create your first habit: https://habits.co
+
+We're here to support your journey!
+The Habits Team
+
+Quote of the Day:
+"{{.Quote.Text}}"
+— {{.Quote.Author}}
+
+---
+© {{.AppName}} 2025 | Manage Email Preferences: https://habits.co/settings
+This email was sent to you because you enabled habit reminders in your settings. 

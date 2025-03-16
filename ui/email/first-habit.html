@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Reset Your Password - {{.AppName}}</title>
+    <title>Start Your First Habit</title>
     <style media="all" type="text/css">
     /* -------------------------------------
     GLOBAL RESETS
@@ -185,15 +185,53 @@
     }
     
     /* -------------------------------------
-    OTHER STYLES
+    HABIT SUGGESTIONS
     ------------------------------------ */
-    ul {
-        margin: 20px 0;
-        padding-left: 20px;
+    .habit-suggestions {
+        margin: 24px 0;
     }
     
-    li {
-        margin-bottom: 8px;
+    .habit-suggestion {
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        padding: 16px;
+        margin-bottom: 12px;
+    }
+    
+    .habit-emoji {
+        font-size: 24px;
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+    
+    .habit-title {
+        font-weight: bold;
+        font-size: 18px;
+        vertical-align: middle;
+    }
+    
+    .habit-description {
+        margin-top: 8px;
+        color: #666;
+    }
+    
+    /* -------------------------------------
+    QUOTE BLOCK
+    ------------------------------------ */
+    .quote-block {
+        background-color: #f9f9f9;
+        border-left: 4px solid #2da44e;
+        padding: 16px;
+        margin: 24px 0;
+        font-style: italic;
+    }
+    
+    .quote-author {
+        display: block;
+        text-align: right;
+        font-style: normal;
+        font-weight: bold;
+        margin-top: 8px;
     }
     
     /* -------------------------------------
@@ -246,23 +284,46 @@
                             <td class="wrapper">
                                 <div class="header">
                                     <img src="https://habits.co/static/icons/icon-512.png" alt="Habits Logo" class="logo">
-                                    <h1>Reset Your Password</h1>
+                                    <h1>Start Your First Habit</h1>
                                 </div>
-
-                                <p>Hi {{.Username}},</p>
-
-                                <p>We received a request to reset your password for your {{.AppName}} account. Click the button below to create a new password:</p>
-
+                                
+                                <p>Hi {{.FirstName}},</p>
+                                
+                                <p>We noticed you haven't created any habits yet. Building positive habits is the key to long-term success and well-being!</p>
+                                
+                                <p>Here are some popular habits to get you started:</p>
+                                
+                                <!-- Habit Suggestions -->
+                                <div class="habit-suggestions">
+                                    <div class="habit-suggestion">
+                                        <span class="habit-emoji">💧</span>
+                                        <span class="habit-title">Drink Water</span>
+                                        <p class="habit-description">Stay hydrated by drinking at least 8 glasses of water daily.</p>
+                                    </div>
+                                    
+                                    <div class="habit-suggestion">
+                                        <span class="habit-emoji">🏃</span>
+                                        <span class="habit-title">Exercise</span>
+                                        <p class="habit-description">Move your body for at least 30 minutes each day.</p>
+                                    </div>
+                                    
+                                    <div class="habit-suggestion">
+                                        <span class="habit-emoji">📚</span>
+                                        <span class="habit-title">Read</span>
+                                        <p class="habit-description">Read for 20 minutes daily to expand your knowledge.</p>
+                                    </div>
+                                </div>
+                                
+                                <p>The journey of a thousand miles begins with a single step. Start with just one habit that you can commit to daily.</p>
+                                
                                 <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
                                     <tbody>
                                         <tr>
-                                            <td align="center">
+                                            <td align="left">
                                                 <table role="presentation" border="0" cellpadding="0" cellspacing="0">
                                                     <tbody>
                                                         <tr>
-                                                            <td>
-                                                                <a href="{{.ResetLink}}" target="_blank" rel="noopener">Reset Password</a>
-                                                            </td>
+                                                            <td><a href="https://habits.co" target="_blank">Create Your First Habit</a></td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -270,15 +331,15 @@
                                         </tr>
                                     </tbody>
                                 </table>
-
-                                <p>This link will expire in {{.ExpiryHours}} hour. If you didn't request this password reset, you can safely ignore this email.</p>
-
-                                <p>For security reasons, this link can only be used once. If you need to reset your password again, please request a new reset link.</p>
-
-                                <p>If you're having trouble clicking the button, copy and paste this URL into your browser:</p>
-                                <p style="word-break: break-all; color: #666; font-size: 14px;">{{.ResetLink}}</p>
-
-                                <p>Best regards,<br><br>The Habits Team</p>
+                                
+                                <p>We're here to support your journey!<br><br>
+                                The Habits Team</p>
+                                
+                                <!-- Quote of the Day -->
+                                <div class="quote-block">
+                                    "{{.Quote.Text}}"
+                                    <span class="quote-author">— {{.Quote.Author}}</span>
+                                </div>
                             </td>
                         </tr>
                     </table>
@@ -288,8 +349,8 @@
                         <table role="presentation" border="0" cellpadding="0" cellspacing="0">
                             <tr>
                                 <td class="content-block">
-                                    <p>© {{.AppName}} 2025 | <a href="https://habits.co/privacy">Privacy Policy</a> | <a href="https://habits.co/terms">Terms of Service</a></p>
-                                    <p>This is an automated message, please do not reply to this email.</p>
+                                    <p>© {{.AppName}} 2025 | <a href="https://habits.co/settings">Manage Email Preferences</a></p>
+                                    <p>This email was sent to you because email notifications are enabled in your settings.</p>
                                 </td>
                             </tr>
                         </table>

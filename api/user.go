@@ -541,24 +541,52 @@ func UpdateSettingsHandler(db *sql.DB) http.HandlerFunc {
 
 		// Parse JSON request
 		var settings struct {
-			ShowConfetti bool `json:"showConfetti"`
-			ShowWeekdays bool `json:"showWeekdays"`
+			ShowConfetti        bool `json:"showConfetti"`
+			ShowWeekdays        bool `json:"showWeekdays"`
+			NotificationEnabled bool `json:"notificationEnabled"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&settings); err != nil {
+			log.Printf("Error decoding settings JSON: %v", err)
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
 
+		log.Printf("Updating settings for user %d: confetti=%v, weekdays=%v, notifications=%v",
+			userID, settings.ShowConfetti, settings.ShowWeekdays, settings.NotificationEnabled)
+
 		// Update settings in database
-		_, err := db.Exec(`
+		result, err := db.Exec(`
 			UPDATE users 
-			SET show_confetti = ?, show_weekdays = ?
+			SET show_confetti = ?, show_weekdays = ?, notification_enabled = ?
 			WHERE id = ?
-		`, settings.ShowConfetti, settings.ShowWeekdays, userID)
+		`, settings.ShowConfetti, settings.ShowWeekdays, settings.NotificationEnabled, userID)
 
 		if err != nil {
+			log.Printf("Error updating settings in database: %v", err)
 			http.Error(w, "Error updating settings", http.StatusInternalServerError)
 			return
+		}
+
+		rowsAffected, _ := result.RowsAffected()
+		log.Printf("Settings update affected %d rows", rowsAffected)
+
+		// Verify the update by retrieving the user again
+		var updatedUser struct {
+			ShowConfetti        bool
+			ShowWeekdays        bool
+			NotificationEnabled bool
+		}
+		err = db.QueryRow(`
+			SELECT show_confetti, show_weekdays, notification_enabled
+			FROM users
+			WHERE id = ?
+		`, userID).Scan(&updatedUser.ShowConfetti, &updatedUser.ShowWeekdays, &updatedUser.NotificationEnabled)
+
+		if err != nil {
+			log.Printf("Error verifying settings update: %v", err)
+		} else {
+			log.Printf("User %d settings after update: confetti=%v, weekdays=%v, notifications=%v",
+				userID, updatedUser.ShowConfetti, updatedUser.ShowWeekdays, updatedUser.NotificationEnabled)
 		}
 
 		// Return success response
@@ -594,5 +622,47 @@ func ResetDataHandler(db *sql.DB) http.HandlerFunc {
 		// Set success flash message
 		middleware.SetFlash(r, "All habit data has been reset successfully ✨")
 		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}
+}
+
+// UpdateNotificationPreferenceHandler handles updating the user's notification preference
+func UpdateNotificationPreferenceHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		// Get user ID from session
+		userID := middleware.GetUserID(r)
+		if userID == 0 {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		// Parse JSON request
+		var request struct {
+			Enabled bool `json:"enabled"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
+
+		// Update notification preference in database
+		err := models.UpdateNotificationPreference(db, int64(userID), request.Enabled)
+		if err != nil {
+			log.Printf("Error updating notification preference: %v", err)
+			http.Error(w, "Error updating notification preference", http.StatusInternalServerError)
+			return
+		}
+
+		// Return success response
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": true,
+			"message": "Notification preference updated successfully",
+			"enabled": request.Enabled,
+		})
 	}
 }

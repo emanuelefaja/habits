@@ -1,0 +1,25 @@
+Daily Habit Reminder
+
+Hi {{.FirstName}},
+
+This is your daily reminder to log your habits. Consistency is key to building lasting habits!
+
+Here are your habits:
+{{range .Habits}}
+- {{.Emoji}} {{.Name}}
+{{end}}
+
+Remember, your habits are built day in, day out. Small consistent actions lead to remarkable results over time.
+
+Log your habits now: https://habits.co
+
+Keep up the great work!
+The Habits Team
+
+Quote of the Day:
+"{{.Quote.Text}}"
+— {{.Quote.Author}}
+
+---
+© {{.AppName}} 2025 | Manage Email Preferences: https://habits.co/settings
+This email was sent to you because you enabled habit reminders in your settings. 

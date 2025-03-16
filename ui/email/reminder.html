@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Reset Your Password - {{.AppName}}</title>
+    <title>Daily Habit Reminder</title>
     <style media="all" type="text/css">
     /* -------------------------------------
     GLOBAL RESETS
@@ -66,8 +66,7 @@
     ------------------------------------ */
     .main {
         background: #ffffff;
-        border: 1px solid #eaebed;
-        border-radius: 16px;
+        border-radius: 4px;
         width: 100%;
     }
     
@@ -78,19 +77,7 @@
     
     .header {
         text-align: center;
-        padding: 24px 0;
-    }
-    
-    .logo {
-        width: 48px;
-        height: 48px;
-        margin-bottom: 16px;
-    }
-    
-    h1 {
-        color: #2da44e;
-        margin: 0 0 16px;
-        font-size: 24px;
+        margin-bottom: 24px;
     }
     
     .footer {
@@ -105,17 +92,30 @@
     .footer span,
     .footer a {
         color: #9a9ea6;
-        font-size: 16px;
+        font-size: 14px;
         text-align: center;
+    }
+    
+    .logo {
+        height: 48px;
+        width: 48px;
+        margin-bottom: 12px;
     }
     
     /* -------------------------------------
     TYPOGRAPHY
     ------------------------------------ */
+    h1 {
+        color: #1a1a1a;
+        font-size: 24px;
+        font-weight: bold;
+        margin: 0;
+        margin-bottom: 16px;
+    }
+    
     p {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         font-size: 16px;
-        font-weight: normal;
+        line-height: 1.5;
         margin: 0;
         margin-bottom: 16px;
     }
@@ -130,7 +130,6 @@
     ------------------------------------ */
     .btn {
         box-sizing: border-box;
-        min-width: 100% !important;
         width: 100%;
     }
     
@@ -185,15 +184,44 @@
     }
     
     /* -------------------------------------
-    OTHER STYLES
+    HABIT PILLS
     ------------------------------------ */
-    ul {
-        margin: 20px 0;
-        padding-left: 20px;
+    .habit-pills {
+        width: 100%;
+        margin-bottom: 24px;
     }
     
-    li {
+    .habit-pill {
+        display: inline-block;
+        background-color: #f0f0f0;
+        border-radius: 16px;
+        padding: 8px 16px;
+        margin-right: 8px;
         margin-bottom: 8px;
+        font-size: 14px;
+    }
+    
+    .habit-emoji {
+        margin-right: 6px;
+    }
+    
+    /* -------------------------------------
+    QUOTE BLOCK
+    ------------------------------------ */
+    .quote-block {
+        background-color: #f9f9f9;
+        border-left: 4px solid #2da44e;
+        padding: 16px;
+        margin: 24px 0;
+        font-style: italic;
+    }
+    
+    .quote-author {
+        display: block;
+        text-align: right;
+        font-style: normal;
+        font-weight: bold;
+        margin-top: 8px;
     }
     
     /* -------------------------------------
@@ -246,23 +274,32 @@
                             <td class="wrapper">
                                 <div class="header">
                                     <img src="https://habits.co/static/icons/icon-512.png" alt="Habits Logo" class="logo">
-                                    <h1>Reset Your Password</h1>
+                                    <h1>Daily Habit Reminder</h1>
                                 </div>
-
-                                <p>Hi {{.Username}},</p>
-
-                                <p>We received a request to reset your password for your {{.AppName}} account. Click the button below to create a new password:</p>
-
+                                
+                                <p>Hi {{.FirstName}},</p>
+                                
+                                <p>This is your daily reminder to log your habits.</p>
+                                
+                                <p>Here are your habits:</p>
+                                
+                                <!-- Habit Pills -->
+                                <div class="habit-pills">
+                                    {{range .Habits}}
+                                    <span class="habit-pill"><span class="habit-emoji">{{.Emoji}}</span>{{.Name}}</span>
+                                    {{end}}
+                                </div>
+                                
+                                <p>Remember, your habits are built day in, day out. Small consistent actions lead to remarkable results over time.</p>
+                                
                                 <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="btn btn-primary">
                                     <tbody>
                                         <tr>
-                                            <td align="center">
+                                            <td align="left">
                                                 <table role="presentation" border="0" cellpadding="0" cellspacing="0">
                                                     <tbody>
                                                         <tr>
-                                                            <td>
-                                                                <a href="{{.ResetLink}}" target="_blank" rel="noopener">Reset Password</a>
-                                                            </td>
+                                                            <td><a href="https://habits.co" target="_blank">Log Your Habits Now</a></td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -270,15 +307,15 @@
                                         </tr>
                                     </tbody>
                                 </table>
-
-                                <p>This link will expire in {{.ExpiryHours}} hour. If you didn't request this password reset, you can safely ignore this email.</p>
-
-                                <p>For security reasons, this link can only be used once. If you need to reset your password again, please request a new reset link.</p>
-
-                                <p>If you're having trouble clicking the button, copy and paste this URL into your browser:</p>
-                                <p style="word-break: break-all; color: #666; font-size: 14px;">{{.ResetLink}}</p>
-
-                                <p>Best regards,<br><br>The Habits Team</p>
+                                
+                                <p>Keep up the great work!<br><br>
+                                The Habits Team</p>
+                                
+                                <!-- Quote of the Day -->
+                                <div class="quote-block">
+                                    "{{.Quote.Text}}"
+                                    <span class="quote-author">— {{.Quote.Author}}</span>
+                                </div>
                             </td>
                         </tr>
                     </table>
@@ -288,8 +325,8 @@
                         <table role="presentation" border="0" cellpadding="0" cellspacing="0">
                             <tr>
                                 <td class="content-block">
-                                    <p>© {{.AppName}} 2025 | <a href="https://habits.co/privacy">Privacy Policy</a> | <a href="https://habits.co/terms">Terms of Service</a></p>
-                                    <p>This is an automated message, please do not reply to this email.</p>
+                                    <p>© {{.AppName}} 2025 | <a href="https://habits.co/settings">Manage Email Preferences</a></p>
+                                    <p>This email was sent to you because email notifications are enabled in your settings.</p>
                                 </td>
                             </tr>
                         </table>
