@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"log"
+	"os"
 	"time"
 
 	"mad/models/email"
@@ -120,13 +121,28 @@ func (s *Scheduler) SetWeeklyReminderTime(cronExpr string) error {
 
 // sendDailyReminders sends reminder emails to users with habits
 func (s *Scheduler) sendDailyReminders() {
+	env := os.Getenv("APP_ENV")
+	if env == "" {
+		env = "development" // Default to development if not set
+	}
+
 	users, err := GetUsersWithHabitsAndNotificationsEnabled(s.db)
 	if err != nil {
 		log.Printf("Error getting users with habits: %v", err)
 		return
 	}
 
-	log.Printf("Sending daily reminders to %d users", len(users))
+	log.Printf("[%s] Sending daily reminders to %d users", env, len(users))
+
+	// If not in production, log more details but don't actually send emails
+	// (The email service will handle skipping sends, this is just for better logging)
+	if env != "production" {
+		log.Printf("[%s] Email sending is disabled in non-production environments", env)
+		for _, user := range users {
+			log.Printf("[%s] Would send reminder to: %s (%s)", env, user.Email, user.FirstName)
+		}
+		return
+	}
 
 	// Process users in batches
 	for i := 0; i < len(users); i += s.batchSize {
@@ -193,13 +209,27 @@ func (s *Scheduler) processDailyReminderBatch(users []*User) {
 
 // sendWeeklyFirstHabitReminders sends emails to users without habits
 func (s *Scheduler) sendWeeklyFirstHabitReminders() {
+	env := os.Getenv("APP_ENV")
+	if env == "" {
+		env = "development" // Default to development if not set
+	}
+
 	users, err := GetUsersWithNoHabitsAndNotificationsEnabled(s.db)
 	if err != nil {
 		log.Printf("Error getting users without habits: %v", err)
 		return
 	}
 
-	log.Printf("Sending first habit reminders to %d users", len(users))
+	log.Printf("[%s] Sending first habit reminders to %d users", env, len(users))
+
+	// If not in production, log more details but don't actually send emails
+	if env != "production" {
+		log.Printf("[%s] Email sending is disabled in non-production environments", env)
+		for _, user := range users {
+			log.Printf("[%s] Would send first habit reminder to: %s (%s)", env, user.Email, user.FirstName)
+		}
+		return
+	}
 
 	// Process users in batches
 	for i := 0; i < len(users); i += s.batchSize {

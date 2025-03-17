@@ -3,6 +3,7 @@ package email
 import (
 	"fmt"
 	"log"
+	"os"
 	"time"
 
 	"github.com/wneessen/go-mail"
@@ -50,6 +51,12 @@ func NewSMTPEmailService(config SMTPConfig) (EmailService, error) {
 
 // SendTypedEmail sends an email using the specified template and data
 func (s *SMTPEmailService) SendTypedEmail(to string, template EmailTemplate, data interface{}) error {
+	// Check if we're in development/staging mode
+	if env := os.Getenv("APP_ENV"); env != "production" {
+		log.Printf("[%s MODE] Would send email to %s with subject: %s", env, to, template.Subject)
+		return nil
+	}
+
 	// Load and render templates
 	htmlContent, textContent, err := s.renderTemplates(template.Name, data)
 	if err != nil {
