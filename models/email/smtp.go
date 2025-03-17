@@ -75,7 +75,7 @@ func (s *SMTPEmailService) SendTypedEmail(to string, template EmailTemplate, dat
 func (s *SMTPEmailService) SendWelcomeEmail(to, username string) error {
 	data := WelcomeEmailData{
 		Username: username,
-		AppName:  "Habits",
+		AppName:  "The Habits Company",
 	}
 	return s.SendTypedEmail(to, WelcomeEmail, data)
 }
@@ -88,7 +88,7 @@ func (s *SMTPEmailService) SendPasswordResetEmail(to, resetLink string, expiry t
 		ResetLink:   resetLink,
 		ExpiryHours: "1",     // Token expires in 1 hour
 		Username:    "there", // Generic greeting since we don't have the username here
-		AppName:     "Habits",
+		AppName:     "The Habits Company",
 	}
 	log.Printf("📝 Email data prepared: %+v", data)
 
@@ -106,7 +106,7 @@ func (s *SMTPEmailService) SendPasswordResetEmail(to, resetLink string, expiry t
 func (s *SMTPEmailService) SendPasswordResetSuccessEmail(to, username string) error {
 	data := PasswordResetSuccessEmailData{
 		Username:  username,
-		AppName:   "Habits",
+		AppName:   "The Habits Company",
 		LoginLink: "https://habits.co/login",
 	}
 	return s.SendTypedEmail(to, PasswordResetSuccessEmail, data)
@@ -118,7 +118,7 @@ func (s *SMTPEmailService) SendReminderEmail(to string, firstName string, habits
 		FirstName: firstName,
 		Habits:    habits,
 		Quote:     quote,
-		AppName:   "Habits",
+		AppName:   "The Habits Company",
 	}
 	return s.SendTypedEmail(to, ReminderEmail, data)
 }
