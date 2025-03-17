@@ -14,7 +14,7 @@ Remember, your habits are built day in, day out. Small consistent actions lead t
 Log your habits now: https://habits.co
 
 Keep up the great work!
-The Habits Team
+The Habits Company
 
 Quote of the Day:
 "{{.Quote.Text}}"

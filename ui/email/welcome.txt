@@ -13,7 +13,7 @@ Ready to get started? Log in now at https://habits.co/login
 Good luck!
 
 Best regards,
-The Habits Team
+
 
 ---
 © {{.AppName}} | Privacy Policy: https://habits.co/privacy | Terms of Service: https://habits.co/terms

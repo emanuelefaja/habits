@@ -20,7 +20,8 @@ The journey of a thousand miles begins with a single step. Start with just one h
 Create your first habit: https://habits.co
 
 We're here to support your journey!
-The Habits Team
+
+The Habits Company
 
 Quote of the Day:
 "{{.Quote.Text}}"
