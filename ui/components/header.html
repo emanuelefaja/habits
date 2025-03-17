@@ -2,13 +2,14 @@
 <div x-data="{ open: false }" class="flex justify-between items-center px-6 py-4 relative">
 
     <div class="flex items-center gap-4">
-        <h1 class="text-left text-3xl font-bold tracking-tight text-gray-900 {{ if .User }}dark:text-white{{ end }}">
-            <a href="/" class="inline-flex items-center gap-2 text-3xl tracking-tight hover:underline">
-                <img src="/static/icons/icon-512.png" alt="habits logo" class="w-8 h-8">
-                <span class="inline-flex items-baseline">
-                    habits
-                    <a href="/changelog" class="text-xs text-gray-500 {{ if .User }}dark:text-gray-400{{ end }} hover:underline ml-2 relative -top-4">v0.3.0</a>
-                </span>
+        <h1 class="text-left tracking-tight text-gray-900 {{ if .User }}dark:text-white{{ end }}">
+            <a href="/" class="inline-flex items-center gap-2 hover:underline">
+                <div class="leading-[1.1] -space-y-1">
+                    <div class="text-[17px] font-bold">the</div>
+                    <div class="text-[17px] font-bold">habits</div>
+                    <div class="text-[17px] font-bold">company</div>
+                </div>
+                <a href="/changelog" class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 ml-2 hover:bg-gray-200">v0.3.0</a>
             </a>
         </h1>
         {{ if and .User .User.IsAdmin }}

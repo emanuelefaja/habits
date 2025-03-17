@@ -326,10 +326,18 @@ func main() {
 			// Store in session
 			middleware.SetMathProblem(r, num1, num2, sum)
 
+			// Get a random quote
+			quote, err := models.GetRandomQuote()
+			if err != nil {
+				log.Printf("Error getting random quote: %v", err)
+				// Continue with default quote from the function
+			}
+
 			// Pass to template
 			data := map[string]interface{}{
 				"MathNum1": num1,
 				"MathNum2": num2,
+				"Quote":    quote,
 			}
 
 			renderTemplate(w, templates, "register.html", data)
@@ -343,7 +351,25 @@ func main() {
 	http.Handle("/login", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
-			renderTemplate(w, templates, "login.html", TemplateData{Flash: middleware.GetFlash(r)})
+			// Get a random quote
+			quote, err := models.GetRandomQuote()
+			if err != nil {
+				log.Printf("Error getting random quote: %v", err)
+				// Continue with default quote from the function
+			}
+
+			data := TemplateData{
+				Flash: middleware.GetFlash(r),
+			}
+
+			// Add quote to the template data
+			templateData := map[string]interface{}{
+				"Flash": data.Flash,
+				"Error": data.Error,
+				"Quote": quote,
+			}
+
+			renderTemplate(w, templates, "login.html", templateData)
 		case http.MethodPost:
 			api.LoginHandler(db, templates)(w, r)
 		default:
