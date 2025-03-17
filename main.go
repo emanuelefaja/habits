@@ -382,6 +382,14 @@ func main() {
 			handleNotAllowed(w, http.MethodGet)
 			return
 		}
+
+		// Get a random quote
+		quote, err := models.GetRandomQuote()
+		if err != nil {
+			log.Printf("Error getting random quote: %v", err)
+			// Continue with default quote from the function
+		}
+
 		data := TemplateData{
 			IsLoggedIn: middleware.IsAuthenticated(r),
 		}
@@ -391,7 +399,15 @@ func main() {
 				data.Email = user.Email
 			}
 		}
-		renderTemplate(w, templates, "forgot.html", data)
+
+		// Add quote to the template data
+		templateData := map[string]interface{}{
+			"IsLoggedIn": data.IsLoggedIn,
+			"Email":      data.Email,
+			"Quote":      quote,
+		}
+
+		renderTemplate(w, templates, "forgot.html", templateData)
 	})))
 
 	http.Handle("/logout", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -416,10 +432,22 @@ func main() {
 				http.Redirect(w, r, "/forgot", http.StatusSeeOther)
 				return
 			}
-			renderTemplate(w, templates, "reset.html", TemplateData{
-				Token: token,
-				Flash: middleware.GetFlash(r),
-			})
+
+			// Get a random quote
+			quote, err := models.GetRandomQuote()
+			if err != nil {
+				log.Printf("Error getting random quote: %v", err)
+				// Continue with default quote from the function
+			}
+
+			// Add quote to the template data
+			templateData := map[string]interface{}{
+				"Token": token,
+				"Flash": middleware.GetFlash(r),
+				"Quote": quote,
+			}
+
+			renderTemplate(w, templates, "reset.html", templateData)
 		default:
 			handleNotAllowed(w, http.MethodGet)
 		}
