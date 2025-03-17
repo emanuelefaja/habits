@@ -27,7 +27,7 @@
             <div class="bg-white dark:bg-gray-800 p-8 shadow sm:rounded-lg">
                 <!-- Header with title and Create Habit button -->
                 <div class="flex justify-between items-center mb-6">
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 md:gap-3">
                         <span class="isolate inline-flex rounded-md shadow-sm">
                             <button type="button" 
                                     @click="
@@ -62,13 +62,13 @@
                                 </svg>
                             </button>
                         </span>
-                        <h2 class="text-2xl font-semibold text-gray-900 dark:text-white" x-text="`🗓️ ${monthNames[currentMonth-1]} ${currentYear}`"></h2>
+                        <h2 class="text-lg md:text-2xl font-semibold text-gray-900 dark:text-white" x-text="`🗓️ ${monthNames[currentMonth-1]} ${currentYear}`"></h2>
                     </div>
                     
-                    <!-- Create Habit button moved to top right -->
+                    <!-- Create Habit button with smaller text and padding on mobile -->
                     <button 
                         @click="modalState.isOpen = true"
-                        class="rounded-md bg-[#2da44e] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#2c974b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2da44e]">
+                        class="rounded-md bg-[#2da44e] px-2 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-semibold text-white shadow-sm hover:bg-[#2c974b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2da44e]">
                         Create Habit ✨
                     </button>
                 </div>
