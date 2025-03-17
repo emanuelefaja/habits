@@ -1,5 +1,5 @@
 {{ define "header" }}
-<div x-data="{ open: false }" class="flex justify-between items-center px-6 py-4 relative">
+<div x-data="{ open: false }" class="flex justify-between items-center px-6 py-4 relative bg-white shadow-sm {{ if .User }}dark:bg-gray-800 dark:shadow-gray-900{{ end }}">
 
     <div class="flex items-center gap-4">
         <h1 class="text-left tracking-tight text-gray-900 {{ if .User }}dark:text-white{{ end }}">
@@ -9,7 +9,7 @@
                     <div class="text-[17px] font-bold">habits</div>
                     <div class="text-[17px] font-bold">company</div>
                 </div>
-                <a href="/changelog" class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 ml-2 hover:bg-gray-200">v0.3.0</a>
+                <a href="/changelog" class="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 ml-2 hover:bg-gray-200 {{ if .User }}dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600{{ end }}">v0.3.0</a>
             </a>
         </h1>
         {{ if and .User .User.IsAdmin }}
@@ -21,7 +21,7 @@
 
     <!-- Mobile menu button -->
     <button 
-        class="inline-block lg:hidden text-2xl {{ if .User }}dark:text-white{{ end }}"
+        class="inline-block lg:hidden text-2xl text-gray-900 {{ if .User }}dark:text-white{{ end }}"
         @click="open = !open"
         aria-label="Toggle menu">
         <span x-text="open ? '❌' : '☰ '"></span>
@@ -31,17 +31,17 @@
     <div class="hidden lg:flex items-center space-x-4">
         {{ if .User }}
             <a href="/" 
-                class="rounded-md {{ if eq .Page "home" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                class="rounded-md {{ if eq .Page "home" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
                 Habits 🏠
             </a>
 
             <a href="/goals" 
-                class="rounded-md {{ if eq .Page "goals" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                class="rounded-md {{ if eq .Page "goals" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
                 Goals 🎯
             </a>
 
             <a href="/settings" 
-                class="rounded-md {{ if eq .Page "settings" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                class="rounded-md {{ if eq .Page "settings" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
                 Settings ⚙️
             </a>
 
@@ -97,22 +97,22 @@
         x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="translate-x-0 opacity-100"
         x-transition:leave-end="-translate-x-full opacity-0"
-        class="fixed inset-y-0 left-0 w-64 bg-gray-50 p-6 z-50 flex flex-col space-y-4 lg:hidden shadow-lg"
+        class="fixed inset-y-0 left-0 w-64 bg-white p-6 z-50 flex flex-col space-y-4 lg:hidden shadow-lg {{ if .User }}dark:bg-gray-800 dark:text-white{{ end }}"
         @click.away="open = false">
 
         {{ if .User }}
             <a href="/" 
-                class="rounded-md {{ if eq .Page "home" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                class="rounded-md {{ if eq .Page "home" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
                 Habits 🏠
             </a>
 
             <a href="/goals" 
-                class="rounded-md {{ if eq .Page "goals" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                class="rounded-md {{ if eq .Page "goals" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
                 Goals 🎯
             </a>
 
             <a href="/settings" 
-                class="rounded-md {{ if eq .Page "settings" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                class="rounded-md {{ if eq .Page "settings" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
                 Settings ⚙️
             </a>
 
