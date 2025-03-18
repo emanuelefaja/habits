@@ -3,8 +3,11 @@
 {{ template "head" . }}
 <body class="bg-white">
     <!-- Hero Section -->
-    <div class="bg-white h-screen flex items-center">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="bg-white h-screen flex items-center relative overflow-hidden" 
+         style="background-image: radial-gradient(closest-side, rgba(255, 255, 255, .94), rgba(255, 255, 255, .94), rgba(255, 255, 255, 1)), url('https://s.electerious.com/images/codepen/grid.svg');
+                background-repeat: no-repeat, repeat;
+                background-size: auto, 75px 44px;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                 <div class="space-y-6">
                     <!-- Logo -->
@@ -46,10 +49,39 @@
                     </form>
                 </div>
                 <div class="flex justify-center flex-col items-center">
-                    <div class="bg-gray-200 h-80 w-full max-w-md rounded-lg flex items-center justify-center">
-                        <span class="text-gray-400 text-sm">Placeholder Image</span>
+                    <!-- Animated Card -->
+                    <div class="box relative w-[140px] h-[140px]" style="transform: rotateX(55deg) rotateZ(45deg);">
+                        <div class="absolute inset-0 animate-opacity-4s"></div>
+                        <div class="absolute inset-0 animate-transform-4s bg-[#2da44e] shadow-custom"></div>
                     </div>
-                    
+
+                    <style>
+                        @keyframes transform {
+                            0% { transform: translate(-10px, -10px); }
+                            100% { transform: translate(-100px, -100px); }
+                        }
+                        @keyframes opacity {
+                            0% { opacity: .4; filter: blur(10px); }
+                            100% { opacity: .2; filter: blur(20px); }
+                        }
+                        .animate-opacity-4s {
+                            animation: opacity 4s ease infinite alternate;
+                            background: #000;
+                        }
+                        .animate-transform-4s {
+                            animation: transform 4s ease infinite alternate;
+                            box-shadow: 1px 1px 0 #2c974b,
+                                       2px 2px 0 #2c974b,
+                                       3px 3px 0 #2c974b,
+                                       4px 4px 0 #2c974b,
+                                       5px 5px 0 #2c974b;
+                        }
+                        .box {
+                            transform-style: preserve-3d;
+                            perspective: 1000px;
+                        }
+                    </style>
+
                     <!-- Social Proof Section -->
                     <div class="mt-6 w-full flex flex-col items-center">
                         <!-- Overlapping Profile Images -->
