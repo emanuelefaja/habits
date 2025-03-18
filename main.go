@@ -199,6 +199,7 @@ func main() {
 		"ui/goals.html",
 		"ui/forgot.html",
 		"ui/reset.html",
+		"ui/courses/digital-detox.html",
 	))
 
 	// Static files
@@ -515,6 +516,19 @@ func main() {
 			Page: "roadmap",
 		}
 		renderTemplate(w, templates, "roadmap.html", data)
+	})))
+
+	// Digital Detox Course
+	http.Handle("/courses/digital-detox", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		user, _ := getAuthenticatedUser(r, db)
+		data := struct {
+			User *models.User
+			Page string
+		}{
+			User: user,
+			Page: "courses",
+		}
+		renderTemplate(w, templates, "digital-detox.html", data)
 	})))
 
 	// Habit View

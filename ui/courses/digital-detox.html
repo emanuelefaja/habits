@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en" class="min-h-full">
+{{ template "head" . }}
+<body class="bg-white">
+    <!-- Hero Section -->
+    <div class="bg-white h-screen flex items-center">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="space-y-6">
+                    <!-- Logo -->
+                    <div class="leading-[1.3] -space-y-1 text-[#2da44e]">
+                        <div class="text-3xl font-bold">the</div>
+                        <div class="text-3xl font-bold">habits</div>
+                        <div class="text-3xl font-bold">company</div>
+                    </div>
+                    
+                    <h1 class="text-5xl font-extrabold text-black">Win back hours of <br>your life every day.</h1>
+                    <p class="text-xl text-gray-600">Learn how to break free from digital addiction and use technology intentionally, not be used by it.</p>
+                    
+                    <form x-data="{ submitting: false }" class="space-y-6 mt-8" @submit.prevent="submitting = true; setTimeout(() => submitting = false, 1000)">
+                        <div>
+                            <label for="first_name" class="block text-sm/6 font-medium text-gray-900">👋 First name</label>
+                            <div class="mt-2">
+                                <input type="text" id="first_name" name="first_name" required
+                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm/6 font-medium text-gray-900">✉️ Email address</label>
+                            <div class="mt-2">
+                                <input type="email" id="email" name="email" required
+                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6">
+                            </div>
+                        </div>
+                        <button type="submit" class="flex w-full justify-center rounded-md bg-[#2da44e] px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-[#2c974b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2da44e]">
+                            <span x-show="!submitting">🚀 Get My Free Email Course</span>
+                            <span x-show="submitting" x-cloak>
+                                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Processing...
+                            </span>
+                        </button>
+                        <p class="text-xs text-gray-500 mt-2 text-center">🔒 Your data is not sold or shared — just thought-provoking insights delivered to your inbox</p>
+                    </form>
+                </div>
+                <div class="flex justify-center flex-col items-center">
+                    <div class="bg-gray-200 h-80 w-full max-w-md rounded-lg flex items-center justify-center">
+                        <span class="text-gray-400 text-sm">Placeholder Image</span>
+                    </div>
+                    
+                    <!-- Social Proof Section -->
+                    <div class="mt-6 w-full flex flex-col items-center">
+                        <!-- Overlapping Profile Images -->
+                        <div class="flex -space-x-2 overflow-hidden mb-2">
+                            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://randomuser.me/api/portraits/women/17.jpg" alt="Profile 1">
+                            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://randomuser.me/api/portraits/men/43.jpg" alt="Profile 2">
+                            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://randomuser.me/api/portraits/women/31.jpg" alt="Profile 3">
+                            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://randomuser.me/api/portraits/men/28.jpg" alt="Profile 4">
+                            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://randomuser.me/api/portraits/women/52.jpg" alt="Profile 5">
+                            <div class="inline-block h-8 w-8 rounded-full ring-2 ring-white bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-500">+99</div>
+                        </div>
+                        <p class="text-sm font-medium text-gray-700">
+                            <span class="font-bold">250+ students</span> ❤️ this course
+                        </p>
+                        <p class="text-xs text-gray-500 mt-1 text-center">Join our growing community today</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Problem Statement Section -->
+    <div class="bg-gray-50 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-center text-gray-900 mb-12">The Digital Addiction Crisis</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Problem Point 1 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                    <div class="flex items-start mb-4">
+                        <span class="text-2xl mr-4">❌</span>
+                        <h3 class="text-xl font-semibold text-gray-900">Constant Distraction</h3>
+                    </div>
+                    <p class="text-gray-600">We check our phones 96 times daily—once every 10 minutes. No wonder we can't hit our goals when we're perpetually distracted.</p>
+                </div>
+                
+                <!-- Problem Point 2 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                    <div class="flex items-start mb-4">
+                        <span class="text-2xl mr-4">❌</span>
+                        <h3 class="text-xl font-semibold text-gray-900">Mental Health Impact</h3>
+                    </div>
+                    <p class="text-gray-600">Heavy social media use directly correlates with anxiety and depression. Constant comparison and dopamine-seeking rewires our brains for unhealthy patterns.</p>
+                </div>
+                
+                <!-- Problem Point 3 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                    <div class="flex items-start mb-4">
+                        <span class="text-2xl mr-4">❌</span>
+                        <h3 class="text-xl font-semibold text-gray-900">Time Theft</h3>
+                    </div>
+                    <p class="text-gray-600">We spend over 7 hours on digital devices daily. That's one-third of your life—scrolling through content designed to keep you addicted.</p>
+                </div>
+                
+                <!-- Problem Point 4 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                    <div class="flex items-start mb-4">
+                        <span class="text-2xl mr-4">❌</span>
+                        <h3 class="text-xl font-semibold text-gray-900">Deteriorating Relationships</h3>
+                    </div>
+                    <p class="text-gray-600">Can't stop checking your phone when you're with friends? Digital distractions are taking a toll on our most important and meaningful connections.</p>
+                </div>
+                
+                <!-- Problem Point 5 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                    <div class="flex items-start mb-4">
+                        <span class="text-2xl mr-4">❌</span>
+                        <h3 class="text-xl font-semibold text-gray-900">Cognitive Decline</h3>
+                    </div>
+                    <p class="text-gray-600">Digital addiction rewires our brains, turning us into modern-day goldfish. Forget deep work, our ability to focus, form memories, and think creatively is being eroded.</p>
+                </div>
+                
+                <!-- Problem Point 6 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                    <div class="flex items-start mb-4">
+                        <span class="text-2xl mr-4">❌</span>
+                        <h3 class="text-xl font-semibold text-gray-900">Loss of Agency</h3>
+                    </div>
+                    <p class="text-gray-600">Algorithms control your attention and are designed to maximize engagement, not to help you live intentionally according to your values.</p>
+                </div>
+            </div>
+            
+            <!-- Call to Action -->
+            <div class="mt-12 text-center">
+                <p class="text-lg text-gray-700 mb-6">Recognize any of these symptoms in your own life? You're not alone—and it's not your fault.</p>
+                <a href="#course-content" class="inline-block bg-[#2da44e] text-white font-semibold px-6 py-3 rounded-lg hover:bg-[#2c974b] transition">See How Our Course Can Help</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- After Problem Statement Section and before Course Content Section -->
+    <div class="bg-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-center text-gray-900 mb-12">What You'll Gain</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Benefit 1 -->
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <div class="text-2xl mb-4">⏰</div>
+                    <h3 class="text-xl font-semibold mb-2">Reclaim 28+ Hours Weekly</h3>
+                    <p>The average person spends 4+ hours daily on their phone. Our methods help you cut that in half—giving you back two weeks of waking life every year.</p>
+                </div>
+                
+                <!-- Benefit 2 -->
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <div class="text-2xl mb-4">🧠</div>
+                    <h3 class="text-xl font-semibold mb-2">Improved Focus & Clarity</h3>
+                    <p>Experience deeper work, better memory retention, and enhanced creativity when your brain isn't constantly interrupted by notifications.</p>
+                </div>
+                
+                <!-- Benefit 3 -->
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <div class="text-2xl mb-4">😌</div>
+                    <h3 class="text-xl font-semibold mb-2">Reduced Anxiety</h3>
+                    <p>Studies show digital detox participants report 30% lower anxiety levels and improved sleep quality within just 7 days.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Content Section -->
+    <div id="course-content" class="bg-brand-green text-white p-8">
+        <div class="course-content" x-data="{ show: false }" x-init="setTimeout(() => show = true, 100)">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div class="md:grid md:grid-cols-2 md:gap-8">
+                    <!-- Left column - Sticky heading -->
+                    <div class="md:sticky md:top-8 md:self-start md:h-screen md:flex md:flex-col md:justify-start">
+                        <div class="opacity-0 transition duration-500 ease-in-out" :class="{ 'opacity-100': show }" style="transition-delay: 100ms;">
+                            <h2 class="text-4xl font-bold mb-2">21 days to a better life.</h2>
+                            
+                            <p class="text-lg mb-6">
+                                Take control of technology, instead of technology controlling you.
+                            </p>
+                            
+                            <div class="hidden md:block mt-8">
+                                <a href="/register" class="inline-block bg-white text-brand-green font-semibold px-6 py-3 rounded-lg hover:bg-opacity-90 transition">
+                                    Start Your Digital Detox Journey
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right column - Scrolling content -->
+                    <div class="mt-8 md:mt-0" x-data="courseData()">
+                        <template x-for="(day, index) in days" :key="index">
+                            <div class="opacity-0 transition duration-500 ease-in-out mb-12" :class="{ 'opacity-100': show }" :style="`transition-delay: ${300 + (index * 20)}ms`">
+                                <div class="border-t border-white/30 pt-4"></div>
+                                <div class="grid grid-cols-4 gap-4">
+                                    <div class="col-span-1">
+                                        <h2 class="text-2xl font-bold" x-text="`Day ${index + 1}`"></h2>
+                                    </div>
+                                    <div class="col-span-3">
+                                        <h3 class="text-2xl font-bold mb-4" x-text="day.title"></h3>
+                                        <p class="text-base" x-text="day.description"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        
+                        <!-- Mobile CTA -->
+                        <div class="mt-12 text-center md:hidden opacity-0 transition duration-500 ease-in-out" :class="{ 'opacity-100': show }" style="transition-delay: 800ms;">
+                            <a href="/register" class="inline-block bg-white text-brand-green font-semibold px-6 py-3 rounded-lg hover:bg-opacity-90 transition">
+                                Start Your Digital Detox Journey
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- After Course Content Section -->
+    <div class="bg-gray-50 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-center text-gray-900 mb-12">What Our Students Say</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="flex items-start mb-4">
+                        <img class="h-12 w-12 rounded-full mr-4" src="https://randomuser.me/api/portraits/women/17.jpg" alt="Profile">
+                        <div>
+                            <h3 class="font-semibold">Sarah J.</h3>
+                            <div class="text-yellow-400">★★★★★</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"I was skeptical at first, but by Day 10 I realized I'd been missing out on real life. I'm now reading books again and sleeping better than I have in years."</p>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="flex items-start mb-4">
+                        <img class="h-12 w-12 rounded-full mr-4" src="https://randomuser.me/api/portraits/men/43.jpg" alt="Profile">
+                        <div>
+                            <h3 class="font-semibold">Michael T.</h3>
+                            <div class="text-yellow-400">★★★★★</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"As a software developer, I thought I needed to be connected 24/7. This course taught me how to set boundaries and now I'm actually more productive while using screens less."</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About The Habits Company -->
+    <div class="bg-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div>
+                    <h2 class="text-3xl font-bold mb-6">Build better habits.</h2>
+                    <p class="text-gray-600 mb-4">The Habits Company is dedicated to helping you build better habits, and lead a life that is aligned with your values and goals.</p>
+                    <p class="text-gray-600 mb-4">Our approach combines behavioral science and technology,  with practical, actionable steps that fit into real life. We believe small changes lead to profound results.</p>
+                </div>
+                <div class="flex items-center justify-center">
+                    <!-- Replace with your actual company logo or appropriate image -->
+                    <div class="leading-[1.3] -space-y-1 text-[#2da44e] text-5xl">
+                        <div class="font-bold">the</div>
+                        <div class="font-bold">habits</div>
+                        <div class="font-bold">company</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="bg-gray-50 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-center text-gray-900 mb-12">Frequently Asked Questions</h2>
+            
+            <div class="space-y-6">
+                <!-- FAQ Item 1 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-xl font-semibold mb-2">How is this course delivered?</h3>
+                    <p class="text-gray-600">This is a 21-day email course. You'll receive one lesson per day directly to your inbox with a specific action step to implement.</p>
+                </div>
+                
+                <!-- FAQ Item 2 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-xl font-semibold mb-2">Is this really free?</h3>
+                    <p class="text-gray-600">Yes! We believe everyone deserves access to tools that improve mental wellbeing. The email course is completely free with no hidden costs.</p>
+                </div>
+                
+                <!-- FAQ Item 3 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-xl font-semibold mb-2">Do I need to quit using technology completely?</h3>
+                    <p class="text-gray-600">Not at all. This course is about developing a healthier relationship with technology, not eliminating it. We focus on intentional use rather than complete abstinence.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course data script -->
+    <script>
+        function courseData() {
+            return {
+                days: [
+                    {
+                        title: "The Attention Economy",
+                        description: "Understand how social media companies make money. These platforms aren't free—you pay with your attention, which is sold to advertisers. Learn why these apps are deliberately designed to be addictive and keep you scrolling longer."
+                    },
+                    {
+                        title: "Technology is Not Neutral",
+                        description: "Unlike physical tools like bikes, digital platforms have their own agendas. Discover how apps are engineered to shape your behavior, form habits, and create dependencies that benefit their creators, not necessarily you."
+                    },
+                    {
+                        title: "Digital Awareness",
+                        description: "Begin by documenting your current tech habits. Track your screen time, app usage, and how you feel before, during, and after technology use. Awareness is the first step to change."
+                    },
+                    {
+                        title: "Tech-Free Mornings",
+                        description: "Create a morning routine without screens. No phone, tablet, or computer for the first hour after waking. Replace with meditation, journaling, or exercise."
+                    },
+                    {
+                        title: "Notification Audit",
+                        description: "Turn off all non-essential notifications on your devices. Keep only those that are time-sensitive or from actual people, not apps trying to capture your attention."
+                    },
+                    {
+                        title: "Home Screen Cleanse",
+                        description: "Remove distracting apps from your home screen. Keep only essential tools and apps that support your goals, moving everything else to folders on secondary screens."
+                    },
+                    {
+                        title: "Digital Sunset",
+                        description: "Implement a \"digital sunset\" — a time each evening when you turn off all screens. Aim for at least one hour before bedtime to improve sleep quality."
+                    },
+                    {
+                        title: "Single-Tasking",
+                        description: "Practice doing one thing at a time without digital interruptions. When working, close unnecessary tabs. When eating, leave your phone in another room."
+                    },
+                    {
+                        title: "Tech-Free Sunday",
+                        description: "Experience a full day without social media, news, or entertainment apps. Focus on in-person connections, nature, and analog activities like reading physical books."
+                    },
+                    {
+                        title: "App Declutter",
+                        description: "Delete apps you haven't used in the past month. For those you're unsure about, move them to a folder named \"Maybe Delete\" and see if you miss them."
+                    },
+                    {
+                        title: "Email Boundaries",
+                        description: "Set specific times to check email (e.g., 10am and 4pm) rather than keeping it open all day. Unsubscribe from newsletters you don't read regularly."
+                    },
+                    {
+                        title: "Digital-Free Dining",
+                        description: "Make all mealtimes screen-free. Pay attention to your food, your body's signals, and the people you're eating with (or enjoy mindful solitude)."
+                    },
+                    {
+                        title: "Analog Alternatives",
+                        description: "Replace one digital activity with an analog alternative: physical books instead of e-readers, paper notebooks instead of notes apps, board games instead of video games."
+                    },
+                    {
+                        title: "Social Media Audit",
+                        description: "Review who you follow on social media. Unfollow accounts that make you feel inadequate, anxious, or that don't add value to your life."
+                    },
+                    {
+                        title: "Deep Work Session",
+                        description: "Schedule a 2-hour deep work session with all distractions removed. Turn off Wi-Fi if possible, use focus mode, and see how much you can accomplish."
+                    },
+                    {
+                        title: "Phone-Free Walks",
+                        description: "Leave your phone at home and take a 30-minute walk. Notice how you feel without the ability to check messages or take photos. Observe your surroundings fully."
+                    },
+                    {
+                        title: "Tech-Free Zones",
+                        description: "Designate certain areas in your home as permanently tech-free: perhaps the bedroom, dining room, or a reading nook. Keep these spaces sacred from screens."
+                    },
+                    {
+                        title: "Digital Detox Buddy",
+                        description: "Find an accountability partner who will join you in specific digital detox practices. Check in with each other daily about your progress and challenges."
+                    },
+                    {
+                        title: "Intentional Media",
+                        description: "Rather than endless scrolling, create a list of specific content you want to consume (articles, videos, etc.). Only engage with media from this curated list."
+                    },
+                    {
+                        title: "Digital Boundaries",
+                        description: "Communicate your new digital boundaries to friends and family. Let them know when you'll be available and your preferred communication methods."
+                    },
+                    {
+                        title: "Sustainable Digital Life",
+                        description: "Create your personalized digital wellbeing plan. Which practices will you continue? How will you maintain boundaries while using technology as a tool, not a master?"
+                    }
+                ]
+            }
+        }
+    </script>
+</body>
+</html> 
