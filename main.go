@@ -181,7 +181,7 @@ func main() {
 
 	// Replace template.Must with explicit error handling:
 	parsedTemplates, err := template.New("").Funcs(funcMap).ParseFiles(
-		"ui/components/campaign-subscription-form.html",
+		// Components
 		"ui/components/header.html",
 		"ui/components/habit-modal.html",
 		"ui/components/monthly-grid.html",
@@ -192,7 +192,7 @@ func main() {
 		"ui/components/footer.html",
 		"ui/components/sum-line-graph.html",
 		"ui/components/goal.html",
-		// Pages that use components should be listed after
+		// Pages
 		"ui/home.html",
 		"ui/settings.html",
 		"ui/login.html",
@@ -213,7 +213,6 @@ func main() {
 		"ui/forgot.html",
 		"ui/reset.html",
 		"ui/unsubscribe.html",
-		// Courses should be listed last since they use the campaign-subscription-form component
 		"ui/courses/digital-detox.html",
 	)
 	if err != nil {
