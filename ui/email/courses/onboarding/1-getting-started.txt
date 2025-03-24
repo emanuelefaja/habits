@@ -1,0 +1,35 @@
+Hi {{.FirstName}},
+
+I'm thrilled you've joined Habits! Let's get you set up for success with your first habit tracking journey.
+
+WHAT MAKES A GOOD HABIT TO TRACK?
+The best habits to track are:
+- Specific - "Meditate for 10 minutes" is better than "Be mindful"
+- Measurable - You should be able to clearly say "yes, I did it" or "no, I didn't"
+- Achievable - Start smaller than you think to build momentum
+
+CREATING YOUR FIRST HABIT
+Follow these simple steps to create your first habit:
+1. Log in to your account at habits.co/login
+2. Click the "+ New Habit" button in the top right
+3. Name your habit (like "Read for 20 minutes" or "Drink 8 glasses of water")
+4. Choose an emoji that represents your habit
+5. Select the habit type (binary, numeric, etc.)
+6. Click "Create Habit"
+
+Once created, you can start tracking your habit right away by clicking on today's date in your habit grid!
+
+PRO TIP: START SMALL
+Research shows that habits stick better when they're easy to do. For example:
+- Instead of "Exercise for an hour" try "Do 5 push-ups"
+- Instead of "Meditate for 20 minutes" try "Meditate for 2 minutes"
+- Instead of "Read a book every week" try "Read 2 pages every day"
+
+You can always increase the difficulty once the habit becomes automatic.
+
+Create your first habit now: https://habits.co/login
+
+I'll check back in a few days to see how you're doing with your first habit.
+
+Happy habit building!
+The Habits Team 

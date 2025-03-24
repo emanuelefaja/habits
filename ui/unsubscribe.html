@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-gray-50">
+{{ template "head" . }}
+<body class="h-full">
+    <div class="flex h-full">
+        <!-- Brand Section -->
+        <div class="hidden lg:flex lg:w-1/3 bg-[#2da44e] flex-col justify-between items-center text-white p-8">
+            <div class="flex-grow"></div>
+            <div class="text-left">
+                <div class="leading-[0.8] -space-y-2">
+                    <h1 class="text-4xl font-bold">the</h1>
+                    <h1 class="text-4xl font-bold">habits</h1>
+                    <h1 class="text-4xl font-bold">company</h1>
+                </div>
+                <p class="text-xl mt-4 opacity-90">Build better habits</p>
+            </div>
+            <div class="flex-grow"></div>
+            
+            <!-- Quote Section (assuming there's a quote coming from the handler) -->
+            <div class="text-center text-white opacity-80 px-6 py-4">
+                <p class="italic text-lg">{{if .Quote}}{{ .Quote.Text }}{{else}}Small habits make big changes.{{end}}</p>
+                <p class="text-sm mt-2">{{if .Quote}}— {{ .Quote.Author }}{{else}}— The Habits Company{{end}}</p>
+            </div>
+        </div>
+
+        <!-- Unsubscribe Content Section -->
+        <div class="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50">
+            <div class="sm:mx-auto sm:w-full sm:max-w-md">
+                <h2 class="text-center text-2xl/9 font-bold tracking-tight text-gray-900">Unsubscribe from {{.CampaignName}}</h2>
+            </div>
+
+            <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+                <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 text-center">
+                    <div class="text-5xl mb-6">{{.CampaignEmoji}}</div>
+                    
+                    <div id="confirmation" class="{{if .Unsubscribed}}hidden{{end}}">
+                        <p class="text-gray-700 mb-4">Are you sure you want to unsubscribe from our {{.CampaignName}} emails?</p>
+                        <p class="text-gray-600 mb-6">You won't receive any more emails from this campaign.</p>
+                        
+                        <form method="POST" action="/unsubscribe" class="mb-6">
+                            <input type="hidden" name="token" value="{{.Token}}">
+                            <input type="hidden" name="campaign_id" value="{{.CampaignID}}">
+                            <input type="hidden" name="email" value="{{.Email}}">
+                            <button type="submit" class="w-full py-2 px-4 bg-[#2da44e] text-white font-semibold rounded-md hover:bg-[#2c974b] transition-colors">
+                                Yes, Unsubscribe Me
+                            </button>
+                        </form>
+                        
+                        <a href="https://habits.co" class="text-sm font-medium text-[#2da44e] hover:text-[#2c974b]">Return to Habits</a>
+                    </div>
+                    
+                    <div id="success" class="{{if not .Unsubscribed}}hidden{{end}} bg-green-50 p-6 rounded-lg border border-green-200">
+                        <h2 class="text-xl font-semibold mb-2 text-gray-800">Successfully Unsubscribed</h2>
+                        <p class="text-gray-700 mb-2">You have been unsubscribed from the {{.CampaignName}} campaign.</p>
+                        <p class="text-gray-700 mb-4">You'll no longer receive emails from this campaign.</p>
+                        <a href="https://habits.co" class="text-sm font-medium text-[#2da44e] hover:text-[#2c974b]">Return to Habits</a>
+                    </div>
+                    
+                    <div class="mt-8 text-xs text-gray-500">
+                        <p>© The Habits Company 2025 | <a href="https://habits.co/privacy" class="text-[#2da44e] hover:text-[#2c974b]">Privacy</a> | <a href="https://habits.co/terms" class="text-[#2da44e] hover:text-[#2c974b]">Terms</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

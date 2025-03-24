@@ -1,0 +1,28 @@
+Hi {{.FirstName}},
+
+Welcome to the Digital Detox course! Over the next two weeks, I'll guide you through practical steps to reduce your digital dependence and regain control of your attention.
+
+In this course, you'll learn:
+- Why our brains crave digital distraction
+- How to identify your personal digital triggers
+- Practical techniques to break the cycle of constant checking
+- How to build sustainable habits for a healthier relationship with technology
+
+"The cost of a thing is the amount of what I will call life which is required to be exchanged for it, immediately or in the long run." — Henry David Thoreau
+
+Let's start with a simple exercise:
+
+DAY 1 EXERCISE: DIGITAL AWARENESS
+For the next 24 hours, I'd like you to simply notice your digital habits without judgment:
+- How many times do you reach for your phone without thinking?
+- What triggers you to check devices (boredom, notifications, anxiety)?
+- How do you feel immediately after using your devices?
+
+Don't try to change anything yet. Just observe and take mental notes. Awareness is the first step toward change.
+
+Tomorrow, we'll discuss what you observed and introduce the concept of "digital minimalism" - a philosophy that can help you reclaim your attention and focus.
+
+I'm excited to be on this journey with you!
+
+Talk soon,
+The Habits Team 

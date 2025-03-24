@@ -49,17 +49,23 @@ func (s *Scheduler) Start() error {
 
 	// Schedule daily reminders for users with habits
 	_, err := s.cron.AddFunc(s.dailyTime, func() {
-		log.Println("Running daily habit reminders")
 		s.sendDailyReminders()
 	})
 	if err != nil {
 		return err
 	}
 
-	// Schedule weekly reminders for users without habits
+	// Schedule weekly nudges for users without habits
 	_, err = s.cron.AddFunc(s.weeklyTime, func() {
-		log.Println("Running weekly first habit reminders")
 		s.sendWeeklyFirstHabitReminders()
+	})
+	if err != nil {
+		return err
+	}
+
+	// Schedule campaign email sending (every minute with rate limiting)
+	_, err = s.cron.AddFunc("* * * * *", func() {
+		s.SendCampaignEmailsBatch(20) // Send 20 emails per minute (1200/hour max)
 	})
 	if err != nil {
 		return err
@@ -281,4 +287,24 @@ func (s *Scheduler) RunDailyRemindersNow() {
 // RunWeeklyFirstHabitRemindersNow triggers the weekly first habit reminder job immediately
 func (s *Scheduler) RunWeeklyFirstHabitRemindersNow() {
 	go s.sendWeeklyFirstHabitReminders()
+}
+
+// SendCampaignEmails sends pending campaign emails (legacy method, uses default batch size)
+func (s *Scheduler) SendCampaignEmails() {
+	log.Println("🔔 Running scheduled campaign email sending")
+
+	campaignManager := email.NewCampaignManager(s.db, s.emailSvc)
+	if err := campaignManager.SendPendingCampaignEmails(); err != nil {
+		log.Printf("❌ Error sending campaign emails: %v", err)
+	}
+}
+
+// SendCampaignEmailsBatch sends pending campaign emails with a specified batch size
+func (s *Scheduler) SendCampaignEmailsBatch(batchSize int) {
+	log.Printf("🔔 Running scheduled campaign email sending (batch size: %d)", batchSize)
+
+	campaignManager := email.NewCampaignManager(s.db, s.emailSvc)
+	if err := campaignManager.SendPendingCampaignEmailsWithLimit(batchSize); err != nil {
+		log.Printf("❌ Error sending campaign emails: %v", err)
+	}
 }

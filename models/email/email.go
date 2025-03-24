@@ -96,4 +96,5 @@ type EmailService interface {
 	SendReminderEmail(to string, firstName string, habits []HabitInfo, quote QuoteInfo) error
 	SendFirstHabitEmail(to string, firstName string, quote QuoteInfo) error
 	SendSimpleEmail(to, subject, content string) error
+	GetCampaignManager() *CampaignManager
 }

@@ -2,7 +2,9 @@ package middleware
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"time"
 
@@ -112,4 +114,25 @@ func ClearMathProblem(r *http.Request) {
 	SessionManager.Remove(r.Context(), "mathNum1")
 	SessionManager.Remove(r.Context(), "mathNum2")
 	SessionManager.Remove(r.Context(), "mathSum")
+}
+
+// GetCSRFToken returns the CSRF token from the session
+func GetCSRFToken(r *http.Request) string {
+	token, ok := SessionManager.Get(r.Context(), "token").(string)
+	if !ok || token == "" {
+		// Generate a new token if none exists
+		token = GenerateCSRFToken()
+		SessionManager.Put(r.Context(), "token", token)
+	}
+	return token
+}
+
+// GenerateCSRFToken generates a new random CSRF token
+func GenerateCSRFToken() string {
+	b := make([]byte, 32)
+	_, err := rand.Read(b)
+	if err != nil {
+		return ""
+	}
+	return fmt.Sprintf("%x", b)
 }

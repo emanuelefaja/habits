@@ -25,8 +25,9 @@ type SMTPConfig struct {
 
 // SMTPEmailService implements EmailService
 type SMTPEmailService struct {
-	config SMTPConfig
-	client *mail.Client
+	config          SMTPConfig
+	client          *mail.Client
+	campaignManager *CampaignManager
 }
 
 // NewSMTPEmailService creates a new SMTP email service
@@ -152,4 +153,14 @@ func (s *SMTPEmailService) SendSimpleEmail(to, subject, content string) error {
 	return s.SendTypedEmail(to, customTemplate, map[string]string{
 		"Content": content,
 	})
+}
+
+// SetCampaignManager sets the campaign manager for the email service
+func (s *SMTPEmailService) SetCampaignManager(cm *CampaignManager) {
+	s.campaignManager = cm
+}
+
+// GetCampaignManager returns the campaign manager
+func (s *SMTPEmailService) GetCampaignManager() *CampaignManager {
+	return s.campaignManager
 }

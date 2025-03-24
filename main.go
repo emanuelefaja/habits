@@ -131,6 +131,16 @@ func main() {
 	// Pass the email service to the API handlers
 	api.InitEmailService(emailService)
 
+	// Initialize campaign manager
+	if emailService != nil {
+		campaignManager := email.NewCampaignManager(db, emailService)
+
+		// Set the campaign manager in the email service if it's the SMTP implementation
+		if smtpService, ok := emailService.(*email.SMTPEmailService); ok {
+			smtpService.SetCampaignManager(campaignManager)
+		}
+	}
+
 	// Initialize and start the scheduler for email notifications
 	scheduler := models.NewScheduler(db, emailService)
 	if err := scheduler.Start(); err != nil {
@@ -169,7 +179,9 @@ func main() {
 		},
 	}
 
-	templates := template.Must(template.New("").Funcs(funcMap).ParseFiles(
+	// Replace template.Must with explicit error handling:
+	parsedTemplates, err := template.New("").Funcs(funcMap).ParseFiles(
+		"ui/components/campaign-subscription-form.html",
 		"ui/components/header.html",
 		"ui/components/habit-modal.html",
 		"ui/components/monthly-grid.html",
@@ -180,6 +192,7 @@ func main() {
 		"ui/components/footer.html",
 		"ui/components/sum-line-graph.html",
 		"ui/components/goal.html",
+		// Pages that use components should be listed after
 		"ui/home.html",
 		"ui/settings.html",
 		"ui/login.html",
@@ -199,8 +212,19 @@ func main() {
 		"ui/goals.html",
 		"ui/forgot.html",
 		"ui/reset.html",
+		"ui/unsubscribe.html",
+		// Courses should be listed last since they use the campaign-subscription-form component
 		"ui/courses/digital-detox.html",
-	))
+	)
+	if err != nil {
+		log.Fatalf("Template parsing error: %v", err)
+	}
+	templates := parsedTemplates
+
+	// After parsing templates, add:
+	for _, t := range templates.Templates() {
+		log.Printf("Loaded template: %s", t.Name())
+	}
 
 	// Static files
 	fs := http.FileServer(http.Dir("static"))
@@ -520,14 +544,30 @@ func main() {
 
 	// Digital Detox Course
 	http.Handle("/courses/digital-detox", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		user, _ := getAuthenticatedUser(r, db)
-		data := struct {
-			User *models.User
-			Page string
-		}{
-			User: user,
-			Page: "courses",
+		if r.URL.Path != "/courses/digital-detox" {
+			http.NotFound(w, r)
+			return
 		}
+
+		// Create random numbers for math verification
+		num1 := rand.Intn(20) + 1 // Random number between 1-20
+		num2 := rand.Intn(20) + 1 // Random number between 1-20
+
+		data := map[string]interface{}{
+			"IsLoggedIn": middleware.IsAuthenticated(r),
+			"CSRFToken":  middleware.GetCSRFToken(r),
+			"MathNum1":   num1,
+			"MathNum2":   num2,
+		}
+
+		// Add user data if logged in
+		if data["IsLoggedIn"].(bool) {
+			user, err := getAuthenticatedUser(r, db)
+			if err == nil && user != nil {
+				data["User"] = user
+			}
+		}
+
 		renderTemplate(w, templates, "digital-detox.html", data)
 	})))
 
@@ -580,7 +620,7 @@ func main() {
 		renderTemplate(w, templates, "about.html", data)
 	})))
 
-	// Roadmap API
+	// Roadmap API handlers
 	http.Handle("/api/roadmap/likes", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
@@ -591,7 +631,6 @@ func main() {
 			handleNotAllowed(w, http.MethodGet, http.MethodPost)
 		}
 	})))
-
 	http.Handle("/api/roadmap/ideas", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
 			api.SubmitRoadmapIdeaHandler(db)(w, r)
@@ -599,6 +638,12 @@ func main() {
 			handleNotAllowed(w, http.MethodPost)
 		}
 	})))
+
+	// Campaign API handlers
+	http.Handle("/api/campaigns/subscribe", middleware.SessionManager.LoadAndSave(http.HandlerFunc(api.SubscribeToCampaign)))
+	http.Handle("/api/campaigns/unsubscribe", middleware.SessionManager.LoadAndSave(http.HandlerFunc(api.UnsubscribeFromCampaign)))
+	http.Handle("/api/campaigns/subscriptions", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(api.GetSubscriptions))))
+	http.Handle("/api/campaigns/preferences", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(api.UpdateSubscriptionPreferences))))
 
 	// Admin
 	http.Handle("/admin", middleware.SessionManager.LoadAndSave(
@@ -835,16 +880,127 @@ func main() {
 		api.UpdateGoalHandler(db)(w, r)
 	}))))
 
-	// // Profile
-	// http.Handle("/profile", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	// 	user, _ := getAuthenticatedUser(r, db)
-	// 	data := struct {
-	// 		User *models.User
-	// 	}{
-	// 		User: user,
-	// 	}
-	// 	renderTemplate(w, templates, "profile.html", data)
-	// })))
+	// Unsubscribe route
+	http.Handle("/unsubscribe", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			token := r.URL.Query().Get("token")
+			campaignID := r.URL.Query().Get("campaign_id")
+			email := r.URL.Query().Get("email")
+
+			if token == "" || campaignID == "" || email == "" {
+				http.Error(w, "Missing required parameters", http.StatusBadRequest)
+				return
+			}
+
+			// Get a random quote
+			quote, err := models.GetRandomQuote()
+			if err != nil {
+				log.Printf("Error getting random quote: %v", err)
+				// Continue with default quote from the function
+			}
+
+			// Get campaign details from the token
+			var campaignName, campaignEmoji string
+
+			// This should come from a campaign lookup based on campaignID
+			// For now, using default values
+			if campaignID == "reminder" {
+				campaignName = "Daily Reminders"
+				campaignEmoji = "🔔"
+			} else if campaignID == "digest" {
+				campaignName = "Weekly Digest"
+				campaignEmoji = "📊"
+			} else {
+				campaignName = "Email Notifications"
+				campaignEmoji = "✉️"
+			}
+
+			data := struct {
+				Token         string
+				CampaignID    string
+				CampaignName  string
+				CampaignEmoji string
+				Email         string
+				Unsubscribed  bool
+				Quote         models.Quote
+			}{
+				Token:         token,
+				CampaignID:    campaignID,
+				CampaignName:  campaignName,
+				CampaignEmoji: campaignEmoji,
+				Email:         email,
+				Unsubscribed:  false,
+				Quote:         quote,
+			}
+
+			renderTemplate(w, templates, "unsubscribe.html", data)
+
+		case http.MethodPost:
+			token := r.FormValue("token")
+			campaignID := r.FormValue("campaign_id")
+			email := r.FormValue("email")
+
+			if token == "" || campaignID == "" || email == "" {
+				http.Error(w, "Missing required parameters", http.StatusBadRequest)
+				return
+			}
+
+			// Validate token and process unsubscribe
+			// This should be handled by the email/campaign service
+			if emailService != nil {
+				// For now, we'll just log the unsubscribe request
+				// TODO: Implement proper unsubscribe logic when campaign manager is completed
+				log.Printf("Unsubscribe request for email %s from campaign %s", email, campaignID)
+			}
+
+			// Get a random quote
+			quote, err := models.GetRandomQuote()
+			if err != nil {
+				log.Printf("Error getting random quote: %v", err)
+				// Continue with default quote from the function
+			}
+
+			// Get campaign details from the token
+			var campaignName, campaignEmoji string
+
+			// This should come from a campaign lookup based on campaignID
+			// For now, using default values
+			if campaignID == "reminder" {
+				campaignName = "Daily Reminders"
+				campaignEmoji = "🔔"
+			} else if campaignID == "digest" {
+				campaignName = "Weekly Digest"
+				campaignEmoji = "📊"
+			} else {
+				campaignName = "Email Notifications"
+				campaignEmoji = "✉️"
+			}
+
+			data := struct {
+				Token         string
+				CampaignID    string
+				CampaignName  string
+				CampaignEmoji string
+				Email         string
+				Unsubscribed  bool
+				Quote         models.Quote
+			}{
+				Token:         token,
+				CampaignID:    campaignID,
+				CampaignName:  campaignName,
+				CampaignEmoji: campaignEmoji,
+				Email:         email,
+				Unsubscribed:  true,
+				Quote:         quote,
+			}
+
+			renderTemplate(w, templates, "unsubscribe.html", data)
+
+		default:
+			handleNotAllowed(w, http.MethodGet, http.MethodPost)
+		}
+	})))
 
 	// Admin Download DB
 	http.Handle("/admin/download-db", middleware.SessionManager.LoadAndSave(middleware.RequireAdmin(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

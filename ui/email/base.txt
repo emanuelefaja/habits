@@ -1,0 +1,10 @@
+{{ .Title }}
+
+{{ .Content }}
+
+---
+
+© {{ .AppName }} 2025 | https://habits.co/
+
+You received this email because you're subscribed to {{ .CampaignName }} {{ .CampaignEmoji }}.
+To unsubscribe from this campaign, visit: {{ .UnsubscribeLink }} 

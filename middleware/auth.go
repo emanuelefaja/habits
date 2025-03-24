@@ -4,7 +4,9 @@ import (
 	"database/sql"
 	"log"
 	"mad/models"
+	"net"
 	"net/http"
+	"strings"
 )
 
 var DB *sql.DB
@@ -69,4 +71,39 @@ func RequireAdmin(next http.Handler) http.Handler {
 		log.Printf("RequireAdmin: Admin access granted for user %d", userID)
 		next.ServeHTTP(w, r)
 	})
+}
+
+// GetIPAddress returns the client IP address from the request
+func GetIPAddress(r *http.Request) string {
+	// Check for X-Forwarded-For header first (for proxies)
+	ip := r.Header.Get("X-Forwarded-For")
+	if ip != "" {
+		// X-Forwarded-For can contain multiple IPs, use the first one
+		return strings.Split(ip, ",")[0]
+	}
+
+	// Fallback to RemoteAddr
+	ip, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		// If there's an error splitting, just return the whole RemoteAddr
+		return r.RemoteAddr
+	}
+	return ip
+}
+
+// GetUser returns the user from the session, or nil if not authenticated
+func GetUser(r *http.Request) *models.User {
+	// Get user ID from session
+	userID, ok := SessionManager.Get(r.Context(), "userID").(int)
+	if !ok || userID == 0 {
+		return nil
+	}
+
+	// Retrieve user from DB
+	user, err := models.GetUserByID(DB, int64(userID))
+	if err != nil {
+		return nil
+	}
+
+	return user
 }

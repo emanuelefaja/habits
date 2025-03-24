@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -243,6 +244,57 @@ func InitDB(db *sql.DB) error {
 	`)
 	if err != nil {
 		return err
+	}
+
+	// Create email_subscriptions table
+	_, err = db.Exec(`
+	CREATE TABLE IF NOT EXISTS email_subscriptions (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		user_id INTEGER NULL REFERENCES users(id) ON DELETE CASCADE,
+		email TEXT NOT NULL,
+		campaign_id TEXT NOT NULL,
+		subscribed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		status TEXT NOT NULL CHECK (status IN ('active', 'unsubscribed')) DEFAULT 'active',
+		last_email_sent INTEGER DEFAULT 0,
+		unsubscribed_at TIMESTAMP NULL,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		UNIQUE(email, campaign_id)
+	)`)
+	if err != nil {
+		return fmt.Errorf("error creating email_subscriptions table: %w", err)
+	}
+
+	// Create email_sends table
+	_, err = db.Exec(`
+	CREATE TABLE IF NOT EXISTS email_sends (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		subscription_id INTEGER NOT NULL REFERENCES email_subscriptions(id) ON DELETE CASCADE,
+		email_number INTEGER NOT NULL,
+		template_name TEXT NOT NULL,
+		subject TEXT NOT NULL,
+		status TEXT NOT NULL CHECK (status IN ('success', 'failed', 'retry')),
+		sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+		error_message TEXT,
+		retry_count INTEGER DEFAULT 0,
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+	)`)
+	if err != nil {
+		return fmt.Errorf("error creating email_sends table: %w", err)
+	}
+
+	// Create indexes for email campaign tables
+	_, err = db.Exec(`
+	CREATE INDEX IF NOT EXISTS idx_email_subscriptions_user_id ON email_subscriptions(user_id);
+	CREATE INDEX IF NOT EXISTS idx_email_subscriptions_email ON email_subscriptions(email);
+	CREATE INDEX IF NOT EXISTS idx_email_subscriptions_campaign_id ON email_subscriptions(campaign_id);
+	CREATE INDEX IF NOT EXISTS idx_email_subscriptions_status ON email_subscriptions(status);
+	CREATE INDEX IF NOT EXISTS idx_email_sends_subscription_id ON email_sends(subscription_id);
+	CREATE INDEX IF NOT EXISTS idx_email_sends_status ON email_sends(status);
+	CREATE INDEX IF NOT EXISTS idx_email_sends_sent_at ON email_sends(sent_at);
+	`)
+	if err != nil {
+		return fmt.Errorf("error creating email campaign indexes: %w", err)
 	}
 
 	return nil

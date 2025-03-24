@@ -246,6 +246,24 @@ func RegisterHandler(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
 					log.Printf("Welcome email sent to %s", email)
 				}
 			}()
+
+			// Auto-subscribe user to campaigns
+			go func() {
+				if campaignManager := emailService.GetCampaignManager(); campaignManager != nil {
+					userObj, err := models.GetUserByEmail(db, email)
+					if err != nil {
+						log.Printf("Failed to get user for auto-subscribe: %v", err)
+						return
+					}
+
+					err = campaignManager.AutoSubscribeUser(email, int(userObj.ID))
+					if err != nil {
+						log.Printf("Failed to auto-subscribe user %s: %v", email, err)
+					} else {
+						log.Printf("User %s auto-subscribed to campaigns", email)
+					}
+				}
+			}()
 		}
 
 		// Set user session immediately after registration

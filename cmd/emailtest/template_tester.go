@@ -8,6 +8,7 @@ import (
 	"mad/models/email"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -20,7 +21,7 @@ func main() {
 	fmt.Println("========================")
 
 	// Find the root directory and load .env file
-	rootDir, err := findRootDir()
+	rootDir, err := findRootDirForEmailTest()
 	if err != nil {
 		fmt.Printf("Error finding root directory: %v\n", err)
 		return
@@ -31,6 +32,16 @@ func main() {
 		fmt.Printf("Error loading .env file: %v\n", err)
 		return
 	}
+
+	// Override APP_ENV to force email sending
+	originalAppEnv := os.Getenv("APP_ENV")
+	os.Setenv("APP_ENV", "production")
+	fmt.Println("\n⚠️  WARNING: Temporarily setting APP_ENV to 'production' to allow actual email sending")
+	fmt.Println("    Emails will be ACTUALLY SENT to the recipient address")
+	defer func() {
+		// Restore original APP_ENV when the program exits
+		os.Setenv("APP_ENV", originalAppEnv)
+	}()
 
 	// Get user input
 	reader := bufio.NewReader(os.Stdin)
@@ -46,7 +57,8 @@ func main() {
 	fmt.Println("3. Password Reset Success Email")
 	fmt.Println("4. Daily Habit Reminder Email")
 	fmt.Println("5. First Habit Email")
-	fmt.Print("\nEnter selection (1-5): ")
+	fmt.Println("6. Campaign Emails")
+	fmt.Print("\nEnter selection (1-6): ")
 	templateChoice, _ := reader.ReadString('\n')
 	templateChoice = strings.TrimSpace(templateChoice)
 
@@ -228,14 +240,96 @@ func main() {
 		}
 		fmt.Println("✅ First habit email sent successfully!")
 
+	case "6":
+		// Campaign Emails
+		// Get all available campaigns
+		campaigns := email.GetAllCampaigns()
+
+		// Display available campaigns
+		fmt.Println("\nAvailable campaigns:")
+		for i, campaign := range campaigns {
+			fmt.Printf("%d. %s %s - %s\n", i+1, campaign.Emoji, campaign.Name, campaign.Description)
+		}
+
+		// Ask user to select a campaign
+		fmt.Print("\nSelect a campaign (1-" + strconv.Itoa(len(campaigns)) + "): ")
+		campaignChoice, _ := reader.ReadString('\n')
+		campaignChoice = strings.TrimSpace(campaignChoice)
+
+		campaignIndex, err := strconv.Atoi(campaignChoice)
+		if err != nil || campaignIndex < 1 || campaignIndex > len(campaigns) {
+			fmt.Printf("Invalid campaign selection: %s\n", campaignChoice)
+			return
+		}
+
+		// Get the selected campaign
+		selectedCampaign := campaigns[campaignIndex-1]
+
+		// Display available emails in the campaign
+		fmt.Printf("\nEmails in %s campaign:\n", selectedCampaign.Name)
+		for _, campaignEmail := range selectedCampaign.Emails {
+			fmt.Printf("%d. %s (Day %d)\n", campaignEmail.Number, campaignEmail.Subject, campaignEmail.SendDay)
+		}
+
+		// Ask user to select an email
+		fmt.Print("\nSelect an email number: ")
+		emailChoice, _ := reader.ReadString('\n')
+		emailChoice = strings.TrimSpace(emailChoice)
+
+		emailNumber, err := strconv.Atoi(emailChoice)
+		if err != nil {
+			fmt.Printf("Invalid email selection: %s\n", emailChoice)
+			return
+		}
+
+		// Validate the email number exists in the campaign
+		var selectedEmail email.CampaignEmail
+		found := false
+		for _, e := range selectedCampaign.Emails {
+			if e.Number == emailNumber {
+				selectedEmail = e
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			fmt.Printf("Email number %d not found in campaign %s\n", emailNumber, selectedCampaign.Name)
+			return
+		}
+
+		// Use "Manny" as the first name as specified in the requirements
+		firstName := "Manny"
+
+		// Prepare email data
+		data, err := email.CampaignEmailData(firstName, to, selectedCampaign.ID, emailNumber)
+		if err != nil {
+			fmt.Printf("Error preparing campaign email data: %v\n", err)
+			return
+		}
+
+		// Send the campaign email
+		template := email.EmailTemplate{
+			Name:    selectedEmail.TemplateName,
+			Subject: selectedEmail.Subject,
+		}
+
+		err = emailService.SendTypedEmail(to, template, data)
+		if err != nil {
+			fmt.Printf("Error sending campaign email: %v\n", err)
+			return
+		}
+
+		fmt.Printf("✅ Campaign email '%s' from '%s' sent successfully!\n", selectedEmail.Subject, selectedCampaign.Name)
+
 	default:
 		fmt.Printf("Invalid template choice: %s\n", templateChoice)
 		return
 	}
 }
 
-// findRootDir attempts to find the root directory of the project
-func findRootDir() (string, error) {
+// findRootDirForEmailTest attempts to find the root directory of the project
+func findRootDirForEmailTest() (string, error) {
 	// Try to find the root directory by looking for common files
 	currentDir, err := os.Getwd()
 	if err != nil {
