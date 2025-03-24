@@ -192,6 +192,7 @@ func main() {
 		"ui/components/footer.html",
 		"ui/components/sum-line-graph.html",
 		"ui/components/goal.html",
+		"ui/components/subscription-form.html",
 		// Pages
 		"ui/home.html",
 		"ui/settings.html",

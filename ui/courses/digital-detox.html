@@ -20,33 +20,14 @@
                     <h1 class="text-5xl font-extrabold text-black">Win back hours of <br>your life every day.</h1>
                     <p class="text-xl text-gray-600">Learn how to break free from digital addiction and use technology intentionally, not be used by it.</p>
                     
-                    <form x-data="{ submitting: false }" class="space-y-6 mt-8" @submit.prevent="submitting = true; setTimeout(() => submitting = false, 1000)">
-                        <div>
-                            <label for="first_name" class="block text-sm/6 font-medium text-gray-900">👋 First name</label>
-                            <div class="mt-2">
-                                <input type="text" id="first_name" name="first_name" required
-                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6">
-                            </div>
-                        </div>
-                        <div>
-                            <label for="email" class="block text-sm/6 font-medium text-gray-900">✉️ Email address</label>
-                            <div class="mt-2">
-                                <input type="email" id="email" name="email" required
-                                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6">
-                            </div>
-                        </div>
-                        <button type="submit" class="flex w-full justify-center rounded-md bg-[#2da44e] px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-[#2c974b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2da44e]">
-                            <span x-show="!submitting">🚀 Get My Free Email Course</span>
-                            <span x-show="submitting" x-cloak>
-                                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                                Processing...
-                            </span>
-                        </button>
-                        <p class="text-xs text-gray-500 mt-2 text-center">🔒 Your data is not sold or shared — just thought-provoking insights delivered to your inbox</p>
-                    </form>
+                    {{ template "subscription-form" dict 
+                        "CampaignId" "digital-detox"
+                        "CtaText" "🚀 Get My Free Email Course"
+                        "LoadingText" "Processing..."
+                        "PrivacyText" "🔒 Your data is not sold or shared — just thought-provoking insights delivered to your inbox"
+                        "ShowFirstName" true
+                        "ButtonColor" "green"
+                    }}
                 </div>
                 <div class="flex justify-center flex-col items-center">
                     <!-- Animated Card -->
@@ -103,7 +84,7 @@
         </div>
     </div>
 
-    <!-- Problem Statement Section — Perhaps this should be the health/wealth/relationships framework for problems?-->
+    <!-- Problem Statement Section — Perhaps this should be the health/wealth/relationships framework for problems?-->
     <div class="bg-gray-50 py-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-4xl font-bold text-center text-gray-900 mb-12">There is a Digital Addiction Crisis</h2>

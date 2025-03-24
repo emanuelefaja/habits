@@ -1,0 +1,161 @@
+{{ define "subscription-form" }}
+<!-- Subscription Form Component -->
+<div class="space-y-6" x-data="subscriptionForm()">
+    <!-- Optional Title and Description -->
+    {{ if .FormTitle }}
+    <h3 class="text-lg font-semibold text-gray-900">{{ .FormTitle }}</h3>
+    {{ end }}
+    {{ if .FormDescription }}
+    <p class="text-sm text-gray-600">{{ .FormDescription }}</p>
+    {{ end }}
+
+    <!-- Form -->
+    <form @submit.prevent="handleSubmit" class="space-y-6">
+        <!-- First Name Field (Optional) -->
+        {{ if .ShowFirstName }}
+        <div>
+            <label for="first_name" class="block text-sm/6 font-medium text-gray-900">👋 First name</label>
+            <div class="mt-2">
+                <input type="text" id="first_name" name="first_name" required
+                    x-model="formData.first_name"
+                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6">
+            </div>
+        </div>
+        {{ end }}
+
+        <!-- Email Field -->
+        <div>
+            <label for="email" class="block text-sm/6 font-medium text-gray-900">✉️ Email address</label>
+            <div class="mt-2">
+                <input type="email" id="email" name="email" required
+                    x-model="formData.email"
+                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6">
+            </div>
+        </div>
+
+        <!-- Math Verification -->
+        <div>
+            <label class="block text-sm/6 font-medium text-gray-900">🔢 Quick verification</label>
+            <div class="mt-2">
+                <div class="text-sm text-gray-600 mb-2">
+                    What is <span x-text="mathProblem.num1"></span> + <span x-text="mathProblem.num2"></span>?
+                </div>
+                <input type="number" required
+                    x-model="formData.math_answer"
+                    class="block w-full rounded-md bg-white px-3 py-1.5 text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-[#2da44e] sm:text-sm/6">
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" 
+            class="flex w-full justify-center rounded-md px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+            :class="{
+                'bg-[#2da44e] hover:bg-[#2c974b] focus-visible:outline-[#2da44e]': buttonColor === 'green',
+                'bg-blue-600 hover:bg-blue-500 focus-visible:outline-blue-600': buttonColor === 'blue',
+                'bg-purple-600 hover:bg-purple-500 focus-visible:outline-purple-600': buttonColor === 'purple'
+            }">
+            <span x-show="!isSubmitting">{{ .CtaText }}</span>
+            <span x-show="isSubmitting" x-cloak>
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {{ .LoadingText }}
+            </span>
+        </button>
+
+        <!-- Privacy Text -->
+        <p class="text-xs text-gray-500 mt-2 text-center">{{ .PrivacyText }}</p>
+
+        <!-- Error Message -->
+        <div x-show="error" x-cloak class="text-sm text-red-600 text-center" x-text="error"></div>
+        
+        <!-- Success Message -->
+        <div x-show="success" x-cloak class="text-sm text-green-600 text-center" x-text="success"></div>
+    </form>
+</div>
+
+<script>
+function subscriptionForm() {
+    return {
+        isSubmitting: false,
+        error: '',
+        success: '',
+        formData: {
+            first_name: '',
+            email: '',
+            math_answer: '',
+            campaign_id: '{{ .CampaignId }}',
+            math_num1: 0,
+            math_num2: 0
+        },
+        mathProblem: {
+            num1: 0,
+            num2: 0,
+            answer: 0
+        },
+        buttonColor: '{{ .ButtonColor }}' || 'green',
+
+        init() {
+            this.generateMathProblem();
+        },
+
+        generateMathProblem() {
+            this.mathProblem.num1 = Math.floor(Math.random() * 10) + 1;
+            this.mathProblem.num2 = Math.floor(Math.random() * 10) + 1;
+            this.mathProblem.answer = this.mathProblem.num1 + this.mathProblem.num2;
+            this.formData.math_num1 = this.mathProblem.num1;
+            this.formData.math_num2 = this.mathProblem.num2;
+        },
+
+        async handleSubmit() {
+            // Reset messages
+            this.error = '';
+            this.success = '';
+
+            // Validate math answer
+            if (parseInt(this.formData.math_answer) !== this.mathProblem.answer) {
+                this.error = 'Please check your math answer and try again.';
+                this.generateMathProblem();
+                this.formData.math_answer = '';
+                return;
+            }
+
+            this.isSubmitting = true;
+
+            try {
+                const response = await fetch('/api/campaigns/subscribe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(this.formData)
+                });
+
+                if (!response.ok) {
+                    const data = await response.json();
+                    throw new Error(data.error || 'Failed to subscribe. Please try again.');
+                }
+
+                this.success = 'Success! Check your email to confirm your subscription.';
+                this.formData = {
+                    first_name: '',
+                    email: '',
+                    math_answer: '',
+                    campaign_id: '{{ .CampaignId }}',
+                    math_num1: 0,
+                    math_num2: 0
+                };
+                this.generateMathProblem();
+            } catch (err) {
+                this.error = err.message;
+                this.generateMathProblem();
+                this.formData.math_answer = '';
+            } finally {
+                this.isSubmitting = false;
+            }
+        }
+    }
+}
+</script> 
+{{ end }}
