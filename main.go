@@ -553,18 +553,42 @@ func main() {
 		num1 := rand.Intn(20) + 1 // Random number between 1-20
 		num2 := rand.Intn(20) + 1 // Random number between 1-20
 
+		// Default data map
 		data := map[string]interface{}{
-			"IsLoggedIn": middleware.IsAuthenticated(r),
-			"CSRFToken":  middleware.GetCSRFToken(r),
-			"MathNum1":   num1,
-			"MathNum2":   num2,
+			"IsAuthenticated": middleware.IsAuthenticated(r),
+			"IsSubscribed":    false,
+			"UserEmail":       "",
+			"UserFirstName":   "",
+			"CSRFToken":       middleware.GetCSRFToken(r),
+			"MathNum1":        num1,
+			"MathNum2":        num2,
 		}
 
 		// Add user data if logged in
-		if data["IsLoggedIn"].(bool) {
+		if data["IsAuthenticated"].(bool) {
 			user, err := getAuthenticatedUser(r, db)
 			if err == nil && user != nil {
 				data["User"] = user
+				data["UserEmail"] = user.Email
+				data["UserFirstName"] = user.FirstName
+
+				// Check if the user is already subscribed to the Digital Detox campaign
+				svc, ok := emailService.(*email.SMTPEmailService)
+				if ok && svc != nil {
+					campaignManager := svc.GetCampaignManager()
+					if campaignManager != nil {
+						subscriptions, err := campaignManager.GetUserSubscriptions(int(user.ID))
+						if err == nil {
+							// Check if user is subscribed to the Digital Detox campaign
+							for _, subscription := range subscriptions {
+								if subscription.CampaignID == "digital-detox" && subscription.Status == "active" {
+									data["IsSubscribed"] = true
+									break
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 
