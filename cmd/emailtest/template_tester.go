@@ -94,6 +94,14 @@ func main() {
 	}
 	defer db.Close()
 
+	// Create and set up campaign manager for unsubscribe testing
+	campaignManager := email.NewCampaignManager(db, emailService)
+	if smtpService, ok := emailService.(*email.SMTPEmailService); ok {
+		smtpService.SetCampaignManager(campaignManager)
+	} else {
+		fmt.Println("⚠️  Warning: Could not set campaign manager - unsubscribe testing may not work properly")
+	}
+
 	// Process based on template choice
 	switch templateChoice {
 	case "1":
@@ -265,6 +273,41 @@ func main() {
 		// Get the selected campaign
 		selectedCampaign := campaigns[campaignIndex-1]
 
+		// Ask if user wants to create a test subscription for unsubscribe testing
+		fmt.Print("\nDo you want to create a real subscription for unsubscribe testing? (y/n): ")
+		createSubscription, _ := reader.ReadString('\n')
+		createSubscription = strings.TrimSpace(createSubscription)
+
+		// Create a real subscription for testing the unsubscribe flow if requested
+		if strings.ToLower(createSubscription) == "y" {
+			fmt.Println("\nCreating test subscription for email:", to)
+
+			// Delete any existing subscription first to start fresh
+			_, err = db.Exec("DELETE FROM email_subscriptions WHERE email = ? AND campaign_id = ?",
+				to, selectedCampaign.ID)
+			if err != nil {
+				fmt.Printf("Warning: Failed to clean up existing subscription: %v\n", err)
+			}
+
+			// Create a new subscription
+			err = campaignManager.SubscribeUser(to, selectedCampaign.ID, 0) // 0 for non-user subscription
+			if err != nil {
+				fmt.Printf("Warning: Failed to create test subscription: %v\n", err)
+			} else {
+				fmt.Println("✅ Created test subscription for unsubscribe testing")
+				fmt.Println("   You can click the unsubscribe link in the email to test the unsubscribe flow")
+
+				// Get the subscription details to show the token
+				var token string
+				err = db.QueryRow(
+					"SELECT token FROM email_subscriptions WHERE email = ? AND campaign_id = ?",
+					to, selectedCampaign.ID).Scan(&token)
+				if err == nil {
+					fmt.Println("   Unsubscribe token:", token)
+				}
+			}
+		}
+
 		// Display available emails in the campaign
 		fmt.Printf("\nEmails in %s campaign:\n", selectedCampaign.Name)
 		for _, campaignEmail := range selectedCampaign.Emails {
@@ -298,8 +341,13 @@ func main() {
 			return
 		}
 
-		// Use "Manny" as the first name as specified in the requirements
-		firstName := "Manny"
+		// Ask for first name to use in the email
+		fmt.Print("\nEnter first name to use in email: ")
+		firstName, _ := reader.ReadString('\n')
+		firstName = strings.TrimSpace(firstName)
+		if firstName == "" {
+			firstName = "Manny" // Default if no name provided
+		}
 
 		// Prepare email data
 		data, err := email.CampaignEmailData(firstName, to, selectedCampaign.ID, emailNumber)
@@ -321,6 +369,7 @@ func main() {
 		}
 
 		fmt.Printf("✅ Campaign email '%s' from '%s' sent successfully!\n", selectedEmail.Subject, selectedCampaign.Name)
+		fmt.Println("   Check your email to view it and test the unsubscribe link if you created a subscription")
 
 	default:
 		fmt.Printf("Invalid template choice: %s\n", templateChoice)
