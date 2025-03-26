@@ -253,6 +253,7 @@ func InitDB(db *sql.DB) error {
 		user_id INTEGER NULL REFERENCES users(id) ON DELETE CASCADE,
 		email TEXT NOT NULL,
 		campaign_id TEXT NOT NULL,
+		token TEXT NOT NULL,
 		subscribed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 		status TEXT NOT NULL CHECK (status IN ('active', 'unsubscribed')) DEFAULT 'active',
 		last_email_sent INTEGER DEFAULT 0,

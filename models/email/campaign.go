@@ -4,6 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"math/rand"
+	"net/url"
+	"os"
 	"time"
 )
 
@@ -184,8 +187,27 @@ func GetAutoSubscribeCampaigns() []EmailCampaign {
 
 // GenerateUnsubscribeLink creates a unique unsubscribe link for a campaign subscription
 func GenerateUnsubscribeLink(email string, campaignID string, token string) string {
-	return fmt.Sprintf("https://habits.co/unsubscribe?email=%s&campaign=%s&token=%s",
-		email, campaignID, token)
+	// Check for explicit BASE_URL first
+	baseURL := os.Getenv("BASE_URL")
+
+	// If no BASE_URL defined, use environment-specific default
+	if baseURL == "" {
+		// Use production URL if APP_ENV is production
+		if os.Getenv("APP_ENV") == "production" {
+			baseURL = "https://habits.co"
+		} else {
+			// Default to localhost for development/testing
+			baseURL = "http://localhost:8080"
+		}
+	}
+
+	// Use url.QueryEscape to properly encode the parameters
+	emailEncoded := url.QueryEscape(email)
+	campaignEncoded := url.QueryEscape(campaignID)
+	tokenEncoded := url.QueryEscape(token)
+
+	return fmt.Sprintf("%s/unsubscribe?email=%s&campaign=%s&token=%s",
+		baseURL, emailEncoded, campaignEncoded, tokenEncoded)
 }
 
 // CampaignEmailData returns the data needed for a campaign email template
@@ -210,8 +232,100 @@ func CampaignEmailData(firstName, email, campaignID string, emailNumber int) (ma
 		return nil, fmt.Errorf("email number %d not found in campaign %s", emailNumber, campaignID)
 	}
 
-	// Generate a secure unsubscribe token (in real implementation, this would be stored in the database)
-	unsubscribeToken := fmt.Sprintf("%d", time.Now().UnixNano())
+	// Use the secure token from the database
+	unsubscribeToken := ""
+
+	// Get the database path from environment
+	dbPath := os.Getenv("DATABASE_PATH")
+	if dbPath == "" {
+		dbPath = "habits.db" // Default fallback
+		log.Printf("Warning: DATABASE_PATH not set, using default path 'habits.db'")
+	}
+
+	log.Printf("Opening database at: %s", dbPath)
+	db, err := sql.Open("sqlite3", dbPath)
+	if err != nil {
+		log.Printf("Error opening database to retrieve token: %v", err)
+		// Don't fall back to a timestamp - log the error and return it
+		return nil, fmt.Errorf("could not open database to get unsubscribe token: %w", err)
+	}
+	defer db.Close()
+
+	// First check if the subscription exists and what the token is
+	log.Printf("Querying token for email=%s, campaign=%s", email, campaignID)
+
+	err = db.QueryRow(`
+		SELECT token 
+		FROM email_subscriptions
+		WHERE email = ?
+		AND campaign_id = ?
+		AND status = 'active'
+	`, email, campaignID).Scan(&unsubscribeToken)
+
+	if err != nil {
+		log.Printf("Error retrieving token from database: %v", err)
+
+		// Check if subscription exists at all
+		var exists bool
+		err = db.QueryRow(`
+			SELECT EXISTS(
+				SELECT 1 FROM email_subscriptions 
+				WHERE email = ? AND campaign_id = ?
+			)
+		`, email, campaignID).Scan(&exists)
+
+		if err != nil {
+			log.Printf("Error checking if subscription exists: %v", err)
+			return nil, fmt.Errorf("database error: %w", err)
+		}
+
+		if !exists {
+			log.Printf("No subscription found for email=%s, campaign=%s - creating one", email, campaignID)
+
+			// Create a real subscription with a proper secure token
+			// Use the same secure token generation as in real subscriptions
+			unsubscribeToken = generateSecureToken()
+			log.Printf("Generated secure token for new subscription: %s", unsubscribeToken)
+
+			// Insert the subscription with this token
+			_, err = db.Exec(`
+				INSERT INTO email_subscriptions (
+					user_id, email, campaign_id, token, subscribed_at, 
+					status, last_email_sent, created_at, updated_at
+				) VALUES (NULL, ?, ?, ?, CURRENT_TIMESTAMP, 'active', 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+			`, email, campaignID, unsubscribeToken)
+
+			if err != nil {
+				log.Printf("Error creating subscription: %v", err)
+				return nil, fmt.Errorf("could not create subscription: %w", err)
+			}
+
+			log.Printf("Successfully created subscription with secure token")
+		} else {
+			// Subscription exists but is not active or couldn't get token
+			log.Printf("Subscription exists but couldn't get token - creating a new one")
+
+			// Generate a new secure token and update the subscription
+			unsubscribeToken = generateSecureToken()
+
+			_, err = db.Exec(`
+				UPDATE email_subscriptions
+				SET token = ?,
+				    status = 'active',
+				    updated_at = CURRENT_TIMESTAMP
+				WHERE email = ? AND campaign_id = ?
+			`, unsubscribeToken, email, campaignID)
+
+			if err != nil {
+				log.Printf("Error updating subscription token: %v", err)
+				return nil, fmt.Errorf("could not update subscription token: %w", err)
+			}
+
+			log.Printf("Successfully updated subscription with new secure token: %s", unsubscribeToken)
+		}
+	} else {
+		log.Printf("Successfully retrieved token from database: %s", unsubscribeToken)
+	}
 
 	// Create the data for the email template
 	data := map[string]interface{}{
@@ -226,7 +340,7 @@ func CampaignEmailData(firstName, email, campaignID string, emailNumber int) (ma
 		"UnsubscribeLink": GenerateUnsubscribeLink(email, campaignID, unsubscribeToken),
 	}
 
-	log.Printf("📧 Prepared campaign email data for %s, email #%d", campaignID, emailNumber)
+	log.Printf("📧 Prepared campaign email data for %s, email #%d with token %s", campaignID, emailNumber, unsubscribeToken)
 	return data, nil
 }
 
@@ -286,12 +400,15 @@ func (cm *CampaignManager) SubscribeUser(email string, campaignID string, userID
 		userIDValue.Valid = true
 	}
 
+	token := generateSecureToken()
+
 	insertQuery := `
 	INSERT INTO email_subscriptions (
-		user_id, email, campaign_id, subscribed_at, status, last_email_sent, created_at, updated_at
-	) VALUES (?, ?, ?, CURRENT_TIMESTAMP, 'active', 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`
+		user_id, email, campaign_id, token, subscribed_at, 
+		status, last_email_sent, created_at, updated_at
+	) VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, 'active', 0, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`
 
-	_, err = cm.db.Exec(insertQuery, userIDValue, email, campaignID)
+	_, err = cm.db.Exec(insertQuery, userIDValue, email, campaignID, token)
 	if err != nil {
 		return fmt.Errorf("error creating subscription: %w", err)
 	}
@@ -599,4 +716,59 @@ func (cm *CampaignManager) UpdateSubscriptionStatus(userID int, campaignID, stat
 
 	log.Printf("Successfully updated subscription status to %s for user %d and campaign %s", status, userID, campaignID)
 	return nil
+}
+
+func generateSecureToken() string {
+	b := make([]byte, 32)
+	if _, err := rand.Read(b); err != nil {
+		return fmt.Sprintf("%d", time.Now().UnixNano())
+	}
+	return fmt.Sprintf("%x", b)
+}
+
+// HandleUserDeletion cleans up email subscriptions when a user is deleted
+// This preserves email logs while removing the user's personal information
+func (cm *CampaignManager) HandleUserDeletion(userID int64) error {
+	// First, get the user's email from subscriptions for logging purposes
+	var userEmail string
+	err := cm.db.QueryRow(`
+		SELECT email FROM email_subscriptions 
+		WHERE user_id = ? 
+		LIMIT 1`, userID).Scan(&userEmail)
+
+	if err != nil && err != sql.ErrNoRows {
+		return fmt.Errorf("error getting user email: %w", err)
+	}
+
+	// Start a transaction
+	tx, err := cm.db.Begin()
+	if err != nil {
+		return fmt.Errorf("error starting transaction: %w", err)
+	}
+	defer tx.Rollback()
+
+	// Update email_subscriptions to anonymize the email
+	// We'll set status to 'unsubscribed' and use a placeholder for the email
+	anonymizedEmail := fmt.Sprintf("deleted-user-%d@anonymous.com", userID)
+
+	_, err = tx.Exec(`
+		UPDATE email_subscriptions 
+		SET status = 'unsubscribed',
+		    email = ?,
+		    unsubscribed_at = CURRENT_TIMESTAMP,
+		    updated_at = CURRENT_TIMESTAMP
+		WHERE user_id = ?`,
+		anonymizedEmail, userID)
+
+	if err != nil {
+		return fmt.Errorf("error anonymizing email subscriptions: %w", err)
+	}
+
+	// Note: We don't need to modify email_sends table as it references subscription_id
+	// and doesn't contain PII directly
+
+	log.Printf("Successfully cleaned up email subscriptions for deleted user ID %d", userID)
+
+	// Commit the transaction
+	return tx.Commit()
 }

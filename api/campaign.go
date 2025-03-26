@@ -153,6 +153,13 @@ func SubscribeToCampaign(w http.ResponseWriter, r *http.Request) {
 
 // UnsubscribeFromCampaign handles POST /api/campaigns/unsubscribe
 func UnsubscribeFromCampaign(w http.ResponseWriter, r *http.Request) {
+	// Rate limiting - 10 attempts per hour per IP
+	ip := middleware.GetIPAddress(r)
+	if !checkRateLimit(ip, "unsubscribe", 10) {
+		http.Error(w, `{"error":"Too many unsubscribe attempts. Please try again later."}`, http.StatusTooManyRequests)
+		return
+	}
+
 	// Only accept POST method
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", http.MethodPost)

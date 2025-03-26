@@ -63,6 +63,12 @@ func (w *timeoutResponseWriter) WriteHeader(statusCode int) {
 	w.ResponseWriter.WriteHeader(statusCode)
 }
 
+// Helper variables
+var (
+	// Rate limiters
+	webUnsubscribeLimiter = middleware.NewRateLimiter(10, time.Hour) // 10 attempts per hour
+)
+
 func main() {
 	// Initialize random seed for Go versions before 1.20
 	// In Go 1.20+ this is no longer needed as it's done automatically
@@ -176,6 +182,9 @@ func main() {
 		"json": func(v interface{}) template.JS {
 			b, _ := json.Marshal(v)
 			return template.JS(b)
+		},
+		"safeURL": func(u string) template.URL {
+			return template.URL(u)
 		},
 	}
 
@@ -573,7 +582,7 @@ func main() {
 				data["UserFirstName"] = user.FirstName
 
 				// Check if the user is already subscribed to the Digital Detox campaign
-				svc, ok := emailService.(*email.SMTPEmailService)
+				svc, ok := emailService.(email.EmailService)
 				if ok && svc != nil {
 					campaignManager := svc.GetCampaignManager()
 					if campaignManager != nil {
@@ -904,126 +913,161 @@ func main() {
 		api.UpdateGoalHandler(db)(w, r)
 	}))))
 
-	// Unsubscribe route
+	// Unsubscribe handler
 	http.Handle("/unsubscribe", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodGet:
-			token := r.URL.Query().Get("token")
-			campaignID := r.URL.Query().Get("campaign_id")
-			email := r.URL.Query().Get("email")
-
-			if token == "" || campaignID == "" || email == "" {
-				http.Error(w, "Missing required parameters", http.StatusBadRequest)
-				return
-			}
-
-			// Get a random quote
-			quote, err := models.GetRandomQuote()
-			if err != nil {
-				log.Printf("Error getting random quote: %v", err)
-				// Continue with default quote from the function
-			}
-
-			// Get campaign details from the token
-			var campaignName, campaignEmoji string
-
-			// This should come from a campaign lookup based on campaignID
-			// For now, using default values
-			if campaignID == "reminder" {
-				campaignName = "Daily Reminders"
-				campaignEmoji = "🔔"
-			} else if campaignID == "digest" {
-				campaignName = "Weekly Digest"
-				campaignEmoji = "📊"
-			} else {
-				campaignName = "Email Notifications"
-				campaignEmoji = "✉️"
-			}
-
-			data := struct {
-				Token         string
-				CampaignID    string
-				CampaignName  string
-				CampaignEmoji string
-				Email         string
-				Unsubscribed  bool
-				Quote         models.Quote
-			}{
-				Token:         token,
-				CampaignID:    campaignID,
-				CampaignName:  campaignName,
-				CampaignEmoji: campaignEmoji,
-				Email:         email,
-				Unsubscribed:  false,
-				Quote:         quote,
-			}
-
-			renderTemplate(w, templates, "unsubscribe.html", data)
-
-		case http.MethodPost:
-			token := r.FormValue("token")
-			campaignID := r.FormValue("campaign_id")
-			email := r.FormValue("email")
-
-			if token == "" || campaignID == "" || email == "" {
-				http.Error(w, "Missing required parameters", http.StatusBadRequest)
-				return
-			}
-
-			// Validate token and process unsubscribe
-			// This should be handled by the email/campaign service
-			if emailService != nil {
-				// For now, we'll just log the unsubscribe request
-				// TODO: Implement proper unsubscribe logic when campaign manager is completed
-				log.Printf("Unsubscribe request for email %s from campaign %s", email, campaignID)
-			}
-
-			// Get a random quote
-			quote, err := models.GetRandomQuote()
-			if err != nil {
-				log.Printf("Error getting random quote: %v", err)
-				// Continue with default quote from the function
-			}
-
-			// Get campaign details from the token
-			var campaignName, campaignEmoji string
-
-			// This should come from a campaign lookup based on campaignID
-			// For now, using default values
-			if campaignID == "reminder" {
-				campaignName = "Daily Reminders"
-				campaignEmoji = "🔔"
-			} else if campaignID == "digest" {
-				campaignName = "Weekly Digest"
-				campaignEmoji = "📊"
-			} else {
-				campaignName = "Email Notifications"
-				campaignEmoji = "✉️"
-			}
-
-			data := struct {
-				Token         string
-				CampaignID    string
-				CampaignName  string
-				CampaignEmoji string
-				Email         string
-				Unsubscribed  bool
-				Quote         models.Quote
-			}{
-				Token:         token,
-				CampaignID:    campaignID,
-				CampaignName:  campaignName,
-				CampaignEmoji: campaignEmoji,
-				Email:         email,
-				Unsubscribed:  true,
-				Quote:         quote,
-			}
-
-			renderTemplate(w, templates, "unsubscribe.html", data)
-
-		default:
-			handleNotAllowed(w, http.MethodGet, http.MethodPost)
+		// Get the campaign manager from the email service
+		campaignManager := emailService.GetCampaignManager()
+		if campaignManager == nil {
+			http.Error(w, "Service unavailable", http.StatusInternalServerError)
+			return
 		}
+
+		// For GET requests, just show the unsubscribe page
+		if r.Method == http.MethodGet {
+			userEmail := r.URL.Query().Get("email")
+			campaignID := r.URL.Query().Get("campaign")
+			token := r.URL.Query().Get("token")
+
+			log.Printf("Unsubscribe GET request: email=%s, campaign=%s, token=%s", userEmail, campaignID, token)
+
+			if userEmail == "" || campaignID == "" {
+				log.Printf("Missing query parameters: email=%s, campaign=%s", userEmail, campaignID)
+				http.Error(w, "Missing required parameters", http.StatusBadRequest)
+				return
+			}
+
+			// Get campaign details for display
+			campaign, err := email.GetCampaign(campaignID)
+			if err != nil {
+				log.Printf("Error getting campaign: %v", err)
+				http.Error(w, "Invalid campaign", http.StatusNotFound)
+				return
+			}
+
+			data := struct {
+				Email         string
+				CampaignID    string
+				CampaignName  string
+				CampaignEmoji string
+				Token         string
+				Quote         struct {
+					Text   string
+					Author string
+				}
+				Unsubscribed bool
+			}{
+				Email:         userEmail,
+				CampaignID:    campaignID,
+				CampaignName:  campaign.Name,
+				CampaignEmoji: campaign.Emoji,
+				Token:         token,
+				Quote: struct {
+					Text   string
+					Author string
+				}{
+					Text:   "Small habits make big changes.",
+					Author: "The Habits Company",
+				},
+				Unsubscribed: false,
+			}
+			renderTemplate(w, templates, "unsubscribe.html", data)
+			return
+		}
+
+		// For POST requests, handle the unsubscribe action
+		if r.Method == http.MethodPost {
+			// Parse form data
+			if err := r.ParseForm(); err != nil {
+				log.Printf("Error parsing form data: %v", err)
+				http.Error(w, "Invalid form data", http.StatusBadRequest)
+				return
+			}
+
+			// Get values from form data instead of URL query parameters
+			formEmail := r.PostFormValue("email")
+			formCampaignID := r.PostFormValue("campaign_id")
+			formToken := r.PostFormValue("token")
+
+			log.Printf("Unsubscribe POST request: email=%s, campaign=%s, token=%s", formEmail, formCampaignID, formToken)
+
+			if formEmail == "" || formCampaignID == "" || formToken == "" {
+				log.Printf("Missing form parameters: email=%s, campaign=%s, token=%s", formEmail, formCampaignID, formToken)
+				http.Error(w, "Missing required parameters", http.StatusBadRequest)
+				return
+			}
+
+			// Apply rate limiting - 10 attempts per hour per IP
+			remaining, resetTime, err := webUnsubscribeLimiter.CheckLimit(r)
+			if remaining == 0 {
+				waitDuration := time.Until(resetTime)
+				http.Error(w, fmt.Sprintf("Too many unsubscribe attempts. Please try again in %d minutes.", int(waitDuration.Minutes())+1), http.StatusTooManyRequests)
+				return
+			}
+
+			// With token validation:
+			valid, err := validateUnsubscribeToken(db, formEmail, formCampaignID, formToken)
+			if err != nil {
+				log.Printf("Error validating token: %v", err)
+				http.Error(w, "Invalid or expired token", http.StatusBadRequest)
+				return
+			}
+
+			if !valid {
+				log.Printf("Invalid token for email=%s, campaign=%s", formEmail, formCampaignID)
+				http.Error(w, "Invalid or expired token", http.StatusBadRequest)
+				return
+			}
+
+			// Get campaign details for the response
+			campaign, err := email.GetCampaign(formCampaignID)
+			if err != nil {
+				log.Printf("Error getting campaign: %v", err)
+				http.Error(w, "Invalid campaign", http.StatusNotFound)
+				return
+			}
+
+			err = campaignManager.UnsubscribeUser(formEmail, formCampaignID)
+			if err != nil {
+				log.Printf("Error unsubscribing user: %v", err)
+				http.Error(w, "Failed to unsubscribe", http.StatusInternalServerError)
+				return
+			}
+
+			log.Printf("Successfully unsubscribed %s from campaign %s", formEmail, formCampaignID)
+
+			data := struct {
+				Success       bool
+				Email         string
+				CampaignID    string
+				CampaignName  string
+				CampaignEmoji string
+				Quote         struct {
+					Text   string
+					Author string
+				}
+				Unsubscribed bool
+				Token        string
+			}{
+				Success:       true,
+				Email:         formEmail,
+				CampaignID:    formCampaignID,
+				CampaignName:  campaign.Name,
+				CampaignEmoji: campaign.Emoji,
+				Quote: struct {
+					Text   string
+					Author string
+				}{
+					Text:   "Small habits make big changes.",
+					Author: "The Habits Company",
+				},
+				Unsubscribed: true,
+				Token:        formToken,
+			}
+			renderTemplate(w, templates, "unsubscribe.html", data)
+			return
+		}
+
+		handleNotAllowed(w, http.MethodGet, http.MethodPost)
 	})))
 
 	// Admin Download DB
@@ -1114,4 +1158,32 @@ func getAuthenticatedUser(r *http.Request, db *sql.DB) (*models.User, error) {
 func serveStaticFileWithContentType(w http.ResponseWriter, r *http.Request, filePath, contentType string) {
 	w.Header().Set("Content-Type", contentType)
 	http.ServeFile(w, r, filePath)
+}
+
+func validateUnsubscribeToken(db *sql.DB, userEmail, campaignID, token string) (bool, error) {
+	var storedToken string
+	err := db.QueryRow(`
+		SELECT token 
+		FROM email_subscriptions
+		WHERE email = ? 
+		AND campaign_id = ?
+		AND status = 'active'
+	`, userEmail, campaignID).Scan(&storedToken)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Printf("No active subscription found for email=%s, campaign=%s", userEmail, campaignID)
+			return false, fmt.Errorf("no active subscription found")
+		}
+		log.Printf("Database error while validating token: %v", err)
+		return false, fmt.Errorf("database error: %v", err)
+	}
+
+	valid := token == storedToken
+	if !valid {
+		log.Printf("Token mismatch: provided=%s vs stored=%s", token, storedToken)
+	} else {
+		log.Printf("Token validated successfully")
+	}
+	return valid, nil
 }

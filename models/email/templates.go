@@ -9,6 +9,13 @@ import (
 	"strings"
 )
 
+// Template functions for email templates
+var emailTemplatesFuncMap = template.FuncMap{
+	"safeURL": func(u string) template.URL {
+		return template.URL(u)
+	},
+}
+
 // renderTemplates loads and renders both HTML and text templates for an email
 func (s *SMTPEmailService) renderTemplates(templateName string, data interface{}) (htmlContent, textContent string, err error) {
 	log.Printf("🎨 Rendering email templates for: %s", templateName)
@@ -23,7 +30,7 @@ func (s *SMTPEmailService) renderTemplates(templateName string, data interface{}
 	htmlPath := filepath.Join(s.config.TemplateDir, templateName+".html")
 	log.Printf("📄 Loading HTML template from: %s", htmlPath)
 
-	htmlTmpl, err := template.ParseFiles(htmlPath)
+	htmlTmpl, err := template.New(filepath.Base(htmlPath)).Funcs(emailTemplatesFuncMap).ParseFiles(htmlPath)
 	if err != nil {
 		log.Printf("❌ Failed to load HTML template: %v", err)
 		return "", "", fmt.Errorf("failed to load HTML template: %w", err)
@@ -66,8 +73,17 @@ func (s *SMTPEmailService) renderCampaignTemplates(templateName string, data int
 	baseHTMLPath := filepath.Join(s.config.TemplateDir, "base.html")
 	baseTextPath := filepath.Join(s.config.TemplateDir, "base.txt")
 
+	// Extract the unsubscribe link before rendering for post-processing
+	unsubscribeLink := ""
+	if linkData, ok := data.(map[string]interface{})["UnsubscribeLink"]; ok {
+		if linkStr, ok := linkData.(string); ok {
+			unsubscribeLink = linkStr
+			log.Printf("📝 Extracted unsubscribe link for post-processing: %s", unsubscribeLink)
+		}
+	}
+
 	// Load base templates
-	baseHTMLTmpl, err := template.ParseFiles(baseHTMLPath)
+	baseHTMLTmpl, err := template.New(filepath.Base(baseHTMLPath)).Funcs(emailTemplatesFuncMap).ParseFiles(baseHTMLPath)
 	if err != nil {
 		log.Printf("❌ Failed to load base HTML template: %v", err)
 		return "", "", fmt.Errorf("failed to load base HTML template: %w", err)
@@ -108,13 +124,14 @@ func (s *SMTPEmailService) renderCampaignTemplates(templateName string, data int
 
 	// Create base template data with rendered content
 	campaignData := map[string]interface{}{
-		"Content":         template.HTML(contentHTMLBuf.String()),
-		"Title":           data.(map[string]interface{})["Title"],
-		"Subject":         data.(map[string]interface{})["Subject"],
-		"AppName":         data.(map[string]interface{})["AppName"],
-		"CampaignName":    data.(map[string]interface{})["CampaignName"],
-		"CampaignEmoji":   data.(map[string]interface{})["CampaignEmoji"],
-		"UnsubscribeLink": data.(map[string]interface{})["UnsubscribeLink"],
+		"Content":       template.HTML(contentHTMLBuf.String()),
+		"Title":         data.(map[string]interface{})["Title"],
+		"Subject":       data.(map[string]interface{})["Subject"],
+		"AppName":       data.(map[string]interface{})["AppName"],
+		"CampaignName":  data.(map[string]interface{})["CampaignName"],
+		"CampaignEmoji": data.(map[string]interface{})["CampaignEmoji"],
+		// Add a placeholder for the unsubscribe link that we'll replace later
+		"UnsubscribeLink": "UNSUBSCRIBE_LINK_PLACEHOLDER",
 		"FirstName":       data.(map[string]interface{})["FirstName"],
 	}
 
@@ -134,7 +151,7 @@ func (s *SMTPEmailService) renderCampaignTemplates(templateName string, data int
 		"AppName":         data.(map[string]interface{})["AppName"],
 		"CampaignName":    data.(map[string]interface{})["CampaignName"],
 		"CampaignEmoji":   data.(map[string]interface{})["CampaignEmoji"],
-		"UnsubscribeLink": data.(map[string]interface{})["UnsubscribeLink"],
+		"UnsubscribeLink": unsubscribeLink, // Use the original link for text emails
 	}
 
 	if err := baseTextTmpl.Execute(finalTextBuf, textCampaignData); err != nil {
@@ -142,6 +159,14 @@ func (s *SMTPEmailService) renderCampaignTemplates(templateName string, data int
 		return "", "", fmt.Errorf("failed to render base text template: %w", err)
 	}
 
+	// Post-process the HTML to replace the placeholder with the actual unsubscribe link
+	// This avoids any HTML encoding by the template engine
+	htmlOutput := finalHTMLBuf.String()
+	if unsubscribeLink != "" {
+		htmlOutput = strings.Replace(htmlOutput, "UNSUBSCRIBE_LINK_PLACEHOLDER", unsubscribeLink, 1)
+		log.Printf("📝 Replaced unsubscribe link placeholder in HTML output")
+	}
+
 	log.Printf("✅ Successfully rendered campaign templates for: %s", templateName)
-	return finalHTMLBuf.String(), finalTextBuf.String(), nil
+	return htmlOutput, finalTextBuf.String(), nil
 }

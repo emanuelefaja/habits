@@ -3,8 +3,11 @@ package models
 import (
 	"database/sql"
 	"log"
+	"os"
 	"strings"
 	"time"
+
+	"mad/models/email"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -175,6 +178,29 @@ func DeleteUserAndData(db *sql.DB, userID int64) error {
 		return err
 	}
 	defer tx.Rollback()
+
+	// Handle email campaign subscriptions
+	// Create a minimal emailService just to initialize the campaign manager
+	emailService, err := email.NewSMTPEmailService(email.SMTPConfig{
+		Host:        os.Getenv("SMTP_HOST"),
+		Port:        587, // Default SMTP port
+		Username:    os.Getenv("SMTP_USERNAME"),
+		Password:    os.Getenv("SMTP_PASSWORD"),
+		FromName:    os.Getenv("SMTP_FROM_NAME"),
+		FromEmail:   os.Getenv("SMTP_FROM_EMAIL"),
+		TemplateDir: "./ui/email",
+	})
+
+	// If we can't initialize email service, log warning but continue with deletion
+	if err != nil {
+		log.Printf("Warning: Could not initialize email service for user deletion: %v", err)
+	} else {
+		// Clean up user's email subscriptions
+		campaignManager := email.NewCampaignManager(db, emailService)
+		if err := campaignManager.HandleUserDeletion(userID); err != nil {
+			log.Printf("Warning: Error handling email subscriptions during user deletion: %v", err)
+		}
+	}
 
 	// Delete habit logs first (due to foreign key constraints)
 	_, err = tx.Exec("DELETE FROM habit_logs WHERE habit_id IN (SELECT id FROM habits WHERE user_id = ?)", userID)
