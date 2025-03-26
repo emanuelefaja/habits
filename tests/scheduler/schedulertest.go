@@ -268,13 +268,19 @@ func findRootDir() (string, error) {
 		return "", err
 	}
 
-	// First check if we're already in the root directory
+	// Check current directory first
 	if _, err := os.Stat(filepath.Join(currentDir, ".env")); err == nil {
 		return currentDir, nil
 	}
 
-	// If not, try going up one level (assuming we're in cmd/emailtest)
-	rootDir := filepath.Join(currentDir, "../..")
+	// Try parent directory (for running from tests/scheduler)
+	rootDir := filepath.Join(currentDir, "..")
+	if _, err := os.Stat(filepath.Join(rootDir, ".env")); err == nil {
+		return rootDir, nil
+	}
+
+	// Try parent of parent directory
+	rootDir = filepath.Join(currentDir, "../..")
 	if _, err := os.Stat(filepath.Join(rootDir, ".env")); err == nil {
 		return rootDir, nil
 	}
