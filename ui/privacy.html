@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" class="min-h-full bg-gray-50 dark:bg-gray-900">
+ {{ template "head" . }}
+<body>
+    <div class="min-h-full bg-gray-50 dark:bg-gray-900">
+        {{ template "header" . }}
+        
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+                    Privacy Policy
+                </h1>
+            </div>
+
+            <div>
+                <div class="space-y-6 text-gray-600 dark:text-gray-300">
+                    <p class="text-lg">Last updated: {{ .LastUpdated }}</p>
+
+                    <div class="space-y-6">
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">Introduction</h2>
+                            <p>This privacy policy describes how we handle data within The Habits Company, in which the software is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0).</p>
+                        </div>
+
+                        <div>
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">Self-Hosted vs Public Instance</h2>
+                        <p>We offer two types of instances: self-hosted and public. The data handling practices for each type are different. For self-hosted instances, you control and manage your own data. For the public instance on habits.co, we may collect additional data to improve the service.</p>
+                    </div>
+
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">What Data We Collect</h2>
+                        <p>We collect minimal personal information necessary to provide our services:</p>
+                        <ul class="list-disc list-inside space-y-2 mt-4 ml-4">
+                            <li>Account information (first name, last name, email)</li>
+                            <li>Password (stored securely as a hash)</li>
+                            <li>Habit tracking data you create while using our service</li>
+                            <li>Basic usage information (IP address, browser type, etc.)</li>
+                            <li>Email logs for account-related emails</li>
+                            <li>Payment information (for paid features)</li>
+                        </ul>
+                    </div>
+
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">What Data We Collect</h2>
+                            <p>We collect minimal personal information necessary to provide our services:</p>
+                            <ul class="list-disc list-inside space-y-2 mt-4 ml-4">
+                                <li>Account information (first name, last name, email)</li>
+                                <li>Password (stored securely as a hash)</li>
+                                <li>Habit tracking data you create while using our service</li>
+                                <li>Basic usage information (IP address, browser type, etc.)</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">How We Use Your Data</h2>
+                            <p>We use your data for the following purposes:</p>
+                            <ul class="list-disc list-inside space-y-2 mt-4 ml-4">
+                                <li>To provide and maintain our service</li>
+                                <li>To notify you about changes to our service</li>
+                                <li>To allow you to participate in interactive features of our service when you choose to do so</li>
+                                <li>To provide customer support</li>
+                                <li>To gather analysis or valuable information so that we can improve our service</li>
+                                <li>To monitor the usage of our service</li>
+                                <li>To detect, prevent and address technical issues</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">Data Storage</h2>
+                            <p>Your data is stored securely in the European Union. We implement appropriate technical and organizational measures to protect your personal data against unauthorized or unlawful processing, accidental loss, destruction or damage.</p>
+                        </div>
+
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">Cookies and Tracking</h2>
+                            <p>We use minimal cookies that are strictly necessary for the functioning of our website. These cookies are used for authentication and session management purposes. We do not use tracking cookies or third-party analytics services.</p>
+                        </div>
+
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">Your Rights</h2>
+                            <p>Under certain circumstances, you have rights under data protection laws in relation to your personal data, including:</p>
+                            <ul class="list-disc list-inside space-y-2 mt-4 ml-4">
+                                <li>Request access to your personal data</li>
+                                <li>Request correction of your personal data</li>
+                                <li>Request erasure of your personal data</li>
+                                <li>Object to processing of your personal data</li>
+                                <li>Request restriction of processing your personal data</li>
+                                <li>Request transfer of your personal data</li>
+                                <li>Right to withdraw consent</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">Third-Party Services</h2>
+                            <p>We use a minimal number of third-party services to operate our website:</p>
+                            <ul class="list-disc list-inside space-y-2 mt-4 ml-4">
+                                <li>Hosting providers (Render)</li>
+                                <li>DNS and DDoS protection (Cloudflare)</li>
+                                <li>Emailit (for notifications and account-related emails)</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">Changes to This Privacy Policy</h2>
+                            <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "last updated" date at the top of this Privacy Policy.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ template "footer" . }}
+</body>
+</html> 

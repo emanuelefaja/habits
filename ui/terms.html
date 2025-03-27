@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" class="min-h-full bg-gray-50 dark:bg-gray-900">
+ {{ template "head" . }}
+<body>
+    <div class="min-h-full bg-gray-50 dark:bg-gray-900">
+        {{ template "header" . }}
+        
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-gray-100">
+                    Terms and License
+                </h1>
+            </div>
+
+            <div>
+                <div class="space-y-6 text-gray-600 dark:text-gray-300">
+                    <p class="text-lg">Last updated: {{ .LastUpdated }}</p>
+
+                    <div class="space-y-6">
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">Introduction</h2>
+                            <p>The Habits Company is an open source project. By accessing or using this software, you agree to abide by these terms and the applicable open source license.</p>
+                        </div>
+
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">Software License</h2>
+                            <p>This software is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). This means:</p>
+                            <ul class="list-disc list-inside space-y-2 mt-4 ml-4">
+                                <li>You are free to use, modify, and distribute the software</li>
+                                <li>If you modify the software and provide it to others over a network, you must make your source code available to users</li>
+                                <li>Any derivative work must also be licensed under AGPL-3.0</li>
+                                <li>There is no warranty for the program, to the extent permitted by applicable law</li>
+                            </ul>
+                            <p class="mt-4">For the full license text, please refer to the LICENSE.txt file in the project repository or visit <a href="https://www.gnu.org/licenses/agpl-3.0.en.html" target="_blank" rel="noopener" class="text-blue-600 dark:text-blue-400 hover:underline">GNU AGPL-3.0</a>.</p>
+                        </div>
+
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">Course Content License</h2>
+                            <p>Course content located in the ui/email/courses directory is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0). This means:</p>
+                            <ul class="list-disc list-inside space-y-2 mt-4 ml-4">
+                                <li>You may share and adapt the course materials</li>
+                                <li>You must give appropriate credit to the original creators</li>
+                                <li>You may not use the course materials for commercial purposes</li>
+                            </ul>
+                            <p class="mt-4">For more information about this license, please visit <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener" class="text-blue-600 dark:text-blue-400 hover:underline">CC BY-NC 4.0</a>.</p>
+                        </div>
+
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">No Warranty</h2>
+                            <p>THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.</p>
+                        </div>
+
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">Limitation of Liability</h2>
+                            <p>IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MODIFIES AND/OR CONVEYS THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
+                        </div>
+
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">Network Use</h2>
+                            <p>If you modify the Program and offer interaction with it remotely through a computer network, you must make the Corresponding Source code available to users. This is a key provision of the AGPL-3.0 license.</p>
+                        </div>
+
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">Contributions</h2>
+                            <p>Contributions to this project are welcome. By contributing, you agree that your contributions will be licensed under the project's license (AGPL-3.0 for code, CC BY-NC 4.0 for course content where applicable).</p>
+                        </div>
+
+                        <div>
+                            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3">Changes to Terms</h2>
+                            <p>These terms may be updated from time to time as the project evolves. Material changes will be documented in the project's repository.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ template "footer" . }}
+</body>
+</html> 

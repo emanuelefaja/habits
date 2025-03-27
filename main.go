@@ -224,6 +224,8 @@ func main() {
 		"ui/reset.html",
 		"ui/unsubscribe.html",
 		"ui/courses/digital-detox.html",
+		"ui/privacy.html",
+		"ui/terms.html",
 	)
 	if err != nil {
 		log.Fatalf("Template parsing error: %v", err)
@@ -642,6 +644,7 @@ func main() {
 
 	// About
 	http.Handle("/about", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Get the user if logged in
 		user, _ := getAuthenticatedUser(r, db)
 		data := struct {
 			User *models.User
@@ -651,6 +654,28 @@ func main() {
 			Page: "about",
 		}
 		renderTemplate(w, templates, "about.html", data)
+	})))
+
+	http.Handle("/privacy", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Get the user if logged in
+		user, _ := getAuthenticatedUser(r, db)
+
+		data := map[string]interface{}{
+			"User":        user,
+			"LastUpdated": time.Now().Format("January 2, 2006"),
+		}
+		renderTemplate(w, templates, "privacy.html", data)
+	})))
+
+	http.Handle("/terms", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Get the user if logged in
+		user, _ := getAuthenticatedUser(r, db)
+
+		data := map[string]interface{}{
+			"User":        user,
+			"LastUpdated": time.Now().Format("January 2, 2006"),
+		}
+		renderTemplate(w, templates, "terms.html", data)
 	})))
 
 	// Roadmap API handlers
