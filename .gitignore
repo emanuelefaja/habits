@@ -8,3 +8,4 @@ ideas.md
 bugs.md
 *.db-shm
 *.db-wal
+/specs
