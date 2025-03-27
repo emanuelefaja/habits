@@ -56,6 +56,8 @@ func GetUserByID(db *sql.DB, id int64) (*User, error) {
 // GetUserByEmail retrieves a user from the database by their email
 func GetUserByEmail(db *sql.DB, email string) (*User, error) {
 	user := &User{}
+	// Convert email to lowercase before querying
+	email = strings.ToLower(email)
 	err := db.QueryRow(`
 		SELECT id, first_name, last_name, email, show_confetti, created_at, is_admin, notification_enabled 
 		FROM users 
