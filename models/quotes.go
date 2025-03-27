@@ -2,7 +2,6 @@ package models
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"path/filepath"
@@ -35,7 +34,7 @@ func GetRandomQuote() (Quote, error) {
 	quotesPath := filepath.Join(dir, "static", "quotes.json")
 
 	// Read the file
-	data, err := ioutil.ReadFile(quotesPath)
+	data, err := os.ReadFile(quotesPath)
 	if err != nil {
 		return defaultQuote, err
 	}
