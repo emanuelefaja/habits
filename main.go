@@ -19,6 +19,7 @@ import (
 	"mad/middleware"
 	"mad/models"
 	"mad/models/email"
+	"mad/web"
 
 	"github.com/joho/godotenv"
 	_ "github.com/mattn/go-sqlite3"
@@ -257,67 +258,10 @@ func main() {
 		serveStaticFileWithContentType(w, r, "static/sitemap.xml", "application/xml")
 	})
 
+	// NEW: Set up the home route
+	web.SetupRoutes(db, templates)
+
 	// Routes
-	http.Handle("/", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Wrap the response writer with a timeout
-		tw := newTimeoutResponseWriter(w, 10*time.Second)
-
-		if r.URL.Path != "/" {
-			http.NotFound(tw, r)
-			return
-		}
-
-		if !middleware.IsAuthenticated(r) {
-			// Guest
-			if err := templates.ExecuteTemplate(tw, "guest-home.html", nil); err != nil {
-				// Check if the error is due to a client disconnection
-				if strings.Contains(err.Error(), "write: broken pipe") ||
-					strings.Contains(err.Error(), "client disconnected") ||
-					strings.Contains(err.Error(), "connection reset by peer") ||
-					strings.Contains(err.Error(), "response timeout exceeded") {
-					log.Printf("Client disconnected while rendering guest-home.html: %v", err)
-					return
-				}
-				http.Error(tw, "Internal Server Error", http.StatusInternalServerError)
-			}
-			return
-		}
-
-		user, err := getAuthenticatedUser(r, db)
-		if err != nil {
-			log.Printf("Error getting authenticated user: %v", err)
-			http.Error(tw, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-
-		// Only get necessary habit data for the current view
-		habits, err := models.GetHabitsByUserID(db, middleware.GetUserID(r))
-		if err != nil {
-			log.Printf("Error getting habits: %v", err)
-			http.Error(tw, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-
-		// Limit the amount of data sent to the template
-		habitsJSON, err := json.Marshal(habits)
-		if err != nil {
-			log.Printf("Error marshaling habits: %v", err)
-			http.Error(tw, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-
-		data := struct {
-			User       *models.User
-			HabitsJSON template.JS
-			Flash      string
-		}{
-			User:       user,
-			HabitsJSON: template.JS(habitsJSON),
-			Flash:      middleware.GetFlash(r),
-		}
-		renderTemplate(tw, templates, "home.html", data)
-	})))
-
 	http.Handle("/settings", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user, err := getAuthenticatedUser(r, db)
 		if err != nil {
@@ -877,18 +821,6 @@ func main() {
 		}
 		renderTemplate(w, templates, "post.html", data)
 	})))
-
-	// http.Handle("/books", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	// 	user, _ := getAuthenticatedUser(r, db)
-	// 	data := struct {
-	// 		User *models.User
-	// 		Page string
-	// 	}{
-	// 		User: user,
-	// 		Page: "books",
-	// 	}
-	// 	renderTemplate(w, templates, "books.html", data)
-	// })))
 
 	http.Handle("/goals", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user, _ := getAuthenticatedUser(r, db)
