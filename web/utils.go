@@ -3,6 +3,8 @@ package web
 import (
 	"bytes"
 	"database/sql"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"html/template"
 	"log"
@@ -12,6 +14,12 @@ import (
 
 	"mad/middleware"
 	"mad/models"
+)
+
+// Rate limiters
+var (
+	// UnsubscribeLimiter limits unsubscribe attempts to 10 per hour
+	UnsubscribeLimiter = middleware.NewRateLimiter(10, time.Hour)
 )
 
 // TemplateData holds common data for templates
@@ -98,4 +106,32 @@ func renderTemplate(w http.ResponseWriter, templates *template.Template, name st
 func HandleNotAllowed(w http.ResponseWriter, allowedMethods ...string) {
 	w.Header().Set("Allow", strings.Join(allowedMethods, ", "))
 	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+}
+
+// Dict creates a map from a list of key/value pairs for use in templates
+func Dict(values ...interface{}) (map[string]interface{}, error) {
+	if len(values)%2 != 0 {
+		return nil, errors.New("invalid dict call")
+	}
+	d := make(map[string]interface{}, len(values)/2)
+	for i := 0; i < len(values); i += 2 {
+		key, ok := values[i].(string)
+		if !ok {
+			return nil, errors.New("dict keys must be strings")
+		}
+		d[key] = values[i+1]
+	}
+	return d, nil
+}
+
+// RespondJSON sends a JSON response with the given payload
+func RespondJSON(w http.ResponseWriter, payload interface{}) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(payload)
+}
+
+// ServeStaticFileWithContentType serves a static file with a specified content type
+func ServeStaticFileWithContentType(w http.ResponseWriter, r *http.Request, filePath, contentType string) {
+	w.Header().Set("Content-Type", contentType)
+	http.ServeFile(w, r, filePath)
 }
