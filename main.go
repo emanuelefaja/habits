@@ -32,11 +32,6 @@ var (
 )
 
 func main() {
-	// Initialize random seed for Go versions before 1.20
-	// In Go 1.20+ this is no longer needed as it's done automatically
-	// This is kept for backward compatibility
-	rand.Seed(time.Now().UnixNano())
-
 	// Load environment variables
 	err := godotenv.Load()
 	if err != nil {
@@ -482,78 +477,6 @@ func main() {
 	http.Handle("/api/campaigns/subscriptions", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(api.GetSubscriptions))))
 	http.Handle("/api/campaigns/preferences", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(api.UpdateSubscriptionPreferences))))
 
-	// Admin
-	http.Handle("/admin", middleware.SessionManager.LoadAndSave(
-		middleware.RequireAdmin(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			user, err := getAuthenticatedUser(r, db)
-			if err != nil {
-				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-				return
-			}
-
-			totalUsers, err := models.GetTotalUsers(db)
-			if err != nil {
-				log.Printf("Error getting total users: %v", err)
-				totalUsers = 0
-			}
-
-			totalHabits, err := models.GetTotalHabits(db)
-			if err != nil {
-				log.Printf("Error getting total habits: %v", err)
-				totalHabits = 0
-			}
-
-			totalHabitLogs, err := models.GetTotalHabitLogs(db)
-			if err != nil {
-				log.Printf("Error getting total habit logs: %v", err)
-				totalHabitLogs = 0
-			}
-
-			totalGoals, err := models.GetTotalGoals(db)
-			if err != nil {
-				log.Printf("Error getting total goals: %v", err)
-				totalGoals = 0
-			}
-
-			users, err := models.GetAllUsers(db)
-			if err != nil {
-				log.Printf("Error getting all users: %v", err)
-				users = []*models.User{}
-			}
-
-			// Get signup status
-			allowSignups, err := models.GetSignupStatus(db)
-			if err != nil {
-				log.Printf("Error getting signup status: %v", err)
-				allowSignups = true // Default to allowing signups
-			}
-
-			data := struct {
-				User           *models.User
-				Users          []*models.User
-				TotalUsers     int
-				TotalHabits    int
-				TotalHabitLogs int
-				TotalGoals     int
-				AllowSignups   bool
-			}{
-				User:           user,
-				Users:          users,
-				TotalUsers:     totalUsers,
-				TotalHabits:    totalHabits,
-				TotalHabitLogs: totalHabitLogs,
-				TotalGoals:     totalGoals,
-				AllowSignups:   allowSignups,
-			}
-
-			renderTemplate(w, templates, "admin.html", data)
-		}))))
-
-	// Admin APIs
-	http.Handle("/admin/api/user/password", middleware.SessionManager.LoadAndSave(middleware.RequireAdmin(api.AdminResetPasswordHandler(db))))
-	http.Handle("/admin/api/user/delete", middleware.SessionManager.LoadAndSave(middleware.RequireAdmin(api.AdminDeleteUserHandler(db))))
-	http.Handle("/admin/api/toggle-signups", middleware.SessionManager.LoadAndSave(middleware.RequireAdmin(api.ToggleSignupStatusHandler(db))))
-
 	// Habit Logs Deletion
 	http.Handle("/api/habits/logs/delete", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
@@ -866,18 +789,6 @@ func main() {
 
 		handleNotAllowed(w, http.MethodGet, http.MethodPost)
 	})))
-
-	// Admin Download DB
-	http.Handle("/admin/download-db", middleware.SessionManager.LoadAndSave(middleware.RequireAdmin(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		dbPath := os.Getenv("DATABASE_PATH")
-		if dbPath == "" {
-			dbPath = "habits.db"
-		}
-
-		w.Header().Set("Content-Type", "application/octet-stream")
-		w.Header().Set("Content-Disposition", "attachment; filename=habits.db")
-		http.ServeFile(w, r, dbPath)
-	}))))
 
 	port := os.Getenv("PORT")
 	if port == "" {
