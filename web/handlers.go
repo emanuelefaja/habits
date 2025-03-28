@@ -126,6 +126,29 @@ func LogoutHandler() http.HandlerFunc {
 	}
 }
 
+// SettingsHandler handles the settings page route
+func SettingsHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user, err := getAuthenticatedUser(r, db)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		// Debug: Print user settings
+		log.Printf("User settings: confetti=%v, weekdays=%v, notifications=%v", user.ShowConfetti, user.ShowWeekdays, user.NotificationEnabled)
+
+		data := struct {
+			User  *models.User
+			Flash string
+		}{
+			User:  user,
+			Flash: middleware.GetFlash(r),
+		}
+		renderTemplate(w, templates, "settings.html", data)
+	}
+}
+
 // Helper functions for handlers
 func renderGuestHome(w http.ResponseWriter, templates *template.Template) {
 	if err := templates.ExecuteTemplate(w, "guest-home.html", nil); err != nil {

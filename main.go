@@ -223,25 +223,6 @@ func main() {
 	web.SetupRoutes(db, templates)
 
 	// Routes
-	http.Handle("/settings", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		user, err := getAuthenticatedUser(r, db)
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-
-		// Debug: Print user settings
-		log.Printf("User settings: confetti=%v, weekdays=%v, notifications=%v", user.ShowConfetti, user.ShowWeekdays, user.NotificationEnabled)
-
-		data := struct {
-			User  *models.User
-			Flash string
-		}{
-			User:  user,
-			Flash: middleware.GetFlash(r),
-		}
-		renderTemplate(w, templates, "settings.html", data)
-	}))))
 
 	// Authentication Routes
 	http.Handle("/register", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
