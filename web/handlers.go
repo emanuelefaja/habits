@@ -110,6 +110,22 @@ func LoginHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
 	}
 }
 
+// LogoutHandler handles the logout functionality
+func LogoutHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			HandleNotAllowed(w, http.MethodPost)
+			return
+		}
+		if err := middleware.ClearSession(r); err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+		middleware.SetFlash(r, "You have been logged out successfully!")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}
+}
+
 // Helper functions for handlers
 func renderGuestHome(w http.ResponseWriter, templates *template.Template) {
 	if err := templates.ExecuteTemplate(w, "guest-home.html", nil); err != nil {

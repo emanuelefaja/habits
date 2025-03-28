@@ -322,19 +322,6 @@ func main() {
 		renderTemplate(w, templates, "forgot.html", templateData)
 	})))
 
-	http.Handle("/logout", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			handleNotAllowed(w, http.MethodPost)
-			return
-		}
-		if err := middleware.ClearSession(r); err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-		middleware.SetFlash(r, "You have been logged out successfully!")
-		http.Redirect(w, r, "/", http.StatusSeeOther)
-	})))
-
 	// Password Reset Routes
 	http.Handle("/reset", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
