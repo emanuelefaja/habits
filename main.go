@@ -128,75 +128,10 @@ func main() {
 	api.StartGitHubSync(db)
 	middleware.InitDB(db)
 
-	// Template functions
-	funcMap := template.FuncMap{
-		"times": func(n int) []int {
-			result := make([]int, n)
-			for i := 0; i < n; i++ {
-				result[i] = i
-			}
-			return result
-		},
-		"add": func(a, b int) int {
-			return a + b
-		},
-		"dict": dict,
-		"json": func(v interface{}) template.JS {
-			b, _ := json.Marshal(v)
-			return template.JS(b)
-		},
-		"safeURL": func(u string) template.URL {
-			return template.URL(u)
-		},
-	}
-
-	// Replace template.Must with explicit error handling:
-	parsedTemplates, err := template.New("").Funcs(funcMap).ParseFiles(
-		// Components
-		"ui/components/header.html",
-		"ui/components/habit-modal.html",
-		"ui/components/monthly-grid.html",
-		"ui/components/demo-grid.html",
-		"ui/components/welcome.html",
-		"ui/components/yearly-grid.html",
-		"ui/components/head.html",
-		"ui/components/footer.html",
-		"ui/components/sum-line-graph.html",
-		"ui/components/goal.html",
-		"ui/components/subscription-form.html",
-		// Pages
-		"ui/home.html",
-		"ui/settings.html",
-		"ui/login.html",
-		"ui/register.html",
-		"ui/roadmap.html",
-		"ui/habits/habit.html",
-		"ui/habits/binary.html",
-		"ui/habits/numeric.html",
-		"ui/habits/choice.html",
-		"ui/habits/set-rep.html",
-		"ui/about.html",
-		"ui/guest-home.html",
-		"ui/admin.html",
-		"ui/changelog.html",
-		"ui/blog/blog.html",
-		"ui/blog/post.html",
-		"ui/goals.html",
-		"ui/forgot.html",
-		"ui/reset.html",
-		"ui/unsubscribe.html",
-		"ui/courses/digital-detox.html",
-		"ui/privacy.html",
-		"ui/terms.html",
-	)
+	// Load templates from the web package
+	templates, err := web.LoadTemplates()
 	if err != nil {
 		log.Fatalf("Template parsing error: %v", err)
-	}
-	templates := parsedTemplates
-
-	// After parsing templates, add:
-	for _, t := range templates.Templates() {
-		log.Printf("Loaded template: %s", t.Name())
 	}
 
 	// Static files
