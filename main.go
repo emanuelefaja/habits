@@ -25,45 +25,6 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-type TemplateData struct {
-	Flash      string
-	Error      string
-	Token      string
-	IsLoggedIn bool
-	Email      string
-}
-
-// timeoutResponseWriter is a custom ResponseWriter that adds timeout functionality
-type timeoutResponseWriter struct {
-	http.ResponseWriter
-	timeout time.Duration
-	start   time.Time
-}
-
-func newTimeoutResponseWriter(w http.ResponseWriter, timeout time.Duration) *timeoutResponseWriter {
-	return &timeoutResponseWriter{
-		ResponseWriter: w,
-		timeout:        timeout,
-		start:          time.Now(),
-	}
-}
-
-func (w *timeoutResponseWriter) Write(b []byte) (int, error) {
-	// Check if we've exceeded the timeout
-	if time.Since(w.start) > w.timeout {
-		return 0, fmt.Errorf("response timeout exceeded")
-	}
-	return w.ResponseWriter.Write(b)
-}
-
-func (w *timeoutResponseWriter) WriteHeader(statusCode int) {
-	// Check if we've exceeded the timeout
-	if time.Since(w.start) > w.timeout {
-		return
-	}
-	w.ResponseWriter.WriteHeader(statusCode)
-}
-
 // Helper variables
 var (
 	// Rate limiters
@@ -328,35 +289,6 @@ func main() {
 		}
 	})))
 
-	http.Handle("/login", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodGet:
-			// Get a random quote
-			quote, err := models.GetRandomQuote()
-			if err != nil {
-				log.Printf("Error getting random quote: %v", err)
-				// Continue with default quote from the function
-			}
-
-			data := TemplateData{
-				Flash: middleware.GetFlash(r),
-			}
-
-			// Add quote to the template data
-			templateData := map[string]interface{}{
-				"Flash": data.Flash,
-				"Error": data.Error,
-				"Quote": quote,
-			}
-
-			renderTemplate(w, templates, "login.html", templateData)
-		case http.MethodPost:
-			api.LoginHandler(db, templates)(w, r)
-		default:
-			handleNotAllowed(w, http.MethodGet, http.MethodPost)
-		}
-	})))
-
 	http.Handle("/forgot", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			handleNotAllowed(w, http.MethodGet)
@@ -370,7 +302,7 @@ func main() {
 			// Continue with default quote from the function
 		}
 
-		data := TemplateData{
+		data := web.TemplateData{
 			IsLoggedIn: middleware.IsAuthenticated(r),
 		}
 		if data.IsLoggedIn {
