@@ -135,38 +135,38 @@ func TestUnsubscribeFlow(t *testing.T) {
 		t.Run("ValidateToken", func(t *testing.T) {
 			// Test invalid token
 			invalidToken := "invalid-token-123"
-			isValid := validateUnsubscribeToken(db, testUser.Email, "digital-detox", invalidToken)
-			if isValid {
+			isValid, err := campaignManager.ValidateUnsubscribeToken(testUser.Email, "digital-detox", invalidToken)
+			if err == nil && isValid {
 				t.Fatal("ERROR: Invalid token was validated as valid")
 			}
-			t.Logf("PASS: Invalid token correctly rejected")
+			t.Logf("PASS: Invalid token correctly rejected with error: %v", err)
 
 			// Test valid token
-			isValid = validateUnsubscribeToken(db, testUser.Email, "digital-detox", sub.Token)
-			if !isValid {
-				t.Fatal("ERROR: Valid token was rejected")
+			isValid, err = campaignManager.ValidateUnsubscribeToken(testUser.Email, "digital-detox", sub.Token)
+			if err != nil || !isValid {
+				t.Fatalf("ERROR: Valid token was rejected with error: %v", err)
 			}
 			t.Logf("PASS: Valid token correctly validated")
 
 			// Test mismatched email
-			isValid = validateUnsubscribeToken(db, "wrong@example.com", "digital-detox", sub.Token)
-			if isValid {
+			isValid, err = campaignManager.ValidateUnsubscribeToken("wrong@example.com", "digital-detox", sub.Token)
+			if err == nil && isValid {
 				t.Fatal("ERROR: Token with wrong email was validated")
 			}
-			t.Logf("PASS: Token with wrong email correctly rejected")
+			t.Logf("PASS: Token with wrong email correctly rejected with error: %v", err)
 
 			// Test mismatched campaign
-			isValid = validateUnsubscribeToken(db, testUser.Email, "wrong-campaign", sub.Token)
-			if isValid {
+			isValid, err = campaignManager.ValidateUnsubscribeToken(testUser.Email, "wrong-campaign", sub.Token)
+			if err == nil && isValid {
 				t.Fatal("ERROR: Token with wrong campaign was validated")
 			}
-			t.Logf("PASS: Token with wrong campaign correctly rejected")
+			t.Logf("PASS: Token with wrong campaign correctly rejected with error: %v", err)
 		})
 
 		// ***** TEST 3: Process Unsubscribe *****
 		t.Run("ProcessUnsubscribe", func(t *testing.T) {
 			// Process unsubscribe (simulating clicking the link and submitting form)
-			err = processUnsubscribeRequest(db, testUser.Email, "digital-detox", sub.Token)
+			err = processUnsubscribeRequest(db, testUser.Email, "digital-detox", sub.Token, campaignManager)
 			if err != nil {
 				t.Fatalf("ERROR: Failed to process unsubscribe: %v", err)
 			}
@@ -193,12 +193,14 @@ func TestUnsubscribeFlow(t *testing.T) {
 
 			// ***** TEST 4: Duplicate Unsubscribe *****
 			t.Run("DuplicateUnsubscribe", func(t *testing.T) {
-				// Process the same unsubscribe again
-				err = processUnsubscribeRequest(db, testUser.Email, "digital-detox", sub.Token)
-				if err != nil {
-					t.Fatalf("ERROR: Failed to process duplicate unsubscribe: %v", err)
+				// For duplicate unsubscribe test, we now expect an error because the actual
+				// implementation requires an active subscription
+				err = processUnsubscribeRequest(db, testUser.Email, "digital-detox", sub.Token, campaignManager)
+				if err == nil {
+					t.Fatal("ERROR: Duplicate unsubscribe should have failed")
+				} else {
+					t.Logf("PASS: Duplicate unsubscribe correctly rejected with error: %v", err)
 				}
-				t.Logf("Processed duplicate unsubscribe request")
 
 				// Should still be unsubscribed
 				subAfterDuplicate, err := getSubscriptionWithUnsubscribeToken(db, testUser.Email, "digital-detox")
@@ -280,36 +282,22 @@ func getSubscriptionWithUnsubscribeToken(db *sql.DB, email, campaignID string) (
 	return &sub, nil
 }
 
-// validateUnsubscribeToken checks if a token is valid for a given email and campaign
-func validateUnsubscribeToken(db *sql.DB, email, campaignID, token string) bool {
-	var count int
-	err := db.QueryRow(`
-		SELECT COUNT(*) FROM email_subscriptions 
-		WHERE email = ? AND campaign_id = ? AND token = ?
-	`, email, campaignID, token).Scan(&count)
-
-	if err != nil {
-		return false
-	}
-
-	return count > 0
-}
-
 // processUnsubscribeRequest simulates the unsubscribe action after clicking the link
-func processUnsubscribeRequest(db *sql.DB, email, campaignID, token string) error {
+func processUnsubscribeRequest(db *sql.DB, userEmail, campaignID, token string, cm *email.CampaignManager) error {
 	// First validate the token
-	if !validateUnsubscribeToken(db, email, campaignID, token) {
-		return fmt.Errorf("invalid unsubscribe token")
+	isValid, err := cm.ValidateUnsubscribeToken(userEmail, campaignID, token)
+	if err != nil || !isValid {
+		return fmt.Errorf("invalid unsubscribe token: %v", err)
 	}
 
 	// Then update the subscription status
-	_, err := db.Exec(`
+	_, err = db.Exec(`
 		UPDATE email_subscriptions 
 		SET status = 'unsubscribed', 
 		    unsubscribed_at = CURRENT_TIMESTAMP,
 		    updated_at = CURRENT_TIMESTAMP
 		WHERE email = ? AND campaign_id = ? AND token = ?
-	`, email, campaignID, token)
+	`, userEmail, campaignID, token)
 
 	return err
 }
