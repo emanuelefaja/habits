@@ -772,3 +772,32 @@ func (cm *CampaignManager) HandleUserDeletion(userID int64) error {
 	// Commit the transaction
 	return tx.Commit()
 }
+
+// ValidateUnsubscribeToken checks if the provided token is valid for the given email and campaign
+func (cm *CampaignManager) ValidateUnsubscribeToken(email, campaignID, token string) (bool, error) {
+	var storedToken string
+	err := cm.db.QueryRow(`
+		SELECT token 
+		FROM email_subscriptions
+		WHERE email = ? 
+		AND campaign_id = ?
+		AND status = 'active'
+	`, email, campaignID).Scan(&storedToken)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			log.Printf("No active subscription found for email=%s, campaign=%s", email, campaignID)
+			return false, fmt.Errorf("no active subscription found")
+		}
+		log.Printf("Database error while validating token: %v", err)
+		return false, fmt.Errorf("database error: %v", err)
+	}
+
+	valid := token == storedToken
+	if !valid {
+		log.Printf("Token mismatch: provided=%s vs stored=%s", token, storedToken)
+	} else {
+		log.Printf("Token validated successfully")
+	}
+	return valid, nil
+}

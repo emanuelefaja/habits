@@ -855,6 +855,11 @@ func main() {
 
 			// Apply rate limiting - 10 attempts per hour per IP
 			remaining, resetTime, err := webUnsubscribeLimiter.CheckLimit(r)
+			if err != nil {
+				log.Printf("Rate limit check error: %v", err)
+				http.Error(w, "Error processing request", http.StatusInternalServerError)
+				return
+			}
 			if remaining == 0 {
 				waitDuration := time.Until(resetTime)
 				http.Error(w, fmt.Sprintf("Too many unsubscribe attempts. Please try again in %d minutes.", int(waitDuration.Minutes())+1), http.StatusTooManyRequests)
@@ -862,7 +867,7 @@ func main() {
 			}
 
 			// With token validation:
-			valid, err := validateUnsubscribeToken(db, formEmail, formCampaignID, formToken)
+			valid, err := campaignManager.ValidateUnsubscribeToken(formEmail, formCampaignID, formToken)
 			if err != nil {
 				log.Printf("Error validating token: %v", err)
 				http.Error(w, "Invalid or expired token", http.StatusBadRequest)
@@ -1015,32 +1020,4 @@ func getAuthenticatedUser(r *http.Request, db *sql.DB) (*models.User, error) {
 func serveStaticFileWithContentType(w http.ResponseWriter, r *http.Request, filePath, contentType string) {
 	w.Header().Set("Content-Type", contentType)
 	http.ServeFile(w, r, filePath)
-}
-
-func validateUnsubscribeToken(db *sql.DB, userEmail, campaignID, token string) (bool, error) {
-	var storedToken string
-	err := db.QueryRow(`
-		SELECT token 
-		FROM email_subscriptions
-		WHERE email = ? 
-		AND campaign_id = ?
-		AND status = 'active'
-	`, userEmail, campaignID).Scan(&storedToken)
-
-	if err != nil {
-		if err == sql.ErrNoRows {
-			log.Printf("No active subscription found for email=%s, campaign=%s", userEmail, campaignID)
-			return false, fmt.Errorf("no active subscription found")
-		}
-		log.Printf("Database error while validating token: %v", err)
-		return false, fmt.Errorf("database error: %v", err)
-	}
-
-	valid := token == storedToken
-	if !valid {
-		log.Printf("Token mismatch: provided=%s vs stored=%s", token, storedToken)
-	} else {
-		log.Printf("Token validated successfully")
-	}
-	return valid, nil
 }
