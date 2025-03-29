@@ -68,10 +68,10 @@ var Campaigns = map[string]EmailCampaign{
 		Emails: []CampaignEmail{
 			{
 				Number:       1,
-				Subject:      "Getting Started with Habits",
+				Subject:      "Welcome to Habits!",
 				Title:        "Welcome to Your Habit Journey",
-				TemplateName: "courses/onboarding/1-getting-started",
-				SendDay:      1, // Send 24 hours after registration
+				TemplateName: "courses/onboarding/1-welcome",
+				SendDay:      0, // Send immediately after registration
 			},
 			{
 				Number:       2,

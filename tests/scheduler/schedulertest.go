@@ -31,13 +31,6 @@ func newTestEmailService(baseService email.EmailService, testRecipient string) *
 	}
 }
 
-// SendWelcomeEmail redirects the welcome email to the test recipient
-func (s *TestEmailService) SendWelcomeEmail(to, firstName string) error {
-	fmt.Printf("📧 Sending welcome email to %s (originally for: %s)\n", s.testRecipient, to)
-	s.emailsSent["welcome"]++
-	return s.baseService.SendWelcomeEmail(s.testRecipient, firstName)
-}
-
 // SendPasswordResetEmail redirects the password reset email to the test recipient
 func (s *TestEmailService) SendPasswordResetEmail(to, resetLink string, expiry time.Time) error {
 	fmt.Printf("📧 Sending password reset email to %s (originally for: %s)\n", s.testRecipient, to)

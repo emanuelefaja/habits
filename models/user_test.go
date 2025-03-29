@@ -27,11 +27,6 @@ func (m *MockEmailService) SendTypedEmail(to string, template email.EmailTemplat
 	return nil
 }
 
-func (m *MockEmailService) SendWelcomeEmail(to, username string) error {
-	m.sentEmails[to+"-welcome"] = true
-	return nil
-}
-
 func (m *MockEmailService) SendPasswordResetEmail(to, resetLink string, expiry time.Time) error {
 	m.sentEmails[to+"-reset"] = true
 	return nil

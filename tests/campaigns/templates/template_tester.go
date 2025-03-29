@@ -110,12 +110,13 @@ func main() {
 		firstName, _ := reader.ReadString('\n')
 		firstName = strings.TrimSpace(firstName)
 
-		err = emailService.SendWelcomeEmail(to, firstName)
+		// Subscribe user to onboarding campaign to receive welcome email
+		err = campaignManager.SubscribeUser(to, "onboarding", 0) // 0 for userID since this might be a test email
 		if err != nil {
-			fmt.Printf("Error sending welcome email: %v\n", err)
+			fmt.Printf("Error subscribing user to onboarding campaign: %v\n", err)
 			return
 		}
-		fmt.Println("✅ Welcome email sent successfully!")
+		fmt.Println("✅ User subscribed to onboarding campaign! Welcome email will be sent immediately.")
 
 	case "2":
 		// Password Reset Email

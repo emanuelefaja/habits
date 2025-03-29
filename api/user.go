@@ -236,18 +236,8 @@ func RegisterHandler(db *sql.DB, tmpl *template.Template) http.HandlerFunc {
 
 		log.Println("User registered successfully:", email)
 
-		// Send welcome email
+		// Auto-subscribe user to campaigns
 		if emailService != nil {
-			go func() {
-				err := emailService.SendWelcomeEmail(email, firstName)
-				if err != nil {
-					log.Printf("Failed to send welcome email to %s: %v", email, err)
-				} else {
-					log.Printf("Welcome email sent to %s", email)
-				}
-			}()
-
-			// Auto-subscribe user to campaigns
 			go func() {
 				if campaignManager := emailService.GetCampaignManager(); campaignManager != nil {
 					userObj, err := models.GetUserByEmail(db, email)

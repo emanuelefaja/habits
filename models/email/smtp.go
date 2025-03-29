@@ -79,15 +79,6 @@ func (s *SMTPEmailService) SendTypedEmail(to string, template EmailTemplate, dat
 	return s.client.DialAndSend(msg)
 }
 
-// SendWelcomeEmail sends a welcome email to a new user
-func (s *SMTPEmailService) SendWelcomeEmail(to, username string) error {
-	data := WelcomeEmailData{
-		Username: username,
-		AppName:  "The Habits Company",
-	}
-	return s.SendTypedEmail(to, WelcomeEmail, data)
-}
-
 // SendPasswordResetEmail sends a password reset email
 func (s *SMTPEmailService) SendPasswordResetEmail(to, resetLink string, expiry time.Time) error {
 	log.Printf("📧 Preparing password reset email for: %s", to)
