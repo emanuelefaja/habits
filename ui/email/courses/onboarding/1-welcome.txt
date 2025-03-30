@@ -4,7 +4,7 @@ Welcome to {{.AppName}}!
 
 Thank you for joining our community of habit builders. We're excited to help you create and maintain positive habits that will transform your life.
 
-With Habits, you can:
+Now you can:
 
 - Track your daily habits
 - Set goals and monitor your progress

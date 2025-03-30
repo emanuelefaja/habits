@@ -78,14 +78,21 @@ var Campaigns = map[string]EmailCampaign{
 				Subject:      "Track Your First Week of Habits",
 				Title:        "Building Momentum: Your First Week",
 				TemplateName: "courses/onboarding/2-first-week",
-				SendDay:      7, // Send 7 days after registration
+				SendDay:      1, // Send 1 day after registration
 			},
 			{
 				Number:       3,
 				Subject:      "Setting Effective Goals",
 				Title:        "The Power of Goal Setting",
 				TemplateName: "courses/onboarding/3-goals",
-				SendDay:      14, // Send 14 days after registration
+				SendDay:      3, // Send 3 days after registration
+			},
+			{
+				Number:       4,
+				Subject:      "Creating a Habit Routine",
+				Title:        "Building a Routine for Success",
+				TemplateName: "courses/onboarding/4-routine",
+				SendDay:      7, // Send 7 days after registration
 			},
 		},
 	},
@@ -137,6 +144,36 @@ var Campaigns = map[string]EmailCampaign{
 				Title:        "Day 10: Creating Your Long-Term Plan",
 				TemplateName: "courses/digital-detox/6-success-plan",
 				SendDay:      10, // Send 10 days after signup
+			},
+		},
+	},
+	"phone-addiction": {
+		ID:            "phone-addiction",
+		Name:          "Phone Addiction Recovery",
+		Description:   "Break the cycle of phone dependency and regain control of your time and attention.",
+		Emoji:         "📵",
+		AutoSubscribe: false, // Opt-in only
+		Emails: []CampaignEmail{
+			{
+				Number:       1,
+				Subject:      "Breaking Free from Phone Addiction",
+				Title:        "Understanding Your Relationship with Your Phone",
+				TemplateName: "courses/phone-addiction/1-introduction",
+				SendDay:      0, // Send immediately
+			},
+			{
+				Number:       2,
+				Subject:      "Building Healthy Phone Habits",
+				Title:        "Creating Boundaries and Alternatives",
+				TemplateName: "courses/phone-addiction/2-boundaries",
+				SendDay:      3, // Send 3 days after signup
+			},
+			{
+				Number:       3,
+				Subject:      "Staying Phone-Free for Good",
+				Title:        "Maintaining Your New Healthy Relationship with Technology",
+				TemplateName: "courses/phone-addiction/3-maintenance",
+				SendDay:      7, // Send 7 days after signup
 			},
 		},
 	},
