@@ -69,6 +69,7 @@ func LoadTemplates() (*template.Template, error) {
 		"ui/courses/digital-detox.html",
 		"ui/privacy.html",
 		"ui/terms.html",
+		"ui/brand.html",
 	)
 
 	if err != nil {

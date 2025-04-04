@@ -149,6 +149,32 @@ func SettingsHandler(db *sql.DB, templates *template.Template) http.HandlerFunc 
 	}
 }
 
+// BrandHandler handles the brand guidelines page route
+func BrandHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		data := struct {
+			Page  string
+			User  *models.User
+			Flash string
+		}{
+			Page:  "brand",
+			Flash: middleware.GetFlash(r),
+		}
+
+		// If user is authenticated, get user data
+		if middleware.IsAuthenticated(r) {
+			user, err := getAuthenticatedUser(r, db)
+			if err != nil {
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				return
+			}
+			data.User = user
+		}
+
+		renderTemplate(w, templates, "brand.html", data)
+	}
+}
+
 // Helper functions for handlers
 func renderGuestHome(w http.ResponseWriter, templates *template.Template) {
 	if err := templates.ExecuteTemplate(w, "guest-home.html", nil); err != nil {
