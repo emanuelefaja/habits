@@ -3,58 +3,65 @@
 <head>
     {{ template "head" . }}
     <title>Brand Guidelines | The Habits Company</title>
+    <style>
+        html, body {
+            overflow-x: hidden;
+            position: relative;
+            width: 100%;
+        }
+    </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 overflow-x-hidden">
     {{ template "header" . }}
     
-    <div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div class="mb-12">
-            <h1 class="text-4xl font-black tracking-tight text-gray-900 sm:text-5xl">Brand Guidelines</h1>
-            <p class="mt-4 text-xl text-gray-500">The visual identity of The Habits Company</p>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 overflow-x-hidden w-full">
+        <div class="mb-12 px-2 sm:px-0">
+            <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-gray-900">Brand Guidelines</h1>
+            <p class="mt-2 sm:mt-4 text-lg sm:text-xl text-gray-500">The visual identity of The Habits Company</p>
         </div>
         
         <!-- Logo Section -->
-        <section class="mb-16">
+        <section class="mb-12 sm:mb-16 px-2 sm:px-0">
             <h2 class="text-2xl font-bold mb-6 text-gray-900 border-b pb-2">Logo</h2>
             <p class="mb-6 text-gray-700">Our logo is available in multiple formats (SVG, PNG, JPG) and color variations (green, black, white). Use the appropriate version for your background.</p>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                <div class="mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8">
+                <div class="p-2 sm:p-3">
                     <h3 class="text-lg font-semibold mb-3 text-gray-800">Primary Logo - Green</h3>
                     <div class="flex items-center justify-center p-5 rounded-lg bg-gray-50 mb-3 transition duration-200 hover:shadow-md">
                         <img src="/brand/primary-logo-green.svg" alt="Primary Logo - Green" class="max-w-full max-h-[100px]">
                     </div>
                 </div>
                 
-                <div class="mb-8">
+                <div class="p-2 sm:p-3">
                     <h3 class="text-lg font-semibold mb-3 text-gray-800">Primary Logo - Black</h3>
                     <div class="flex items-center justify-center p-5 rounded-lg bg-gray-50 mb-3 transition duration-200 hover:shadow-md">
                         <img src="/brand/primary-logo-black.svg" alt="Primary Logo - Black" class="max-w-full max-h-[100px]">
                     </div>
                 </div>
                 
-                <div class="mb-8">
+                <div class="p-2 sm:p-3">
                     <h3 class="text-lg font-semibold mb-3 text-gray-800">Primary Logo - White</h3>
                     <div class="flex items-center justify-center p-5 rounded-lg bg-gray-800 mb-3 transition duration-200 hover:shadow-md">
                         <img src="/brand/primary-logo-white.svg" alt="Primary Logo - White" class="max-w-full max-h-[100px]">
                     </div>
                 </div>
                 
-                <div class="mb-8">
+                <div class="p-2 sm:p-3">
                     <h3 class="text-lg font-semibold mb-3 text-gray-800">Secondary Logo - Green</h3>
                     <div class="flex items-center justify-center p-5 rounded-lg bg-gray-50 mb-3 transition duration-200 hover:shadow-md">
                         <img src="/brand/secondary-logo-green.svg" alt="Secondary Logo - Green" class="max-w-full max-h-[100px]">
                     </div>
                 </div>
                 
-                <div class="mb-8">
+                <div class="p-2 sm:p-3">
                     <h3 class="text-lg font-semibold mb-3 text-gray-800">Secondary Logo - Black</h3>
                     <div class="flex items-center justify-center p-5 rounded-lg bg-gray-50 mb-3 transition duration-200 hover:shadow-md">
                         <img src="/brand/secondary-logo-black.svg" alt="Secondary Logo - Black" class="max-w-full max-h-[100px]">
                     </div>
                 </div>
                 
-                <div class="mb-8">
+                <div class="p-2 sm:p-3">
                     <h3 class="text-lg font-semibold mb-3 text-gray-800">Secondary Logo - White</h3>
                     <div class="flex items-center justify-center p-5 rounded-lg bg-gray-800 mb-3 transition duration-200 hover:shadow-md">
                         <img src="/brand/secondary-logo-white.svg" alt="Secondary Logo - White" class="max-w-full max-h-[100px]">
@@ -88,10 +95,10 @@
             <h2 class="text-2xl font-bold mb-6 text-gray-900 border-b pb-2">Typography</h2>
             <p class="mb-6 text-gray-700">Our primary typeface is Inter, a versatile sans-serif font designed for excellent readability on screens.</p>
             
-            <div class="bg-white rounded-lg shadow-sm p-8 mb-8">
+            <div class="bg-white rounded-lg shadow-sm p-4 sm:p-8 mb-8">
                 <div class="space-y-4 font-sans">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-2 border-b">
-                        <span class="text-4xl font-black">Inter Black (900)</span>
+                        <span class="text-4xl font-black break-words">Inter Black (900)</span>
                         <span class="text-gray-500">Use for main headlines</span>
                     </div>
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-2 border-b">
@@ -138,34 +145,34 @@
                 <!-- Green Palette -->
                 <div>
                     <h3 class="text-lg font-semibold mb-4 text-gray-800">Green</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #2DA44E;" data-color="#2DA44E">Core</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#2DA44E</div>
                                 <div>rgb(45, 164, 78)</div>
                                 <div>hsl(137, 57%, 41%)</div>
                             </div>
                         </div>
-                        <div>
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #1B622F;" data-color="#1B622F">Shade</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#1B622F</div>
                                 <div>rgb(27, 98, 47)</div>
                                 <div>hsl(137, 57%, 25%)</div>
                             </div>
                         </div>
-                        <div>
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #81C895;" data-color="#81C895">Tint 1</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#81C895</div>
                                 <div>rgb(129, 200, 149)</div>
                                 <div>hsl(137, 39%, 65%)</div>
                             </div>
                         </div>
-                        <div>
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #DBFAE3;" data-color="#DBFAE3">Tint 2</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#DBFAE3</div>
                                 <div>rgb(219, 250, 227)</div>
                                 <div>hsl(135, 76%, 92%)</div>
@@ -177,34 +184,34 @@
                 <!-- Blue Palette -->
                 <div>
                     <h3 class="text-lg font-semibold mb-4 text-gray-800">Blue</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #1C4E65;" data-color="#1C4E65">Core</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#1C4E65</div>
                                 <div>rgb(28, 78, 101)</div>
                                 <div>hsl(199, 57%, 25%)</div>
                             </div>
                         </div>
-                        <div>
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #112F3D;" data-color="#112F3D">Shade</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#112F3D</div>
                                 <div>rgb(17, 47, 61)</div>
                                 <div>hsl(199, 56%, 15%)</div>
                             </div>
                         </div>
-                        <div>
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #7795A3;" data-color="#7795A3">Tint 1</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#7795A3</div>
                                 <div>rgb(119, 149, 163)</div>
                                 <div>hsl(199, 19%, 55%)</div>
                             </div>
                         </div>
-                        <div>
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #E8EDF0;" data-color="#E8EDF0">Tint 2</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#E8EDF0</div>
                                 <div>rgb(232, 237, 240)</div>
                                 <div>hsl(202, 21%, 93%)</div>
@@ -216,34 +223,34 @@
                 <!-- Orange Palette -->
                 <div>
                     <h3 class="text-lg font-semibold mb-4 text-gray-800">Orange</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #F4A258;" data-color="#F4A258">Core</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#F4A258</div>
                                 <div>rgb(244, 162, 88)</div>
                                 <div>hsl(28, 88%, 65%)</div>
                             </div>
                         </div>
-                        <div>
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #B35500;" data-color="#B35500">Shade</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#B35500</div>
                                 <div>rgb(179, 85, 0)</div>
                                 <div>hsl(28, 100%, 35%)</div>
                             </div>
                         </div>
-                        <div>
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #F8C79B;" data-color="#F8C79B">Tint 1</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#F8C79B</div>
                                 <div>rgb(248, 199, 155)</div>
                                 <div>hsl(28, 87%, 79%)</div>
                             </div>
                         </div>
-                        <div>
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #FFEEDD;" data-color="#FFEEDD">Tint 2</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#FFEEDD</div>
                                 <div>rgb(255, 238, 221)</div>
                                 <div>hsl(30, 100%, 93%)</div>
@@ -255,34 +262,34 @@
                 <!-- Yellow Palette -->
                 <div>
                     <h3 class="text-lg font-semibold mb-4 text-gray-800">Yellow</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #F9D86D;" data-color="#F9D86D">Core</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#F9D86D</div>
                                 <div>rgb(249, 216, 109)</div>
                                 <div>hsl(46, 92%, 70%)</div>
                             </div>
                         </div>
-                        <div>
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #E7B100;" data-color="#E7B100">Shade</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#E7B100</div>
                                 <div>rgb(231, 177, 0)</div>
                                 <div>hsl(46, 100%, 45%)</div>
                             </div>
                         </div>
-                        <div>
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #FBE8A7;" data-color="#FBE8A7">Tint 1</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#FBE8A7</div>
                                 <div>rgb(251, 232, 167)</div>
                                 <div>hsl(46, 91%, 82%)</div>
                             </div>
                         </div>
-                        <div>
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #FEF7E2;" data-color="#FEF7E2">Tint 2</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#FEF7E2</div>
                                 <div>rgb(254, 247, 226)</div>
                                 <div>hsl(45, 93%, 94%)</div>
@@ -294,34 +301,34 @@
                 <!-- Mint Palette -->
                 <div>
                     <h3 class="text-lg font-semibold mb-4 text-gray-800">Mint</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #96C3A4;" data-color="#96C3A4">Core</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#96C3A4</div>
                                 <div>rgb(150, 195, 164)</div>
                                 <div>hsl(139, 27%, 68%)</div>
                             </div>
                         </div>
-                        <div>
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #5A7562;" data-color="#5A7562">Shade</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#5A7562</div>
                                 <div>rgb(90, 117, 98)</div>
                                 <div>hsl(138, 13%, 41%)</div>
                             </div>
                         </div>
-                        <div>
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #C0DBC8;" data-color="#C0DBC8">Tint 1</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#C0DBC8</div>
                                 <div>rgb(192, 219, 200)</div>
                                 <div>hsl(138, 27%, 81%)</div>
                             </div>
                         </div>
-                        <div>
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #E8F7EC;" data-color="#E8F7EC">Tint 2</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#E8F7EC</div>
                                 <div>rgb(232, 247, 236)</div>
                                 <div>hsl(136, 48%, 94%)</div>
@@ -333,34 +340,34 @@
                 <!-- Ivory Palette -->
                 <div>
                     <h3 class="text-lg font-semibold mb-4 text-gray-800">Ivory</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #F0E7C8;" data-color="#F0E7C8">Core</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#F0E7C8</div>
                                 <div>rgb(240, 231, 200)</div>
                                 <div>hsl(47, 57%, 86%)</div>
                             </div>
                         </div>
-                        <div>
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #C6B67A;" data-color="#C6B67A">Shade</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#C6B67A</div>
                                 <div>rgb(198, 182, 122)</div>
                                 <div>hsl(47, 40%, 63%)</div>
                             </div>
                         </div>
-                        <div>
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #F6F1DE;" data-color="#F6F1DE">Tint 1</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#F6F1DE</div>
                                 <div>rgb(246, 241, 222)</div>
                                 <div>hsl(47, 57%, 92%)</div>
                             </div>
                         </div>
-                        <div>
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #FFFCF4;" data-color="#FFFCF4">Tint 2</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#FFFCF4</div>
                                 <div>rgb(255, 252, 244)</div>
                                 <div>hsl(44, 100%, 98%)</div>
@@ -372,34 +379,34 @@
                 <!-- Text Colors -->
                 <div>
                     <h3 class="text-lg font-semibold mb-4 text-gray-800">Text</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #22293A;" data-color="#22293A">Dark</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#22293A</div>
                                 <div>rgb(34, 41, 58)</div>
                                 <div>hsl(222, 26%, 18%)</div>
                             </div>
                         </div>
-                        <div>
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #414651;" data-color="#414651">Medium</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#414651</div>
                                 <div>rgb(65, 70, 81)</div>
                                 <div>hsl(221, 11%, 29%)</div>
                             </div>
                         </div>
-                        <div>
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #898C93;" data-color="#898C93">Light</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#898C93</div>
                                 <div>rgb(137, 140, 147)</div>
                                 <div>hsl(222, 4%, 56%)</div>
                             </div>
                         </div>
-                        <div>
+                        <div class="w-full">
                             <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #E7E8E9;" data-color="#E7E8E9">Disabled</div>
-                            <div class="text-sm mt-1 text-gray-500">
+                            <div class="text-sm mt-1 text-gray-500 break-words">
                                 <div>#E7E8E9</div>
                                 <div>rgb(231, 232, 233)</div>
                                 <div>hsl(210, 4%, 91%)</div>
@@ -417,7 +424,7 @@
                     <li>Orange and yellow are accent colors - use sparingly for highlights and attention.</li>
                     <li>Mint and ivory provide softer, complementary options for backgrounds and subtle elements.</li>
                     <li>Use text colors appropriately: Dark for primary text, Medium for secondary text, Light for tertiary information, and Disabled for inactive elements.</li>
-                    <li>Ensure sufficient contrast between text and background colors for accessibility.</li>
+                    <li class="break-words">Ensure sufficient contrast between text and background colors for accessibility.</li>
                 </ul>
             </div>
         </section>
