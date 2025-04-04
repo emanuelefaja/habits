@@ -4,14 +4,10 @@
     <div class="flex items-center gap-4">
         <h1 class="text-left tracking-tight text-gray-900 {{ if .User }}dark:text-white{{ end }}">
             <a href="/" class="inline-flex items-center gap-2 hover:underline">
-                <div class="leading-[1.1] -space-y-1">
-                    <div class="text-[17px] font-bold">the</div>
-                    <div class="text-[17px] font-bold">habits</div>
-                    <div class="text-[17px] font-bold">company</div>
-                </div>
-                <a href="/changelog" class="inline-flex items-center rounded-full bg-[#2da44e] px-2 py-0.5 text-xs font-medium text-white ml-2 hover:bg-[#2c974b] {{ if .User }}dark:bg-[#2da44e] dark:text-white dark:hover:bg-[#2c974b]{{ end }}">v0.3.4</a>
+                <img src="/brand/primary-logo-black.svg" alt="The Habits Company" class="h-auto w-24">
             </a>
         </h1>
+        <a href="/changelog" class="inline-flex items-center rounded-full bg-[#2da44e] px-2 py-0.5 text-xs font-medium text-white hover:bg-[#2c974b] -mt-10 {{ if .User }}dark:bg-[#2da44e] dark:text-white dark:hover:bg-[#2c974b]{{ end }}">v0.3.4</a>
         {{ if and .User .User.IsAdmin }}
             <a href="/admin" class="rounded-md {{ if eq .Page "admin" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
                 Adminland 🗄️
