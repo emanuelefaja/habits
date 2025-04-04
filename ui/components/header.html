@@ -1,15 +1,15 @@
 {{ define "header" }}
-<div x-data="{ open: false }" class="flex justify-between items-center px-6 py-4 relative bg-white shadow-sm {{ if .User }}dark:bg-gray-800 dark:shadow-gray-900{{ end }}">
+<div x-data="{ open: false }" class="flex justify-between items-center px-4 sm:px-6 py-4 relative bg-white shadow-sm overflow-hidden {{ if .User }}dark:bg-gray-800 dark:shadow-gray-900{{ end }}">
 
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-4 flex-shrink-0">
         <h1 class="text-left tracking-tight text-gray-900 {{ if .User }}dark:text-white{{ end }}">
             <a href="/" class="inline-flex items-center gap-2 hover:underline">
-                <img src="/brand/primary-logo-black.svg" alt="The Habits Company" class="h-auto w-24">
+                <img src="/brand/primary-logo-black.svg" alt="The Habits Company" class="h-auto w-20 sm:w-24">
             </a>
         </h1>
         <a href="/changelog" class="inline-flex items-center rounded-full bg-[#2da44e] px-2 py-0.5 text-xs font-medium text-white hover:bg-[#2c974b] -mt-10 {{ if .User }}dark:bg-[#2da44e] dark:text-white dark:hover:bg-[#2c974b]{{ end }}">v0.3.4</a>
         {{ if and .User .User.IsAdmin }}
-            <a href="/admin" class="rounded-md {{ if eq .Page "admin" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+            <a href="/admin" class="rounded-md {{ if eq .Page "admin" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200{{ end }} px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
                 Adminland 🗄️
             </a>
         {{ end }}
@@ -17,7 +17,7 @@
 
     <!-- Mobile menu button -->
     <button 
-        class="inline-block lg:hidden text-2xl text-gray-900 {{ if .User }}dark:text-white{{ end }}"
+        class="inline-block lg:hidden text-2xl text-gray-900 {{ if .User }}dark:text-white{{ end }} z-40"
         @click="open = !open"
         aria-label="Toggle menu">
         <span x-text="open ? '❌' : '☰ '"></span>
@@ -93,7 +93,7 @@
         x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="translate-x-0 opacity-100"
         x-transition:leave-end="-translate-x-full opacity-0"
-        class="fixed inset-y-0 left-0 w-64 bg-white p-6 z-50 flex flex-col space-y-4 lg:hidden shadow-lg {{ if .User }}dark:bg-gray-800 dark:text-white{{ end }}"
+        class="fixed inset-y-0 left-0 w-4/5 max-w-[250px] bg-white p-6 z-30 flex flex-col space-y-4 lg:hidden shadow-lg {{ if .User }}dark:bg-gray-800 dark:text-white{{ end }}"
         @click.away="open = false">
 
         {{ if .User }}
@@ -154,6 +154,5 @@
             <img src="/static/github-mark-white.svg" alt="GitHub" class="w-6 h-6 hidden {{ if .User }}dark:block{{ end }}">
         </a>
     </div>
-
 </div>
 {{ end }}
