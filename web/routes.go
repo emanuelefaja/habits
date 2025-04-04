@@ -16,6 +16,9 @@ func SetupRoutes(db *sql.DB, templates *template.Template) {
 	authMiddleware := middleware.RequireAuth
 	adminMiddleware := middleware.RequireAdmin
 
+	// Setup static file handlers
+	SetupStaticFileHandlers()
+
 	// Page routes
 	http.Handle("/", sessionMiddleware(HomeHandler(db, templates)))
 	http.Handle("/login", sessionMiddleware(LoginHandler(db, templates)))
