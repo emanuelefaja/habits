@@ -25,6 +25,7 @@ func SetupRoutes(db *sql.DB, templates *template.Template) {
 	http.Handle("/logout", sessionMiddleware(LogoutHandler()))
 	http.Handle("/settings", sessionMiddleware(authMiddleware(SettingsHandler(db, templates))))
 	http.Handle("/brand", sessionMiddleware(BrandHandler(db, templates)))
+	http.Handle("/about", sessionMiddleware(AboutHandler(db, templates)))
 
 	// Admin routes
 	http.Handle("/admin", sessionMiddleware(adminMiddleware(AdminDashboardHandler(db, templates))))

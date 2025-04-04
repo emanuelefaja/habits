@@ -397,18 +397,6 @@ func main() {
 	}))))
 
 	// About
-	http.Handle("/about", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Get the user if logged in
-		user, _ := getAuthenticatedUser(r, db)
-		data := struct {
-			User *models.User
-			Page string
-		}{
-			User: user,
-			Page: "about",
-		}
-		renderTemplate(w, templates, "about.html", data)
-	})))
 
 	http.Handle("/privacy", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Get the user if logged in
