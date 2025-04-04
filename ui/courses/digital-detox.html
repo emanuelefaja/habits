@@ -11,13 +11,11 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                 <div class="space-y-6">
                     <!-- Logo -->
-                    <div class="leading-[1.3] -space-y-1 text-[#2da44e]">
-                        <div class="text-3xl font-bold">the</div>
-                        <div class="text-3xl font-bold">habits</div>
-                        <div class="text-3xl font-bold">company</div>
+                    <div class="flex items-center justify-start">
+                        <img src="/brand/secondary-logo-green.svg" alt="The Habits Company" class="h-auto w-32">
                     </div>
                     
-                    <h1 class="text-5xl font-extrabold text-black">Win back hours of <br>your life every day.</h1>
+                    <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-black tracking-tight leading-[1.1] mb-4">Win back hours of <br class="hidden sm:block">your life every day.</h1>
                     <p class="text-xl text-gray-600">Learn how to break free from digital addiction and use technology intentionally, not be used by it.</p>
                     
                     {{ template "subscription-form" dict 
@@ -34,38 +32,8 @@
                     }}
                 </div>
                 <div class="flex justify-center flex-col items-center">
-                    <!-- Animated Card -->
-                    <div class="box relative w-[140px] h-[140px]" style="transform: rotateX(55deg) rotateZ(45deg);">
-                        <div class="absolute inset-0 animate-opacity-4s"></div>
-                        <div class="absolute inset-0 animate-transform-4s bg-[#2da44e] shadow-custom"></div>
-                    </div>
-
-                    <style>
-                        @keyframes transform {
-                            0% { transform: translate(-10px, -10px); }
-                            100% { transform: translate(-100px, -100px); }
-                        }
-                        @keyframes opacity {
-                            0% { opacity: .4; filter: blur(10px); }
-                            100% { opacity: .2; filter: blur(20px); }
-                        }
-                        .animate-opacity-4s {
-                            animation: opacity 4s ease infinite alternate;
-                            background: #000;
-                        }
-                        .animate-transform-4s {
-                            animation: transform 4s ease infinite alternate;
-                            box-shadow: 1px 1px 0 #2c974b,
-                                       2px 2px 0 #2c974b,
-                                       3px 3px 0 #2c974b,
-                                       4px 4px 0 #2c974b,
-                                       5px 5px 0 #2c974b;
-                        }
-                        .box {
-                            transform-style: preserve-3d;
-                            perspective: 1000px;
-                        }
-                    </style>
+                    <!-- Phone Addiction Image -->
+                    <img src="/static/images/phone-addiction-before-after.jpg" alt="Phone addiction before and after" class="rounded-lg shadow-md max-w-[80%] md:max-w-[70%] h-auto">
 
                     <!-- Social Proof Section -->
                     <div class="mt-6 w-full flex flex-col items-center">
@@ -195,7 +163,7 @@
                     <!-- Left column - Sticky heading -->
                     <div class="md:sticky md:top-8 md:self-start md:h-screen md:flex md:flex-col md:justify-start">
                         <div class="opacity-0 transition duration-500 ease-in-out" :class="{ 'opacity-100': show }" style="transition-delay: 100ms;">
-                            <h2 class="text-4xl font-bold mb-2">21 days to a better life.</h2>
+                            <h2 class="text-4xl font-bold mb-2">The Digital Detox Course Modules.</h2>
                             
                             <p class="text-lg mb-6">
                                 Take control of technology, instead of technology controlling you.
@@ -214,11 +182,8 @@
                         <template x-for="(day, index) in days" :key="index">
                             <div class="opacity-0 transition duration-500 ease-in-out mb-12" :class="{ 'opacity-100': show }" :style="`transition-delay: ${300 + (index * 20)}ms`">
                                 <div class="border-t border-white/30 pt-4"></div>
-                                <div class="grid grid-cols-4 gap-4">
-                                    <div class="col-span-1">
-                                        <h2 class="text-2xl font-bold" x-text="`Day ${index + 1}`"></h2>
-                                    </div>
-                                    <div class="col-span-3">
+                                <div class="grid grid-cols-1 gap-4">
+                                    <div>
                                         <h3 class="text-2xl font-bold mb-4" x-text="day.title"></h3>
                                         <p class="text-base" x-text="day.description"></p>
                                     </div>
@@ -277,16 +242,20 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
                 <div>
                     <h2 class="text-3xl font-bold mb-6">Build better habits.</h2>
-                    <p class="text-gray-600 mb-4">The Habits Company is dedicated to helping you build better habits, and lead a life that is aligned with your values and goals.</p>
-                    <p class="text-gray-600 mb-4">Our approach combines behavioral science and technology,  with practical, actionable steps that fit into real life. We believe small changes lead to profound results.</p>
+                    <p class="text-lg text-gray-600 mb-4">
+                        The purpose of The Habits Company is to help people bridge the gap between 
+                        who they are and who they dream of becoming, revealing the profound truth that 
+                        small, consistent, and intentional actions create extraordinary lives.
+                    </p>
+                    <p class="text-lg text-gray-600 mb-4">
+                        Built with modern technology but grounded in ancient wisdom, we provide a clean, 
+                        distraction-free environment for personal growth. Whether you're building new habits 
+                        or breaking old ones, we help you stay accountable and mindful of your daily choices.
+                    </p>
                 </div>
                 <div class="flex items-center justify-center">
-                    <!-- Replace with your actual company logo or appropriate image -->
-                    <div class="leading-[1.3] -space-y-1 text-[#2da44e] text-5xl">
-                        <div class="font-bold">the</div>
-                        <div class="font-bold">habits</div>
-                        <div class="font-bold">company</div>
-                    </div>
+                    <!-- Company logo -->
+                    <img src="/brand/secondary-logo-green.svg" alt="The Habits Company" class="h-auto w-64">
                 </div>
             </div>
         </div>
@@ -301,7 +270,7 @@
                 <!-- FAQ Item 1 -->
                 <div class="bg-white p-6 rounded-lg shadow-sm">
                     <h3 class="text-xl font-semibold mb-2">How is this course delivered?</h3>
-                    <p class="text-gray-600">This is a 21-day email course. You'll receive one lesson per day directly to your inbox with a specific action step to implement.</p>
+                    <p class="text-gray-600">This is a 5-day email course. You'll receive one lesson per day directly to your inbox with a specific action step to implement.</p>
                 </div>
                 
                 <!-- FAQ Item 2 -->
@@ -325,88 +294,24 @@
             return {
                 days: [
                     {
-                        title: "The Attention Economy",
-                        description: "Understand how social media companies make money. These platforms aren't free—you pay with your attention, which is sold to advertisers. Learn why these apps are deliberately designed to be addictive and keep you scrolling longer."
+                        title: "The Addiction Reality Check",
+                        description: "Discover how phone addiction steals 2-4 daily hours (12+ years/lifetime) while eroding focus, relationships and mental health through continued use despite negative consequences."
                     },
                     {
-                        title: "Technology is Not Neutral",
-                        description: "Unlike physical tools like bikes, digital platforms have their own agendas. Discover how apps are engineered to shape your behavior, form habits, and create dependencies that benefit their creators, not necessarily you."
+                        title: "Caveman Brain Hijack",
+                        description: "Understand how social media exploits evolutionary reward systems (food, tribe, danger detection) through AI-powered feeds and notifications their creators avoid."
                     },
                     {
-                        title: "Digital Awareness",
-                        description: "Begin by documenting your current tech habits. Track your screen time, app usage, and how you feel before, during, and after technology use. Awareness is the first step to change."
+                        title: "Environmental Engineering",
+                        description: "Learn the Vietnam vet heroin recovery parallel: Create phone-free zones, add app friction tools, and smartphone 'downgrades' to break addiction cycles."
                     },
                     {
-                        title: "Tech-Free Mornings",
-                        description: "Create a morning routine without screens. No phone, tablet, or computer for the first hour after waking. Replace with meditation, journaling, or exercise."
+                        title: "Habit Remix Revolution", 
+                        description: "Replace phone use triggers with intentional routines using the Habit Loop framework - morning walks, evening reading, and gratitude journaling."
                     },
                     {
-                        title: "Notification Audit",
-                        description: "Turn off all non-essential notifications on your devices. Keep only those that are time-sensitive or from actual people, not apps trying to capture your attention."
-                    },
-                    {
-                        title: "Home Screen Cleanse",
-                        description: "Remove distracting apps from your home screen. Keep only essential tools and apps that support your goals, moving everything else to folders on secondary screens."
-                    },
-                    {
-                        title: "Digital Sunset",
-                        description: "Implement a \"digital sunset\" — a time each evening when you turn off all screens. Aim for at least one hour before bedtime to improve sleep quality."
-                    },
-                    {
-                        title: "Single-Tasking",
-                        description: "Practice doing one thing at a time without digital interruptions. When working, close unnecessary tabs. When eating, leave your phone in another room."
-                    },
-                    {
-                        title: "Tech-Free Sunday",
-                        description: "Experience a full day without social media, news, or entertainment apps. Focus on in-person connections, nature, and analog activities like reading physical books."
-                    },
-                    {
-                        title: "App Declutter",
-                        description: "Delete apps you haven't used in the past month. For those you're unsure about, move them to a folder named \"Maybe Delete\" and see if you miss them."
-                    },
-                    {
-                        title: "Email Boundaries",
-                        description: "Set specific times to check email (e.g., 10am and 4pm) rather than keeping it open all day. Unsubscribe from newsletters you don't read regularly."
-                    },
-                    {
-                        title: "Digital-Free Dining",
-                        description: "Make all mealtimes screen-free. Pay attention to your food, your body's signals, and the people you're eating with (or enjoy mindful solitude)."
-                    },
-                    {
-                        title: "Analog Alternatives",
-                        description: "Replace one digital activity with an analog alternative: physical books instead of e-readers, paper notebooks instead of notes apps, board games instead of video games."
-                    },
-                    {
-                        title: "Social Media Audit",
-                        description: "Review who you follow on social media. Unfollow accounts that make you feel inadequate, anxious, or that don't add value to your life."
-                    },
-                    {
-                        title: "Deep Work Session",
-                        description: "Schedule a 2-hour deep work session with all distractions removed. Turn off Wi-Fi if possible, use focus mode, and see how much you can accomplish."
-                    },
-                    {
-                        title: "Phone-Free Walks",
-                        description: "Leave your phone at home and take a 30-minute walk. Notice how you feel without the ability to check messages or take photos. Observe your surroundings fully."
-                    },
-                    {
-                        title: "Tech-Free Zones",
-                        description: "Designate certain areas in your home as permanently tech-free: perhaps the bedroom, dining room, or a reading nook. Keep these spaces sacred from screens."
-                    },
-                    {
-                        title: "Digital Detox Buddy",
-                        description: "Find an accountability partner who will join you in specific digital detox practices. Check in with each other daily about your progress and challenges."
-                    },
-                    {
-                        title: "Intentional Media",
-                        description: "Rather than endless scrolling, create a list of specific content you want to consume (articles, videos, etc.). Only engage with media from this curated list."
-                    },
-                    {
-                        title: "Digital Boundaries",
-                        description: "Communicate your new digital boundaries to friends and family. Let them know when you'll be available and your preferred communication methods."
-                    },
-                    {
-                        title: "Sustainable Digital Life",
-                        description: "Create your personalized digital wellbeing plan. Which practices will you continue? How will you maintain boundaries while using technology as a tool, not a master?"
+                        title: "Digital Detox Experience",
+                        description: "Prepare for a 24-hour tech fast to rediscover presence, focus and real-world connection through experiential contrast."
                     }
                 ]
             }
