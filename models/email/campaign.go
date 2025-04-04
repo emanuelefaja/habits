@@ -105,16 +105,16 @@ var Campaigns = map[string]EmailCampaign{
 		Emails: []CampaignEmail{
 			{
 				Number:       1,
-				Subject:      "Welcome to Digital Detox",
-				Title:        "Day 1: Digital Awareness",
-				TemplateName: "courses/digital-detox/1-welcome",
+				Subject:      "Day 1: The Phone Addiction Pandemic",
+				Title:        "Day 1: The Phone Addiction Pandemic",
+				TemplateName: "courses/digital-detox/1-phone-addiction",
 				SendDay:      0, // Send immediately
 			},
 			{
 				Number:       2,
-				Subject:      "Understanding Digital Minimalism",
-				Title:        "Day 2: The Philosophy of Digital Minimalism",
-				TemplateName: "courses/digital-detox/2-minimalism",
+				Subject:      "Day 2: How Social Media Exploits Your Caveman Brain",
+				Title:        "Day 2: How Social Media Exploits Your Caveman Brain",
+				TemplateName: "courses/digital-detox/2-caveman-brain",
 				SendDay:      1, // Send 1 day after signup
 			},
 			{
