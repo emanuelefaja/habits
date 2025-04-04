@@ -191,6 +191,34 @@ func AboutHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
 	}
 }
 
+// PrivacyHandler handles the privacy policy page route
+func PrivacyHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Get the user if logged in
+		user, _ := getAuthenticatedUser(r, db)
+
+		data := map[string]interface{}{
+			"User":        user,
+			"LastUpdated": time.Now().Format("January 2, 2006"),
+		}
+		renderTemplate(w, templates, "privacy.html", data)
+	}
+}
+
+// TermsHandler handles the terms of service page route
+func TermsHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Get the user if logged in
+		user, _ := getAuthenticatedUser(r, db)
+
+		data := map[string]interface{}{
+			"User":        user,
+			"LastUpdated": time.Now().Format("January 2, 2006"),
+		}
+		renderTemplate(w, templates, "terms.html", data)
+	}
+}
+
 // Helper functions for handlers
 func renderGuestHome(w http.ResponseWriter, templates *template.Template) {
 	if err := templates.ExecuteTemplate(w, "guest-home.html", nil); err != nil {

@@ -396,30 +396,6 @@ func main() {
 		renderTemplate(w, templates, "habit.html", data)
 	}))))
 
-	// About
-
-	http.Handle("/privacy", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Get the user if logged in
-		user, _ := getAuthenticatedUser(r, db)
-
-		data := map[string]interface{}{
-			"User":        user,
-			"LastUpdated": time.Now().Format("January 2, 2006"),
-		}
-		renderTemplate(w, templates, "privacy.html", data)
-	})))
-
-	http.Handle("/terms", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Get the user if logged in
-		user, _ := getAuthenticatedUser(r, db)
-
-		data := map[string]interface{}{
-			"User":        user,
-			"LastUpdated": time.Now().Format("January 2, 2006"),
-		}
-		renderTemplate(w, templates, "terms.html", data)
-	})))
-
 	// Roadmap API handlers
 	http.Handle("/api/roadmap/likes", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
