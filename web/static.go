@@ -12,6 +12,7 @@ func SetupStaticFileHandlers() {
 	http.Handle("/icons/", http.StripPrefix("/icons/", http.FileServer(http.Dir("static/icons"))))
 	http.Handle("/content/media/", http.StripPrefix("/content/media/", http.FileServer(http.Dir("content/media"))))
 	http.Handle("/brand/", http.StripPrefix("/brand/", http.FileServer(http.Dir("static/brand"))))
+	http.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("static/images"))))
 
 	// Manifest and Service Worker
 	http.HandleFunc("/manifest.json", func(w http.ResponseWriter, r *http.Request) {
