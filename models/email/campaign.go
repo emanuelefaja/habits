@@ -110,70 +110,49 @@ var Campaigns = map[string]EmailCampaign{
 				TemplateName: "courses/digital-detox/1-phone-addiction",
 				SendDay:      0, // Send immediately
 			},
-			{
-				Number:       2,
-				Subject:      "Day 2: How Social Media Exploits Your Caveman Brain",
-				Title:        "Day 2: How Social Media Exploits Your Caveman Brain",
-				TemplateName: "courses/digital-detox/2-caveman-brain",
-				SendDay:      1, // Send 1 day after signup
-			},
-			{
-				Number:       3,
-				Subject:      "Identifying Your Digital Triggers",
-				Title:        "Day 3: Breaking the Cycle",
-				TemplateName: "courses/digital-detox/3-triggers",
-				SendDay:      3, // Send 3 days after signup
-			},
-			{
-				Number:       4,
-				Subject:      "Creating Tech-Free Zones",
-				Title:        "Day 5: Designing Your Environment",
-				TemplateName: "courses/digital-detox/4-environment",
-				SendDay:      5, // Send 5 days after signup
-			},
-			{
-				Number:       5,
-				Subject:      "Healthy Alternatives to Digital Consumption",
-				Title:        "Day 7: Filling the Void",
-				TemplateName: "courses/digital-detox/5-alternatives",
-				SendDay:      7, // Send 7 days after signup
-			},
-			{
-				Number:       6,
-				Subject:      "Your Digital Detox Success Plan",
-				Title:        "Day 10: Creating Your Long-Term Plan",
-				TemplateName: "courses/digital-detox/6-success-plan",
-				SendDay:      10, // Send 10 days after signup
-			},
 		},
 	},
 	"phone-addiction": {
 		ID:            "phone-addiction",
-		Name:          "Phone Addiction Recovery",
-		Description:   "Break the cycle of phone dependency and regain control of your time and attention.",
+		Name:          "Break Phone Addiction",
+		Description:   "Break the cycle of smartphone addiction and regain control of your time and attention.",
 		Emoji:         "📵",
 		AutoSubscribe: false, // Opt-in only
 		Emails: []CampaignEmail{
 			{
 				Number:       1,
-				Subject:      "Breaking Free from Phone Addiction",
-				Title:        "Understanding Your Relationship with Your Phone",
-				TemplateName: "courses/phone-addiction/1-introduction",
+				Subject:      "Day 1: The Phone Addiction Pandemic",
+				Title:        "Day 1: The Phone Addiction Pandemic",
+				TemplateName: "courses/phone-addiction/1-phone-addiction",
 				SendDay:      0, // Send immediately
 			},
 			{
 				Number:       2,
-				Subject:      "Building Healthy Phone Habits",
-				Title:        "Creating Boundaries and Alternatives",
-				TemplateName: "courses/phone-addiction/2-boundaries",
-				SendDay:      3, // Send 3 days after signup
+				Subject:      "Day 2: How Social Media Exploits Your Caveman Brain",
+				Title:        "Day 2: How Social Media Exploits Your Caveman Brain",
+				TemplateName: "courses/phone-addiction/2-caveman-brain",
+				SendDay:      1, // Send 1 day after signup
 			},
 			{
 				Number:       3,
-				Subject:      "Staying Phone-Free for Good",
-				Title:        "Maintaining Your New Healthy Relationship with Technology",
-				TemplateName: "courses/phone-addiction/3-maintenance",
-				SendDay:      7, // Send 7 days after signup
+				Subject:      "Day 3: 3 Ways to Break Free from Phone Addiction",
+				Title:        "Day 3: 3 Ways to Break Free from Phone Addiction",
+				TemplateName: "courses/phone-addiction/3-break-free-phone-addiction",
+				SendDay:      2, // Send 2 days after signup
+			},
+			{
+				Number:       4,
+				Subject:      "Day 4: Remix Your Routine",
+				Title:        "Day 4: Remix Your Routine",
+				TemplateName: "courses/phone-addiction/4-routine",
+				SendDay:      3, // Send 3 days after signup
+			},
+			{
+				Number:       5,
+				Subject:      "Day 5: Do a 24-Hour Digital Detox",
+				Title:        "Day 5: Do a 24-Hour Digital Detox",
+				TemplateName: "courses/phone-addiction/5-detox",
+				SendDay:      4, // Send 4 days after signup
 			},
 		},
 	},
