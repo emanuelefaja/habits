@@ -1,88 +1,73 @@
-<div>
-    <p style="color: #888888; font-size: 12px;">Read time: 4 minutes</p>
-    
-    <p>Today is the 3rd day of your 5-Day Mini Course on Breaking Phone Addiction.</p>
-    
-    <div style="background-color: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin: 15px 0;">
-        <p style="font-weight: bold; margin-top: 0; margin-bottom: 8px;">Lesson 3 TLDR</p>
-        <p style="margin-bottom: 0;">By far the #1 way to change habits? Change your environment. It can make even the hardest to break habits become easy to overcome.</p>
-    </div>
-    
-    <hr>
-    
-    <p>Today we're talking about:</p>
-    <ol>
-        <li>The Surprising Story of Vietnam Vets and Heroin Addiction</li>
-        <li>Our 3 Favorite Ways to Break Phone Addiction</li>
-    </ol>
-    
-    <hr>
-    
-    <h2>1. The Surprising Story of Vietnam Vets and Heroin Addiction</h2>
-    
-    <p>Hey {{.FirstName}},</p>
-    
-    <p>Manny and Mike back with you.</p>
-    
-    <p>Yesterday, we uncovered how social media platforms exploit our caveman brain and keep us glued to the screen. Today we'll talk about how to break free.</p>
+Read time: 4 minutes
 
-    <p>Here's the thing, willpower alone isn't enough. The Godlike technology is too powerful for most people's willpower. You gotta change your environment.</p>
-    
-    <p>What's that mean? Here's a story from the end of the Vietnam War that illustrates how.</p>
-    
-    <p>During the Vietnam War, heroin use among American soldiers was high. As heroin is incredibly addictive, one would assume this would create a massive problem at the end of the war, when the soldiers returned, right?</p>
-    
-    <p>Wrong.</p>
-    
-    <p>When these veterans returned home, an astonishing 90% stopped using heroin effortlessly.</p>
-    
-    <p>This flew in the face of typical addiction recovery rates and shocked researchers.</p>
-    
-    <p>How could that be? How could the veterans stop using one of the world's most addictive substances instantly?</p>
-    
-    <p>The answer is simple: Their environment changed overnight.</p>
-    
-    <p>You see, in Vietnam, heroin was everywhere. It was easy to get. It was the norm for social circles.</p>
-    
-    <p>Back in the US, the environment was different. Heroin was no longer everywhere. It was difficult to get. The norm changed to raising kids.</p>
-    
-    <p>Since the environment that fueled the habit was gone, the habit disappeared too.</p>
-    
-    <hr>
-    
-    <h2>2. Our 3 Favorite Ways to Break Phone Addiction</h2>
-    
-    <p>Just like those veterans, you can break free of phone addiction by changing your environment at home.</p>
-    
-    <p>Here are our three favorite ways to do it:</p>
-    
-    <ol>
-        <li><strong>Make Your Bedroom a Phone Free Zone.</strong> Just like moving back to the US made it harder for war veterans to access heroin, you can also make it harder to access your phone at home. An easy way to start? Make your bedroom a Phone Free Zone. Buy an old school alarm clock, put a bowl outside your bedroom door, and leave your phone in it before you enter. Boom! You got a phone free zone.</li>
-        <li><strong>Make the Addictive Apps More Difficult to Use.</strong> In addition to making a phone free zone, we recommend using an app like <a href="https://one-sec.app/blog/how-one-sec-works/"></a>OneSec</a> that creates some friction before you compulsively open an app. You might think - doesn't this sound like Screen Time? Trust us, it's WAY better.</li>
-        <li><strong>Turn Your Smart Phone into a Wise Phone.</strong> Want a fun challenge? If you want results fast, delete all apps on your phone that are addictive. That's right. Delete all your social media, dating apps, news apps, Netflix, stocks, games, and any app you can doomscroll. Don't worry you can always reinstall them later. Also, if you need to use them, you can use them on your computer. If you're on the fence about this one, we recommend to try it for a week. What do you have to lose?</li>
-    </ol>
-    
-    <br>
-    <div style="background-color: #f5f5f5; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin: 15px 0;">
-        <p style="font-weight: bold; margin-top: 0; margin-bottom: 8px;">So now you've got your homework.</p>
-        <p style="margin-bottom: 0;">Do at least ONE of these three methods TODAY after you finish work.</p>
-    </div>
-    
-    <br>
-    <p>All the best,</p>
-    <p>Manny and Mike</p>
-    
-    <p><em>PS: If you try one of these three ways, you may have a bit of phone withdrawal (especially if you have a strong addiction!). In the next lesson we'll give tips on how to deal with this.</em></p>
-    
-    <hr>
-    
-    <h3>Reflection of the day:</h3>
-    <p>How might your life improve if you got back 2-4 hours a day?</p>
-    
-    <hr>
-    
-    <h3>Quote of the day:</h3>
-    <div class="quote">
-        "Tweaking the environment is about making the right behaviors a little bit easier and the wrong behaviors a little bit harder." - Chip Heath & Dan Heath, Authors of #1 NYT Bestseller Switch: How to Change When Change is Hard.
-    </div>
-</div> 
+Today is the 4th day of your 5-Day Mini Course on Breaking Phone Addiction.
+
+----- LESSON 4 TLDR -----
+If you start using your phone less, you may find yourself confused at first (i.e. reaching your phone and realizing it's not next to your bed anymore).
+
+This is normal!
+
+That new 'space' is an ideal opportunity to experiment with new routines that you feel great about.
+------------------------
+
+Hey {{.FirstName}},
+
+Manny and Mike back, pushing you closer to phone freedom!
+
+Yesterday, we armed you with powerful environmental changes to make phone use harder. Assuming you've done at least one of the tweaks, that means you'll start to have more time.
+
+Today, we'll talk about what to do instead of reaching for your phone.
+
+-----------------------
+
+1. HABIT LOOP BREAK DOWN
+
+The Habit Loop is a three-part neurological pattern that makes up our habits.
+
+It starts with a CUE - a trigger that initiates a routine (i.e you feel tired or bored).
+
+Second is a ROUTINE - which is the action you take (i.e. you pick up your phone).
+
+Last is the REWARD - which is what your brain receives from the routine (i.e. you get a dopamine hit from watching the news. Note: This is what makes doom scrolling so addictive, you have a buffet of dopamine hits available 24/7).
+
+So assuming you did your homework from Day 3's email - if you didn't, go back, there's still time! - you have effectively taken out the routine of being able to pick up your phone.
+
+The thing is that, now your initial cue - i.e. boredom - is lonely with no routine to play with.
+
+This means, if you don't replace your phone habit with a new routine, you may feel uncomfortable for longer than you'd like (and blame us for ruining your life!).
+
+So what to do?
+
+-----------------------
+
+2. THREE IDEAS TO REMIX YOUR ROUTINE
+
+So next time that cue of boredom, stress, overwhelmed or a negative emotion hits, instead of grabbing your phone, here's 3 routines you can experiment with:
+
+1. Bring back #ReadingInBed - Put a book next to your bed and fall in love with reading again. It will also help your sleep! While you're at it, put a book next to places where you would normally use your phone too (i.e on your toilet, sofa, etc).
+
+2. Make a morning ritual - Instead of looking at your phone first thing in the morning, design a simple 15-30 minute morning ritual. This could mean taking a walk, getting some morning sun, doing yoga, a quick HIIT workout, a run, etc.
+
+3. Make an evening ritual - At least 30 minutes before bed - this could be combined with #ReadingInBed - try gratitude journaling, an evening stretch, a quick to-do list for the next day, meditation, prep a healthy meal for the next day, or anything that helps you wind down.
+
+You'll find that any of these routines, you will get a reward that is more enjoyable, guilt-free, and far better for your health and productivity than doomscrolling.
+
+One of the main reasons why? You're no longer a zombie glued to your screen. You're brain restores it's natural chemical balance. You are going from a passive life to an active one.
+
+Give some new routines a try!
+
+Let us know how they go!
+
+All the best,
+
+Manny and Mike
+
+-----------------------
+
+Reflection of the day:
+How do you feel after you read, exercise, take a moment to pause (or meditate) or do something for your health? What would your life look like if you took a moment for yourself everyday?
+
+-----------------------
+
+Quote of the day:
+"Look for magic in the daily routine." — Lou Barlow

@@ -27,10 +27,6 @@
     <p>Second is a <strong>routine</strong> - which is the action you take (i.e. you pick up your phone).</p>
     
     <p>Last is the <strong>reward</strong> - which is what your brain receives from the routine (i.e. you get a dopamine hit from watching the news. Note: This is what makes doom scrolling so addictive, you have a buffet of dopamine hits available 24/7).</p>
-
-    <div class="image-container">
-        <img src="https://habits.co/images/habit-loop-smartphone.jpg" alt="Habit Loop Diagram showing Trigger (boredom), Behaviour (smartphone), and Dopamine hit" width="550">
-    </div>
     
     <p>So assuming you did your homework from Day 3's email - if you didn't, go back, there's still time! - you have effectively taken out the routine of being able to pick up your phone.</p>
     

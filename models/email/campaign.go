@@ -114,7 +114,7 @@ var Campaigns = map[string]EmailCampaign{
 	},
 	"phone-addiction": {
 		ID:            "phone-addiction",
-		Name:          "Break Phone Addiction",
+		Name:          "Breaking Phone Addiction",
 		Description:   "Break the cycle of smartphone addiction and regain control of your time and attention.",
 		Emoji:         "📵",
 		AutoSubscribe: false, // Opt-in only
