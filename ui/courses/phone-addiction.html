@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en" class="min-h-full">
+{{ template "head" . }}
+<body class="bg-white">
+    <!-- Hero Section -->
+    <div class="bg-white h-screen flex items-center relative overflow-hidden" 
+         style="background-image: radial-gradient(closest-side, rgba(255, 255, 255, .94), rgba(255, 255, 255, .94), rgba(255, 255, 255, 1)), url('https://s.electerious.com/images/codepen/grid.svg');
+                background-repeat: no-repeat, repeat;
+                background-size: auto, 75px 44px;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="space-y-6">
+                    <!-- Logo -->
+                    <div class="flex items-center justify-start">
+                        <img src="/brand/secondary-logo-green.svg" alt="The Habits Company" class="h-auto w-32">
+                    </div>
+                    
+                    <h1 class="text-4xl sm:text-5xl md:text-6xl font-black text-black tracking-tight leading-[1.1] mb-4">Win back hours of <br class="hidden sm:block">your life every day.</h1>
+                    <p class="text-xl text-gray-600">Learn how to break free from phone addiction and use technology intentionally, not be used by it.</p>
+                    
+                    {{ template "subscription-form" dict 
+                        "CampaignId" "digital-detox"
+                        "CtaText" "🚀 Get My Free Email Course"
+                        "LoadingText" "Processing..."
+                        "PrivacyText" "🔒 Your data is not sold or shared — just thought-provoking insights delivered to your inbox"
+                        "ShowFirstName" true
+                        "ButtonColor" "green"
+                        "IsAuthenticated" .IsAuthenticated
+                        "IsSubscribed" .IsSubscribed
+                        "UserEmail" .UserEmail
+                        "UserFirstName" .UserFirstName
+                    }}
+                </div>
+                <div class="flex justify-center flex-col items-center">
+                    <!-- Phone Addiction Image -->
+                    <img src="/static/images/phone-addiction-before-after.jpg" alt="Phone addiction before and after" class="rounded-lg shadow-md max-w-[80%] md:max-w-[70%] h-auto">
+
+                    <!-- Social Proof Section -->
+                    <div class="mt-6 w-full flex flex-col items-center">
+                        <!-- Overlapping Profile Images -->
+                        <div class="flex -space-x-2 overflow-hidden mb-2">
+                            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://randomuser.me/api/portraits/women/17.jpg" alt="Profile 1">
+                            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://randomuser.me/api/portraits/men/43.jpg" alt="Profile 2">
+                            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://randomuser.me/api/portraits/women/31.jpg" alt="Profile 3">
+                            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://randomuser.me/api/portraits/men/28.jpg" alt="Profile 4">
+                            <img class="inline-block h-8 w-8 rounded-full ring-2 ring-white" src="https://randomuser.me/api/portraits/women/52.jpg" alt="Profile 5">
+                            <div class="inline-block h-8 w-8 rounded-full ring-2 ring-white bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-500">+99</div>
+                        </div>
+                        <p class="text-sm font-medium text-gray-700">
+                            <span class="font-bold">250+ students</span> ❤️ this course
+                        </p>
+                        <p class="text-xs text-gray-500 mt-1 text-center">Join our growing community today</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Problem Statement Section -->
+    <div class="bg-gray-50 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-black text-center text-gray-900 mb-12">The Phone Addiction Crisis</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Problem Point 1 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                    <div class="flex items-start mb-4">
+                        <span class="text-2xl mr-4">⏱️</span>
+                        <h3 class="text-xl font-semibold text-gray-900">A Lifetime Lost</h3>
+                    </div>
+                    <p class="text-gray-600">The average person loses 2-4 hours daily on their phone. That's a staggering 12+ years of your life lost to mindless scrolling — 3 times longer than college.</p>
+                </div>
+                
+                <!-- Problem Point 2 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                    <div class="flex items-start mb-4">
+                        <span class="text-2xl mr-4">🧠</span>
+                        <h3 class="text-xl font-semibold text-gray-900">Addiction By Design</h3>
+                    </div>
+                    <p class="text-gray-600">57% of Americans admit being addicted. The clinical definition? "Continued use despite adverse consequences" — and social media is engineered to exploit our brain's reward systems.</p>
+                </div>
+                
+                <!-- Problem Point 3 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                    <div class="flex items-start mb-4">
+                        <span class="text-2xl mr-4">😔</span>
+                        <h3 class="text-xl font-semibold text-gray-900">Focus & Energy Drain</h3>
+                    </div>
+                    <p class="text-gray-600">Regular phone addiction leads to low motivation, poor focus, depression, and procrastination — stealing not just your time but your potential for greatness.</p>
+                </div>
+                
+                <!-- Problem Point 4 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                    <div class="flex items-start mb-4">
+                        <span class="text-2xl mr-4">💤</span>
+                        <h3 class="text-xl font-semibold text-gray-900">Sleep Disruptor</h3>
+                    </div>
+                    <p class="text-gray-600">Your phone is often the last thing you see before sleep and first when you wake. This disrupts your natural sleep cycles and damages overall health and cognitive function.</p>
+                </div>
+                
+                <!-- Problem Point 5 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                    <div class="flex items-start mb-4">
+                        <span class="text-2xl mr-4">👥</span>
+                        <h3 class="text-xl font-semibold text-gray-900">Relationship Killer</h3>
+                    </div>
+                    <p class="text-gray-600">Scrolling in the presence of loved ones and friends damages real connections. We're more connected than ever digitally, yet increasingly isolated emotionally.</p>
+                </div>
+                
+                <!-- Problem Point 6 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                    <div class="flex items-start mb-4">
+                        <span class="text-2xl mr-4">🤖</span>
+                        <h3 class="text-xl font-semibold text-gray-900">Godlike Algorithms</h3>
+                    </div>
+                    <p class="text-gray-600">Social platforms track every click, scroll, and second you linger on content, using AI to maximize your attention—even as their own creators avoid these addictive systems.</p>
+                </div>
+            </div>
+            
+            <!-- Call to Action -->
+            <div class="mt-12 text-center">
+                <p class="text-lg text-gray-700 mb-6">Recognize any of these symptoms? You're not alone—and it's not your fault. Our brain's ancient wiring is no match for modern attention engineers.</p>
+                <a href="#course-content" class="inline-block bg-[#2da44e] text-white font-semibold px-6 py-3 rounded-lg hover:bg-[#2c974b] transition">See How Our Course Can Help</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- After Problem Statement Section and before Course Content Section -->
+    <div class="bg-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-black text-center text-gray-900 mb-12">A Digital Detox Can Change Your Life</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Benefit 1 -->
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <div class="text-2xl mb-4">⏰</div>
+                    <h3 class="text-xl font-semibold mb-2">Reclaim 14-28 Hours Weekly</h3>
+                    <p>Imagine what you could do with those extra hours each week: workout consistently, start a side hustle, write a novel, or simply be present with loved ones.</p>
+                </div>
+                
+                <!-- Benefit 2 -->
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <div class="text-2xl mb-4">🧠</div>
+                    <h3 class="text-xl font-semibold mb-2">Break the Addiction Loop</h3>
+                    <p>Learn practical environmental engineering strategies and habit replacement techniques that make digital detox sustainable, not just temporary.</p>
+                </div>
+                
+                <!-- Benefit 3 -->
+                <div class="bg-gray-50 p-6 rounded-lg">
+                    <div class="text-2xl mb-4">😌</div>
+                    <h3 class="text-xl font-semibold mb-2">Rediscover Real Life</h3>
+                    <p>Experience the profound clarity, presence, and joy that emerges when you create space for activities that truly fulfill you rather than merely distract you.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Content Section -->
+    <div id="course-content" class="bg-brand-green text-white p-8">
+        <div class="course-content" x-data="{ show: false }" x-init="setTimeout(() => show = true, 100)">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div class="md:grid md:grid-cols-2 md:gap-8">
+                    <!-- Left column - Sticky heading -->
+                    <div class="md:sticky md:top-8 md:self-start md:h-screen md:flex md:flex-col md:justify-start">
+                        <div class="opacity-0 transition duration-500 ease-in-out" :class="{ 'opacity-100': show }" style="transition-delay: 100ms;">
+                            <h2 class="text-4xl font-black mb-2">The Digital Detox Course Modules.</h2>
+                            
+                            <p class="text-lg mb-6">
+                                Take control of technology, instead of technology controlling you.
+                            </p>
+                            
+                            <div class="hidden md:block mt-8">
+                                <a href="/register" class="inline-block bg-white text-brand-green font-semibold px-6 py-3 rounded-lg hover:bg-opacity-90 transition">
+                                    Start Your Digital Detox Journey
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Right column - Scrolling content -->
+                    <div class="mt-8 md:mt-0" x-data="courseData()">
+                        <template x-for="(day, index) in days" :key="index">
+                            <div class="opacity-0 transition duration-500 ease-in-out mb-12" :class="{ 'opacity-100': show }" :style="`transition-delay: ${300 + (index * 20)}ms`">
+                                <div class="border-t border-white/30 pt-4"></div>
+                                <div class="grid grid-cols-1 gap-4">
+                                    <div>
+                                        <h3 class="text-2xl font-bold mb-4" x-text="day.title"></h3>
+                                        <p class="text-base" x-text="day.description"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        
+                        <!-- Mobile CTA -->
+                        <div class="mt-12 text-center md:hidden opacity-0 transition duration-500 ease-in-out" :class="{ 'opacity-100': show }" style="transition-delay: 800ms;">
+                            <a href="/register" class="inline-block bg-white text-brand-green font-semibold px-6 py-3 rounded-lg hover:bg-opacity-90 transition">
+                                Start Your Digital Detox Journey
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- After Course Content Section -->
+    <div class="bg-gray-50 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-black text-center text-gray-900 mb-12">What Our Students Say</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="flex items-start mb-4">
+                        <img class="h-12 w-12 rounded-full mr-4" src="https://randomuser.me/api/portraits/women/17.jpg" alt="Profile">
+                        <div>
+                            <h3 class="font-semibold">Sarah J.</h3>
+                            <div class="text-yellow-400">★★★★★</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"I was skeptical at first, but by Day 10 I realized I'd been missing out on real life. I'm now reading books again and sleeping better than I have in years."</p>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="flex items-start mb-4">
+                        <img class="h-12 w-12 rounded-full mr-4" src="https://randomuser.me/api/portraits/men/43.jpg" alt="Profile">
+                        <div>
+                            <h3 class="font-semibold">Michael T.</h3>
+                            <div class="text-yellow-400">★★★★★</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 italic">"As a software developer, I thought I needed to be connected 24/7. This course taught me how to set boundaries and now I'm actually more productive while using screens less."</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About The Habits Company -->
+    <div class="bg-white py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div>
+                    <h2 class="text-3xl font-black mb-6">Build better habits.</h2>
+                    <p class="text-lg text-gray-600 mb-4">
+                        The purpose of The Habits Company is to help you bridge the gap between 
+                        who you are and who you dream of becoming, revealing the profound truth that 
+                        small, consistent, and intentional actions create extraordinary lives.
+                    </p>
+                    <p class="text-lg text-gray-600 mb-4">
+                        Built with modern technology but grounded in ancient wisdom, we provide a clean, 
+                        distraction-free environment for personal growth. Whether you're building new habits 
+                        or breaking old ones, we help you stay accountable and mindful of your daily choices.
+                    </p>
+                </div>
+                <div class="flex items-center justify-center">
+                    <!-- Company logo -->
+                    <img src="/brand/secondary-logo-green.svg" alt="The Habits Company" class="h-auto w-64">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="bg-gray-50 py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-black text-center text-gray-900 mb-12">Frequently Asked Questions</h2>
+            
+            <div class="space-y-6">
+                <!-- FAQ Item 1 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-xl font-semibold mb-2">How is this course delivered?</h3>
+                    <p class="text-gray-600">This is a 5-day email course delivered directly to your inbox. Each day covers a specific aspect of phone addiction with practical, actionable steps you can implement immediately.</p>
+                </div>
+                
+                <!-- FAQ Item 2 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-xl font-semibold mb-2">Is this really free?</h3>
+                    <p class="text-gray-600">Yes! We believe everyone deserves access to tools that improve mental wellbeing. The email course is completely free with no hidden costs or upsells.</p>
+                </div>
+                
+                <!-- FAQ Item 3 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-xl font-semibold mb-2">Do I need to quit using technology completely?</h3>
+                    <p class="text-gray-600">Not at all. This course is about developing a healthier relationship with technology and using it intentionally. The goal is to control your technology, not let it control you.</p>
+                </div>
+                
+                <!-- FAQ Item 4 (New) -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-xl font-semibold mb-2">What's a Digital Detox Experience?</h3>
+                    <p class="text-gray-600">On day 5, we guide you through an optional 24-hour digital detox — turning off your smartphone and staying off all digital media. We provide alternatives and strategies to make this transformative experience accessible.</p>
+                </div>
+                
+                <!-- FAQ Item 5 (New) -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-xl font-semibold mb-2">I'm very busy. How much time does this course require?</h3>
+                    <p class="text-gray-600">Each daily email takes about 3-4 minutes to read. The implementation steps vary, but most can be incorporated into your existing routines with minimal additional time investment.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course data script -->
+    <script>
+        function courseData() {
+            return {
+                days: [
+                    {
+                        title: "1. The Addiction Reality Check",
+                        description: "Discover how phone addiction steals 2-4 hours daily (12+ years over a lifetime) while eroding your focus, relationships and mental health. Learn the clinical definition of addiction and assess your own relationship with technology."
+                    },
+                    {
+                        title: "2. Caveman Brain Hijack",
+                        description: "Understand how social media exploits our ancient evolutionary reward systems through AI-powered feeds and notifications. Learn why these platforms are so addictive and why even their creators avoid using them."
+                    },
+                    {
+                        title: "3. Environmental Engineering",
+                        description: "Discover powerful strategies from the Vietnam vet heroin recovery study. Learn to create phone-free zones, add friction to addictive apps, and implement smartphone 'downgrades' to break addiction cycles."
+                    },
+                    {
+                        title: "4. Habit Remix Revolution", 
+                        description: "Replace harmful phone habits with intentional routines using the Habit Loop framework. Transform your morning and evening rituals with alternatives like walks, reading, and gratitude journaling."
+                    },
+                    {
+                        title: "5. Digital Detox Experience",
+                        description: "Prepare for a transformative 24-hour tech fast using our 4Ps framework. Rediscover life beyond the screen."
+                    }
+                ]
+            }
+        }
+    </script>
+</body>
+</html> 

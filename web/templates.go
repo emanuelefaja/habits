@@ -67,6 +67,7 @@ func LoadTemplates() (*template.Template, error) {
 		"ui/reset.html",
 		"ui/unsubscribe.html",
 		"ui/courses/digital-detox.html",
+		"ui/courses/phone-addiction.html",
 		"ui/privacy.html",
 		"ui/terms.html",
 		"ui/brand.html",
