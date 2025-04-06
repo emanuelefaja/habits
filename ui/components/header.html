@@ -1,5 +1,5 @@
 {{ define "header" }}
-<div x-data="{ open: false }" class="flex justify-between items-center px-4 sm:px-6 py-4 relative bg-white shadow-sm overflow-hidden {{ if .User }}dark:bg-gray-800 dark:shadow-gray-900{{ end }}">
+<div x-data="{ open: false }" class="flex justify-between items-center px-4 sm:px-6 py-4 relative bg-white border-b border-gray-200 dark:border-gray-700 overflow-hidden {{ if .User }}dark:bg-gray-800{{ end }}">
 
     <div class="flex items-center gap-4 flex-shrink-0">
         <h1 class="text-left tracking-tight text-gray-900 {{ if .User }}dark:text-white{{ end }}">
