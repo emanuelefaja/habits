@@ -12,6 +12,13 @@
                 selectedModuleId: 1,
                 modules: courseData.modules,
                 
+                // Context menu state
+                contextMenuOpen: false,
+                contextMenuModuleId: null,
+                contextMenuLessonId: null,
+                contextMenuX: 0,
+                contextMenuY: 0,
+                
                 // Progress calculations
                 get totalLessons() {
                     return this.modules.reduce((total, module) => total + module.lessons.length, 0);
@@ -138,6 +145,13 @@
                                                     moduleId: module.id, 
                                                     lessonId: lesson.id 
                                                 })"
+                                                @contextmenu.prevent="(() => {
+                                                    contextMenuOpen = true;
+                                                    contextMenuModuleId = module.id;
+                                                    contextMenuLessonId = lesson.id;
+                                                    contextMenuX = $event.clientX;
+                                                    contextMenuY = $event.clientY;
+                                                })()"
                                                 class="flex items-center justify-between p-2 rounded cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
                                                 :class="{ 
                                                     'bg-[#DBFAE3] dark:bg-[#DBFAE3]': selectedLessonId === lesson.id,
@@ -348,6 +362,60 @@
                                     Next lesson ➡️
                                 </button>
                             </div>
+                        </div>
+                    </template>
+                </div>
+                
+                <!-- Context Menu / Right-click Menu -->
+                <div x-show="contextMenuOpen"
+                     @click.outside="contextMenuOpen = false"
+                     @keydown.escape.window="contextMenuOpen = false"
+                     x-transition:enter="transition ease-out duration-100"
+                     x-transition:enter-start="opacity-0 scale-95"
+                     x-transition:enter-end="opacity-100 scale-100"
+                     class="absolute z-50 bg-white dark:bg-gray-800 shadow-lg rounded-md py-2 w-64 border border-gray-200 dark:border-gray-700"
+                     :style="`left: ${contextMenuX}px; top: ${contextMenuY}px;`">
+                    
+                    <template x-if="contextMenuLessonId !== null">
+                        <div>
+                            <template x-for="module in modules" :key="module.id">
+                                <template x-if="module.id === contextMenuModuleId">
+                                    <template x-for="lesson in module.lessons" :key="lesson.id">
+                                        <template x-if="lesson.id === contextMenuLessonId">
+                                            <!-- Complete/Incomplete Toggle Option -->
+                                            <button @click="(() => {
+                                                lesson.done = !lesson.done;
+                                                
+                                                // Trigger confetti when marking complete (not when unmarking)
+                                                if (lesson.done) {
+                                                    setTimeout(() => {
+                                                        try {
+                                                            const x = 0.5;
+                                                            const y = 0.3;
+                                                            
+                                                            confetti({
+                                                                particleCount: 150,
+                                                                spread: 90,
+                                                                origin: { x, y }
+                                                            });
+                                                        } catch (error) {
+                                                            console.error('Confetti error:', error);
+                                                        }
+                                                    }, 100);
+                                                }
+                                                
+                                                contextMenuOpen = false;
+                                            })()"
+                                                class="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                <div class="flex items-center">
+                                                    <span class="mr-2" x-text="lesson.done ? '❌' : '✅'"></span>
+                                                    <span x-text="lesson.done ? 'Mark as incomplete' : 'Mark as complete'"></span>
+                                                </div>
+                                            </button>
+                                        </template>
+                                    </template>
+                                </template>
+                            </template>
                         </div>
                     </template>
                 </div>
