@@ -219,6 +219,23 @@ func TermsHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
 	}
 }
 
+// CourseHandler handles the course page route
+func CourseHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Get the user if logged in
+		user, _ := getAuthenticatedUser(r, db)
+
+		data := struct {
+			User *models.User
+			Page string
+		}{
+			User: user,
+			Page: "course",
+		}
+		renderTemplate(w, templates, "course.html", data)
+	}
+}
+
 // Helper functions for handlers
 func renderGuestHome(w http.ResponseWriter, templates *template.Template) {
 	if err := templates.ExecuteTemplate(w, "guest-home.html", nil); err != nil {
