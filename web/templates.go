@@ -71,7 +71,7 @@ func LoadTemplates() (*template.Template, error) {
 		"ui/privacy.html",
 		"ui/terms.html",
 		"ui/brand.html",
-		"ui/course.html",
+		"ui/masterclass.html",
 	)
 
 	if err != nil {
