@@ -108,6 +108,11 @@
                                         <div class="flex items-center">
                                             <span class="mr-2" x-text="module.emoji"></span>
                                             <span class="font-medium text-sm text-gray-900 dark:text-white" x-text="module.title"></span>
+                                            <span 
+                                                x-show="module.lessons.length > 0 && module.lessons.every(lesson => lesson.done)" 
+                                                class="ml-2 text-green-500"
+                                                title="All lessons completed"
+                                            >✅</span>
                                         </div>
                                         <svg x-show="!module.expanded" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
                                             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
