@@ -8,8 +8,8 @@
         <div class="w-full">
             <div class="flex flex-col md:flex-row h-screen" x-data="{
                 // State management
-                selectedLessonId: null,
-                selectedModuleId: null,
+                selectedLessonId: 101,
+                selectedModuleId: 1,
                 modules: courseData.modules,
                 
                 // Progress calculations
@@ -132,8 +132,8 @@
                                                 })"
                                                 class="flex items-center p-2 rounded cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
                                                 :class="{ 
-                                                    'bg-blue-100 dark:bg-blue-900': $parent.selectedLessonId === lesson.id,
-                                                    'text-gray-500 bg-gray-100 dark:bg-gray-800': lesson.done
+                                                    'bg-[#DBFAE3] dark:bg-[#DBFAE3]': selectedLessonId === lesson.id,
+                                                    'text-gray-500': lesson.done
                                                 }"
                                             >
                                                 <span class="mr-2" x-text="lesson.emoji"></span>
