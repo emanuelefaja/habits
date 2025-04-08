@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en" class="min-h-full bg-gray-50 dark:bg-gray-900">
+{{ template "head" . }}
+<body>
+    <div class="min-h-full bg-gray-50 dark:bg-gray-900">
+        {{ template "header" . }}
+        
+        <div class="w-full">
+            <div class="flex flex-col md:flex-row h-screen" x-data="{
+                // State management
+                moduleSlug: '{{ .ModuleSlug }}',
+                lessonSlug: '{{ .LessonSlug }}',
+                modules: [],
+                currentLesson: null,
+                currentModule: null,
+                
+                // Progress calculations
+                completedLessons: 0,
+                totalLessons: 0,
+                completionPercentage: 0,
+                
+                // Initialize data
+                init() {
+                    this.fetchCourseStructure();
+                    this.fetchLessonData();
+                },
+                
+                // Fetch course structure from API
+                async fetchCourseStructure() {
+                    try {
+                        const response = await fetch('/masterclass/api/course-structure');
+                        const data = await response.json();
+                        this.modules = data.modules;
+                        this.completedLessons = data.completedCount;
+                        this.totalLessons = data.totalCount;
+                        this.completionPercentage = data.progress;
+                        
+                        // Find current module
+                        this.currentModule = this.modules.find(m => m.slug === this.moduleSlug);
+                    } catch (error) {
+                        console.error('Error fetching course structure:', error);
+                    }
+                },
+                
+                // Fetch current lesson data
+                async fetchLessonData() {
+                    try {
+                        const response = await fetch(`/masterclass/api/lesson?moduleSlug=${this.moduleSlug}&lessonSlug=${this.lessonSlug}`);
+                        const data = await response.json();
+                        this.currentLesson = data;
+                    } catch (error) {
+                        console.error('Error fetching lesson data:', error);
+                    }
+                },
+                
+                // Mark lesson as complete/incomplete
+                async toggleLessonComplete() {
+                    if (!this.currentLesson) return;
+                    
+                    const endpoint = this.currentLesson.completed 
+                        ? '/masterclass/api/mark-incomplete' 
+                        : '/masterclass/api/mark-complete';
+                    
+                    try {
+                        const response = await fetch(`${endpoint}?moduleSlug=${this.moduleSlug}&lessonSlug=${this.lessonSlug}`, {
+                            method: 'POST'
+                        });
+                        const data = await response.json();
+                        
+                        if (data.completed !== undefined) {
+                            this.currentLesson.completed = data.completed;
+                            
+                            // If marked as complete, trigger confetti
+                            if (data.completed) {
+                                this.triggerConfetti();
+                            }
+                            
+                            // Refresh course structure to update progress
+                            this.fetchCourseStructure();
+                        }
+                    } catch (error) {
+                        console.error('Error toggling lesson completion:', error);
+                    }
+                },
+                
+                // Navigate to another lesson
+                navigateToLesson(moduleSlug, lessonSlug) {
+                    window.location.href = `/masterclass/${moduleSlug}/${lessonSlug}`;
+                },
+                
+                // Trigger confetti effect
+                triggerConfetti() {
+                    setTimeout(() => {
+                        try {
+                            // Position confetti in center-top of screen
+                            const x = 0.5;
+                            const y = 0.3;
+                            
+                            confetti({
+                                particleCount: 150,
+                                spread: 90,
+                                origin: { x, y }
+                            });
+                        } catch (error) {
+                            console.error('Confetti error:', error);
+                        }
+                    }, 100);
+                },
+                
+                // Navigate to next lesson
+                async navigateToNextLesson() {
+                    try {
+                        const response = await fetch(`/masterclass/api/next-lesson?moduleSlug=${this.moduleSlug}&lessonSlug=${this.lessonSlug}`);
+                        const data = await response.json();
+                        
+                        if (data.slug && data.moduleSlug) {
+                            this.navigateToLesson(data.moduleSlug, data.slug);
+                        }
+                    } catch (error) {
+                        console.error('Error fetching next lesson:', error);
+                    }
+                },
+                
+                // Navigate to previous lesson
+                async navigateToPreviousLesson() {
+                    try {
+                        const response = await fetch(`/masterclass/api/previous-lesson?moduleSlug=${this.moduleSlug}&lessonSlug=${this.lessonSlug}`);
+                        const data = await response.json();
+                        
+                        if (data.slug && data.moduleSlug) {
+                            this.navigateToLesson(data.moduleSlug, data.slug);
+                        }
+                    } catch (error) {
+                        console.error('Error fetching previous lesson:', error);
+                    }
+                }
+            }">
+                <!-- Include sidebar component -->
+                {{ template "sidebar.html" . }}
+                
+                <!-- Main content area -->
+                <div class="flex-1 overflow-y-auto p-6">
+                    <!-- Lesson header -->
+                    <div class="border-b border-gray-200 dark:border-gray-700 pb-4 mb-6">
+                        <template x-if="currentLesson">
+                            <div>
+                                <div class="flex justify-between items-center">
+                                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                                        <span x-text="currentLesson.emoji" class="mr-2"></span>
+                                        <span x-text="currentLesson.title"></span>
+                                    </h1>
+                                    <button 
+                                        @click="toggleLessonComplete"
+                                        :class="currentLesson.completed 
+                                            ? 'bg-green-600 text-white hover:bg-green-700' 
+                                            : 'bg-gray-300 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200'"
+                                        class="rounded-md px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                                        <span x-text="currentLesson.completed ? 'Completed' : 'Mark as complete'"></span>
+                                        <span x-show="currentLesson.completed">✅</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+                        <template x-if="!currentLesson">
+                            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                                Loading lesson...
+                            </h1>
+                        </template>
+                    </div>
+                    
+                    <!-- Lesson content -->
+                    <template x-if="currentLesson">
+                        <div class="mt-4 prose dark:prose-invert max-w-none">
+                            <!-- Dynamic content based on lesson type -->
+                            <template x-if="currentLesson.type === 'video'">
+                                <!-- Video content will be included here -->
+                                <div class="aspect-w-16 aspect-h-9 mb-6">
+                                    <h2>Video player will be here</h2>
+                                </div>
+                            </template>
+                            
+                            <!-- Render lesson content -->
+                            <div x-html="currentLesson.content"></div>
+                        </div>
+                    </template>
+                    <template x-if="!currentLesson">
+                        <div class="text-center p-12">
+                            <p class="text-lg text-gray-600 dark:text-gray-400">Loading lesson content...</p>
+                        </div>
+                    </template>
+                    
+                    <!-- Lesson navigation -->
+                    <template x-if="currentLesson">
+                        <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                            <div class="flex justify-center items-center space-x-4">
+                                <button 
+                                    @click="navigateToPreviousLesson"
+                                    class="rounded-md px-4 py-2 text-sm font-semibold shadow-sm bg-gray-600 text-white hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                                    ⬅️ Previous lesson
+                                </button>
+                                
+                                <button 
+                                    @click="toggleLessonComplete"
+                                    :class="currentLesson.completed 
+                                        ? 'bg-green-600 text-white hover:bg-green-700' 
+                                        : 'bg-gray-300 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200'"
+                                    class="rounded-md px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                                    <span x-text="currentLesson.completed ? 'Completed' : 'Mark as complete'"></span>
+                                    <span x-show="currentLesson.completed">✅</span>
+                                </button>
+                                
+                                <button 
+                                    @click="navigateToNextLesson"
+                                    class="rounded-md px-4 py-2 text-sm font-semibold shadow-sm bg-gray-600 text-white hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                                    Next lesson ➡️
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Wait for Alpine.js initialization
+        document.addEventListener('alpine:init', () => {
+            console.log('Alpine initialized, course UI ready');
+        });
+    </script>
+</body>
+</html> 

@@ -72,6 +72,9 @@ func LoadTemplates() (*template.Template, error) {
 		"ui/terms.html",
 		"ui/brand.html",
 		"ui/masterclass.html",
+		"ui/masterclass/masterclass-lp.html",
+		"ui/masterclass/lesson-base.html",
+		"ui/masterclass/components/sidebar.html",
 	)
 
 	if err != nil {
@@ -79,6 +82,7 @@ func LoadTemplates() (*template.Template, error) {
 	}
 
 	// Log loaded templates
+	log.Printf("Total templates loaded: %d", len(parsedTemplates.Templates()))
 	for _, t := range parsedTemplates.Templates() {
 		log.Printf("Loaded template: %s", t.Name())
 	}

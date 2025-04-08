@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" class="min-h-full bg-gray-50 dark:bg-gray-900">
+{{ template "head" . }}
+<body class="bg-gray-50 dark:bg-gray-900">
+    <div class="min-h-full">
+        {{ template "header" . }}
+        
+        <main class="container mx-auto px-4 py-12">
+            <!-- Hero Section -->
+            <div class="text-center mb-16">
+                <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-6">Habits Masterclass</h1>
+                <p class="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+                    Learn how to build lasting habits that transform your life.
+                    This comprehensive course will guide you through proven strategies for habit formation.
+                </p>
+            </div>
+            
+            <!-- Course Overview -->
+            <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg p-8 mb-12">
+                <h2 class="text-2xl font-semibold text-gray-900 dark:text-white mb-4">What You'll Learn</h2>
+                <ul class="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-2">
+                    <li>The science behind habit formation</li>
+                    <li>How to design your environment for success</li>
+                    <li>Techniques to build consistency</li>
+                    <li>Methods to track and measure progress</li>
+                </ul>
+            </div>
+            
+            <!-- Call to Action -->
+            <div class="text-center">
+                {{ if .User }}
+                    {{ if .HasAccess }}
+                        <p class="text-green-600 dark:text-green-400 mb-4">You already have access to this course!</p>
+                    {{ else }}
+                        <a href="/purchase/masterclass" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg inline-block">
+                            Get Access Now
+                        </a>
+                    {{ end }}
+                {{ else }}
+                    <a href="/login" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg inline-block">
+                        Login to Access
+                    </a>
+                    <p class="mt-4 text-gray-600 dark:text-gray-400">
+                        Don't have an account? <a href="/register" class="text-blue-600 dark:text-blue-400 hover:underline">Sign up</a>
+                    </p>
+                {{ end }}
+            </div>
+        </main>
+        
+        {{ template "footer" . }}
+    </div>
+</body>
+</html> 

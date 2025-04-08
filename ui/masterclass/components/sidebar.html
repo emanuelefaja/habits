@@ -1,0 +1,88 @@
+<!-- Sidebar with modules and lessons -->
+<div class="w-full md:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+    <div class="sticky top-0 p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Masterclass</h2>
+        
+        <!-- Progress bar -->
+        <div class="mb-3">
+            <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
+                <span>🎓 Progress</span>
+                <span x-text="completedLessons + '/' + totalLessons + ' lessons'"></span>
+            </div>
+            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-1">
+                <div class="bg-green-500 h-2.5 rounded-full" :style="'width: ' + completionPercentage + '%'"></div>
+            </div>
+            <div class="text-right text-xs text-gray-500 dark:text-gray-400">
+                <span x-text="Math.round(completionPercentage) + '%'"></span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Module and lesson list -->
+    <div class="flex-1 overflow-y-auto">
+        <div class="space-y-2 p-2">
+            <template x-for="module in modules" :key="module.id">
+                <div class="rounded-md">
+                    <!-- Module header -->
+                    <div 
+                        @click="module.expanded = !module.expanded"
+                        class="flex justify-between items-center p-2 cursor-pointer bg-white dark:bg-gray-700 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600"
+                    >
+                        <div class="flex items-center">
+                            <span class="mr-2" x-text="module.emoji"></span>
+                            <span 
+                                class="font-medium text-sm" 
+                                :class="{
+                                    'text-gray-500 line-through': module.completed,
+                                    'text-gray-900 dark:text-white': !module.completed
+                                }"
+                                x-text="module.title"></span>
+                        </div>
+                        <div class="flex items-center">
+                            <span 
+                                x-show="module.completed" 
+                                class="mr-2 text-green-500"
+                                title="All lessons completed"
+                            >✅</span>
+                            <svg x-show="!module.expanded" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                            <svg x-show="module.expanded" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <!-- Lessons list (visible when module is expanded) -->
+                    <div x-show="module.expanded || module.slug === moduleSlug" class="pl-6 mt-1 space-y-1">
+                        <template x-for="lesson in module.lessons" :key="lesson.id">
+                            <div 
+                                @click="navigateToLesson(module.slug, lesson.slug)"
+                                class="flex items-center justify-between p-2 rounded cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
+                                :class="{ 
+                                    'bg-green-100 dark:bg-green-900': lesson.slug === lessonSlug && module.slug === moduleSlug,
+                                }"
+                            >
+                                <div class="flex items-center">
+                                    <span class="mr-2" x-text="lesson.emoji"></span>
+                                    <span 
+                                        class="text-xs" 
+                                        :class="{'text-gray-500': lesson.completed}"
+                                        x-text="lesson.title"></span>
+                                </div>
+                                <span x-show="lesson.completed" class="text-green-500">✅</span>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+            
+            <!-- Loading state -->
+            <template x-if="modules.length === 0">
+                <div class="p-4 text-center text-gray-500">
+                    Loading course content...
+                </div>
+            </template>
+        </div>
+    </div>
+</div> 

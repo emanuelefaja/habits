@@ -3,6 +3,7 @@ package web
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -10,6 +11,7 @@ import (
 	"time"
 
 	"mad/api"
+	"mad/masterclass"
 	"mad/middleware"
 	"mad/models"
 )
@@ -219,20 +221,179 @@ func TermsHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
 	}
 }
 
-// MasterclassHandler handles the masterclass page route
+// MasterclassHandler handles the masterclass landing page route
 func MasterclassHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// Get the user if logged in
-		user, _ := getAuthenticatedUser(r, db)
-
+		// Template data with defaults for non-authenticated users
 		data := struct {
-			User *models.User
-			Page string
+			User      *models.User
+			Page      string
+			HasAccess bool
+			Flash     string
 		}{
-			User: user,
-			Page: "masterclass",
+			Page:  "masterclass",
+			Flash: middleware.GetFlash(r),
 		}
-		renderTemplate(w, templates, "masterclass.html", data)
+
+		// Check if user is authenticated
+		if middleware.IsAuthenticated(r) {
+			// Get authenticated user
+			userID := middleware.GetUserID(r)
+			user, err := models.GetUserByID(db, int64(userID))
+			if err != nil {
+				http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+				return
+			}
+			data.User = user
+
+			// Check if user has access to the masterclass
+			hasAccess, err := masterclass.HasCourseAccess(db, userID, "masterclass")
+			if err == nil && hasAccess {
+				data.HasAccess = true
+
+				// Get the first module and lesson for redirect
+				modules := masterclass.GetCourseStructure()
+				if len(modules) > 0 && len(modules[0].Lessons) > 0 {
+					firstModule := modules[0]
+					firstLesson := firstModule.Lessons[0]
+					redirectURL := fmt.Sprintf("/masterclass/%s/%s",
+						firstModule.Slug, firstLesson.Slug)
+					http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+					return
+				}
+			}
+		}
+
+		// If not authenticated or no access, show landing page
+		renderTemplate(w, templates, "masterclass-lp.html", data)
+	}
+}
+
+// MasterclassModuleHandler handles module and lesson pages
+func MasterclassModuleHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// First check if user has access
+		userID := middleware.GetUserID(r)
+		hasAccess, err := masterclass.HasCourseAccess(db, userID, "masterclass")
+		if err != nil || !hasAccess {
+			middleware.SetFlash(r, "You don't have access to this course")
+			http.Redirect(w, r, "/masterclass", http.StatusSeeOther)
+			return
+		}
+
+		user, err := getAuthenticatedUser(r, db)
+		if err != nil {
+			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+			return
+		}
+
+		// Extract module and lesson slugs from URL path
+		path := strings.TrimPrefix(r.URL.Path, "/masterclass/")
+		parts := strings.Split(path, "/")
+
+		// Get all course data for the template
+		modules := masterclass.GetCourseStructure()
+
+		// Handle module-only URL (redirect to first lesson)
+		if len(parts) == 1 && parts[0] != "" {
+			moduleSlug := parts[0]
+
+			// Find the module
+			var targetModule *masterclass.Module
+			for i := range modules {
+				if modules[i].Slug == moduleSlug {
+					targetModule = &modules[i]
+					break
+				}
+			}
+
+			if targetModule != nil && len(targetModule.Lessons) > 0 {
+				// Redirect to first lesson
+				firstLesson := targetModule.Lessons[0]
+				redirectURL := fmt.Sprintf("/masterclass/%s/%s", moduleSlug, firstLesson.Slug)
+				http.Redirect(w, r, redirectURL, http.StatusSeeOther)
+				return
+			}
+		}
+
+		// Handle module+lesson URL
+		if len(parts) >= 2 && parts[0] != "" && parts[1] != "" {
+			moduleSlug := parts[0]
+			lessonSlug := parts[1]
+
+			// Get the lesson first
+			lesson, err := masterclass.GetLessonBySlug(moduleSlug, lessonSlug)
+			if err != nil {
+				// Lesson not found
+				http.Redirect(w, r, "/masterclass", http.StatusSeeOther)
+				return
+			}
+
+			// Get the module separately
+			module, err := masterclass.GetModuleBySlug(moduleSlug)
+			if err != nil {
+				http.Redirect(w, r, "/masterclass", http.StatusSeeOther)
+				return
+			}
+
+			// Set default template data
+			data := struct {
+				User       *models.User
+				Modules    []masterclass.Module
+				ModuleSlug string
+				LessonSlug string
+				Lesson     *masterclass.Lesson
+				Module     *masterclass.Module
+				Page       string
+			}{
+				User:       user,
+				Modules:    modules,
+				ModuleSlug: moduleSlug,
+				LessonSlug: lessonSlug,
+				Lesson:     lesson,
+				Module:     module,
+				Page:       "masterclass",
+			}
+
+			data.Lesson = lesson
+			data.Module = module
+
+			renderTemplate(w, templates, "lesson-base.html", data)
+			return
+		}
+
+		// If we get here, redirect to masterclass landing
+		http.Redirect(w, r, "/masterclass", http.StatusSeeOther)
+	}
+}
+
+// MasterclassAPIHandler handles API requests for the masterclass
+func MasterclassAPIHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Extract the API endpoint from the URL
+		path := strings.TrimPrefix(r.URL.Path, "/masterclass/api/")
+
+		// Route to the appropriate handler
+		switch path {
+		case "course-structure":
+			masterclass.CourseStructureHandler(db).ServeHTTP(w, r)
+		case "lesson":
+			masterclass.LessonHandler(db).ServeHTTP(w, r)
+		case "mark-complete":
+			masterclass.MarkLessonCompleteHandler(db).ServeHTTP(w, r)
+		case "mark-incomplete":
+			masterclass.MarkLessonIncompleteHandler(db).ServeHTTP(w, r)
+		case "next-lesson":
+			masterclass.NextLessonHandler(db).ServeHTTP(w, r)
+		case "previous-lesson":
+			masterclass.PreviousLessonHandler(db).ServeHTTP(w, r)
+		case "progress":
+			masterclass.GetUserProgressHandler(db).ServeHTTP(w, r)
+		case "access":
+			masterclass.GetUserCourseAccessHandler(db).ServeHTTP(w, r)
+		default:
+			http.NotFound(w, r)
+		}
 	}
 }
 
