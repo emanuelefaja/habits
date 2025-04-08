@@ -21,17 +21,35 @@
                 
                 // Initialize data
                 init() {
+                    // Defensive checks for initial data
+                    if (!this.modules || typeof this.modules !== 'object') {
+                        console.error('Initial course data is missing or invalid');
+                        this.modules = { modules: [], completedCount: 0, totalCount: 0, progress: 0 };
+                        // Try to fetch data if missing
+                        this.fetchCourseStructure();
+                    }
+                    
+                    if (!this.currentLesson || typeof this.currentLesson !== 'object') {
+                        console.error('Initial lesson data is missing or invalid');
+                        // Try to fetch lesson data if missing
+                        if (this.moduleSlug && this.lessonSlug) {
+                            this.fetchLessonData();
+                        }
+                    }
+                    
                     // Set progress data from initial course data
                     this.completedLessons = this.modules.completedCount || 0;
                     this.totalLessons = this.modules.totalCount || 0;
                     this.completionPercentage = this.modules.progress || 0;
                     
                     // Find current module
-                    this.currentModule = this.modules.modules.find(m => m.slug === this.moduleSlug);
-                    
-                    // Set initial expanded state for current module
-                    if (this.currentModule) {
-                        this.currentModule.expanded = true;
+                    if (this.modules.modules) {
+                        this.currentModule = this.modules.modules.find(m => m.slug === this.moduleSlug);
+                        
+                        // Set initial expanded state for current module
+                        if (this.currentModule) {
+                            this.currentModule.expanded = true;
+                        }
                     }
                     
                     // Expose triggerConfetti to make it globally available

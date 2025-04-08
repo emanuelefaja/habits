@@ -344,6 +344,13 @@ func MasterclassModuleHandler(db *sql.DB, templates *template.Template) http.Han
 				completed = false
 			}
 
+			// Get lesson content (missing in original code)
+			lessonContent, err := masterclass.LoadLessonContent(moduleSlug, lessonSlug)
+			if err != nil {
+				log.Printf("Error loading lesson content: %v", err)
+				lessonContent = fmt.Sprintf("<div class='prose dark:prose-invert'><p>Lesson content could not be loaded.</p><p class='text-sm text-gray-500'>Error: %s</p></div>", err.Error())
+			}
+
 			// Pre-fetch course structure with completion data
 			courseStructure := masterclass.GetCourseStructure()
 			completedCount := 0
@@ -437,6 +444,7 @@ func MasterclassModuleHandler(db *sql.DB, templates *template.Template) http.Han
 				"order":       lesson.Order,
 				"description": lesson.Description,
 				"completed":   completed,
+				"content":     lessonContent,
 			}
 
 			// Convert to JSON for template
