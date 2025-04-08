@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"time"
+
+	"mad/middleware"
 )
 
 // Response types
@@ -81,13 +83,10 @@ func writeErrorResponse(w http.ResponseWriter, status int, errMsg string) {
 	writeJSON(w, status, ErrorResponse{Error: errMsg})
 }
 
-// getUserID extracts the user ID from the request context
-// This assumes the auth middleware has added a userID to the request context
+// getUserID extracts the user ID from the request using the middleware
 func getUserID(r *http.Request) (int, error) {
-	// This implementation will need to match how your auth middleware stores userID
-	// This is a placeholder - replace with your actual implementation
-	userID, ok := r.Context().Value("userID").(int)
-	if !ok {
+	userID := middleware.GetUserID(r)
+	if userID == 0 {
 		return 0, ErrNoAccess
 	}
 	return userID, nil
