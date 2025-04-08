@@ -3,6 +3,8 @@ package masterclass
 import (
 	"database/sql"
 	"fmt"
+	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -388,4 +390,23 @@ func RevokeCourseAccess(db *sql.DB, userID int, courseID string, reason string) 
 	`, reason, userID, courseID)
 
 	return err
+}
+
+// LoadLessonContent loads the HTML content of a lesson from the filesystem
+func LoadLessonContent(moduleSlug, lessonSlug string) (string, error) {
+	// Construct the file path for the lesson content
+	filePath := filepath.Join("ui", "masterclass", "lessons", moduleSlug, lessonSlug+".html")
+
+	// Check if the file exists
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		return "", fmt.Errorf("lesson content file not found: %s", filePath)
+	}
+
+	// Read the file content using os.ReadFile instead of ioutil.ReadFile
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		return "", fmt.Errorf("error reading lesson content: %w", err)
+	}
+
+	return string(content), nil
 }

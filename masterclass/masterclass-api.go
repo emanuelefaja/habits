@@ -216,16 +216,19 @@ func LessonHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// In a production implementation, we would load the content from a file
-		// The file would be located at: ui/masterclass/lessons/{moduleSlug}/{lessonSlug}.html
-		content := fmt.Sprintf(`
-			<div class="prose dark:prose-invert">
-				<p>Lesson content for "%s" in module "%s" will be loaded from:</p>
-				<p class="text-sm text-gray-500">ui/masterclass/lessons/%s/%s.html</p>
-				<hr>
-				<p>%s</p>
-			</div>
-		`, lesson.Title, moduleSlug, moduleSlug, lessonSlug, lesson.Description)
+		// Get lesson content
+		content, err := LoadLessonContent(moduleSlug, lessonSlug)
+		if err != nil {
+			// Fallback to placeholder if content can't be loaded
+			content = fmt.Sprintf(`
+				<div class="prose dark:prose-invert">
+					<p>Lesson content could not be loaded.</p>
+					<p class="text-sm text-gray-500">Error: %s</p>
+					<hr>
+					<p>%s</p>
+				</div>
+			`, err.Error(), lesson.Description)
+		}
 
 		// Create response
 		response := LessonResponse{
