@@ -1,5 +1,12 @@
 <!-- Sidebar with modules and lessons -->
-<div class="w-full md:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+<div class="w-full md:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col" x-data="{
+    // Context menu state
+    contextMenuOpen: false,
+    contextMenuModuleSlug: null,
+    contextMenuLessonSlug: null,
+    contextMenuX: 0,
+    contextMenuY: 0
+}">
     <div class="sticky top-0 p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Masterclass</h2>
         
@@ -58,6 +65,13 @@
                         <template x-for="lesson in module.lessons" :key="lesson.id">
                             <div 
                                 @click="navigateToLesson(module.slug, lesson.slug)"
+                                @contextmenu.prevent="(() => {
+                                    contextMenuOpen = true;
+                                    contextMenuModuleSlug = module.slug;
+                                    contextMenuLessonSlug = lesson.slug;
+                                    contextMenuX = $event.clientX;
+                                    contextMenuY = $event.clientY;
+                                })()"
                                 class="flex items-center justify-between p-2 rounded cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
                                 :class="{ 
                                     'bg-green-100 dark:bg-green-900': lesson.slug === lessonSlug && module.slug === moduleSlug,
@@ -84,5 +98,89 @@
                 </div>
             </template>
         </div>
+    </div>
+    
+    <!-- Context Menu for right-click actions -->
+    <div x-show="contextMenuOpen"
+         @click.outside="contextMenuOpen = false"
+         @keydown.escape.window="contextMenuOpen = false"
+         x-transition:enter="transition ease-out duration-100"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         class="fixed z-50 bg-white dark:bg-gray-800 shadow-lg rounded-md py-2 w-64 border border-gray-200 dark:border-gray-700"
+         :style="`left: ${contextMenuX}px; top: ${contextMenuY}px;`">
+        
+        <!-- Menu content -->
+        <template x-if="contextMenuLessonSlug">
+            <div>
+                <!-- Find the target lesson -->
+                <template x-for="module in modules.modules" :key="module.id">
+                    <template x-if="module.slug === contextMenuModuleSlug">
+                        <template x-for="lesson in module.lessons" :key="lesson.id">
+                            <template x-if="lesson.slug === contextMenuLessonSlug">
+                                <!-- Toggle completion status -->
+                                <button 
+                                    @click="async () => {
+                                        // Toggle completion in the API
+                                        const endpoint = lesson.completed
+                                            ? '/masterclass/api/mark-incomplete'
+                                            : '/masterclass/api/mark-complete';
+                                            
+                                        try {
+                                            const response = await fetch(`${endpoint}?moduleSlug=${module.slug}&lessonSlug=${lesson.slug}`, {
+                                                method: 'POST',
+                                                headers: {
+                                                    'Content-Type': 'application/json'
+                                                }
+                                            });
+                                            
+                                            if (response.ok) {
+                                                // Update UI state - similar to the toggleLessonComplete function
+                                                const wasCompleted = lesson.completed;
+                                                lesson.completed = !wasCompleted;
+                                                
+                                                // Update global completion counts
+                                                if (wasCompleted) {
+                                                    completedLessons--;
+                                                } else {
+                                                    completedLessons++;
+                                                    // Show confetti if marking complete
+                                                    window.triggerConfetti();
+                                                }
+                                                
+                                                // Update progress
+                                                if (totalLessons > 0) {
+                                                    completionPercentage = (completedLessons / totalLessons) * 100;
+                                                }
+                                                
+                                                // Update current lesson if this is the active lesson
+                                                if (moduleSlug === module.slug && lessonSlug === lesson.slug && currentLesson) {
+                                                    currentLesson.completed = !wasCompleted;
+                                                }
+                                                
+                                                // Update module completion status
+                                                let moduleCompletedCount = module.lessons.filter(l => l.completed).length;
+                                                module.completed = moduleCompletedCount === module.lessons.length;
+                                            }
+                                        } catch (error) {
+                                            console.error('Error toggling lesson completion:', error);
+                                        }
+                                        
+                                        // Close the context menu
+                                        contextMenuOpen = false;
+                                    }"
+                                    class="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700"
+                                >
+                                    <div class="flex items-center">
+                                        <span class="mr-2" x-text="lesson.completed ? '❌' : '✅'"></span>
+                                        <span x-text="lesson.completed ? 'Mark as incomplete' : 'Mark as complete'"></span>
+                                    </div>
+                                </button>
+                            </template>
+                        </template>
+                    </template>
+                </template>
+            </div>
+        </template>
     </div>
 </div> 

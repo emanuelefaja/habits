@@ -33,6 +33,9 @@
                     if (this.currentModule) {
                         this.currentModule.expanded = true;
                     }
+                    
+                    // Expose triggerConfetti to make it globally available
+                    window.triggerConfetti = this.triggerConfetti;
                 },
                 
                 // Fetch course structure from API (only if needed)
