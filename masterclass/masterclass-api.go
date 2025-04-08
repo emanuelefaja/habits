@@ -3,6 +3,7 @@ package masterclass
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -215,6 +216,31 @@ func LessonHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
+		// Load content HTML based on lesson type
+		content := ""
+
+		// This is a simplified way to get content - in a real app, you'd have a better system
+		// for retrieving and rendering lesson content from templates or a CMS
+		if lesson.Type == "markdown" {
+			// For markdown lessons, convert the stored markdown to HTML
+			content = RenderLessonContent(lesson.ID)
+		} else if lesson.Type == "video" {
+			// For video lessons, embed the video player
+			content = fmt.Sprintf(`
+				<div class="aspect-w-16 aspect-h-9 mb-6">
+					<iframe src="https://www.youtube.com/embed/%s" 
+						frameborder="0" 
+						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+						allowfullscreen>
+					</iframe>
+				</div>
+				<div>%s</div>
+			`, lesson.VideoID, lesson.Description)
+		} else {
+			// Default content
+			content = fmt.Sprintf("<p>%s</p>", lesson.Description)
+		}
+
 		// Create response
 		response := LessonResponse{
 			ID:          lesson.ID,
@@ -225,8 +251,8 @@ func LessonHandler(db *sql.DB) http.HandlerFunc {
 			ModuleSlug:  lesson.ModuleSlug,
 			Order:       lesson.Order,
 			Description: lesson.Description,
-			// Content would be loaded from elsewhere like a template
-			Completed: completed,
+			Content:     content,
+			Completed:   completed,
 		}
 
 		writeJSON(w, http.StatusOK, response)

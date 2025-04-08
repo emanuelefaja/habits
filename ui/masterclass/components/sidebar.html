@@ -21,7 +21,7 @@
     <!-- Module and lesson list -->
     <div class="flex-1 overflow-y-auto">
         <div class="space-y-2 p-2">
-            <template x-for="module in modules" :key="module.id">
+            <template x-for="module in modules.modules" :key="module.id">
                 <div class="rounded-md">
                     <!-- Module header -->
                     <div 
@@ -78,7 +78,7 @@
             </template>
             
             <!-- Loading state -->
-            <template x-if="modules.length === 0">
+            <template x-if="!modules || !modules.modules || modules.modules.length === 0">
                 <div class="p-4 text-center text-gray-500">
                     Loading course content...
                 </div>

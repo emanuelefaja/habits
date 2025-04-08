@@ -10,8 +10,8 @@
                 // State management
                 moduleSlug: '{{ .ModuleSlug }}',
                 lessonSlug: '{{ .LessonSlug }}',
-                modules: [],
-                currentLesson: null,
+                modules: {{ .InitialCourseData }},
+                currentLesson: {{ .InitialLessonData }},
                 currentModule: null,
                 
                 // Progress calculations
@@ -21,11 +21,21 @@
                 
                 // Initialize data
                 init() {
-                    this.fetchCourseStructure();
-                    this.fetchLessonData();
+                    // Set progress data from initial course data
+                    this.completedLessons = this.modules.completedCount || 0;
+                    this.totalLessons = this.modules.totalCount || 0;
+                    this.completionPercentage = this.modules.progress || 0;
+                    
+                    // Find current module
+                    this.currentModule = this.modules.modules.find(m => m.slug === this.moduleSlug);
+                    
+                    // Set initial expanded state for current module
+                    if (this.currentModule) {
+                        this.currentModule.expanded = true;
+                    }
                 },
                 
-                // Fetch course structure from API
+                // Fetch course structure from API (only if needed)
                 async fetchCourseStructure() {
                     try {
                         const response = await fetch('/masterclass/api/course-structure');
@@ -42,7 +52,7 @@
                     }
                 },
                 
-                // Fetch current lesson data
+                // Fetch current lesson data (only if needed)
                 async fetchLessonData() {
                     try {
                         const response = await fetch(`/masterclass/api/lesson?moduleSlug=${this.moduleSlug}&lessonSlug=${this.lessonSlug}`);
@@ -53,30 +63,59 @@
                     }
                 },
                 
-                // Mark lesson as complete/incomplete
+                // Toggle lesson completion status
                 async toggleLessonComplete() {
                     if (!this.currentLesson) return;
                     
-                    const endpoint = this.currentLesson.completed 
-                        ? '/masterclass/api/mark-incomplete' 
+                    const endpoint = this.currentLesson.completed
+                        ? '/masterclass/api/mark-incomplete'
                         : '/masterclass/api/mark-complete';
                     
                     try {
                         const response = await fetch(`${endpoint}?moduleSlug=${this.moduleSlug}&lessonSlug=${this.lessonSlug}`, {
-                            method: 'POST'
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
                         });
-                        const data = await response.json();
                         
-                        if (data.completed !== undefined) {
-                            this.currentLesson.completed = data.completed;
+                        if (response.ok) {
+                            // Update local state for the current lesson
+                            const wasCompleted = this.currentLesson.completed;
+                            this.currentLesson.completed = !wasCompleted;
                             
-                            // If marked as complete, trigger confetti
-                            if (data.completed) {
-                                this.triggerConfetti();
+                            // Update module lessons and count completed lessons
+                            let moduleCompletedCount = 0;
+                            const foundModule = this.modules.modules.find(m => m.slug === this.moduleSlug);
+                            
+                            if (foundModule) {
+                                // Find and update the lesson in the module
+                                const lesson = foundModule.lessons.find(l => l.slug === this.lessonSlug);
+                                if (lesson) {
+                                    lesson.completed = !wasCompleted;
+                                }
+                                
+                                // Count completed lessons in this module
+                                moduleCompletedCount = foundModule.lessons.filter(l => l.completed).length;
+                                foundModule.completed = moduleCompletedCount === foundModule.lessons.length;
                             }
                             
-                            // Refresh course structure to update progress
-                            this.fetchCourseStructure();
+                            // Update global completion counts
+                            if (wasCompleted) {
+                                this.completedLessons--;
+                            } else {
+                                this.completedLessons++;
+                            }
+                            
+                            // Update progress
+                            if (this.totalLessons > 0) {
+                                this.completionPercentage = (this.completedLessons / this.totalLessons) * 100;
+                            }
+                            
+                            // Show confetti if completing
+                            if (!wasCompleted) {
+                                this.triggerConfetti();
+                            }
                         }
                     } catch (error) {
                         console.error('Error toggling lesson completion:', error);
@@ -84,8 +123,46 @@
                 },
                 
                 // Navigate to another lesson
-                navigateToLesson(moduleSlug, lessonSlug) {
-                    window.location.href = `/masterclass/${moduleSlug}/${lessonSlug}`;
+                async navigateToLesson(moduleSlug, lessonSlug) {
+                    if (moduleSlug === this.moduleSlug && lessonSlug === this.lessonSlug) {
+                        return; // Already on this lesson
+                    }
+                    
+                    try {
+                        // Update URL without full page reload
+                        history.pushState(
+                            { moduleSlug, lessonSlug }, 
+                            '', 
+                            `/masterclass/${moduleSlug}/${lessonSlug}`
+                        );
+                        
+                        // Fetch the new lesson data
+                        const response = await fetch(`/masterclass/api/lesson?moduleSlug=${moduleSlug}&lessonSlug=${lessonSlug}`);
+                        const lessonData = await response.json();
+                        
+                        // Update state
+                        this.moduleSlug = moduleSlug;
+                        this.lessonSlug = lessonSlug;
+                        this.currentLesson = lessonData;
+                        
+                        // Find and update the current module
+                        this.currentModule = this.modules.modules.find(m => m.slug === moduleSlug);
+                        
+                        // Set expanded state for the module
+                        if (this.currentModule) {
+                            // Make sure all modules are collapsed except current
+                            this.modules.modules.forEach(m => {
+                                m.expanded = (m.slug === moduleSlug);
+                            });
+                        }
+                        
+                        // Scroll to top of content
+                        document.querySelector('.overflow-y-auto')?.scrollTo(0, 0);
+                    } catch (error) {
+                        console.error('Error navigating to lesson:', error);
+                        // Fallback to traditional navigation on error
+                        window.location.href = `/masterclass/${moduleSlug}/${lessonSlug}`;
+                    }
                 },
                 
                 // Trigger confetti effect
@@ -114,7 +191,8 @@
                         const data = await response.json();
                         
                         if (data.slug && data.moduleSlug) {
-                            this.navigateToLesson(data.moduleSlug, data.slug);
+                            // Use client-side navigation instead of full page reload
+                            await this.navigateToLesson(data.moduleSlug, data.slug);
                         }
                     } catch (error) {
                         console.error('Error fetching next lesson:', error);
@@ -128,7 +206,8 @@
                         const data = await response.json();
                         
                         if (data.slug && data.moduleSlug) {
-                            this.navigateToLesson(data.moduleSlug, data.slug);
+                            // Use client-side navigation instead of full page reload
+                            await this.navigateToLesson(data.moduleSlug, data.slug);
                         }
                     } catch (error) {
                         console.error('Error fetching previous lesson:', error);
@@ -226,6 +305,21 @@
         // Wait for Alpine.js initialization
         document.addEventListener('alpine:init', () => {
             console.log('Alpine initialized, course UI ready');
+        });
+        
+        // Handle browser back/forward navigation
+        window.addEventListener('popstate', (event) => {
+            const pathParts = window.location.pathname.split('/');
+            if (pathParts.length >= 4 && pathParts[1] === 'masterclass') {
+                const moduleSlug = pathParts[2];
+                const lessonSlug = pathParts[3];
+                
+                // Get Alpine.js component and update it
+                const component = Alpine.evaluate(document.querySelector('[x-data]'), '$data');
+                if (component && component.navigateToLesson) {
+                    component.navigateToLesson(moduleSlug, lessonSlug);
+                }
+            }
         });
     </script>
 </body>

@@ -336,23 +336,137 @@ func MasterclassModuleHandler(db *sql.DB, templates *template.Template) http.Han
 				return
 			}
 
+			// Pre-fetch lesson completion status
+			completed, err := masterclass.GetLessonCompletionStatus(db, userID, lesson.ID)
+			if err != nil {
+				// Log error but continue with default value
+				log.Printf("Error getting lesson completion status: %v", err)
+				completed = false
+			}
+
+			// Pre-fetch course structure with completion data
+			courseStructure := masterclass.GetCourseStructure()
+			completedCount := 0
+			totalCount := 0
+			moduleResponses := make([]map[string]interface{}, len(courseStructure))
+
+			for i, module := range courseStructure {
+				// Get module completion status
+				moduleComplete, err := masterclass.IsModuleComplete(db, userID, module.Slug)
+				if err != nil {
+					log.Printf("Error checking module completion: %v", err)
+					moduleComplete = false
+				}
+
+				// Get module progress
+				completed, total, progress, err := masterclass.GetModuleProgress(db, userID, module.Slug)
+				if err != nil {
+					log.Printf("Error getting module progress: %v", err)
+					completed, total, progress = 0, len(module.Lessons), 0
+				}
+
+				// Add to totals
+				completedCount += completed
+				totalCount += total
+
+				// Create lesson responses with completion status
+				lessonResponses := make([]map[string]interface{}, len(module.Lessons))
+				for j, lesson := range module.Lessons {
+					// Get lesson completion status
+					lessonComplete, err := masterclass.GetLessonCompletionStatus(db, userID, lesson.ID)
+					if err != nil {
+						log.Printf("Error checking lesson completion: %v", err)
+						lessonComplete = false
+					}
+
+					lessonResponses[j] = map[string]interface{}{
+						"id":          lesson.ID,
+						"slug":        lesson.Slug,
+						"title":       lesson.Title,
+						"emoji":       lesson.Emoji,
+						"type":        lesson.Type,
+						"moduleSlug":  lesson.ModuleSlug,
+						"order":       lesson.Order,
+						"description": lesson.Description,
+						"completed":   lessonComplete,
+					}
+				}
+
+				moduleResponses[i] = map[string]interface{}{
+					"id":          module.ID,
+					"slug":        module.Slug,
+					"title":       module.Title,
+					"description": module.Description,
+					"emoji":       module.Emoji,
+					"order":       module.Order,
+					"lessons":     lessonResponses,
+					"completed":   moduleComplete,
+					"progress":    progress,
+				}
+			}
+
+			// Calculate overall progress
+			var overallProgress float64 = 0
+			if totalCount > 0 {
+				overallProgress = float64(completedCount) / float64(totalCount) * 100
+			}
+
+			// Create course structure response
+			courseData := map[string]interface{}{
+				"modules":        moduleResponses,
+				"completedCount": completedCount,
+				"totalCount":     totalCount,
+				"progress":       overallProgress,
+			}
+
+			// Convert to JSON for template
+			courseDataJSON, err := json.Marshal(courseData)
+			if err != nil {
+				log.Printf("Error marshaling course data: %v", err)
+				courseDataJSON = []byte("{}")
+			}
+
+			// Create lesson data response
+			lessonData := map[string]interface{}{
+				"id":          lesson.ID,
+				"slug":        lesson.Slug,
+				"title":       lesson.Title,
+				"emoji":       lesson.Emoji,
+				"type":        lesson.Type,
+				"moduleSlug":  lesson.ModuleSlug,
+				"order":       lesson.Order,
+				"description": lesson.Description,
+				"completed":   completed,
+			}
+
+			// Convert to JSON for template
+			lessonDataJSON, err := json.Marshal(lessonData)
+			if err != nil {
+				log.Printf("Error marshaling lesson data: %v", err)
+				lessonDataJSON = []byte("{}")
+			}
+
 			// Set default template data
 			data := struct {
-				User       *models.User
-				Modules    []masterclass.Module
-				ModuleSlug string
-				LessonSlug string
-				Lesson     *masterclass.Lesson
-				Module     *masterclass.Module
-				Page       string
+				User              *models.User
+				Modules           []masterclass.Module
+				ModuleSlug        string
+				LessonSlug        string
+				Lesson            *masterclass.Lesson
+				Module            *masterclass.Module
+				Page              string
+				InitialLessonData template.JS
+				InitialCourseData template.JS
 			}{
-				User:       user,
-				Modules:    modules,
-				ModuleSlug: moduleSlug,
-				LessonSlug: lessonSlug,
-				Lesson:     lesson,
-				Module:     module,
-				Page:       "masterclass",
+				User:              user,
+				Modules:           modules,
+				ModuleSlug:        moduleSlug,
+				LessonSlug:        lessonSlug,
+				Lesson:            lesson,
+				Module:            module,
+				Page:              "masterclass",
+				InitialLessonData: template.JS(lessonDataJSON),
+				InitialCourseData: template.JS(courseDataJSON),
 			}
 
 			data.Lesson = lesson
