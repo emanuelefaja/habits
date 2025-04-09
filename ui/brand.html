@@ -480,6 +480,125 @@
                 </ul>
             </div>
         </section>
+        
+        <!-- Card Components Section -->
+        <section class="mb-16">
+            <h2 class="text-2xl font-bold mb-6 text-gray-900 border-b pb-2">Card Components</h2>
+            <p class="mb-6 text-gray-700">Cards are a core UI component used throughout our products for organizing content. We maintain consistent styling across card types to ensure brand cohesion.</p>
+            
+            <!-- Card Types -->
+            <h3 class="text-xl font-bold mb-6 text-gray-900">Card Types</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <!-- Standard Card -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4 text-gray-800">Standard Card</h4>
+                    <div class="text-sm text-gray-500 mb-4">
+                        Used for feature highlights, statistics, and general content blocks.
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-4">
+                        <div class="text-3xl mb-2">⚡</div>
+                        <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">Fast</h3>
+                        <p class="text-gray-600 dark:text-gray-300">Everything loads in less than 100ms.</p>
+                    </div>
+                </div>
+                
+                <!-- Stat Cards -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4 text-gray-800">Stat Cards</h4>
+                    <div class="text-sm text-gray-500 mb-4">
+                        Used for displaying metrics, statistics, and analytics data across the application.
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <!-- Total Done Card -->
+                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
+                            <div class="p-5">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0">
+                                        <span class="text-2xl">✅</span>
+                                    </div>
+                                    <div class="ml-5 w-0 flex-1">
+                                        <dl>
+                                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Total Done</dt>
+                                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white">52</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Best Set Card -->
+                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
+                            <div class="p-5 relative">
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0">
+                                        <span class="text-2xl">🥇</span>
+                                    </div>
+                                    <div class="ml-5 w-0 flex-1">
+                                        <dl>
+                                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Best Set</dt>
+                                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white">23</dd>
+                                        </dl>
+                                    </div>
+                                </div>
+                                <div class="absolute bottom-2 right-3 text-xs text-gray-500">May 15, 2023</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <!-- Feature Card -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4 text-gray-800">Feature Card</h4>
+                    <div class="text-sm text-gray-500 mb-4">
+                        Used for showcasing product features, benefits, or habit types.
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 mb-4">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="text-3xl">💪</div>
+                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Card Label</span>
+                        </div>
+                        <h3 class="font-semibold text-gray-900 mb-2">Feature Title</h3>
+                        <p class="text-sm text-gray-500">Brief description of the feature or benefit.</p>
+                    </div>
+                </div>
+                
+                <!-- Floating Card -->
+                <div>
+                    <h4 class="text-lg font-semibold mb-4 text-gray-800">Floating Card</h4>
+                    <div class="text-sm text-gray-500 mb-4">
+                        Used for decorative elements and visual interest in hero sections.
+                    </div>
+                    <div class="relative h-40 bg-gray-100 rounded-lg mb-4 overflow-hidden">
+                        <div class="absolute rounded-lg bg-white bg-opacity-80 px-4 py-2 flex items-center shadow-sm transform rotate-2" style="top: 20%; left: 15%; max-width: 200px;">
+                            <span class="text-xl mr-2">🧪</span>
+                            <span class="text-sm font-medium truncate">Core Habit Theory</span>
+                        </div>
+                        <div class="absolute rounded-lg bg-white bg-opacity-80 px-4 py-2 flex items-center shadow-sm transform -rotate-1" style="top: 60%; right: 15%; max-width: 200px;">
+                            <span class="text-xl mr-2">🏠</span>
+                            <span class="text-sm font-medium truncate">Environment Design</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Card Guidelines -->
+            <div class="bg-white p-6 rounded-lg shadow-sm">
+                <h3 class="text-lg font-semibold mb-3 text-gray-800">Card Usage Guidelines</h3>
+                <ul class="list-disc pl-6 text-gray-700 space-y-2">
+                    <li>Maintain consistent padding (p-6) across all standard cards</li>
+                    <li>Use rounded corners (rounded-lg) on all card elements</li>
+                    <li>Apply subtle shadows (shadow-sm) and borders (border border-gray-200) for depth</li>
+                    <li>Include appropriate spacing between card elements (mb-2 for titles, mb-3 for icons)</li>
+                    <li>Use hover states (hover:border-[#2da44e]) for interactive cards</li>
+                    <li>Keep content concise and focused within each card</li>
+                    <li>Use icons that align with our brand style and message</li>
+                    <li>Apply responsive design (grid grid-cols-1 md:grid-cols-X) for card layouts</li>
+                </ul>
+            </div>
+        </section>
     </div>
     
     <!-- Toast for copy notification -->
