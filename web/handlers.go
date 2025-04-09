@@ -7,6 +7,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -344,11 +345,24 @@ func MasterclassModuleHandler(db *sql.DB, templates *template.Template) http.Han
 				completed = false
 			}
 
-			// Get lesson content (missing in original code)
-			lessonContent, err := masterclass.LoadLessonContent(moduleSlug, lessonSlug)
+			// Get lesson content
+			lessonContent := ""
+			lessonPath := filepath.Join("ui", "masterclass", "lessons", moduleSlug, lessonSlug+".html")
+
+			// Process the lesson content using the masterclass template processing function
+			processedContent, err := masterclass.ProcessTemplate(lessonPath, nil)
 			if err != nil {
-				log.Printf("Error loading lesson content: %v", err)
-				lessonContent = fmt.Sprintf("<div class='prose dark:prose-invert'><p>Lesson content could not be loaded.</p><p class='text-sm text-gray-500'>Error: %s</p></div>", err.Error())
+				log.Printf("Error processing lesson template: %v", err)
+				// Fallback to loading the raw content
+				rawContent, err := masterclass.LoadLessonContent(moduleSlug, lessonSlug)
+				if err != nil {
+					log.Printf("Error loading lesson content: %v", err)
+					lessonContent = fmt.Sprintf("<div class='prose dark:prose-invert'><p>Lesson content could not be loaded.</p><p class='text-sm text-gray-500'>Error: %s</p></div>", err.Error())
+				} else {
+					lessonContent = rawContent
+				}
+			} else {
+				lessonContent = processedContent
 			}
 
 			// Pre-fetch course structure with completion data

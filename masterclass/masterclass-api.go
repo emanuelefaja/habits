@@ -4,7 +4,9 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
+	"path/filepath"
 	"time"
 
 	"mad/middleware"
@@ -217,17 +219,27 @@ func LessonHandler(db *sql.DB) http.HandlerFunc {
 		}
 
 		// Get lesson content
-		content, err := LoadLessonContent(moduleSlug, lessonSlug)
+		lessonPath := filepath.Join("ui", "masterclass", "lessons", moduleSlug, lessonSlug+".html")
+		content, err := ProcessTemplate(lessonPath, nil)
 		if err != nil {
-			// Fallback to placeholder if content can't be loaded
-			content = fmt.Sprintf(`
-				<div class="prose dark:prose-invert">
-					<p>Lesson content could not be loaded.</p>
-					<p class="text-sm text-gray-500">Error: %s</p>
-					<hr>
-					<p>%s</p>
-				</div>
-			`, err.Error(), lesson.Description)
+			// Log the error
+			log.Printf("Error processing lesson template: %v", err)
+
+			// Fallback to raw content if template processing fails
+			rawContent, err := LoadLessonContent(moduleSlug, lessonSlug)
+			if err != nil {
+				// Fallback to placeholder if content can't be loaded
+				content = fmt.Sprintf(`
+					<div class="prose dark:prose-invert">
+						<p>Lesson content could not be loaded.</p>
+						<p class="text-sm text-gray-500">Error: %s</p>
+						<hr>
+						<p>%s</p>
+					</div>
+				`, err.Error(), lesson.Description)
+			} else {
+				content = rawContent
+			}
 		}
 
 		// Create response
