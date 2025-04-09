@@ -3,6 +3,7 @@ package masterclass
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"time"
@@ -409,4 +410,44 @@ func LoadLessonContent(moduleSlug, lessonSlug string) (string, error) {
 	}
 
 	return string(content), nil
+}
+
+// GetFirstIncompleteLesson finds the first incomplete lesson for a user
+// If all lessons are complete, it returns the first lesson of the first module
+func GetFirstIncompleteLesson(db *sql.DB, userID int) (*Lesson, *Module, error) {
+	// Get the course structure
+	modules := GetCourseStructure()
+	if len(modules) == 0 {
+		return nil, nil, fmt.Errorf("no modules found in course structure")
+	}
+
+	// Check each module and lesson in order
+	for _, module := range modules {
+		if len(module.Lessons) == 0 {
+			continue // Skip empty modules
+		}
+
+		for _, lesson := range module.Lessons {
+			// Check if this lesson is incomplete
+			completed, err := GetLessonCompletionStatus(db, userID, lesson.ID)
+			if err != nil {
+				// Log error but continue checking other lessons
+				log.Printf("Error checking completion status for lesson %s: %v", lesson.ID, err)
+				continue
+			}
+
+			// If the lesson is not completed, return it
+			if !completed {
+				// Return a copy of module and lesson to avoid modifying the original
+				currentModule := module
+				currentLesson := lesson
+				return &currentLesson, &currentModule, nil
+			}
+		}
+	}
+
+	// If all lessons are complete, return the first lesson of the first module
+	firstModule := modules[0]
+	firstLesson := firstModule.Lessons[0]
+	return &firstLesson, &firstModule, nil
 }

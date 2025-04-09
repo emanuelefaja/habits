@@ -252,13 +252,22 @@ func MasterclassHandler(db *sql.DB, templates *template.Template) http.HandlerFu
 			if err == nil && hasAccess {
 				data.HasAccess = true
 
-				// Get the first module and lesson for redirect
-				modules := masterclass.GetCourseStructure()
-				if len(modules) > 0 && len(modules[0].Lessons) > 0 {
-					firstModule := modules[0]
-					firstLesson := firstModule.Lessons[0]
+				// Find first incomplete lesson, or default to first lesson if all complete
+				firstIncompleteLesson, firstIncompleteModule, err := masterclass.GetFirstIncompleteLesson(db, userID)
+				if err != nil {
+					log.Printf("Error finding first incomplete lesson: %v", err)
+					// Fallback to first lesson of first module if there's an error
+					modules := masterclass.GetCourseStructure()
+					if len(modules) > 0 && len(modules[0].Lessons) > 0 {
+						firstIncompleteModule = &modules[0]
+						firstIncompleteLesson = &modules[0].Lessons[0]
+					}
+				}
+
+				// Redirect to the identified lesson
+				if firstIncompleteLesson != nil && firstIncompleteModule != nil {
 					redirectURL := fmt.Sprintf("/masterclass/%s/%s",
-						firstModule.Slug, firstLesson.Slug)
+						firstIncompleteModule.Slug, firstIncompleteLesson.Slug)
 					http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 					return
 				}
