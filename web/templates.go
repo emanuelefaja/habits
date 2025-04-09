@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"html/template"
 	"log"
+	"os"
+	"path/filepath"
+	"strings"
 )
 
 // TemplateFuncMap returns the template functions map used across the application
@@ -32,60 +35,33 @@ func TemplateFuncMap() template.FuncMap {
 
 // LoadTemplates loads and parses all application templates
 func LoadTemplates() (*template.Template, error) {
-	parsedTemplates, err := template.New("").Funcs(TemplateFuncMap()).ParseFiles(
-		// Components
-		"ui/components/header.html",
-		"ui/components/habit-modal.html",
-		"ui/components/monthly-grid.html",
-		"ui/components/demo-grid.html",
-		"ui/components/welcome.html",
-		"ui/components/yearly-grid.html",
-		"ui/components/head.html",
-		"ui/components/footer.html",
-		"ui/components/sum-line-graph.html",
-		"ui/components/goal.html",
-		"ui/components/subscription-form.html",
-		// Pages
-		"ui/home.html",
-		"ui/settings.html",
-		"ui/login.html",
-		"ui/register.html",
-		"ui/roadmap.html",
-		"ui/habits/habit.html",
-		"ui/habits/binary.html",
-		"ui/habits/numeric.html",
-		"ui/habits/choice.html",
-		"ui/habits/set-rep.html",
-		"ui/about.html",
-		"ui/guest-home.html",
-		"ui/admin.html",
-		"ui/changelog.html",
-		"ui/blog/blog.html",
-		"ui/blog/post.html",
-		"ui/goals.html",
-		"ui/forgot.html",
-		"ui/reset.html",
-		"ui/unsubscribe.html",
-		"ui/courses/digital-detox.html",
-		"ui/courses/phone-addiction.html",
-		"ui/privacy.html",
-		"ui/terms.html",
-		"ui/brand.html",
-		"ui/masterclass.html",
-		"ui/masterclass/masterclass-lp.html",
-		"ui/masterclass/lesson-base.html",
-		"ui/masterclass/components/sidebar.html",
-	)
+	t := template.New("").Funcs(TemplateFuncMap())
 
-	if err != nil {
+	// Walk the ui directory
+	if err := filepath.Walk("ui", func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// Only process .html files
+		if !info.IsDir() && strings.HasSuffix(path, ".html") {
+			// Parse each file
+			t, err = t.ParseFiles(path)
+			if err != nil {
+				log.Printf("Warning: Error parsing template %s: %v", path, err)
+				return nil // Continue despite errors
+			}
+		}
+		return nil
+	}); err != nil {
 		return nil, err
 	}
 
 	// Log loaded templates
-	log.Printf("Total templates loaded: %d", len(parsedTemplates.Templates()))
-	for _, t := range parsedTemplates.Templates() {
-		log.Printf("Loaded template: %s", t.Name())
+	log.Printf("Total templates loaded: %d", len(t.Templates()))
+	for _, tmpl := range t.Templates() {
+		log.Printf("Loaded template: %s", tmpl.Name())
 	}
 
-	return parsedTemplates, nil
+	return t, nil
 }
