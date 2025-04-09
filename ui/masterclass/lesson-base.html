@@ -279,10 +279,11 @@
                                     <button 
                                         @click="toggleLessonComplete"
                                         :class="currentLesson.completed 
-                                            ? 'bg-green-600 text-white hover:bg-green-700' 
-                                            : 'bg-[#81C895] text-white hover:bg-green-500 dark:bg-[#81C895] dark:text-white'"
-                                        class="rounded-md px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                                            ? 'bg-habit-color-green-core text-white' 
+                                            : 'bg-habit-color-blue-core text-white'"
+                                        class="rounded-md px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-habit-color-green-core">
                                         <span x-text="currentLesson.completed ? 'Completed' : 'Mark as complete'"></span>
+                                        <span x-show="!currentLesson.completed">🌱</span>
                                         <span x-show="currentLesson.completed">✅</span>
                                     </button>
                                 </div>
@@ -321,10 +322,11 @@
                                 <button 
                                     @click="toggleLessonComplete"
                                     :class="currentLesson.completed 
-                                        ? 'bg-green-600 text-white hover:bg-green-700' 
-                                        : 'bg-[#81C895] text-white hover:bg-green-500 dark:bg-[#81C895] dark:text-white'"
-                                    class="rounded-md px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                                        ? 'bg-habit-color-green-core text-white' 
+                                        : 'bg-habit-color-blue-core text-white'"
+                                    class="rounded-md px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-habit-color-green-core">
                                     <span x-text="currentLesson.completed ? 'Completed' : 'Mark as complete'"></span>
+                                    <span x-show="!currentLesson.completed">🌱</span>
                                     <span x-show="currentLesson.completed">✅</span>
                                 </button>
                                 
