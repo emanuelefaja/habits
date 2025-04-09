@@ -1,0 +1,145 @@
+<div class="prose dark:prose-invert max-w-none" x-data="{ 
+    answers: {
+        awareness: null,
+        consistency: null,
+        satisfaction: null,
+        obstacles: null
+    },
+    submitted: false,
+    score: 0,
+    calculateScore() {
+        this.score = 0;
+        if (this.answers.awareness) this.score += parseInt(this.answers.awareness);
+        if (this.answers.consistency) this.score += parseInt(this.answers.consistency);
+        if (this.answers.satisfaction) this.score += parseInt(this.answers.satisfaction);
+        if (this.answers.obstacles) this.score += parseInt(this.answers.obstacles);
+        this.submitted = true;
+    }
+}">
+    <h2 class="text-3xl font-bold mb-6">The Habit Assessment</h2>
+    
+    <p class="lead">Before you can improve your habits, you need to understand your current relationship with them. This assessment will help you evaluate your habit-building strengths and weaknesses.</p>
+    
+    <div class="my-8 p-6 bg-gray-100 dark:bg-gray-800 rounded-lg" x-show="!submitted">
+        <h3 class="text-xl font-semibold mb-4">Self-Assessment Questionnaire</h3>
+        <p class="mb-4">Rate each statement on a scale from 1 (strongly disagree) to 5 (strongly agree):</p>
+        
+        <div class="mb-6">
+            <label class="block font-medium mb-2">1. I'm aware of most of my daily habits and routines.</label>
+            <div class="flex space-x-4">
+                <template x-for="i in 5" :key="i">
+                    <label class="flex items-center">
+                        <input type="radio" name="awareness" :value="i" x-model="answers.awareness" class="mr-1">
+                        <span x-text="i"></span>
+                    </label>
+                </template>
+            </div>
+        </div>
+        
+        <div class="mb-6">
+            <label class="block font-medium mb-2">2. When I decide to build a new habit, I can consistently maintain it.</label>
+            <div class="flex space-x-4">
+                <template x-for="i in 5" :key="i">
+                    <label class="flex items-center">
+                        <input type="radio" name="consistency" :value="i" x-model="answers.consistency" class="mr-1">
+                        <span x-text="i"></span>
+                    </label>
+                </template>
+            </div>
+        </div>
+        
+        <div class="mb-6">
+            <label class="block font-medium mb-2">3. I find satisfaction in the process of building habits, not just the results.</label>
+            <div class="flex space-x-4">
+                <template x-for="i in 5" :key="i">
+                    <label class="flex items-center">
+                        <input type="radio" name="satisfaction" :value="i" x-model="answers.satisfaction" class="mr-1">
+                        <span x-text="i"></span>
+                    </label>
+                </template>
+            </div>
+        </div>
+        
+        <div class="mb-6">
+            <label class="block font-medium mb-2">4. I can identify specific obstacles that prevent me from maintaining good habits.</label>
+            <div class="flex space-x-4">
+                <template x-for="i in 5" :key="i">
+                    <label class="flex items-center">
+                        <input type="radio" name="obstacles" :value="i" x-model="answers.obstacles" class="mr-1">
+                        <span x-text="i"></span>
+                    </label>
+                </template>
+            </div>
+        </div>
+        
+        <button @click="calculateScore()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition" 
+                :disabled="!answers.awareness || !answers.consistency || !answers.satisfaction || !answers.obstacles">
+            Submit Assessment
+        </button>
+    </div>
+    
+    <div class="my-8 p-6 bg-gray-100 dark:bg-gray-800 rounded-lg" x-show="submitted">
+        <h3 class="text-xl font-semibold mb-4">Your Habit Profile</h3>
+        
+        <p class="mb-4">Your total score: <span x-text="score"></span> out of 20</p>
+        
+        <template x-if="score < 10">
+            <div class="mb-4">
+                <h4 class="font-bold">Habit Beginner</h4>
+                <p>You're just starting your journey with intentional habit building. This course will provide the structure and knowledge you need to make significant progress.</p>
+            </div>
+        </template>
+        
+        <template x-if="score >= 10 && score < 15">
+            <div class="mb-4">
+                <h4 class="font-bold">Habit Enthusiast</h4>
+                <p>You have a good foundation in habit building but still face some challenges. This course will help you refine your approach and overcome common obstacles.</p>
+            </div>
+        </template>
+        
+        <template x-if="score >= 15">
+            <div class="mb-4">
+                <h4 class="font-bold">Habit Craftsman</h4>
+                <p>You already have strong habit-building skills. This course will help you optimize your system and achieve even more sophisticated habit patterns.</p>
+            </div>
+        </template>
+        
+        <div class="mt-6">
+            <h4 class="font-bold mb-2">Next Steps</h4>
+            <ul class="list-disc pl-6">
+                <li>Note your lowest-scoring areas — these represent your biggest opportunities for growth</li>
+                <li>Keep this assessment in mind as you progress through the course</li>
+                <li>We'll revisit this assessment at the end of the course to measure your progress</li>
+            </ul>
+        </div>
+        
+        <button @click="submitted = false" class="mt-4 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-md transition">
+            Retake Assessment
+        </button>
+    </div>
+    
+    <h3 class="text-xl font-semibold mt-8 mb-4">What Your Assessment Reveals</h3>
+    
+    <p>This simple assessment gives you a starting point for understanding your current relationship with habits. As you progress through this course, you'll develop a much deeper understanding of your habit patterns.</p>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
+        <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+            <h4 class="font-bold mb-2">Awareness</h4>
+            <p>Your ability to notice your existing habits is the foundation of all habit change. Without awareness, change is nearly impossible.</p>
+        </div>
+        <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+            <h4 class="font-bold mb-2">Consistency</h4>
+            <p>Your capacity to maintain new behaviors is what separates temporary changes from lasting transformation.</p>
+        </div>
+        <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+            <h4 class="font-bold mb-2">Satisfaction</h4>
+            <p>Finding joy in the process, not just the outcome, is crucial for long-term habit maintenance.</p>
+        </div>
+        <div class="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg">
+            <h4 class="font-bold mb-2">Obstacle Recognition</h4>
+            <p>Your ability to identify what prevents habit formation allows you to design more effective solutions.</p>
+        </div>
+    </div>
+    
+    <p>In the coming lessons, we'll build on this foundation with practical strategies for habit design and implementation that work with your unique strengths and challenges.</p>
+</div> 

@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en" class="min-h-full bg-gray-50 dark:bg-gray-900">
+{{ template "head" . }}
+<body>
+    <div class="min-h-full bg-gray-50 dark:bg-gray-900">
+        {{ template "header" . }}
+        
+        <div class="w-full">
+            <div class="flex flex-col md:flex-row h-screen" x-data="{
+                // State management
+                moduleSlug: '{{ .ModuleSlug }}',
+                lessonSlug: '{{ .LessonSlug }}',
+                modules: {{ .InitialCourseData }},
+                currentLesson: {{ .InitialLessonData }},
+                currentModule: null,
+                
+                // Progress calculations
+                completedLessons: 0,
+                totalLessons: 0,
+                completionPercentage: 0,
+                
+                // Initialize data
+                init() {
+                    // Defensive checks for initial data
+                    if (!this.modules || typeof this.modules !== 'object') {
+                        console.error('Initial course data is missing or invalid');
+                        this.modules = { modules: [], completedCount: 0, totalCount: 0, progress: 0 };
+                        // Try to fetch data if missing
+                        this.fetchCourseStructure();
+                    }
+                    
+                    if (!this.currentLesson || typeof this.currentLesson !== 'object') {
+                        console.error('Initial lesson data is missing or invalid');
+                        // Try to fetch lesson data if missing
+                        if (this.moduleSlug && this.lessonSlug) {
+                            this.fetchLessonData();
+                        }
+                    }
+                    
+                    // Set progress data from initial course data
+                    this.completedLessons = this.modules.completedCount || 0;
+                    this.totalLessons = this.modules.totalCount || 0;
+                    this.completionPercentage = this.modules.progress || 0;
+                    
+                    // Find current module
+                    if (this.modules.modules) {
+                        this.currentModule = this.modules.modules.find(m => m.slug === this.moduleSlug);
+                        
+                        // Set initial expanded state for current module
+                        if (this.currentModule) {
+                            this.currentModule.expanded = true;
+                        }
+                    }
+                    
+                    // Expose global methods
+                    window.triggerConfetti = this.triggerConfetti;
+                    window.toggleLessonComplete = (moduleSlug, lessonSlug) => this.toggleLessonComplete(moduleSlug, lessonSlug);
+                    
+                    // Initialize toast functionality
+                    window.toast = function(message, options = {}) {
+                        console.log('Toast function called with:', message, options);
+                        let description = '';
+                        let type = 'default';
+                        let position = 'bottom-center';
+                        let html = '';
+                        
+                        if(typeof options.description != 'undefined') description = options.description;
+                        if(typeof options.type != 'undefined') type = options.type;
+                        if(typeof options.position != 'undefined') position = options.position;
+                        if(typeof options.html != 'undefined') html = options.html;
+                        
+                        window.dispatchEvent(new CustomEvent('toast-show', { 
+                            detail: { 
+                                type: type, 
+                                message: message, 
+                                description: description, 
+                                position: position, 
+                                html: html 
+                            }
+                        }));
+                    };
+
+                    // Add keyboard navigation event listener
+                    this.setupKeyboardNavigation();
+                },
+                
+                // Set up keyboard navigation
+                setupKeyboardNavigation() {
+                    window.addEventListener('keydown', (e) => {
+                        // Skip if user is typing in an input field
+                        if (e.target.tagName === 'INPUT' || 
+                            e.target.tagName === 'TEXTAREA' || 
+                            e.target.isContentEditable) {
+                            return;
+                        }
+                        
+                        // Left arrow key for previous lesson
+                        if (e.key === 'ArrowLeft') {
+                            e.preventDefault();
+                            this.navigateToPreviousLesson();
+                        }
+                        
+                        // Right arrow key for next lesson
+                        if (e.key === 'ArrowRight') {
+                            e.preventDefault();
+                            this.navigateToNextLesson();
+                        }
+                    });
+                },
+                
+                // Fetch course structure from API (only if needed)
+                async fetchCourseStructure() {
+                    try {
+                        const response = await fetch('/masterclass/api/course-structure');
+                        const data = await response.json();
+                        this.modules = data.modules;
+                        this.completedLessons = data.completedCount;
+                        this.totalLessons = data.totalCount;
+                        this.completionPercentage = data.progress;
+                        
+                        // Find current module
+                        this.currentModule = this.modules.find(m => m.slug === this.moduleSlug);
+                    } catch (error) {
+                        console.error('Error fetching course structure:', error);
+                    }
+                },
+                
+                // Fetch current lesson data (only if needed)
+                async fetchLessonData() {
+                    try {
+                        const response = await fetch(`/masterclass/api/lesson?moduleSlug=${this.moduleSlug}&lessonSlug=${this.lessonSlug}`);
+                        const data = await response.json();
+                        this.currentLesson = data;
+                    } catch (error) {
+                        console.error('Error fetching lesson data:', error);
+                    }
+                },
+                
+                // Toggle lesson completion status
+                async toggleLessonComplete(targetModuleSlug, targetLessonSlug) {
+                    // Use provided slugs or default to current lesson if not provided
+                    const moduleSlug = targetModuleSlug || this.moduleSlug;
+                    const lessonSlug = targetLessonSlug || this.lessonSlug;
+                    
+                    // Get the lesson to toggle
+                    let lessonToToggle = null;
+                    let moduleToUpdate = null;
+                    
+                    // Find the target module
+                    moduleToUpdate = this.modules.modules.find(m => m.slug === moduleSlug);
+                    if (!moduleToUpdate) return;
+                    
+                    // Find the target lesson
+                    lessonToToggle = moduleToUpdate.lessons.find(l => l.slug === lessonSlug);
+                    if (!lessonToToggle) return;
+                    
+                    // Determine if it's the current lesson
+                    const isCurrentLesson = moduleSlug === this.moduleSlug && lessonSlug === this.lessonSlug;
+                    
+                    // Remember the current completed state before toggling
+                    const wasCompleted = lessonToToggle.completed;
+                    
+                    const endpoint = wasCompleted
+                        ? '/masterclass/api/mark-incomplete'
+                        : '/masterclass/api/mark-complete';
+                    
+                    try {
+                        const response = await fetch(`${endpoint}?moduleSlug=${moduleSlug}&lessonSlug=${lessonSlug}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                        
+                        if (response.ok) {
+                            // Toggle the lesson completion state
+                            lessonToToggle.completed = !wasCompleted;
+                            
+                            // If this is the current lesson, update currentLesson too
+                            if (isCurrentLesson && this.currentLesson) {
+                                this.currentLesson.completed = !wasCompleted;
+                            }
+                            
+                            // Update module completion status
+                            const moduleCompletedCount = moduleToUpdate.lessons.filter(l => l.completed).length;
+                            moduleToUpdate.completed = moduleCompletedCount === moduleToUpdate.lessons.length;
+                            
+                            // Update global completion counts
+                            if (wasCompleted) {
+                                this.completedLessons--;
+                            } else {
+                                this.completedLessons++;
+                                
+                                // Show confetti if completing
+                                this.triggerConfetti();
+                                
+                                // Show success toast notification
+                                if (window.toast) {
+                                    console.log('Attempting to show toast for:', lessonToToggle.title);
+                                    window.toast(`Lesson completed!`, {
+                                        type: 'success',
+                                        position: 'bottom-center',
+                                        description: `Great job completing '${lessonToToggle.title}'`
+                                    });
+                                } else {
+                                    console.error('window.toast function not available');
+                                }
+                            }
+                            
+                            // Update progress
+                            if (this.totalLessons > 0) {
+                                this.completionPercentage = (this.completedLessons / this.totalLessons) * 100;
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error toggling lesson completion:', error);
+                    }
+                },
+                
+                // Navigate to another lesson
+                async navigateToLesson(moduleSlug, lessonSlug) {
+                    if (moduleSlug === this.moduleSlug && lessonSlug === this.lessonSlug) {
+                        return; // Already on this lesson
+                    }
+                    
+                    // Clear any active element focus before navigation
+                    if (document.activeElement) {
+                        document.activeElement.blur();
+                    }
+                    
+                    try {
+                        // Update URL without full page reload
+                        history.pushState(
+                            { moduleSlug, lessonSlug }, 
+                            '', 
+                            `/masterclass/${moduleSlug}/${lessonSlug}`
+                        );
+                        
+                        // Fetch the new lesson data
+                        const response = await fetch(`/masterclass/api/lesson?moduleSlug=${moduleSlug}&lessonSlug=${lessonSlug}`);
+                        const lessonData = await response.json();
+                        
+                        // Update state
+                        this.moduleSlug = moduleSlug;
+                        this.lessonSlug = lessonSlug;
+                        this.currentLesson = lessonData;
+                        
+                        // Find and update the current module
+                        this.currentModule = this.modules.modules.find(m => m.slug === moduleSlug);
+                        
+                        // Set expanded state for the module
+                        if (this.currentModule) {
+                            // Make sure all modules are collapsed except current
+                            this.modules.modules.forEach(m => {
+                                m.expanded = (m.slug === moduleSlug);
+                            });
+                        }
+                        
+                        // Scroll to top of content
+                        document.querySelector('.overflow-y-auto')?.scrollTo(0, 0);
+                    } catch (error) {
+                        console.error('Error navigating to lesson:', error);
+                        // Fallback to traditional navigation on error
+                        window.location.href = `/masterclass/${moduleSlug}/${lessonSlug}`;
+                    }
+                },
+                
+                // Trigger confetti effect
+                triggerConfetti() {
+                    setTimeout(() => {
+                        try {
+                            // Position confetti in center-top of screen
+                            const x = 0.5;
+                            const y = 0.3;
+                            
+                            confetti({
+                                particleCount: 150,
+                                spread: 90,
+                                origin: { x, y }
+                            });
+                        } catch (error) {
+                            console.error('Confetti error:', error);
+                        }
+                    }, 100);
+                },
+                
+                // Navigate to next lesson
+                async navigateToNextLesson() {
+                    try {
+                        const response = await fetch(`/masterclass/api/next-lesson?moduleSlug=${this.moduleSlug}&lessonSlug=${this.lessonSlug}`);
+                        const data = await response.json();
+                        
+                        if (data.slug && data.moduleSlug) {
+                            // Use client-side navigation instead of full page reload
+                            await this.navigateToLesson(data.moduleSlug, data.slug);
+                        }
+                    } catch (error) {
+                        console.error('Error fetching next lesson:', error);
+                    }
+                },
+                
+                // Navigate to previous lesson
+                async navigateToPreviousLesson() {
+                    try {
+                        const response = await fetch(`/masterclass/api/previous-lesson?moduleSlug=${this.moduleSlug}&lessonSlug=${this.lessonSlug}`);
+                        const data = await response.json();
+                        
+                        if (data.slug && data.moduleSlug) {
+                            // Use client-side navigation instead of full page reload
+                            await this.navigateToLesson(data.moduleSlug, data.slug);
+                        }
+                    } catch (error) {
+                        console.error('Error fetching previous lesson:', error);
+                    }
+                }
+            }">
+                <!-- Include sidebar component -->
+                {{ template "sidebar.html" . }}
+                
+                <!-- Main content area -->
+                <div class="flex-1 overflow-y-auto p-6">
+                    <!-- Lesson header -->
+                    <div class="border-b border-gray-200 dark:border-gray-700 pb-4 mb-6">
+                        <template x-if="currentLesson">
+                            <div>
+                                <div class="flex justify-between items-center">
+                                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                                        <span x-text="currentLesson.emoji" class="mr-2"></span>
+                                        <span x-text="currentLesson.title"></span>
+                                    </h1>
+                                    <button 
+                                        @click="toggleLessonComplete()"
+                                        :class="currentLesson.completed 
+                                            ? 'bg-habit-color-green-core text-white' 
+                                            : 'bg-habit-color-blue-core text-white'"
+                                        class="rounded-md px-4 py-2 text-sm font-semibold shadow-sm outline-none focus:outline-none focus-visible:outline-none">
+                                        <span x-text="currentLesson.completed ? 'Completed' : 'Mark as complete'"></span>
+                                        <span x-show="!currentLesson.completed">🌱</span>
+                                        <span x-show="currentLesson.completed">✅</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+                        <template x-if="!currentLesson">
+                            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                                Loading lesson...
+                            </h1>
+                        </template>
+                    </div>
+                    
+                    <!-- Lesson content -->
+                    <template x-if="currentLesson">
+                        <div class="mt-4 prose dark:prose-invert max-w-none">
+                            <!-- Render lesson content -->
+                            <div x-html="currentLesson.content"></div>
+                        </div>
+                    </template>
+                    <template x-if="!currentLesson">
+                        <div class="text-center p-12">
+                            <p class="text-lg text-gray-600 dark:text-gray-400">Loading lesson content...</p>
+                        </div>
+                    </template>
+                    
+                    <!-- Lesson navigation -->
+                    <template x-if="currentLesson">
+                        <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                            <div class="flex justify-center items-center space-x-4">
+                                <button 
+                                    @click="navigateToPreviousLesson"
+                                    class="rounded-md px-4 py-2 text-sm font-semibold shadow-sm bg-[#E8EDF0] text-gray-800 hover:bg-gray-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                                    ⬅️ Previous lesson
+                                </button>
+                                
+                                <button 
+                                    @click="toggleLessonComplete()"
+                                    :class="currentLesson.completed 
+                                        ? 'bg-habit-color-green-core text-white' 
+                                        : 'bg-habit-color-blue-core text-white'"
+                                    class="rounded-md px-4 py-2 text-sm font-semibold shadow-sm outline-none focus:outline-none focus-visible:outline-none">
+                                    <span x-text="currentLesson.completed ? 'Completed' : 'Mark as complete'"></span>
+                                    <span x-show="!currentLesson.completed">🌱</span>
+                                    <span x-show="currentLesson.completed">✅</span>
+                                </button>
+                                
+                                <button 
+                                    @click="navigateToNextLesson"
+                                    class="rounded-md px-4 py-2 text-sm font-semibold shadow-sm bg-[#E8EDF0] text-gray-800 hover:bg-gray-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                                    Next lesson ➡️
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Wait for Alpine.js initialization
+        document.addEventListener('alpine:init', () => {
+            console.log('Alpine initialized, course UI ready');
+        });
+        
+        // Handle browser back/forward navigation
+        window.addEventListener('popstate', (event) => {
+            const pathParts = window.location.pathname.split('/');
+            if (pathParts.length >= 4 && pathParts[1] === 'masterclass') {
+                const moduleSlug = pathParts[2];
+                const lessonSlug = pathParts[3];
+                
+                // Safe way to get Alpine component
+                setTimeout(() => {
+                    const element = document.querySelector('.flex.flex-col.md\\:flex-row.h-screen');
+                    if (element && element.__x) {
+                        const component = element.__x.$data;
+                        if (component && component.navigateToLesson) {
+                            component.navigateToLesson(moduleSlug, lessonSlug);
+                        }
+                    }
+                }, 100);
+            }
+        });
+        
+        // Add keyboard navigation support
+        document.addEventListener('DOMContentLoaded', () => {
+            window.addEventListener('keydown', (e) => {
+                // Skip if user is typing in an input field
+                if (e.target.tagName === 'INPUT' || 
+                    e.target.tagName === 'TEXTAREA' || 
+                    e.target.isContentEditable) {
+                    return;
+                }
+                
+                setTimeout(() => {
+                    // Safe way to access the Alpine.js component
+                    const element = document.querySelector('.flex.flex-col.md\\:flex-row.h-screen');
+                    if (element && element.__x) {
+                        const component = element.__x.$data;
+                        if (!component) return;
+                        
+                        // Left arrow key for previous lesson
+                        if (e.key === 'ArrowLeft') {
+                            e.preventDefault();
+                            component.navigateToPreviousLesson();
+                        }
+                        
+                        // Right arrow key for next lesson
+                        if (e.key === 'ArrowRight') {
+                            e.preventDefault();
+                            component.navigateToNextLesson();
+                        }
+                    }
+                }, 100);
+            });
+        });
+
+        // Add a safe test method to trigger a toast directly
+        window.testToast = function() {
+            console.log("Testing toast notification...");
+            if (window.toast) {
+                window.toast("Test Toast", {
+                    type: 'success',
+                    position: 'bottom-center',
+                    description: 'This is a test notification'
+                });
+            } else {
+                console.error("window.toast function is not available");
+            }
+        };
+    </script>
+    
+    <!-- Toast Notification System - Moved outside of main Alpine component -->
+    <div x-data="{}" id="toast-container">
+        <template x-teleport="body">
+            <ul 
+                x-data="{ 
+                    toasts: [],
+                    toastsHovered: false,
+                    expanded: false,
+                    position: 'bottom-center',
+                    paddingBetweenToasts: 15,
+                    deleteToastWithId(id) {
+                        for(let i = 0; i < this.toasts.length; i++) {
+                            if(this.toasts[i].id === id) {
+                                this.toasts.splice(i, 1);
+                                break;
+                            }
+                        }
+                    },
+                    burnToast(id) {
+                        const burnToast = this.getToastWithId(id);
+                        const burnToastElement = document.getElementById(burnToast.id);
+                        if(burnToastElement) {
+                            burnToastElement.classList.remove('translate-y-0');
+                            burnToastElement.classList.add('translate-y-full');
+                            burnToastElement.classList.add('opacity-0');
+                            
+                            let that = this;
+                            setTimeout(function() {
+                                that.deleteToastWithId(id);
+                            }, 300);
+                        }
+                    },
+                    getToastWithId(id) {
+                        for(let i = 0; i < this.toasts.length; i++) {
+                            if(this.toasts[i].id === id) {
+                                return this.toasts[i];
+                            }
+                        }
+                    }
+                }"
+                @toast-show.window="
+                    console.log('Toast show event received:', event.detail);
+                    event.stopPropagation();
+                    toasts.unshift({
+                        id: 'toast-' + Math.random().toString(16).slice(2),
+                        message: event.detail.message,
+                        description: event.detail.description,
+                        type: event.detail.type
+                    });
+                    console.log('Toast added to list, current toasts:', toasts);
+                "
+                class="fixed block w-full z-[99] sm:max-w-xs right-0 bottom-0 sm:mb-6 sm:mr-6"
+                x-cloak>
+            
+                <template x-for="(toast, index) in toasts" :key="toast.id">
+                    <li
+                        :id="toast.id"
+                        x-data="{ toastHovered: false }"
+                        x-init="
+                            $el.firstElementChild.classList.add('opacity-0', 'translate-y-full');
+                            
+                            setTimeout(function() {
+                                $el.firstElementChild.classList.remove('opacity-0', 'translate-y-full');
+                                $el.firstElementChild.classList.add('opacity-100', 'translate-y-0');
+                            }, 50);
+            
+                            setTimeout(function() {
+                                if (!toastHovered) {
+                                    $el.firstElementChild.classList.remove('opacity-100');
+                                    $el.firstElementChild.classList.add('opacity-0');
+                                    $el.firstElementChild.classList.remove('translate-y-0');
+                                    $el.firstElementChild.classList.add('translate-y-full');
+                                    
+                                    setTimeout(function() {
+                                        deleteToastWithId(toast.id);
+                                    }, 300);
+                                }
+                            }, 4000);
+                        "
+                        @mouseover="toastHovered = true"
+                        @mouseout="toastHovered = false"
+                        class="w-full duration-300 ease-out select-none mb-2 sm:max-w-xs"
+                    >
+                        <span 
+                            class="relative flex flex-col items-start shadow-lg w-full transition-all duration-300 ease-out bg-white border border-gray-100 rounded-md p-4"
+                        >
+                            <div class="relative">
+                                <div class="flex items-center">
+                                    <span class="text-lg mr-1.5">✅</span>
+                                    <p class="text-[13px] font-medium leading-none text-gray-800" x-text="toast.message"></p>
+                                </div>
+                                <p x-show="toast.description" 
+                                    class="pl-5 mt-1.5 text-xs leading-none opacity-70" 
+                                    x-text="toast.description"></p>
+                            </div>
+                            <span 
+                                @click="burnToast(toast.id)"
+                                class="absolute right-0 p-1.5 mr-2.5 text-gray-400 duration-100 ease-in-out rounded-full cursor-pointer hover:bg-gray-50 hover:text-gray-500"
+                                :class="{ 'top-1/2 -translate-y-1/2': !toast.description, 'top-0 mt-2.5': toast.description, 'opacity-100': toastHovered, 'opacity-0': !toastHovered }"
+                            >
+                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                            </span>
+                        </span>
+                    </li>
+                </template>
+            </ul>
+        </template>
+    </div>
+</body>
+</html> 

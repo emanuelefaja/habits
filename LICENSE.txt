@@ -10,9 +10,9 @@ but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU Affero General Public License for more details.
 
-Note: Course content located in the ui/email/courses directory is licensed under
+Note: Course content located in the ui/email/courses and ui/masterclass/lessons directory are licensed under
 the Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0).
-Please see ui/email/courses/LICENSE.TXT for details on the course content license.
+Please see ui/email/courses/LICENSE.TXT and ui/masterclass/lessons/LICENSE.txt for details on the course content license.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.

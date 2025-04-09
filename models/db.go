@@ -298,6 +298,59 @@ func InitDB(db *sql.DB) error {
 		return fmt.Errorf("error creating email campaign indexes: %w", err)
 	}
 
+	// Create user_lesson_completion table
+	_, err = db.Exec(`
+		CREATE TABLE IF NOT EXISTS user_lesson_completion (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			user_id INTEGER NOT NULL,
+			lesson_id TEXT NOT NULL,
+			module_id TEXT NOT NULL,
+			completed BOOLEAN NOT NULL DEFAULT FALSE,
+			completed_at TIMESTAMP,
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+			UNIQUE(user_id, lesson_id)
+		)
+	`)
+	if err != nil {
+		return fmt.Errorf("error creating user_lesson_completion table: %w", err)
+	}
+
+	// Create indexes for user_lesson_completion
+	_, err = db.Exec(`
+		CREATE INDEX IF NOT EXISTS idx_user_lesson_completion_user_id ON user_lesson_completion(user_id);
+		CREATE INDEX IF NOT EXISTS idx_user_lesson_completion_lesson_id ON user_lesson_completion(lesson_id)
+	`)
+	if err != nil {
+		return fmt.Errorf("error creating user_lesson_completion indexes: %w", err)
+	}
+
+	// Create user_course_access table
+	_, err = db.Exec(`
+		CREATE TABLE IF NOT EXISTS user_course_access (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			user_id INTEGER NOT NULL,
+			course_id TEXT NOT NULL,
+			purchased_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			purchase_price REAL,
+			status TEXT NOT NULL CHECK(status IN ('active', 'refunded', 'expired')) DEFAULT 'active',
+			FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+			UNIQUE(user_id, course_id)
+		)
+	`)
+	if err != nil {
+		return fmt.Errorf("error creating user_course_access table: %w", err)
+	}
+
+	// Create indexes for user_course_access
+	_, err = db.Exec(`
+		CREATE INDEX IF NOT EXISTS idx_user_course_access_user_id ON user_course_access(user_id);
+		CREATE INDEX IF NOT EXISTS idx_user_course_access_course_id ON user_course_access(course_id)
+	`)
+	if err != nil {
+		return fmt.Errorf("error creating user_course_access indexes: %w", err)
+	}
+
 	return nil
 }
 

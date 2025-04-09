@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en" class="min-h-full bg-gray-50 dark:bg-gray-900">
+{{ template "head" . }}
+<body>
+    <div class="min-h-full bg-gray-50 dark:bg-gray-900">
+        {{ template "header" . }}
+        
+        <div class="w-full">
+            <div class="flex flex-col md:flex-row h-screen" x-data="{
+                // State management
+                selectedLessonId: 101,
+                selectedModuleId: 1,
+                modules: courseData.modules,
+                
+                // Context menu state
+                contextMenuOpen: false,
+                contextMenuModuleId: null,
+                contextMenuLessonId: null,
+                contextMenuX: 0,
+                contextMenuY: 0,
+                
+                // Progress calculations
+                get totalLessons() {
+                    return this.modules.reduce((total, module) => total + module.lessons.length, 0);
+                },
+                get completedLessons() {
+                    return this.modules.reduce((total, module) => total + module.lessons.filter(lesson => lesson.done).length, 0);
+                },
+                get completionPercentage() {
+                    return Math.round((this.completedLessons / this.totalLessons) * 100) || 0;
+                },
+                
+                // Actions
+                selectLesson(moduleId, lessonId) {
+                    console.log('selectLesson called with:', moduleId, lessonId);
+                    
+                    // Validate inputs
+                    if (!moduleId || !lessonId) {
+                        console.error('Invalid moduleId or lessonId:', moduleId, lessonId);
+                        return;
+                    }
+                    
+                    // Find the module and lesson to ensure they exist
+                    const module = this.modules.find(m => m.id === moduleId);
+                    if (!module) {
+                        console.error('Module not found:', moduleId);
+                        return;
+                    }
+                    
+                    const lesson = module.lessons.find(l => l.id === lessonId);
+                    if (!lesson) {
+                        console.error('Lesson not found:', lessonId, 'in module:', moduleId);
+                        return;
+                    }
+                    
+                    // Update the selected lesson and module
+                    this.selectedLessonId = lessonId;
+                    this.selectedModuleId = moduleId;
+                    
+                    // Expand the module that contains the selected lesson
+                    this.modules = this.modules.map(m => ({
+                        ...m,
+                        expanded: m.id === moduleId ? true : m.expanded
+                    }));
+                    
+                    console.log('After selectLesson:', this.selectedModuleId, this.selectedLessonId);
+                    
+                    // Force a UI update
+                    this.$nextTick(() => {
+                        console.log('UI updated with new lesson');
+                    });
+                },
+                toggleModule(moduleId) {
+                    this.modules = this.modules.map(module => ({
+                        ...module,
+                        expanded: module.id === moduleId ? !module.expanded : module.expanded
+                    }));
+                },
+                
+                // Current lesson
+                get currentLesson() {
+                    if (!this.selectedLessonId) return null;
+                    const module = this.modules.find(m => m.id === this.selectedModuleId);
+                    return module?.lessons.find(l => l.id === this.selectedLessonId);
+                }
+            }">
+                <!-- Sidebar with modules and lessons -->
+                <div class="w-full md:w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col">
+                    <div class="sticky top-0 p-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                        <h2 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Masterclass</h2>
+                        
+                        <!-- Progress bar -->
+                        <div class="mb-3">
+                            <div class="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-1">
+                                <span>🎓 Progress</span>
+                                <span x-text="completedLessons + '/' + totalLessons + ' lessons'"></span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mb-1">
+                                <div class="bg-green-500 h-2.5 rounded-full" :style="'width: ' + completionPercentage + '%'"></div>
+                            </div>
+                            <div class="text-right text-xs text-gray-500 dark:text-gray-400">
+                                <span x-text="completionPercentage + '%'"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-1 overflow-y-auto" @lesson-selected.window="selectLesson($event.detail.moduleId, $event.detail.lessonId)">
+                        <div class="space-y-2">
+                            <template x-for="module in modules" :key="module.id">
+                                <div class="rounded-md">
+                                    <!-- Module header -->
+                                    <div 
+                                        @click="toggleModule(module.id)"
+                                        class="flex justify-between items-center p-2 cursor-pointer bg-white dark:bg-gray-700 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600"
+                                    >
+                                        <div class="flex items-center">
+                                            <span class="mr-2" x-text="module.emoji"></span>
+                                            <span 
+                                                class="font-medium text-sm" 
+                                                :class="{
+                                                    'text-gray-500 line-through': module.lessons.length > 0 && module.lessons.every(lesson => lesson.done),
+                                                    'text-gray-900 dark:text-white': !(module.lessons.length > 0 && module.lessons.every(lesson => lesson.done))
+                                                }"
+                                                x-text="module.title"></span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <span 
+                                                x-show="module.lessons.length > 0 && module.lessons.every(lesson => lesson.done)" 
+                                                class="mr-2 text-green-500"
+                                                title="All lessons completed"
+                                            >✅</span>
+                                            <svg x-show="!module.expanded" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                            </svg>
+                                            <svg x-show="module.expanded" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Updated lessons list -->
+                                    <div x-show="module.expanded" class="pl-6 mt-1 space-y-1">
+                                        <template x-for="lesson in module.lessons" :key="lesson.id">
+                                            <div 
+                                                @click="$dispatch('lesson-selected', { 
+                                                    moduleId: module.id, 
+                                                    lessonId: lesson.id 
+                                                })"
+                                                @contextmenu.prevent="(() => {
+                                                    contextMenuOpen = true;
+                                                    contextMenuModuleId = module.id;
+                                                    contextMenuLessonId = lesson.id;
+                                                    contextMenuX = $event.clientX;
+                                                    contextMenuY = $event.clientY;
+                                                })()"
+                                                class="flex items-center justify-between p-2 rounded cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
+                                                :class="{ 
+                                                    'bg-[#DBFAE3] dark:bg-[#DBFAE3]': selectedLessonId === lesson.id,
+                                                    'text-gray-500': lesson.done
+                                                }"
+                                            >
+                                                <div class="flex items-center">
+                                                    <span class="mr-2" x-text="lesson.emoji"></span>
+                                                    <span class="text-xs" x-text="lesson.title"></span>
+                                                </div>
+                                                <span x-show="lesson.done">✅</span>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Main content area -->
+                <div class="flex-1 overflow-y-auto p-6">
+                    <!-- Lesson header -->
+                    <div class="border-b border-gray-200 dark:border-gray-700 pb-4 mb-6">
+                        <template x-if="currentLesson">
+                            <div>
+                                <div class="flex justify-between items-center">
+                                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                                        <span x-text="currentLesson.emoji" class="mr-2"></span>
+                                        <span x-text="currentLesson.title"></span>
+                                    </h1>
+                                    <button 
+                                        @click="modules.forEach(module => { 
+                                            if (module.id === selectedModuleId) { 
+                                                module.lessons.forEach(lesson => { 
+                                                    if (lesson.id === selectedLessonId) { 
+                                                        const wasComplete = lesson.done;
+                                                        lesson.done = !lesson.done;
+                                                        
+                                                        // Trigger confetti when marking complete (not when unmarking)
+                                                        if (!wasComplete && lesson.done) {
+                                                            setTimeout(() => {
+                                                                try {
+                                                                    // Position confetti in center-top of screen
+                                                                    const x = 0.5;
+                                                                    const y = 0.3;
+                                                                    
+                                                                    confetti({
+                                                                        particleCount: 150,
+                                                                        spread: 90,
+                                                                        origin: { x, y }
+                                                                    });
+                                                                } catch (error) {
+                                                                    console.error('Confetti error:', error);
+                                                                }
+                                                            }, 100);
+                                                        }
+                                                    } 
+                                                }) 
+                                            } 
+                                        })"
+                                        :class="currentLesson.done 
+                                            ? 'bg-[#2da44e] text-white hover:bg-[#2c974b] dark:bg-[#2da44e] dark:text-white' 
+                                            : 'bg-gray-300 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200'"
+                                        class="rounded-md px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                                        <span x-text="currentLesson.done ? 'Completed' : 'Mark as complete'"></span>
+                                        <span x-show="currentLesson.done"> ✅</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+                        <template x-if="!currentLesson">
+                            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                                📚 Course Content
+                            </h1>
+                        </template>
+                    </div>
+                    
+                    <!-- Lesson content -->
+                    <template x-if="currentLesson">
+                        <div class="mt-4 prose dark:prose-invert" x-html="currentLesson.content || ''"></div>
+                    </template>
+                    <template x-if="!currentLesson">
+                        <div class="text-center p-12">
+                            <p class="text-lg text-gray-600 dark:text-gray-400">Select a lesson from the sidebar to begin</p>
+                        </div>
+                    </template>
+                    
+                    <!-- Lesson navigation -->
+                    <template x-if="currentLesson">
+                        <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                            <div class="flex justify-center items-center space-x-4">
+                                <button 
+                                    @click="
+                                        console.log('Previous button clicked');
+                                        // Find current module and lesson indices
+                                        const moduleIndex = modules.findIndex(m => m.id === selectedModuleId);
+                                        const lessonIndex = modules[moduleIndex].lessons.findIndex(l => l.id === selectedLessonId);
+                                        
+                                        console.log('Current position:', moduleIndex, lessonIndex);
+                                        
+                                        // Navigate to previous lesson if available
+                                        if (lessonIndex > 0) {
+                                            // Previous lesson in same module
+                                            console.log('Navigating to previous lesson in same module');
+                                            const prevLessonId = modules[moduleIndex].lessons[lessonIndex - 1].id;
+                                            selectLesson(selectedModuleId, prevLessonId);
+                                        } else if (moduleIndex > 0 && modules[moduleIndex - 1].lessons.length > 0) {
+                                            // Last lesson of previous module
+                                            console.log('Navigating to last lesson of previous module');
+                                            const prevModule = modules[moduleIndex - 1];
+                                            const prevLessonId = prevModule.lessons[prevModule.lessons.length - 1].id;
+                                            selectLesson(prevModule.id, prevLessonId);
+                                        }
+                                    "
+                                    class="rounded-md px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400"
+                                    :class="{
+                                        'bg-[#7795A3] text-white hover:bg-[#6a8593]': true,
+                                        'opacity-50 cursor-not-allowed': 
+                                            // Disable if first lesson of first module
+                                            (modules.findIndex(m => m.id === selectedModuleId) === 0 && 
+                                             modules[0].lessons.findIndex(l => l.id === selectedLessonId) === 0)
+                                    }"
+                                    :disabled="
+                                        // Disable if first lesson of first module
+                                        (modules.findIndex(m => m.id === selectedModuleId) === 0 && 
+                                         modules[0].lessons.findIndex(l => l.id === selectedLessonId) === 0)
+                                    "
+                                >
+                                    ⬅️ Previous lesson
+                                </button>
+                                
+                                <button 
+                                    @click="modules.forEach(module => { 
+                                        if (module.id === selectedModuleId) { 
+                                            module.lessons.forEach(lesson => { 
+                                                if (lesson.id === selectedLessonId) { 
+                                                    const wasComplete = lesson.done;
+                                                    lesson.done = !lesson.done;
+                                                    
+                                                    // Trigger confetti when marking complete (not when unmarking)
+                                                    if (!wasComplete && lesson.done) {
+                                                        setTimeout(() => {
+                                                            try {
+                                                                // Position confetti in center-top of screen
+                                                                const x = 0.5;
+                                                                const y = 0.3;
+                                                                
+                                                                confetti({
+                                                                    particleCount: 150,
+                                                                    spread: 90,
+                                                                    origin: { x, y }
+                                                                });
+                                                            } catch (error) {
+                                                                console.error('Confetti error:', error);
+                                                            }
+                                                        }, 100);
+                                                    }
+                                                } 
+                                            }) 
+                                        } 
+                                    })"
+                                    :class="currentLesson.done 
+                                        ? 'bg-[#2da44e] text-white hover:bg-[#2c974b] dark:bg-[#2da44e] dark:text-white' 
+                                        : 'bg-gray-300 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200'"
+                                    class="rounded-md px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                                    <span x-text="currentLesson.done ? 'Completed' : 'Mark as complete'"></span>
+                                    <span x-show="currentLesson.done"> ✅</span>
+                                </button>
+                                
+                                <button 
+                                    @click="
+                                        console.log('Next button clicked');
+                                        // Find current module and lesson indices
+                                        const moduleIndex = modules.findIndex(m => m.id === selectedModuleId);
+                                        const lessonIndex = modules[moduleIndex].lessons.findIndex(l => l.id === selectedLessonId);
+                                        
+                                        console.log('Current position:', moduleIndex, lessonIndex);
+                                        
+                                        // Navigate to next lesson if available
+                                        if (lessonIndex < modules[moduleIndex].lessons.length - 1) {
+                                            // Next lesson in same module
+                                            console.log('Navigating to next lesson in same module');
+                                            const nextLessonId = modules[moduleIndex].lessons[lessonIndex + 1].id;
+                                            selectLesson(selectedModuleId, nextLessonId);
+                                        } else if (moduleIndex < modules.length - 1 && modules[moduleIndex + 1].lessons.length > 0) {
+                                            // First lesson of next module
+                                            console.log('Navigating to first lesson of next module');
+                                            const nextModule = modules[moduleIndex + 1];
+                                            const nextLessonId = nextModule.lessons[0].id;
+                                            selectLesson(nextModule.id, nextLessonId);
+                                        }
+                                    "
+                                    class="rounded-md px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400"
+                                    :class="{
+                                        'bg-[#7795A3] text-white hover:bg-[#6a8593]': true,
+                                        'opacity-50 cursor-not-allowed': 
+                                            // Disable if last lesson of last module
+                                            (modules.findIndex(m => m.id === selectedModuleId) === modules.length - 1 && 
+                                             modules[modules.length - 1].lessons.findIndex(l => l.id === selectedLessonId) === modules[modules.length - 1].lessons.length - 1)
+                                    }"
+                                    :disabled="
+                                        // Disable if last lesson of last module
+                                        (modules.findIndex(m => m.id === selectedModuleId) === modules.length - 1 && 
+                                         modules[modules.length - 1].lessons.findIndex(l => l.id === selectedLessonId) === modules[modules.length - 1].lessons.length - 1)
+                                    "
+                                >
+                                    Next lesson ➡️
+                                </button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                
+                <!-- Context Menu / Right-click Menu -->
+                <div x-show="contextMenuOpen"
+                     @click.outside="contextMenuOpen = false"
+                     @keydown.escape.window="contextMenuOpen = false"
+                     x-transition:enter="transition ease-out duration-100"
+                     x-transition:enter-start="opacity-0 scale-95"
+                     x-transition:enter-end="opacity-100 scale-100"
+                     class="absolute z-50 bg-white dark:bg-gray-800 shadow-lg rounded-md py-2 w-64 border border-gray-200 dark:border-gray-700"
+                     :style="`left: ${contextMenuX}px; top: ${contextMenuY}px;`">
+                    
+                    <template x-if="contextMenuLessonId !== null">
+                        <div>
+                            <template x-for="module in modules" :key="module.id">
+                                <template x-if="module.id === contextMenuModuleId">
+                                    <template x-for="lesson in module.lessons" :key="lesson.id">
+                                        <template x-if="lesson.id === contextMenuLessonId">
+                                            <!-- Complete/Incomplete Toggle Option -->
+                                            <button @click="(() => {
+                                                lesson.done = !lesson.done;
+                                                
+                                                // Trigger confetti when marking complete (not when unmarking)
+                                                if (lesson.done) {
+                                                    setTimeout(() => {
+                                                        try {
+                                                            const x = 0.5;
+                                                            const y = 0.3;
+                                                            
+                                                            confetti({
+                                                                particleCount: 150,
+                                                                spread: 90,
+                                                                origin: { x, y }
+                                                            });
+                                                        } catch (error) {
+                                                            console.error('Confetti error:', error);
+                                                        }
+                                                    }, 100);
+                                                }
+                                                
+                                                contextMenuOpen = false;
+                                            })()"
+                                                class="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                <div class="flex items-center">
+                                                    <span class="mr-2" x-text="lesson.done ? '❌' : '✅'"></span>
+                                                    <span x-text="lesson.done ? 'Mark as incomplete' : 'Mark as complete'"></span>
+                                                </div>
+                                            </button>
+                                        </template>
+                                    </template>
+                                </template>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // Course data in JSON format for easy updates
+        const courseData = {
+            modules: [
+                {
+                    id: 1,
+                    title: "Introduction to Habits",
+                    emoji: "🚀",
+                    expanded: true,
+                    lessons: [
+                        { id: 101, title: "Why Habits Matter", emoji: "💡", done: true, content: "<p>Habits are the small decisions you make and actions you perform every day. They shape your identity and determine your future.</p>" },
+                        { id: 102, title: "The Science of Habit Formation", emoji: "🧪", done: false },
+                        { id: 103, title: "Setting Your Intention", emoji: "🎯", done: false }
+                    ]
+                },
+                {
+                    id: 2,
+                    title: "Habit Foundations",
+                    emoji: "🏗️",
+                    expanded: false,
+                    lessons: [
+                        { id: 201, title: "The Four Laws of Behavior Change", emoji: "📜", done: false },
+                        { id: 202, title: "Identity-Based Habits", emoji: "🔄", done: false },
+                        { id: 203, title: "Habit Stacking", emoji: "📚", done: false }
+                    ]
+                },
+                {
+                    id: 3,
+                    title: "Building Systems",
+                    emoji: "⚙️",
+                    expanded: false,
+                    lessons: [
+                        { id: 301, title: "Environment Design", emoji: "🏠", done: false },
+                        { id: 302, title: "Implementation Intentions", emoji: "📝", done: false },
+                        { id: 303, title: "Habit Tracking Methods", emoji: "📊", done: false }
+                    ]
+                },
+                {
+                    id: 4,
+                    title: "Overcoming Obstacles",
+                    emoji: "🧗",
+                    expanded: false,
+                    lessons: [
+                        { id: 401, title: "Dealing with Setbacks", emoji: "🔄", done: false },
+                        { id: 402, title: "Breaking Bad Habits", emoji: "🚫", done: false },
+                        { id: 403, title: "The Plateau of Latent Potential", emoji: "📈", done: false }
+                    ]
+                },
+                {
+                    id: 5,
+                    title: "Advanced Strategies",
+                    emoji: "🧠",
+                    expanded: false,
+                    lessons: [
+                        { id: 501, title: "The Two-Minute Rule", emoji: "⏱️", done: false },
+                        { id: 502, title: "Temptation Bundling", emoji: "🎁", done: false },
+                        { id: 503, title: "Habit Contracts", emoji: "📜", done: false }
+                    ]
+                },
+                {
+                    id: 6,
+                    title: "Motivation & Consistency",
+                    emoji: "🔥",
+                    expanded: false,
+                    lessons: [
+                        { id: 601, title: "Intrinsic vs. Extrinsic Motivation", emoji: "⚖️", done: false },
+                        { id: 602, title: "The Role of Accountability", emoji: "👥", done: false },
+                        { id: 603, title: "Building Streak Momentum", emoji: "🔄", done: false }
+                    ]
+                },
+                {
+                    id: 7,
+                    title: "Habit Measurement",
+                    emoji: "📏",
+                    expanded: false,
+                    lessons: [
+                        { id: 701, title: "Quantifying Progress", emoji: "📊", done: false },
+                        { id: 702, title: "Habit Scoring Systems", emoji: "🏆", done: false },
+                        { id: 703, title: "The Power of Reflection", emoji: "🤔", done: false }
+                    ]
+                },
+                {
+                    id: 8,
+                    title: "Time Management",
+                    emoji: "⏰",
+                    expanded: false,
+                    lessons: [
+                        { id: 801, title: "Time Blocking for Habits", emoji: "📅", done: false },
+                        { id: 802, title: "Morning vs Evening Routines", emoji: "🌞", done: false },
+                        { id: 803, title: "The Pareto Principle for Habits", emoji: "📊", done: false }
+                    ]
+                },
+                {
+                    id: 9,
+                    title: "Mindset & Psychology",
+                    emoji: "🧠",
+                    expanded: false,
+                    lessons: [
+                        { id: 901, title: "Growth Mindset for Habit Change", emoji: "🌱", done: false },
+                        { id: 902, title: "Overcoming Perfectionism", emoji: "✨", done: false },
+                        { id: 903, title: "Self-Compassion in Habit Building", emoji: "❤️", done: false }
+                    ]
+                },
+                {
+                    id: 10,
+                    title: "Physical Habits",
+                    emoji: "💪",
+                    expanded: false,
+                    lessons: [
+                        { id: 1001, title: "Exercise Habit Fundamentals", emoji: "🏋️", done: false },
+                        { id: 1002, title: "Nutrition Habit Building", emoji: "🥗", done: false },
+                        { id: 1003, title: "Sleep Optimization", emoji: "😴", done: false }
+                    ]
+                },
+                {
+                    id: 11,
+                    title: "Mental Habits",
+                    emoji: "🧘",
+                    expanded: false,
+                    lessons: [
+                        { id: 1101, title: "Meditation Practice", emoji: "🧘", done: false },
+                        { id: 1102, title: "Journaling Techniques", emoji: "📓", done: false },
+                        { id: 1103, title: "Gratitude Practices", emoji: "🙏", done: false }
+                    ]
+                },
+                {
+                    id: 12,
+                    title: "Productivity Habits",
+                    emoji: "📈",
+                    expanded: false,
+                    lessons: [
+                        { id: 1201, title: "Deep Work Habits", emoji: "🎯", done: false },
+                        { id: 1202, title: "Managing Digital Distractions", emoji: "📱", done: false },
+                        { id: 1203, title: "Task Batching Techniques", emoji: "📋", done: false }
+                    ]
+                },
+                {
+                    id: 13,
+                    title: "Social Habits",
+                    emoji: "👥",
+                    expanded: false,
+                    lessons: [
+                        { id: 1301, title: "Building Connection Habits", emoji: "🤝", done: false },
+                        { id: 1302, title: "Communication Practices", emoji: "💬", done: false },
+                        { id: 1303, title: "Networking Routines", emoji: "🌐", done: false }
+                    ]
+                },
+                {
+                    id: 14,
+                    title: "Financial Habits",
+                    emoji: "💰",
+                    expanded: false,
+                    lessons: [
+                        { id: 1401, title: "Saving & Investing Routines", emoji: "💵", done: false },
+                        { id: 1402, title: "Spending Awareness Practices", emoji: "🛍️", done: false },
+                        { id: 1403, title: "Budgeting Systems", emoji: "📊", done: false }
+                    ]
+                },
+                {
+                    id: 15,
+                    title: "Integrating Habits for Life",
+                    emoji: "🌟",
+                    expanded: false,
+                    lessons: [
+                        { id: 1501, title: "Creating Your Personal Habit System", emoji: "🏛️", done: false },
+                        { id: 1502, title: "Long-term Habit Maintenance", emoji: "⏳", done: false },
+                        { id: 1503, title: "Evolving Your Habits Over Time", emoji: "🔄", done: false }
+                    ]
+                }
+            ]
+        };
+    </script>
+</body>
+</html> 
