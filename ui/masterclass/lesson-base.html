@@ -52,8 +52,9 @@
                         }
                     }
                     
-                    // Expose triggerConfetti to make it globally available
+                    // Expose global methods
                     window.triggerConfetti = this.triggerConfetti;
+                    window.toggleLessonComplete = (moduleSlug, lessonSlug) => this.toggleLessonComplete(moduleSlug, lessonSlug);
 
                     // Add keyboard navigation event listener
                     this.setupKeyboardNavigation();
@@ -112,15 +113,35 @@
                 },
                 
                 // Toggle lesson completion status
-                async toggleLessonComplete() {
-                    if (!this.currentLesson) return;
+                async toggleLessonComplete(targetModuleSlug, targetLessonSlug) {
+                    // Use provided slugs or default to current lesson if not provided
+                    const moduleSlug = targetModuleSlug || this.moduleSlug;
+                    const lessonSlug = targetLessonSlug || this.lessonSlug;
                     
-                    const endpoint = this.currentLesson.completed
+                    // Get the lesson to toggle
+                    let lessonToToggle = null;
+                    let moduleToUpdate = null;
+                    
+                    // Find the target module
+                    moduleToUpdate = this.modules.modules.find(m => m.slug === moduleSlug);
+                    if (!moduleToUpdate) return;
+                    
+                    // Find the target lesson
+                    lessonToToggle = moduleToUpdate.lessons.find(l => l.slug === lessonSlug);
+                    if (!lessonToToggle) return;
+                    
+                    // Determine if it's the current lesson
+                    const isCurrentLesson = moduleSlug === this.moduleSlug && lessonSlug === this.lessonSlug;
+                    
+                    // Remember the current completed state before toggling
+                    const wasCompleted = lessonToToggle.completed;
+                    
+                    const endpoint = wasCompleted
                         ? '/masterclass/api/mark-incomplete'
                         : '/masterclass/api/mark-complete';
                     
                     try {
-                        const response = await fetch(`${endpoint}?moduleSlug=${this.moduleSlug}&lessonSlug=${this.lessonSlug}`, {
+                        const response = await fetch(`${endpoint}?moduleSlug=${moduleSlug}&lessonSlug=${lessonSlug}`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -128,25 +149,17 @@
                         });
                         
                         if (response.ok) {
-                            // Update local state for the current lesson
-                            const wasCompleted = this.currentLesson.completed;
-                            this.currentLesson.completed = !wasCompleted;
+                            // Toggle the lesson completion state
+                            lessonToToggle.completed = !wasCompleted;
                             
-                            // Update module lessons and count completed lessons
-                            let moduleCompletedCount = 0;
-                            const foundModule = this.modules.modules.find(m => m.slug === this.moduleSlug);
-                            
-                            if (foundModule) {
-                                // Find and update the lesson in the module
-                                const lesson = foundModule.lessons.find(l => l.slug === this.lessonSlug);
-                                if (lesson) {
-                                    lesson.completed = !wasCompleted;
-                                }
-                                
-                                // Count completed lessons in this module
-                                moduleCompletedCount = foundModule.lessons.filter(l => l.completed).length;
-                                foundModule.completed = moduleCompletedCount === foundModule.lessons.length;
+                            // If this is the current lesson, update currentLesson too
+                            if (isCurrentLesson && this.currentLesson) {
+                                this.currentLesson.completed = !wasCompleted;
                             }
+                            
+                            // Update module completion status
+                            const moduleCompletedCount = moduleToUpdate.lessons.filter(l => l.completed).length;
+                            moduleToUpdate.completed = moduleCompletedCount === moduleToUpdate.lessons.length;
                             
                             // Update global completion counts
                             if (wasCompleted) {
@@ -282,7 +295,7 @@
                                         <span x-text="currentLesson.title"></span>
                                     </h1>
                                     <button 
-                                        @click="toggleLessonComplete"
+                                        @click="toggleLessonComplete()"
                                         :class="currentLesson.completed 
                                             ? 'bg-habit-color-green-core text-white' 
                                             : 'bg-habit-color-blue-core text-white'"
@@ -325,7 +338,7 @@
                                 </button>
                                 
                                 <button 
-                                    @click="toggleLessonComplete"
+                                    @click="toggleLessonComplete()"
                                     :class="currentLesson.completed 
                                         ? 'bg-habit-color-green-core text-white' 
                                         : 'bg-habit-color-blue-core text-white'"

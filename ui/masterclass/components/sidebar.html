@@ -121,49 +121,9 @@
                                 <!-- Toggle completion status -->
                                 <button 
                                     @click="async () => {
-                                        // Toggle completion in the API
-                                        const endpoint = lesson.completed
-                                            ? '/masterclass/api/mark-incomplete'
-                                            : '/masterclass/api/mark-complete';
-                                            
-                                        try {
-                                            const response = await fetch(`${endpoint}?moduleSlug=${module.slug}&lessonSlug=${lesson.slug}`, {
-                                                method: 'POST',
-                                                headers: {
-                                                    'Content-Type': 'application/json'
-                                                }
-                                            });
-                                            
-                                            if (response.ok) {
-                                                // Update UI state - similar to the toggleLessonComplete function
-                                                const wasCompleted = lesson.completed;
-                                                lesson.completed = !wasCompleted;
-                                                
-                                                // Update global completion counts
-                                                if (wasCompleted) {
-                                                    completedLessons--;
-                                                } else {
-                                                    completedLessons++;
-                                                    // Show confetti if marking complete
-                                                    window.triggerConfetti();
-                                                }
-                                                
-                                                // Update progress
-                                                if (totalLessons > 0) {
-                                                    completionPercentage = (completedLessons / totalLessons) * 100;
-                                                }
-                                                
-                                                // Update current lesson if this is the active lesson
-                                                if (moduleSlug === module.slug && lessonSlug === lesson.slug && currentLesson) {
-                                                    currentLesson.completed = !wasCompleted;
-                                                }
-                                                
-                                                // Update module completion status
-                                                let moduleCompletedCount = module.lessons.filter(l => l.completed).length;
-                                                module.completed = moduleCompletedCount === module.lessons.length;
-                                            }
-                                        } catch (error) {
-                                            console.error('Error toggling lesson completion:', error);
+                                        // Use the global toggle function instead of duplicating logic
+                                        if (window.toggleLessonComplete) {
+                                            await window.toggleLessonComplete(contextMenuModuleSlug, contextMenuLessonSlug);
                                         }
                                         
                                         // Close the context menu
