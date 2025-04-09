@@ -55,6 +55,30 @@
                     // Expose global methods
                     window.triggerConfetti = this.triggerConfetti;
                     window.toggleLessonComplete = (moduleSlug, lessonSlug) => this.toggleLessonComplete(moduleSlug, lessonSlug);
+                    
+                    // Initialize toast functionality
+                    window.toast = function(message, options = {}) {
+                        console.log('Toast function called with:', message, options);
+                        let description = '';
+                        let type = 'default';
+                        let position = 'bottom-center';
+                        let html = '';
+                        
+                        if(typeof options.description != 'undefined') description = options.description;
+                        if(typeof options.type != 'undefined') type = options.type;
+                        if(typeof options.position != 'undefined') position = options.position;
+                        if(typeof options.html != 'undefined') html = options.html;
+                        
+                        window.dispatchEvent(new CustomEvent('toast-show', { 
+                            detail: { 
+                                type: type, 
+                                message: message, 
+                                description: description, 
+                                position: position, 
+                                html: html 
+                            }
+                        }));
+                    };
 
                     // Add keyboard navigation event listener
                     this.setupKeyboardNavigation();
@@ -166,16 +190,26 @@
                                 this.completedLessons--;
                             } else {
                                 this.completedLessons++;
+                                
+                                // Show confetti if completing
+                                this.triggerConfetti();
+                                
+                                // Show success toast notification
+                                if (window.toast) {
+                                    console.log('Attempting to show toast for:', lessonToToggle.title);
+                                    window.toast(`Lesson completed!`, {
+                                        type: 'success',
+                                        position: 'bottom-center',
+                                        description: `Great job completing '${lessonToToggle.title}'`
+                                    });
+                                } else {
+                                    console.error('window.toast function not available');
+                                }
                             }
                             
                             // Update progress
                             if (this.totalLessons > 0) {
                                 this.completionPercentage = (this.completedLessons / this.totalLessons) * 100;
-                            }
-                            
-                            // Show confetti if completing
-                            if (!wasCompleted) {
-                                this.triggerConfetti();
                             }
                         }
                     } catch (error) {
@@ -374,11 +408,16 @@
                 const moduleSlug = pathParts[2];
                 const lessonSlug = pathParts[3];
                 
-                // Get Alpine.js component and update it
-                const component = document.querySelector('[x-data]').__x.$data;
-                if (component && component.navigateToLesson) {
-                    component.navigateToLesson(moduleSlug, lessonSlug);
-                }
+                // Safe way to get Alpine component
+                setTimeout(() => {
+                    const element = document.querySelector('.flex.flex-col.md\\:flex-row.h-screen');
+                    if (element && element.__x) {
+                        const component = element.__x.$data;
+                        if (component && component.navigateToLesson) {
+                            component.navigateToLesson(moduleSlug, lessonSlug);
+                        }
+                    }
+                }, 100);
             }
         });
         
@@ -393,24 +432,150 @@
                 }
                 
                 setTimeout(() => {
-                    // Access the Alpine.js component
-                    const component = document.querySelector('.flex.flex-col.md\\:flex-row.h-screen').__x.$data;
-                    if (!component) return;
-                    
-                    // Left arrow key for previous lesson
-                    if (e.key === 'ArrowLeft') {
-                        e.preventDefault();
-                        component.navigateToPreviousLesson();
+                    // Safe way to access the Alpine.js component
+                    const element = document.querySelector('.flex.flex-col.md\\:flex-row.h-screen');
+                    if (element && element.__x) {
+                        const component = element.__x.$data;
+                        if (!component) return;
+                        
+                        // Left arrow key for previous lesson
+                        if (e.key === 'ArrowLeft') {
+                            e.preventDefault();
+                            component.navigateToPreviousLesson();
+                        }
+                        
+                        // Right arrow key for next lesson
+                        if (e.key === 'ArrowRight') {
+                            e.preventDefault();
+                            component.navigateToNextLesson();
+                        }
                     }
-                    
-                    // Right arrow key for next lesson
-                    if (e.key === 'ArrowRight') {
-                        e.preventDefault();
-                        component.navigateToNextLesson();
-                    }
-                }, 0);
+                }, 100);
             });
         });
+
+        // Add a safe test method to trigger a toast directly
+        window.testToast = function() {
+            console.log("Testing toast notification...");
+            if (window.toast) {
+                window.toast("Test Toast", {
+                    type: 'success',
+                    position: 'bottom-center',
+                    description: 'This is a test notification'
+                });
+            } else {
+                console.error("window.toast function is not available");
+            }
+        };
     </script>
+    
+    <!-- Toast Notification System - Moved outside of main Alpine component -->
+    <div x-data="{}" id="toast-container">
+        <template x-teleport="body">
+            <ul 
+                x-data="{ 
+                    toasts: [],
+                    toastsHovered: false,
+                    expanded: false,
+                    position: 'bottom-center',
+                    paddingBetweenToasts: 15,
+                    deleteToastWithId(id) {
+                        for(let i = 0; i < this.toasts.length; i++) {
+                            if(this.toasts[i].id === id) {
+                                this.toasts.splice(i, 1);
+                                break;
+                            }
+                        }
+                    },
+                    burnToast(id) {
+                        const burnToast = this.getToastWithId(id);
+                        const burnToastElement = document.getElementById(burnToast.id);
+                        if(burnToastElement) {
+                            burnToastElement.classList.remove('translate-y-0');
+                            burnToastElement.classList.add('translate-y-full');
+                            burnToastElement.classList.add('opacity-0');
+                            
+                            let that = this;
+                            setTimeout(function() {
+                                that.deleteToastWithId(id);
+                            }, 300);
+                        }
+                    },
+                    getToastWithId(id) {
+                        for(let i = 0; i < this.toasts.length; i++) {
+                            if(this.toasts[i].id === id) {
+                                return this.toasts[i];
+                            }
+                        }
+                    }
+                }"
+                @toast-show.window="
+                    console.log('Toast show event received:', event.detail);
+                    event.stopPropagation();
+                    toasts.unshift({
+                        id: 'toast-' + Math.random().toString(16).slice(2),
+                        message: event.detail.message,
+                        description: event.detail.description,
+                        type: event.detail.type
+                    });
+                    console.log('Toast added to list, current toasts:', toasts);
+                "
+                class="fixed block w-full z-[99] sm:max-w-xs right-0 bottom-0 sm:mb-6 sm:mr-6"
+                x-cloak>
+            
+                <template x-for="(toast, index) in toasts" :key="toast.id">
+                    <li
+                        :id="toast.id"
+                        x-data="{ toastHovered: false }"
+                        x-init="
+                            $el.firstElementChild.classList.add('opacity-0', 'translate-y-full');
+                            
+                            setTimeout(function() {
+                                $el.firstElementChild.classList.remove('opacity-0', 'translate-y-full');
+                                $el.firstElementChild.classList.add('opacity-100', 'translate-y-0');
+                            }, 50);
+            
+                            setTimeout(function() {
+                                if (!toastHovered) {
+                                    $el.firstElementChild.classList.remove('opacity-100');
+                                    $el.firstElementChild.classList.add('opacity-0');
+                                    $el.firstElementChild.classList.remove('translate-y-0');
+                                    $el.firstElementChild.classList.add('translate-y-full');
+                                    
+                                    setTimeout(function() {
+                                        deleteToastWithId(toast.id);
+                                    }, 300);
+                                }
+                            }, 4000);
+                        "
+                        @mouseover="toastHovered = true"
+                        @mouseout="toastHovered = false"
+                        class="w-full duration-300 ease-out select-none mb-2 sm:max-w-xs"
+                    >
+                        <span 
+                            class="relative flex flex-col items-start shadow-lg w-full transition-all duration-300 ease-out bg-white border border-gray-100 rounded-md p-4"
+                        >
+                            <div class="relative">
+                                <div class="flex items-center">
+                                    <span class="text-lg mr-1.5">✅</span>
+                                    <p class="text-[13px] font-medium leading-none text-gray-800" x-text="toast.message"></p>
+                                </div>
+                                <p x-show="toast.description" 
+                                    class="pl-5 mt-1.5 text-xs leading-none opacity-70" 
+                                    x-text="toast.description"></p>
+                            </div>
+                            <span 
+                                @click="burnToast(toast.id)"
+                                class="absolute right-0 p-1.5 mr-2.5 text-gray-400 duration-100 ease-in-out rounded-full cursor-pointer hover:bg-gray-50 hover:text-gray-500"
+                                :class="{ 'top-1/2 -translate-y-1/2': !toast.description, 'top-0 mt-2.5': toast.description, 'opacity-100': toastHovered, 'opacity-0': !toastHovered }"
+                            >
+                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                            </span>
+                        </span>
+                    </li>
+                </template>
+            </ul>
+        </template>
+    </div>
 </body>
 </html> 
