@@ -1,13 +1,62 @@
 {{ define "video-player.html" }}
 <!-- Video Player Component -->
-<div class="video-container my-8">
-    <!-- Responsive video wrapper with 16:9 aspect ratio -->
-    <div class="relative w-full" style="padding-bottom: 56.25%;">
+<div class="video-container my-8 mx-auto" 
+     x-data="{ 
+        videoWidth: 0,
+        videoHeight: 0,
+        aspectRatio: 56.25,
+        containerWidth: '60%',
+        videoLoaded: false
+     }"
+     :style="`max-width: ${containerWidth}`">
+    <!-- Video wrapper with fixed aspect ratio container -->
+    <div class="relative w-full border-[5px] border-brand-green rounded-lg overflow-hidden" 
+         style="padding-bottom: 56.25%;" 
+         x-ref="videoContainer">
         <video 
-            class="absolute top-0 left-0 w-full h-full rounded-lg shadow-lg" 
+            x-ref="videoElement"
+            class="absolute top-0 left-0 w-full h-full shadow-lg object-contain" 
             controls
             preload="metadata"
             poster="/static/images/video-placeholder.jpg"
+            @loadedmetadata="
+                videoWidth = $event.target.videoWidth;
+                videoHeight = $event.target.videoHeight;
+                
+                // Set max height and fix aspect ratio
+                if (videoWidth && videoHeight) {
+                    // Calculate the new aspect ratio
+                    const newAspectRatio = (videoHeight / videoWidth) * 100;
+                    
+                    // Apply max height of 500px if needed
+                    const maxHeight = 500;
+                    const containerWidth = $refs.videoContainer.offsetWidth;
+                    const naturalHeight = (containerWidth * videoHeight) / videoWidth;
+                    
+                    if (naturalHeight > maxHeight) {
+                        // Video would be too tall - constrain it
+                        $refs.videoContainer.style.height = maxHeight + 'px';
+                        $refs.videoContainer.style.paddingBottom = '0px';
+                    } else {
+                        // Use natural aspect ratio
+                        $refs.videoContainer.style.paddingBottom = newAspectRatio + '%';
+                        $refs.videoContainer.style.height = 'auto';
+                    }
+                }
+                
+                // Adjust container width based on video dimensions
+                if (videoWidth > 1280) {
+                    containerWidth = '75%';
+                } else if (videoWidth > 854) {
+                    containerWidth = '60%';
+                } else if (videoWidth > 640) {
+                    containerWidth = '50%';
+                } else {
+                    containerWidth = '40%';
+                }
+                
+                videoLoaded = true;
+            "
         >
             <source src="{{ .URL }}" type="video/mp4">
             Your browser does not support the video tag.
@@ -15,17 +64,28 @@
     </div>
     
     <!-- Download button -->
-    <div class="mt-3 flex justify-end">
+    <div class="mt-3 flex justify-center">
         <a 
             href="{{ .URL }}" 
             download
-            class="inline-flex items-center px-4 py-2 bg-gray-700 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-600 active:bg-gray-800 focus:outline-none focus:border-gray-800 focus:ring ring-gray-300 disabled:opacity-25 transition ease-in-out duration-150"
+            style="text-decoration: none !important;"
+            class="video-download-btn inline-flex items-center px-4 py-2 bg-brand-green border border-transparent rounded-md font-semibold text-xs !text-white uppercase tracking-widest hover:bg-green-600 active:bg-green-700 focus:outline-none focus:border-green-800 focus:ring ring-green-300 disabled:opacity-25 transition ease-in-out duration-150 !no-underline"
         >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
-            Download Video
+            <span style="text-decoration: none !important;" class="text-white">Download Video</span>
         </a>
     </div>
-</div> 
+</div>
+
+<style>
+/* Extra styles to override any global link styling */
+.video-download-btn, 
+.video-download-btn:hover, 
+.video-download-btn:focus, 
+.video-download-btn:active {
+    text-decoration: none !important;
+}
+</style>
 {{ end }}
