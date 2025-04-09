@@ -23,7 +23,7 @@ var MasterclassDefinition = []Module{
 			{
 				ID:          "science-of-habit-formation",
 				Slug:        "science-of-habit-formation",
-				Title:       "The Science of Habit Formation",
+				Title:       "The Science of Habits",
 				Emoji:       "🧪",
 				Type:        LessonTypeVideo,
 				ModuleSlug:  "introduction",
