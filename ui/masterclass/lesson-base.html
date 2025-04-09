@@ -176,6 +176,11 @@
                         return; // Already on this lesson
                     }
                     
+                    // Clear any active element focus before navigation
+                    if (document.activeElement) {
+                        document.activeElement.blur();
+                    }
+                    
                     try {
                         // Update URL without full page reload
                         history.pushState(
@@ -281,7 +286,7 @@
                                         :class="currentLesson.completed 
                                             ? 'bg-habit-color-green-core text-white' 
                                             : 'bg-habit-color-blue-core text-white'"
-                                        class="rounded-md px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-habit-color-green-core">
+                                        class="rounded-md px-4 py-2 text-sm font-semibold shadow-sm outline-none focus:outline-none focus-visible:outline-none">
                                         <span x-text="currentLesson.completed ? 'Completed' : 'Mark as complete'"></span>
                                         <span x-show="!currentLesson.completed">🌱</span>
                                         <span x-show="currentLesson.completed">✅</span>
@@ -324,7 +329,7 @@
                                     :class="currentLesson.completed 
                                         ? 'bg-habit-color-green-core text-white' 
                                         : 'bg-habit-color-blue-core text-white'"
-                                    class="rounded-md px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-habit-color-green-core">
+                                    class="rounded-md px-4 py-2 text-sm font-semibold shadow-sm outline-none focus:outline-none focus-visible:outline-none">
                                     <span x-text="currentLesson.completed ? 'Completed' : 'Mark as complete'"></span>
                                     <span x-show="!currentLesson.completed">🌱</span>
                                     <span x-show="currentLesson.completed">✅</span>
