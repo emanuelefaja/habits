@@ -54,6 +54,33 @@
                     
                     // Expose triggerConfetti to make it globally available
                     window.triggerConfetti = this.triggerConfetti;
+
+                    // Add keyboard navigation event listener
+                    this.setupKeyboardNavigation();
+                },
+                
+                // Set up keyboard navigation
+                setupKeyboardNavigation() {
+                    window.addEventListener('keydown', (e) => {
+                        // Skip if user is typing in an input field
+                        if (e.target.tagName === 'INPUT' || 
+                            e.target.tagName === 'TEXTAREA' || 
+                            e.target.isContentEditable) {
+                            return;
+                        }
+                        
+                        // Left arrow key for previous lesson
+                        if (e.key === 'ArrowLeft') {
+                            e.preventDefault();
+                            this.navigateToPreviousLesson();
+                        }
+                        
+                        // Right arrow key for next lesson
+                        if (e.key === 'ArrowRight') {
+                            e.preventDefault();
+                            this.navigateToNextLesson();
+                        }
+                    });
                 },
                 
                 // Fetch course structure from API (only if needed)
@@ -328,11 +355,41 @@
                 const lessonSlug = pathParts[3];
                 
                 // Get Alpine.js component and update it
-                const component = Alpine.evaluate(document.querySelector('[x-data]'), '$data');
+                const component = document.querySelector('[x-data]').__x.$data;
                 if (component && component.navigateToLesson) {
                     component.navigateToLesson(moduleSlug, lessonSlug);
                 }
             }
+        });
+        
+        // Add keyboard navigation support
+        document.addEventListener('DOMContentLoaded', () => {
+            window.addEventListener('keydown', (e) => {
+                // Skip if user is typing in an input field
+                if (e.target.tagName === 'INPUT' || 
+                    e.target.tagName === 'TEXTAREA' || 
+                    e.target.isContentEditable) {
+                    return;
+                }
+                
+                setTimeout(() => {
+                    // Access the Alpine.js component
+                    const component = document.querySelector('.flex.flex-col.md\\:flex-row.h-screen').__x.$data;
+                    if (!component) return;
+                    
+                    // Left arrow key for previous lesson
+                    if (e.key === 'ArrowLeft') {
+                        e.preventDefault();
+                        component.navigateToPreviousLesson();
+                    }
+                    
+                    // Right arrow key for next lesson
+                    if (e.key === 'ArrowRight') {
+                        e.preventDefault();
+                        component.navigateToNextLesson();
+                    }
+                }, 0);
+            });
         });
     </script>
 </body>
