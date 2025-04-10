@@ -7,6 +7,8 @@
         
         <div class="w-full">
             <div class="flex flex-col md:flex-row h-screen" x-data="{
+                // Add hoveredStar state
+                hoveredStar: null,
                 // State management
                 moduleSlug: '{{ .ModuleSlug }}',
                 lessonSlug: '{{ .LessonSlug }}',
@@ -21,6 +23,17 @@
                 
                 // Initialize data
                 init() {
+                    // Debug log for initial data
+                    console.log('⭐️ Main component initializing with lesson data:', {
+                        moduleSlug: this.moduleSlug,
+                        lessonSlug: this.lessonSlug,
+                        currentLesson: this.currentLesson
+                    });
+                    
+                    if (this.currentLesson && this.currentLesson.rating) {
+                        console.log('⭐️ Initial lesson has rating:', this.currentLesson.rating);
+                    }
+                    
                     // Defensive checks for initial data
                     if (!this.modules || typeof this.modules !== 'object') {
                         console.error('Initial course data is missing or invalid');
@@ -132,8 +145,11 @@
                 // Fetch current lesson data (only if needed)
                 async fetchLessonData() {
                     try {
+                        console.log('⭐️ Fetching lesson data for:', this.moduleSlug, this.lessonSlug);
                         const response = await fetch(`/masterclass/api/lesson?moduleSlug=${this.moduleSlug}&lessonSlug=${this.lessonSlug}`);
                         const data = await response.json();
+                        console.log('⭐️ Lesson data received:', data);
+                        console.log('⭐️ Rating received from API:', data.rating);
                         this.currentLesson = data;
                     } catch (error) {
                         console.error('Error fetching lesson data:', error);
@@ -324,8 +340,11 @@
                         );
                         
                         // Fetch the new lesson data
+                        console.log('⭐️ Navigating to lesson:', moduleSlug, lessonSlug);
                         const response = await fetch(`/masterclass/api/lesson?moduleSlug=${moduleSlug}&lessonSlug=${lessonSlug}`);
                         const lessonData = await response.json();
+                        console.log('⭐️ Navigation received lesson data:', lessonData);
+                        console.log('⭐️ Rating from navigation:', lessonData.rating);
                         
                         // Update state
                         this.moduleSlug = moduleSlug;
@@ -399,6 +418,84 @@
                     } catch (error) {
                         console.error('Error fetching previous lesson:', error);
                     }
+                },
+                
+                // Submit rating for the lesson
+                submitRating(star) {
+                    // If clicking the same star that's already selected, clear the rating
+                    const clearRating = this.currentLesson.rating && this.currentLesson.rating === star;
+                    
+                    // Prepare the request payload
+                    const payload = {
+                        lessonId: this.currentLesson.id,
+                        rating: clearRating ? null : star
+                    };
+                    
+                    console.log(`${clearRating ? 'Clearing' : 'Submitting'} rating: ${payload.rating}`);
+                    
+                    // Send the rating to the API
+                    fetch('/masterclass/api/rating', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Rating response:', data);
+                        if (data.success) {
+                            // Update the UI with the new rating
+                            this.currentLesson.rating = payload.rating;
+                            
+                            // Show success toast
+                            if (window.toast) {
+                                if (clearRating) {
+                                    window.toast('Rating removed', {
+                                        type: 'success',
+                                        position: 'bottom-center',
+                                        description: `Removed rating for '${this.currentLesson.title}'`,
+                                        emoji: '✅'
+                                    });
+                                } else {
+                                    window.toast(`Rated ${payload.rating} ${payload.rating === 1 ? 'star' : 'stars'}`, {
+                                        type: 'success',
+                                        position: 'bottom-center',
+                                        description: `You rated '${this.currentLesson.title}' ${payload.rating} stars`,
+                                        emoji: '⭐'
+                                    });
+                                }
+                            }
+                        } else {
+                            console.error('Error setting rating:', data.message);
+                            // Show error toast
+                            if (window.toast) {
+                                window.toast('Failed to update rating', {
+                                    type: 'error',
+                                    position: 'bottom-center',
+                                    description: data.message || 'Please try again',
+                                    emoji: '❌'
+                                });
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error submitting rating:', error);
+                        // Show error toast
+                        if (window.toast) {
+                            window.toast('Failed to update rating', {
+                                type: 'error',
+                                position: 'bottom-center',
+                                description: 'Please try again',
+                                emoji: '❌'
+                            });
+                        }
+                    });
                 }
             }">
                 <!-- Include sidebar component -->
@@ -476,167 +573,23 @@
                                 </button>
                             </div>
                             
-                            <!-- Star Rating Component - Only shown for completed lessons -->
-                            <div x-show="currentLesson.completed" class="mt-4 flex justify-center">
-                                <div x-data="{
-                                    disabled: false,
-                                    max_stars: 5,
-                                    stars: 0,
-                                    value: 0,
-                                    lessonId: null,
-                                    
-                                    init() {
-                                        // Initialize with the lesson ID from parent scope
-                                        this.lessonId = this.$el.dataset.lessonId;
-                                        
-                                        // Initialize with current lesson's rating if available
-                                        const rating = parseInt(this.$el.dataset.rating);
-                                        if (!isNaN(rating)) {
-                                            this.stars = rating;
-                                            this.value = rating;
-                                        }
-                                        
-                                        console.log('Rating component initialized with:', {
-                                            lessonId: this.lessonId,
-                                            rating: this.value
-                                        });
-                                    },
-                                    
-                                    hoverStar(star) {
-                                        if (this.disabled) {
-                                            return;
-                                        }
-                                        this.stars = star; 
-                                    },
-                                    
-                                    mouseLeftStar() {
-                                        if (this.disabled) {
-                                            return;
-                                        }
-                                        this.stars = this.value;
-                                    },
-                                    
-                                    async rate(star) {
-                                        if (this.disabled) {
-                                            return;
-                                        }
-                                        
-                                        const previousValue = this.value;
-                                        this.stars = star;
-                                        this.value = star;
-                                        
-                                        // Debug - check parent access
-                                        console.log('Rating attempt for star:', star);
-                                        console.log('Using lessonId:', this.lessonId);
-                                        
-                                        if (!this.lessonId) {
-                                            console.error('Failed to get lessonId');
-                                            window.toast('Error saving rating', {
-                                                type: 'error',
-                                                position: 'bottom-center',
-                                                description: 'Could not determine which lesson to rate',
-                                                emoji: '❌'
-                                            });
-                                            return;
-                                        }
-                                        
-                                        try {
-                                            // Save rating to server
-                                            const response = await fetch('/masterclass/api/rating', {
-                                                method: 'POST',
-                                                headers: {
-                                                    'Content-Type': 'application/json'
-                                                },
-                                                body: JSON.stringify({
-                                                    lessonId: this.lessonId,
-                                                    rating: star
-                                                })
-                                            });
-                                            
-                                            // Debug - log the raw response
-                                            const responseText = await response.text();
-                                            console.log('Raw API response:', responseText);
-                                            
-                                            // Parse the response
-                                            let data;
-                                            try {
-                                                data = JSON.parse(responseText);
-                                            } catch (e) {
-                                                console.error('Error parsing response JSON:', e);
-                                                throw new Error('Invalid JSON response');
-                                            }
-                                            
-                                            if (data.success) {
-                                                // Update the current lesson object in the parent component
-                                                try {
-                                                    // Get the parent Alpine component
-                                                    const parentEl = document.querySelector('.flex.flex-col.md\\:flex-row.h-screen');
-                                                    if (parentEl && parentEl.__x) {
-                                                        const parentComponent = parentEl.__x.$data;
-                                                        if (parentComponent && parentComponent.currentLesson) {
-                                                            parentComponent.currentLesson.rating = star;
-                                                            console.log('Updated rating in parent component');
-                                                        }
-                                                    }
-                                                } catch (err) {
-                                                    console.warn('Could not update parent component:', err);
-                                                }
-                                                
-                                                // Show success toast
-                                                const isUpdate = previousValue > 0;
-                                                const message = isUpdate ? 'Rating updated!' : 'Rating submitted!';
-                                                const description = `You rated this lesson ${star} ${star === 1 ? 'star' : 'stars'}`;
-                                                
-                                                window.toast(message, {
-                                                    type: 'success',
-                                                    position: 'bottom-center',
-                                                    description: description,
-                                                    emoji: '⭐️'
-                                                });
-                                            } else {
-                                                // Show error toast with more details
-                                                console.error('Error from API:', data);
-                                                window.toast('Error saving rating', {
-                                                    type: 'error',
-                                                    position: 'bottom-center',
-                                                    description: data.message || 'Please try again',
-                                                    emoji: '❌'
-                                                });
-                                                
-                                                // Revert to previous value
-                                                this.stars = previousValue;
-                                                this.value = previousValue;
-                                            }
-                                        } catch (error) {
-                                            console.error('Error submitting rating:', error);
-                                            
-                                            // Show error toast with more details
-                                            window.toast('Error saving rating', {
-                                                type: 'error',
-                                                position: 'bottom-center',
-                                                description: `${error.message || 'Please try again later'}`,
-                                                emoji: '❌'
-                                            });
-                                            
-                                            // Revert to previous value
-                                            this.stars = previousValue;
-                                            this.value = previousValue;
-                                        }
-                                    }
-                                }" x-init="init()" :data-lesson-id="currentLesson.id" :data-rating="currentLesson.rating">
-                                    <div class="flex flex-col items-center max-w-6xl mx-auto justify-center">
-                                        <ul class="flex mb-2">
-                                            <template x-for="star in max_stars">
-                                                <li @mouseover="hoverStar(star)" @mouseleave="mouseLeftStar" @click="rate(star)" class="px-1 cursor-pointer" :class="{ 'text-gray-400 cursor-not-allowed': disabled}">
-                                                    <svg x-show="star > stars" class="w-6 h-6 text-gray-300 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><rect width="256" height="256" fill="none"/><path d="M234.29,114.85l-45,38.83L203,211.75a16.4,16.4,0,0,1-24.5,17.82L128,198.49,77.47,229.57A16.4,16.4,0,0,1,53,211.75l13.76-58.07-45-38.83A16.46,16.46,0,0,1,31.08,86l59-4.76,22.76-55.08a16.36,16.36,0,0,1,30.27,0l22.75,55.08,59,4.76a16.46,16.46,0,0,1,9.37,28.86Z"/></svg>
-                                                    <svg x-show="star <= stars" class="w-6 h-6 text-yellow-400 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><rect width="256" height="256" fill="none"/><path d="M234.29,114.85l-45,38.83L203,211.75a16.4,16.4,0,0,1-24.5,17.82L128,198.49,77.47,229.57A16.4,16.4,0,0,1,53,211.75l13.76-58.07-45-38.83A16.46,16.46,0,0,1,31.08,86l59-4.76,22.76-55.08a16.36,16.36,0,0,1,30.27,0l22.75,55.08,59,4.76a16.46,16.46,0,0,1,9.37,28.86Z"/></svg>
-                                                </li>
-                                            </template>
-                                        </ul>
-                                        <!-- Rating text moved below the stars -->
-                                        <div x-show="value > 0" class="text-xs text-gray-500">
-                                            Rated <span x-text="value"></span> <span x-text="value === 1 ? 'star' : 'stars'"></span>
-                                        </div>
+                            <!-- Rating display - only shown if lesson is completed -->
+                            <div class="mt-4 flex justify-center" x-show="currentLesson.completed" :key="currentLesson.id">
+                                <div class="text-center">
+                                    <div class="flex items-center justify-center space-x-1">
+                                        <template x-for="star in [1, 2, 3, 4, 5]" :key="star">
+                                            <button 
+                                                @mouseenter="hoveredStar = star"
+                                                @mouseleave="hoveredStar = null"
+                                                @click="submitRating(star)"
+                                                class="text-2xl focus:outline-none transition-colors duration-200"
+                                                :class="{
+                                                    'text-habit-color-yellow-shade': (hoveredStar !== null ? star <= hoveredStar : currentLesson.rating && star <= currentLesson.rating),
+                                                    'text-gray-300': (hoveredStar !== null ? star > hoveredStar : !currentLesson.rating || star > currentLesson.rating)
+                                                }">
+                                                ★
+                                            </button>
+                                        </template>
                                     </div>
                                 </div>
                             </div>

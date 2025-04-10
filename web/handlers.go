@@ -470,6 +470,20 @@ func MasterclassModuleHandler(db *sql.DB, templates *template.Template) http.Han
 				"content":     lessonContent,
 			}
 
+			// Get lesson rating if completed
+			if completed {
+				log.Printf("⭐️ Initial page load - Lesson '%s' is completed, checking for rating for user %d", lesson.ID, userID)
+				ratingValue, hasRating, err := masterclass.GetLessonRating(db, userID, lesson.ID)
+				if err != nil {
+					log.Printf("⭐️ Initial page load - Error getting lesson rating: %v", err)
+				} else if hasRating {
+					log.Printf("⭐️ Initial page load - Found rating %d for lesson '%s', user %d", ratingValue, lesson.ID, userID)
+					lessonData["rating"] = ratingValue
+				} else {
+					log.Printf("⭐️ Initial page load - No rating found for lesson '%s', user %d", lesson.ID, userID)
+				}
+			}
+
 			// Convert to JSON for template
 			lessonDataJSON, err := json.Marshal(lessonData)
 			if err != nil {

@@ -464,43 +464,64 @@ func SetLessonRating(db *sql.DB, userID int, lessonID string, rating int) error 
 	`, userID, lessonID).Scan(&completed)
 
 	if err == sql.ErrNoRows {
+		log.Printf("⭐️ Rating DB - Error: Lesson not found for user %d, lesson %s", userID, lessonID)
 		return fmt.Errorf("lesson must be completed before rating")
 	}
 	if err != nil {
+		log.Printf("⭐️ Rating DB - Error querying lesson completion: %v", err)
 		return err
 	}
 	if !completed {
+		log.Printf("⭐️ Rating DB - Error: Lesson not completed for user %d, lesson %s", userID, lessonID)
 		return fmt.Errorf("lesson must be completed before rating")
 	}
 
 	// Validate rating value
 	if rating < 1 || rating > 5 {
+		log.Printf("⭐️ Rating DB - Error: Invalid rating value %d for user %d, lesson %s", rating, userID, lessonID)
 		return fmt.Errorf("rating must be between 1 and 5")
 	}
 
 	// Set the rating
-	_, err = db.Exec(`
+	log.Printf("⭐️ Rating DB - Attempting to save rating %d for user %d, lesson %s", rating, userID, lessonID)
+	result, err := db.Exec(`
 		UPDATE user_lesson_completion
 		SET rating = ?, rating_submitted_at = CURRENT_TIMESTAMP
 		WHERE user_id = ? AND lesson_id = ?
 	`, rating, userID, lessonID)
 
-	return err
+	if err != nil {
+		log.Printf("⭐️ Rating DB - Error saving rating: %v", err)
+		return err
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+	log.Printf("⭐️ Rating DB - Successfully saved rating %d for user %d, lesson %s (rows affected: %d)", rating, userID, lessonID, rowsAffected)
+	return nil
 }
 
 // RemoveLessonRating removes a rating for a lesson
 func RemoveLessonRating(db *sql.DB, userID int, lessonID string) error {
-	_, err := db.Exec(`
+	log.Printf("⭐️ Rating DB - Attempting to remove rating for user %d, lesson %s", userID, lessonID)
+	result, err := db.Exec(`
 		UPDATE user_lesson_completion
 		SET rating = NULL, rating_submitted_at = NULL
 		WHERE user_id = ? AND lesson_id = ?
 	`, userID, lessonID)
 
-	return err
+	if err != nil {
+		log.Printf("⭐️ Rating DB - Error removing rating: %v", err)
+		return err
+	}
+
+	rowsAffected, _ := result.RowsAffected()
+	log.Printf("⭐️ Rating DB - Successfully removed rating for user %d, lesson %s (rows affected: %d)", userID, lessonID, rowsAffected)
+	return nil
 }
 
 // GetLessonRating gets a user's rating for a lesson
 func GetLessonRating(db *sql.DB, userID int, lessonID string) (int, bool, error) {
+	log.Printf("⭐️ DB Query - Getting rating for user %d, lesson '%s'", userID, lessonID)
 	var rating sql.NullInt64
 	err := db.QueryRow(`
 		SELECT rating FROM user_lesson_completion
@@ -508,15 +529,19 @@ func GetLessonRating(db *sql.DB, userID int, lessonID string) (int, bool, error)
 	`, userID, lessonID).Scan(&rating)
 
 	if err == sql.ErrNoRows {
+		log.Printf("⭐️ DB Query - No row found for user %d, lesson '%s'", userID, lessonID)
 		return 0, false, nil
 	}
 	if err != nil {
+		log.Printf("⭐️ DB Query - Error querying rating: %v", err)
 		return 0, false, err
 	}
 
 	if !rating.Valid {
+		log.Printf("⭐️ DB Query - Rating is NULL for user %d, lesson '%s'", userID, lessonID)
 		return 0, false, nil
 	}
 
+	log.Printf("⭐️ DB Query - Found valid rating %d for user %d, lesson '%s'", rating.Int64, userID, lessonID)
 	return int(rating.Int64), true, nil
 }

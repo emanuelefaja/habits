@@ -232,12 +232,18 @@ func LessonHandler(db *sql.DB) http.HandlerFunc {
 		// Get lesson rating if completed
 		var rating *int
 		if completed {
+			log.Printf("⭐️ API - Lesson '%s' is completed, checking for rating for user %d", lesson.ID, userID)
 			ratingValue, hasRating, err := GetLessonRating(db, userID, lesson.ID)
 			if err != nil {
-				log.Printf("Error getting lesson rating: %v", err)
+				log.Printf("⭐️ API - Error getting lesson rating: %v", err)
 			} else if hasRating {
+				log.Printf("⭐️ API - Found rating %d for lesson '%s', user %d", ratingValue, lesson.ID, userID)
 				rating = &ratingValue
+			} else {
+				log.Printf("⭐️ API - No rating found for lesson '%s', user %d", lesson.ID, userID)
 			}
+		} else {
+			log.Printf("⭐️ API - Lesson '%s' is not completed, skipping rating check for user %d", lesson.ID, userID)
 		}
 
 		// Get lesson content
@@ -279,6 +285,7 @@ func LessonHandler(db *sql.DB) http.HandlerFunc {
 			Rating:      rating,
 		}
 
+		log.Printf("⭐️ API - Sending lesson response for '%s' with rating: %v", lesson.ID, rating)
 		writeJSON(w, http.StatusOK, response)
 	}
 }
@@ -711,6 +718,7 @@ func SetLessonRatingHandler(db *sql.DB) http.HandlerFunc {
 		// Either set or remove the rating
 		if request.Rating == nil {
 			// Remove the rating
+			log.Printf("⭐️ Rating API - Removing rating for user %d, lesson %s", userID, request.LessonID)
 			err = RemoveLessonRating(db, userID, request.LessonID)
 			if err != nil {
 				writeErrorResponse(w, http.StatusInternalServerError, "Error removing rating: "+err.Error())
@@ -718,9 +726,11 @@ func SetLessonRatingHandler(db *sql.DB) http.HandlerFunc {
 			}
 			response.Success = true
 			response.Message = "Rating removed successfully"
+			log.Printf("⭐️ Rating API - Successfully removed rating for user %d, lesson %s", userID, request.LessonID)
 		} else {
 			// Set the rating
 			rating := *request.Rating
+			log.Printf("⭐️ Rating API - Setting rating %d for user %d, lesson %s", rating, userID, request.LessonID)
 			err = SetLessonRating(db, userID, request.LessonID, rating)
 			if err != nil {
 				writeErrorResponse(w, http.StatusInternalServerError, "Error setting rating: "+err.Error())
@@ -729,6 +739,7 @@ func SetLessonRatingHandler(db *sql.DB) http.HandlerFunc {
 			response.Success = true
 			response.Message = "Rating saved successfully"
 			response.Timestamp = time.Now().Format(time.RFC3339)
+			log.Printf("⭐️ Rating API - Successfully saved rating %d for user %d, lesson %s", rating, userID, request.LessonID)
 		}
 
 		writeJSON(w, http.StatusOK, response)
