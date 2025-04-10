@@ -235,7 +235,7 @@
                     const duration = 4000;
                     const animationEnd = Date.now() + duration;
                     const defaults = { 
-                        startVelocity: 20,
+                        startVelocity: 30,
                         spread: 360,
                         ticks: 100,
                         zIndex: 0 
@@ -253,18 +253,40 @@
                             return;
                         }
 
-                        const particleCount = 30 * (timeLeft / duration);
+                        const particleCount = 75 * (timeLeft / duration);
+                        
+                        // Left side confetti
                         confetti({
                             ...defaults,
                             particleCount,
                             origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
                         });
+                        
+                        // Center confetti
+                        confetti({
+                            ...defaults,
+                            particleCount: particleCount * 1.5,
+                            origin: { x: 0.5, y: 0.2 },
+                        });
+                        
+                        // Right side confetti
                         confetti({
                             ...defaults,
                             particleCount,
                             origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
                         });
-                    }, 400);
+                        
+                        // Add occasional random bursts for extra effect
+                        if (Math.random() > 0.7) {
+                            confetti({
+                                ...defaults,
+                                particleCount: particleCount * 2,
+                                origin: { x: randomInRange(0.2, 0.8), y: randomInRange(0.3, 0.5) },
+                                gravity: 1.2,
+                                scalar: 1.5
+                            });
+                        }
+                    }, 400); // More frequent confetti bursts
 
                     // Show a special toast notification for module completion
                     if (window.toast) {
