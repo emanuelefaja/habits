@@ -122,6 +122,12 @@
                             e.preventDefault();
                             this.navigateToNextLesson();
                         }
+
+                        // Add Enter key support for completing lesson
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            this.toggleLessonComplete();
+                        }
                     });
                 },
                 
@@ -551,8 +557,8 @@
                             <div class="flex justify-center items-center space-x-4">
                                 <button 
                                     @click="navigateToPreviousLesson"
-                                    class="rounded-md px-4 py-2 text-sm font-semibold shadow-sm bg-[#E8EDF0] text-gray-800 hover:bg-gray-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
-                                    ⬅️ Previous lesson
+                                    class="rounded-md px-4 py-2 text-sm font-semibold shadow-sm bg-[#E8EDF0] text-gray-800 hover:bg-gray-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400 min-w-[120px] flex-shrink-0 text-center">
+                                    ⬅️ Previous
                                 </button>
                                 
                                 <button 
@@ -568,8 +574,8 @@
                                 
                                 <button 
                                     @click="navigateToNextLesson"
-                                    class="rounded-md px-4 py-2 text-sm font-semibold shadow-sm bg-[#E8EDF0] text-gray-800 hover:bg-gray-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
-                                    Next lesson ➡️
+                                    class="rounded-md px-4 py-2 text-sm font-semibold shadow-sm bg-[#E8EDF0] text-gray-800 hover:bg-gray-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400 min-w-[120px] flex-shrink-0 text-center">
+                                    Next ➡️
                                 </button>
                             </div>
                             
