@@ -53,7 +53,8 @@
                     }
                     
                     // Expose global methods
-                    window.triggerConfetti = this.triggerConfetti;
+                    window.triggerConfetti = this.triggerConfetti.bind(this);
+                    window.celebrateModuleCompletion = this.celebrateModuleCompletion.bind(this);
                     window.toggleLessonComplete = (moduleSlug, lessonSlug) => this.toggleLessonComplete(moduleSlug, lessonSlug);
                     
                     // Initialize toast functionality
@@ -63,11 +64,13 @@
                         let type = 'default';
                         let position = 'bottom-center';
                         let html = '';
+                        let emoji = '✅'; // Default emoji
                         
                         if(typeof options.description != 'undefined') description = options.description;
                         if(typeof options.type != 'undefined') type = options.type;
                         if(typeof options.position != 'undefined') position = options.position;
                         if(typeof options.html != 'undefined') html = options.html;
+                        if(typeof options.emoji != 'undefined') emoji = options.emoji;
                         
                         window.dispatchEvent(new CustomEvent('toast-show', { 
                             detail: { 
@@ -75,7 +78,8 @@
                                 message: message, 
                                 description: description, 
                                 position: position, 
-                                html: html 
+                                html: html,
+                                emoji: emoji
                             }
                         }));
                     };
@@ -173,6 +177,7 @@
                         });
                         
                         if (response.ok) {
+                            const data = await response.json();
                             // Toggle the lesson completion state
                             lessonToToggle.completed = !wasCompleted;
                             
@@ -191,8 +196,14 @@
                             } else {
                                 this.completedLessons++;
                                 
-                                // Show confetti if completing
-                                this.triggerConfetti();
+                                // Check if completing this lesson completed the entire module
+                                if (data.moduleCompleted) {
+                                    // Module was completed, show special celebration
+                                    this.celebrateModuleCompletion(moduleToUpdate);
+                                } else {
+                                    // Regular lesson completion, show standard confetti
+                                    this.triggerConfetti();
+                                }
                                 
                                 // Show success toast notification
                                 if (window.toast) {
@@ -200,7 +211,8 @@
                                     window.toast(`Lesson completed!`, {
                                         type: 'success',
                                         position: 'bottom-center',
-                                        description: `Great job completing '${lessonToToggle.title}'`
+                                        description: `Great job completing '${lessonToToggle.title}'`,
+                                        emoji: '✅'
                                     });
                                 } else {
                                     console.error('window.toast function not available');
@@ -214,6 +226,54 @@
                         }
                     } catch (error) {
                         console.error('Error toggling lesson completion:', error);
+                    }
+                },
+                
+                // Celebrate module completion with special effects
+                celebrateModuleCompletion(module) {
+                    // Show a more elaborate confetti effect
+                    const duration = 4000;
+                    const animationEnd = Date.now() + duration;
+                    const defaults = { 
+                        startVelocity: 20,
+                        spread: 360,
+                        ticks: 100,
+                        zIndex: 0 
+                    };
+
+                    function randomInRange(min, max) {
+                        return Math.random() * (max - min) + min;
+                    }
+
+                    const interval = setInterval(function() {
+                        const timeLeft = animationEnd - Date.now();
+
+                        if (timeLeft <= 0) {
+                            clearInterval(interval);
+                            return;
+                        }
+
+                        const particleCount = 30 * (timeLeft / duration);
+                        confetti({
+                            ...defaults,
+                            particleCount,
+                            origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+                        });
+                        confetti({
+                            ...defaults,
+                            particleCount,
+                            origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+                        });
+                    }, 400);
+
+                    // Show a special toast notification for module completion
+                    if (window.toast) {
+                        window.toast(`Module Completed!`, {
+                            type: 'success',
+                            position: 'top-center',
+                            description: `Congratulations! You've completed the '${module.title}' module.`,
+                            emoji: '🎉'
+                        });
                     }
                 },
                 
@@ -516,7 +576,8 @@
                         id: 'toast-' + Math.random().toString(16).slice(2),
                         message: event.detail.message,
                         description: event.detail.description,
-                        type: event.detail.type
+                        type: event.detail.type,
+                        emoji: event.detail.emoji || '✅'
                     });
                     console.log('Toast added to list, current toasts:', toasts);
                 "
@@ -557,7 +618,7 @@
                         >
                             <div class="relative">
                                 <div class="flex items-center">
-                                    <span class="text-lg mr-1.5">✅</span>
+                                    <span class="text-lg mr-1.5" x-text="toast.emoji"></span>
                                     <p class="text-[13px] font-medium leading-none text-gray-800" x-text="toast.message"></p>
                                 </div>
                                 <p x-show="toast.description" 

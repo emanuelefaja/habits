@@ -56,10 +56,11 @@ type ProgressResponse struct {
 }
 
 type LessonCompletionResponse struct {
-	LessonID  string    `json:"lessonId"`
-	ModuleID  string    `json:"moduleId"`
-	Completed bool      `json:"completed"`
-	Timestamp time.Time `json:"timestamp,omitempty"`
+	LessonID        string    `json:"lessonId"`
+	ModuleID        string    `json:"moduleId"`
+	Completed       bool      `json:"completed"`
+	ModuleCompleted bool      `json:"moduleCompleted"`
+	Timestamp       time.Time `json:"timestamp,omitempty"`
 }
 
 type CourseAccessResponse struct {
@@ -385,18 +386,14 @@ func LessonExistsHandler() http.HandlerFunc {
 // MarkLessonCompleteHandler marks a lesson as complete
 func MarkLessonCompleteHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			writeErrorResponse(w, http.StatusMethodNotAllowed, "Method not allowed")
-			return
-		}
-
+		// Get user ID from session
 		userID, err := getUserID(r)
 		if err != nil {
-			writeErrorResponse(w, http.StatusUnauthorized, "Unauthorized access")
+			writeErrorResponse(w, http.StatusUnauthorized, "Not authenticated")
 			return
 		}
 
-		// Get module and lesson slugs
+		// Get module and lesson slugs from query parameters
 		moduleSlug := r.URL.Query().Get("moduleSlug")
 		lessonSlug := r.URL.Query().Get("lessonSlug")
 
@@ -405,29 +402,34 @@ func MarkLessonCompleteHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// Get lesson to verify it exists and to get its ID
+		// Get the lesson by slug
 		lesson, err := GetLessonBySlug(moduleSlug, lessonSlug)
 		if err != nil {
-			writeErrorResponse(w, http.StatusNotFound, "Lesson not found")
+			writeErrorResponse(w, http.StatusNotFound, err.Error())
 			return
 		}
 
-		// Mark lesson as complete
-		err = MarkLessonComplete(db, userID, moduleSlug, lesson.ID)
+		// Mark the lesson as complete
+		if err := MarkLessonComplete(db, userID, moduleSlug, lesson.ID); err != nil {
+			writeErrorResponse(w, http.StatusInternalServerError, "Failed to mark lesson as complete: "+err.Error())
+			return
+		}
+
+		// Check if this completion completes the entire module
+		moduleCompleted, err := IsModuleComplete(db, userID, moduleSlug)
 		if err != nil {
-			writeErrorResponse(w, http.StatusInternalServerError, "Error marking lesson as complete")
-			return
+			log.Printf("Error checking module completion: %v", err)
+			moduleCompleted = false
 		}
 
-		// Create response
-		response := LessonCompletionResponse{
-			LessonID:  lesson.ID,
-			ModuleID:  moduleSlug,
-			Completed: true,
-			Timestamp: time.Now(),
-		}
-
-		writeJSON(w, http.StatusOK, response)
+		// Return the updated completion status
+		writeJSON(w, http.StatusOK, LessonCompletionResponse{
+			LessonID:        lesson.ID,
+			ModuleID:        moduleSlug,
+			Completed:       true,
+			ModuleCompleted: moduleCompleted,
+			Timestamp:       time.Now(),
+		})
 	}
 }
 
