@@ -536,6 +536,12 @@ func MasterclassAPIHandler(db *sql.DB) http.HandlerFunc {
 			masterclass.GetUserProgressHandler(db).ServeHTTP(w, r)
 		case "access":
 			masterclass.GetUserCourseAccessHandler(db).ServeHTTP(w, r)
+		case "rating":
+			if r.Method == http.MethodPost {
+				masterclass.SetLessonRatingHandler(db).ServeHTTP(w, r)
+			} else {
+				masterclass.GetLessonRatingHandler(db).ServeHTTP(w, r)
+			}
 		default:
 			http.NotFound(w, r)
 		}

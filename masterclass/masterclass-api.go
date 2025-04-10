@@ -28,6 +28,7 @@ type LessonResponse struct {
 	Description string `json:"description"`
 	Content     string `json:"content,omitempty"`
 	Completed   bool   `json:"completed"`
+	Rating      *int   `json:"rating,omitempty"`
 }
 
 type ModuleResponse struct {
@@ -69,6 +70,15 @@ type CourseAccessResponse struct {
 	PurchasedAt  string `json:"purchasedAt,omitempty"`
 	CourseID     string `json:"courseId"`
 	ErrorMessage string `json:"errorMessage,omitempty"`
+}
+
+// RatingResponse represents a response for rating operations
+type RatingResponse struct {
+	LessonID  string `json:"lessonId"`
+	Rating    *int   `json:"rating"`
+	Timestamp string `json:"timestamp,omitempty"`
+	Success   bool   `json:"success"`
+	Message   string `json:"message,omitempty"`
 }
 
 // Helper functions
@@ -219,6 +229,17 @@ func LessonHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
+		// Get lesson rating if completed
+		var rating *int
+		if completed {
+			ratingValue, hasRating, err := GetLessonRating(db, userID, lesson.ID)
+			if err != nil {
+				log.Printf("Error getting lesson rating: %v", err)
+			} else if hasRating {
+				rating = &ratingValue
+			}
+		}
+
 		// Get lesson content
 		lessonPath := filepath.Join("ui", "masterclass", "lessons", moduleSlug, lessonSlug+".html")
 		content, err := ProcessTemplate(lessonPath, nil)
@@ -255,6 +276,7 @@ func LessonHandler(db *sql.DB) http.HandlerFunc {
 			Description: lesson.Description,
 			Content:     content,
 			Completed:   completed,
+			Rating:      rating,
 		}
 
 		writeJSON(w, http.StatusOK, response)
@@ -646,6 +668,103 @@ func GrantCourseAccessHandler(db *sql.DB) http.HandlerFunc {
 			"userId":   request.UserID,
 			"courseId": request.CourseID,
 			"message":  "Course access granted successfully",
+		}
+
+		writeJSON(w, http.StatusOK, response)
+	}
+}
+
+// SetLessonRatingHandler updates or removes a rating for a lesson
+func SetLessonRatingHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			writeErrorResponse(w, http.StatusMethodNotAllowed, "Method not allowed")
+			return
+		}
+
+		userID, err := getUserID(r)
+		if err != nil {
+			writeErrorResponse(w, http.StatusUnauthorized, "Unauthorized access")
+			return
+		}
+
+		// Parse request
+		var request struct {
+			LessonID string `json:"lessonId"`
+			Rating   *int   `json:"rating"`
+		}
+
+		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+			writeErrorResponse(w, http.StatusBadRequest, "Invalid request format")
+			return
+		}
+
+		if request.LessonID == "" {
+			writeErrorResponse(w, http.StatusBadRequest, "Lesson ID is required")
+			return
+		}
+
+		var response RatingResponse
+		response.LessonID = request.LessonID
+		response.Rating = request.Rating
+
+		// Either set or remove the rating
+		if request.Rating == nil {
+			// Remove the rating
+			err = RemoveLessonRating(db, userID, request.LessonID)
+			if err != nil {
+				writeErrorResponse(w, http.StatusInternalServerError, "Error removing rating: "+err.Error())
+				return
+			}
+			response.Success = true
+			response.Message = "Rating removed successfully"
+		} else {
+			// Set the rating
+			rating := *request.Rating
+			err = SetLessonRating(db, userID, request.LessonID, rating)
+			if err != nil {
+				writeErrorResponse(w, http.StatusInternalServerError, "Error setting rating: "+err.Error())
+				return
+			}
+			response.Success = true
+			response.Message = "Rating saved successfully"
+			response.Timestamp = time.Now().Format(time.RFC3339)
+		}
+
+		writeJSON(w, http.StatusOK, response)
+	}
+}
+
+// GetLessonRatingHandler retrieves a user's rating for a lesson
+func GetLessonRatingHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		userID, err := getUserID(r)
+		if err != nil {
+			writeErrorResponse(w, http.StatusUnauthorized, "Unauthorized access")
+			return
+		}
+
+		lessonID := r.URL.Query().Get("lessonId")
+		if lessonID == "" {
+			writeErrorResponse(w, http.StatusBadRequest, "Lesson ID is required")
+			return
+		}
+
+		ratingValue, hasRating, err := GetLessonRating(db, userID, lessonID)
+		if err != nil {
+			writeErrorResponse(w, http.StatusInternalServerError, "Error getting rating: "+err.Error())
+			return
+		}
+
+		var rating *int
+		if hasRating {
+			rating = &ratingValue
+		}
+
+		response := RatingResponse{
+			LessonID: lessonID,
+			Rating:   rating,
+			Success:  true,
 		}
 
 		writeJSON(w, http.StatusOK, response)

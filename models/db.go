@@ -308,6 +308,8 @@ func InitDB(db *sql.DB) error {
 			completed BOOLEAN NOT NULL DEFAULT FALSE,
 			completed_at TIMESTAMP,
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			rating INTEGER CHECK (rating IS NULL OR (rating >= 1 AND rating <= 5)),
+			rating_submitted_at TIMESTAMP,
 			FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
 			UNIQUE(user_id, lesson_id)
 		)
@@ -419,6 +421,50 @@ func MigrateDB(db *sql.DB) error {
 		_, err = db.Exec(`
 			ALTER TABLE users 
 			ADD COLUMN notification_enabled BOOLEAN NOT NULL DEFAULT true
+		`)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Check if rating column exists in user_lesson_completion table
+	err = db.QueryRow(`
+		SELECT COUNT(*) > 0 
+		FROM pragma_table_info('user_lesson_completion') 
+		WHERE name = 'rating'
+	`).Scan(&columnExists)
+
+	if err != nil {
+		return err
+	}
+
+	// Add rating column if it doesn't exist
+	if !columnExists {
+		_, err = db.Exec(`
+			ALTER TABLE user_lesson_completion 
+			ADD COLUMN rating INTEGER CHECK (rating IS NULL OR (rating >= 1 AND rating <= 5))
+		`)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Check if rating_submitted_at column exists
+	err = db.QueryRow(`
+		SELECT COUNT(*) > 0 
+		FROM pragma_table_info('user_lesson_completion') 
+		WHERE name = 'rating_submitted_at'
+	`).Scan(&columnExists)
+
+	if err != nil {
+		return err
+	}
+
+	// Add rating_submitted_at column if it doesn't exist
+	if !columnExists {
+		_, err = db.Exec(`
+			ALTER TABLE user_lesson_completion 
+			ADD COLUMN rating_submitted_at TIMESTAMP
 		`)
 		if err != nil {
 			return err

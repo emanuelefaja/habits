@@ -50,13 +50,15 @@ type Lesson struct {
 
 // LessonCompletion represents a user's completion status for a lesson
 type LessonCompletion struct {
-	ID          int
-	UserID      int
-	LessonID    string
-	ModuleID    string
-	Completed   bool
-	CompletedAt time.Time
-	CreatedAt   time.Time
+	ID                int
+	UserID            int
+	LessonID          string
+	ModuleID          string
+	Completed         bool
+	CompletedAt       time.Time
+	CreatedAt         time.Time
+	Rating            *int
+	RatingSubmittedAt *time.Time
 }
 
 // CourseAccess represents a user's access to a course
@@ -215,7 +217,7 @@ func MarkLessonComplete(db *sql.DB, userID int, moduleID, lessonID string) error
 func MarkLessonIncomplete(db *sql.DB, userID int, lessonID string) error {
 	_, err := db.Exec(`
 		UPDATE user_lesson_completion 
-		SET completed = false, completed_at = NULL
+		SET completed = false, completed_at = NULL, rating = NULL, rating_submitted_at = NULL
 		WHERE user_id = ? AND lesson_id = ?
 	`, userID, lessonID)
 
@@ -450,4 +452,71 @@ func GetFirstIncompleteLesson(db *sql.DB, userID int) (*Lesson, *Module, error) 
 	firstModule := modules[0]
 	firstLesson := firstModule.Lessons[0]
 	return &firstLesson, &firstModule, nil
+}
+
+// SetLessonRating sets a rating for a completed lesson
+func SetLessonRating(db *sql.DB, userID int, lessonID string, rating int) error {
+	// Verify the lesson is completed first
+	var completed bool
+	err := db.QueryRow(`
+		SELECT completed FROM user_lesson_completion
+		WHERE user_id = ? AND lesson_id = ?
+	`, userID, lessonID).Scan(&completed)
+
+	if err == sql.ErrNoRows {
+		return fmt.Errorf("lesson must be completed before rating")
+	}
+	if err != nil {
+		return err
+	}
+	if !completed {
+		return fmt.Errorf("lesson must be completed before rating")
+	}
+
+	// Validate rating value
+	if rating < 1 || rating > 5 {
+		return fmt.Errorf("rating must be between 1 and 5")
+	}
+
+	// Set the rating
+	_, err = db.Exec(`
+		UPDATE user_lesson_completion
+		SET rating = ?, rating_submitted_at = CURRENT_TIMESTAMP
+		WHERE user_id = ? AND lesson_id = ?
+	`, rating, userID, lessonID)
+
+	return err
+}
+
+// RemoveLessonRating removes a rating for a lesson
+func RemoveLessonRating(db *sql.DB, userID int, lessonID string) error {
+	_, err := db.Exec(`
+		UPDATE user_lesson_completion
+		SET rating = NULL, rating_submitted_at = NULL
+		WHERE user_id = ? AND lesson_id = ?
+	`, userID, lessonID)
+
+	return err
+}
+
+// GetLessonRating gets a user's rating for a lesson
+func GetLessonRating(db *sql.DB, userID int, lessonID string) (int, bool, error) {
+	var rating sql.NullInt64
+	err := db.QueryRow(`
+		SELECT rating FROM user_lesson_completion
+		WHERE user_id = ? AND lesson_id = ?
+	`, userID, lessonID).Scan(&rating)
+
+	if err == sql.ErrNoRows {
+		return 0, false, nil
+	}
+	if err != nil {
+		return 0, false, err
+	}
+
+	if !rating.Valid {
+		return 0, false, nil
+	}
+
+	return int(rating.Int64), true, nil
 }
