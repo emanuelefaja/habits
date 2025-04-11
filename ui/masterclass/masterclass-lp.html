@@ -6,142 +6,131 @@
         {{ template "header" . }}
 
         <!-- Hero section -->
-        <section class="bg-habit-color-green-core text-white flex items-center justify-center relative overflow-hidden" style="min-height: calc(100vh - 73px);">
+        <style>
+            @media (prefers-reduced-motion: no-preference) {
+              .float-slow {
+                animation: floatUpDown 6s ease-in-out infinite;
+              }
+              .float-medium {
+                animation: floatUpDown 4s ease-in-out infinite;
+              }
+              .float-fast {
+                animation: floatUpDown 3s ease-in-out infinite;
+              }
+              .float-reverse {
+                animation: floatDownUp 5s ease-in-out infinite;
+              }
+          
+              @keyframes floatUpDown {
+                0%, 100% {
+                  transform: translateY(0);
+                }
+                50% {
+                  transform: translateY(-8px);
+                }
+              }
+          
+              @keyframes floatDownUp {
+                0%, 100% {
+                  transform: translateY(0);
+                }
+                50% {
+                  transform: translateY(8px);
+                }
+              }
+            }
+          </style>
+          
+          <section class="bg-habit-color-green-core text-white flex items-center justify-center relative overflow-hidden" style="min-height: calc(100vh - 73px);">
             <!-- Floating cards background -->
             <div class="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
-                <!-- Card 1 -->
-                <div class="absolute rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform rotate-2" style="top: 15%; left: 10%; max-width: 200px;">
-                    <span class="text-xl mr-2">🧪</span>
-                    <span class="text-sm font-medium truncate">The Science of Habits</span>
-                </div>
-                
-                <!-- Card 2 -->
-                <div class="absolute rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform -rotate-3" style="top: 45%; right: 10%; max-width: 200px;">
-                    <span class="text-xl mr-2">📚</span>
-                    <span class="text-sm font-medium truncate">Habit Stacking</span>
-                </div>
-                
-                <!-- Card 3 -->
-                <div class="absolute rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform rotate-1" style="top: 70%; left: 15%; max-width: 200px;">
-                    <span class="text-xl mr-2">📊</span>
-                    <span class="text-sm font-medium truncate">Habit Tracking Methods</span>
-                </div>
-                
-                <!-- Card 4 -->
-                <div class="absolute rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform -rotate-1" style="top: 25%; left: 25%; max-width: 200px;">
-                    <span class="text-xl mr-2">🏠</span>
-                    <span class="text-sm font-medium truncate">Environment Design</span>
-                </div>
-                
-                <!-- Card 5 -->
-                <div class="absolute rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform rotate-2" style="top: 60%; right: 25%; max-width: 200px;">
-                    <span class="text-xl mr-2">⚡</span>
-                    <span class="text-sm font-medium truncate">Energy Management</span>
-                </div>
-                
-                <!-- Card 6 -->
-                <div class="absolute rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform -rotate-2" style="top: 45%; left: 5%; max-width: 200px;">
-                    <span class="text-xl mr-2">🎯</span>
-                    <span class="text-sm font-medium truncate">The Goal Behind the Goal</span>
-                </div>
-                
-                <!-- Card 7 -->
-                <div class="absolute rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform rotate-3" style="top: 75%; right: 5%; max-width: 200px;">
-                    <span class="text-xl mr-2">🤖</span>
-                    <span class="text-sm font-medium truncate">Automation & Leverage</span>
-                </div>
-                
-                <!-- Card 8 -->
-                <div class="absolute rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform -rotate-1" style="top: 10%; right: 30%; max-width: 200px;">
-                    <span class="text-xl mr-2">🧠</span>
-                    <span class="text-sm font-medium truncate">What is Productivity?</span>
-                </div>
-
-                <!-- Card 9 -->
-                <div class="absolute rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform rotate-3" style="top: 5%; left: 35%; max-width: 200px;">
-                    <span class="text-xl mr-2">🧘</span>
-                    <span class="text-sm font-medium truncate">Mindfulness & Habits</span>
-                </div>
-
-                <!-- Card 10 -->
-                <div class="absolute rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform -rotate-2" style="top: 85%; right: 8%; max-width: 200px;">
-                    <span class="text-xl mr-2">🤝</span>
-                    <span class="text-sm font-medium truncate">Accountability Systems</span>
-                </div>
-
-                <!-- Card 11 -->
-                <div class="absolute rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform rotate-1" style="top: 10%; right: 5%; max-width: 200px;">
-                    <span class="text-xl mr-2">⏰</span>
-                    <span class="text-sm font-medium truncate">Time Blocking</span>
-                </div>
-
-                <!-- Card 12 -->
-                <div class="absolute rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform -rotate-3" style="top: 90%; left: 8%; max-width: 200px;">
-                    <span class="text-xl mr-2">📈</span>
-                    <span class="text-sm font-medium truncate">Progress Visualization</span>
-                </div>
-
-                <!-- Card 13 -->
-                <div class="absolute rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform rotate-2" style="top: 20%; left: 80%; max-width: 200px;">
-                    <span class="text-xl mr-2">🔔</span>
-                    <span class="text-sm font-medium truncate">Habit Triggers</span>
-                </div>
-
-                <!-- Card 14 -->
-                <div class="absolute rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform -rotate-1" style="top: 80%; right: 30%; max-width: 200px;">
-                    <span class="text-xl mr-2">🔄</span>
-                    <span class="text-sm font-medium truncate">Habit Iteration</span>
-                </div>
-
-                <!-- Card 15 -->
-                <div class="absolute rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform rotate-3" style="top: 25%; left: 65%; max-width: 200px;">
-                    <span class="text-xl mr-2">💡</span>
-                    <span class="text-sm font-medium truncate">Motivation Systems</span>
-                </div>
-
-                <!-- Card 16 -->
-                <div class="absolute rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform -rotate-2" style="top: 90%; left: 30%; max-width: 200px;">
-                    <span class="text-xl mr-2">📱</span>
-                    <span class="text-sm font-medium truncate">Digital Habit Tools</span>
-                </div>
+              <div class="absolute float-slow rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform rotate-2" style="top: 15%; left: 10%; max-width: 200px;">
+                <span class="text-xl mr-2">🧪</span><span class="text-sm font-medium truncate">The Science of Habits</span>
+              </div>
+              <div class="absolute float-medium rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform -rotate-3" style="top: 45%; right: 10%; max-width: 200px;">
+                <span class="text-xl mr-2">📚</span><span class="text-sm font-medium truncate">Habit Stacking</span>
+              </div>
+              <div class="absolute float-reverse rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform rotate-1" style="top: 70%; left: 15%; max-width: 200px;">
+                <span class="text-xl mr-2">📊</span><span class="text-sm font-medium truncate">Habit Tracking Methods</span>
+              </div>
+              <div class="absolute float-fast rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform -rotate-1" style="top: 25%; left: 25%; max-width: 200px;">
+                <span class="text-xl mr-2">🏠</span><span class="text-sm font-medium truncate">Environment Design</span>
+              </div>
+              <div class="absolute float-slow rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform rotate-2" style="top: 60%; right: 25%; max-width: 200px;">
+                <span class="text-xl mr-2">⚡</span><span class="text-sm font-medium truncate">Energy Management</span>
+              </div>
+              <div class="absolute float-reverse rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform -rotate-2" style="top: 45%; left: 5%; max-width: 200px;">
+                <span class="text-xl mr-2">🎯</span><span class="text-sm font-medium truncate">The Goal Behind the Goal</span>
+              </div>
+              <div class="absolute float-medium rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform rotate-3" style="top: 75%; right: 5%; max-width: 200px;">
+                <span class="text-xl mr-2">🤖</span><span class="text-sm font-medium truncate">Automation & Leverage</span>
+              </div>
+              <div class="absolute float-fast rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform -rotate-1" style="top: 10%; right: 30%; max-width: 200px;">
+                <span class="text-xl mr-2">🧠</span><span class="text-sm font-medium truncate">What is Productivity?</span>
+              </div>
+              <div class="absolute float-slow rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform rotate-3" style="top: 5%; left: 35%; max-width: 200px;">
+                <span class="text-xl mr-2">🧘</span><span class="text-sm font-medium truncate">Mindfulness & Habits</span>
+              </div>
+              <div class="absolute float-reverse rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform -rotate-2" style="top: 85%; right: 8%; max-width: 200px;">
+                <span class="text-xl mr-2">🤝</span><span class="text-sm font-medium truncate">Accountability Systems</span>
+              </div>
+              <div class="absolute float-medium rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform rotate-1" style="top: 10%; right: 5%; max-width: 200px;">
+                <span class="text-xl mr-2">⏰</span><span class="text-sm font-medium truncate">Time Blocking</span>
+              </div>
+              <div class="absolute float-fast rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform -rotate-3" style="top: 90%; left: 8%; max-width: 200px;">
+                <span class="text-xl mr-2">📈</span><span class="text-sm font-medium truncate">Progress Visualization</span>
+              </div>
+              <div class="absolute float-slow rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform rotate-2" style="top: 20%; left: 80%; max-width: 200px;">
+                <span class="text-xl mr-2">🔔</span><span class="text-sm font-medium truncate">Habit Triggers</span>
+              </div>
+              <div class="absolute float-reverse rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform -rotate-1" style="top: 80%; right: 30%; max-width: 200px;">
+                <span class="text-xl mr-2">🔄</span><span class="text-sm font-medium truncate">Habit Iteration</span>
+              </div>
+              <div class="absolute float-medium rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform rotate-3" style="top: 25%; left: 65%; max-width: 200px;">
+                <span class="text-xl mr-2">💡</span><span class="text-sm font-medium truncate">Motivation Systems</span>
+              </div>
+              <div class="absolute float-fast rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform -rotate-2" style="top: 90%; left: 30%; max-width: 200px;">
+                <span class="text-xl mr-2">📱</span><span class="text-sm font-medium truncate">Digital Habit Tools</span>
+              </div>
             </div>
-            
+          
             <!-- Main content -->
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 text-center relative z-10">
-                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight">
-                    Learn to build a better life.
-                </h1>
-                <p class="mt-6 text-xl sm:text-2xl max-w-3xl mx-auto font-medium">
-                    A masterclass on creating lasting habits that transform your life.
-                </p>
-                <div class="mt-10">
-                    <div class="flex space-x-4 justify-center">
-                        <button 
-                            class="px-6 py-3 text-white bg-transparent border border-white rounded-md font-medium hover:bg-white hover:bg-opacity-10 transition-colors duration-200"
-                            onclick="smoothScroll('#pricing')">
-                            View Pricing ↓
-                        </button>
-                    </div>
+              <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight">
+                Learn to build a better life.
+              </h1>
+              <p class="mt-6 text-xl sm:text-2xl max-w-3xl mx-auto font-medium">
+                A masterclass on creating lasting habits that transform your life.
+              </p>
+              <div class="mt-10">
+                <div class="flex space-x-4 justify-center">
+                  <button 
+                    class="px-6 py-3 text-white bg-transparent border border-white rounded-md font-medium hover:bg-white hover:bg-opacity-10 transition-colors duration-200"
+                    onclick="smoothScroll('#pricing')">
+                    View Pricing ↓
+                  </button>
                 </div>
+              </div>
             </div>
-        </section>
+          </section>
+          
 
         <!-- Problem section -->
         <section class="bg-white dark:bg-gray-800 py-20">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
               <h2 class="text-4xl sm:text-5xl font-black tracking-tight text-gray-900 dark:text-white mb-4">
-                Life didn’t turn out quite how you thought it would.
+                Life didn't turn out quite how you thought it would.
               </h2>
               <p class="text-xl sm:text-2xl font-medium text-gray-700 dark:text-gray-300 mb-6">
-                That’s okay — we know the feeling.
+                That's okay — we know the feeling.
               </p>
               <p class="text-lg sm:text-xl text-gray-600 dark:text-gray-400 leading-relaxed">
-                You’re doing your best — juggling work, family, friends, health, side projects, and goals. And that nagging voice
-                in your head that says you should be doing more. You’ve tried habit apps,
+                You're doing your best — juggling work, family, friends, health, side projects, and goals. And that nagging voice
+                in your head that says you should be doing more. You've tried habit apps,
                 morning routines, maybe even a productivity book or two... but nothing sticks.
               </p>
               <p class="mt-6 text-lg sm:text-xl text-gray-600 dark:text-gray-400 leading-relaxed">
-                It’s not a lack of motivation. It’s not laziness. <br><br>It’s the system. And
+                It's not a lack of motivation. It's not laziness. <br><br>It's the system. And
                 when you fix the system, your habits become effortless. 
               </p>
             </div>
@@ -192,7 +181,7 @@
                             The <span class="text-black dark:text-white">version of you</span>
                         </h3>
                         <p class="mt-3 text-lg text-gray-700 dark:text-gray-300">
-                            who is feeling down and wants to change your life without the help of a coach.
+                            who feels stuck and is ready to take control—without hiring a coach.
                         </p>
                     </div>
                 </div>
@@ -202,7 +191,7 @@
         <!-- Course Curriculum Section -->
         <section class="py-16 bg-gray-50 dark:bg-gray-900">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-3xl font-extrabold text-center text-gray-900 dark:text-white sm:text-4xl mb-2">
+                <h2 class="text-4xl sm:text-5xl font-black tracking-tight text-center text-gray-900 dark:text-white mb-12">
                     Course Curriculum
                 </h2>
                 <p class="mt-4 max-w-2xl mx-auto text-center text-xl text-gray-500 dark:text-gray-300 mb-12">
@@ -610,7 +599,7 @@
         <!-- Pricing Section -->
         <section id="pricing" class="py-16 bg-white dark:bg-gray-800">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-3xl font-extrabold text-center text-gray-900 dark:text-white sm:text-4xl">
+                <h2 class="text-4xl sm:text-5xl font-black tracking-tight text-center text-gray-900 dark:text-white mb-12">
                     Choose Your Learning Path
                 </h2>
                 <p class="mt-4 max-w-2xl mx-auto text-center text-xl text-gray-500 dark:text-gray-300">
@@ -842,7 +831,7 @@
         <!-- FAQ Section -->
         <section class="py-16 bg-gray-50 dark:bg-gray-900">
             <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-3xl font-extrabold text-center text-gray-900 dark:text-white sm:text-4xl mb-10">
+                <h2 class="text-4xl sm:text-5xl font-black tracking-tight text-center text-gray-900 dark:text-white mb-12">
                     Frequently Asked Questions
                 </h2>
                 
@@ -914,7 +903,7 @@
                         </button>
                         <div x-show="activeAccordion==id" x-collapse x-cloak>
                             <div class="p-4 pt-0 opacity-70 text-gray-700 dark:text-gray-300 text-base">
-                                We offer a 7-day money-back guarantee on the masterclass. If you're not satisfied with the content, you can request a full refund within 7 days of purchase, provided you've watched less than 10% of the masterclass content. This gives you enough time to explore the material while ensuring the policy isn't misused. Simple go to the settings page and click the refund button and it will be processed automatically. The refund will typically reach your bank account within 3-5 business days.
+                                We offer a 7-day money-back guarantee on the masterclass. If you're not satisfied with the content, you can request a full refund within 7 days of purchase, provided you've watched less than 10% of the masterclass content. This gives you enough time to explore the material while ensuring the policy isn't misused. Simply go to the settings page and click the refund button and it will be processed automatically. The refund will typically reach your bank account within 3-5 business days.
                         </div>
                     </div>
                 </div>
