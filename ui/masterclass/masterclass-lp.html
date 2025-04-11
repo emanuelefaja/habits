@@ -245,12 +245,12 @@
                             <a href="#" class="block w-full bg-habit-color-green-core border border-transparent rounded-md py-3 px-5 text-center text-white font-medium hover:bg-opacity-90 transition-colors duration-200">
                                 Coming Soon
                             </a>
-                            <div class="text-sm text-gray-500 dark:text-gray-400 text-center mt-2">One time payment</div>
+                            <div class="text-sm text-gray-500 dark:text-gray-400 text-center mt-2">Pay once. Access forever.</div>
                         </div>
                     </div>
                     
                     <!-- Full Course Plan -->
-                    <div class="border-2 border-habit-color-green-core rounded-lg shadow-lg p-8 bg-white dark:bg-gray-900 flex flex-col relative">
+                    <div class="border-4 border-habit-color-green-core rounded-lg shadow-lg p-8 bg-white dark:bg-gray-900 flex flex-col relative">
                         <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-habit-color-green-core text-white dark:bg-habit-color-green-core dark:text-white">
                                 Most Popular
@@ -311,7 +311,22 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                     </svg>
                                 </div>
-                                <p class="ml-3 text-base text-gray-700 dark:text-gray-300">Accountability Systems</p>
+                                <div class="flex items-center">
+                                    <p class="ml-3 text-base text-gray-700 dark:text-gray-300">Accountability Systems</p>
+                                </div>
+                            </li>
+                            <li class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-6 w-6 text-habit-color-green-core" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                <div class="flex items-center">
+                                    <p class="ml-3 text-base text-gray-700 dark:text-gray-300">Lifetime Updates</p>
+                                    <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-habit-color-green-core text-white">
+                                        Updated 3 days ago
+                                    </span>
+                                </div>
                             </li>
                         </ul>
                         
@@ -319,7 +334,79 @@
                             <a href="#" class="block w-full bg-habit-color-green-core border border-transparent rounded-md py-3 px-5 text-center text-white font-medium hover:bg-opacity-90 transition-colors duration-200">
                                 Coming Soon
                             </a>
-                            <div class="text-sm text-gray-500 dark:text-gray-400 text-center mt-2">One time payment</div>
+                            <div class="text-sm text-gray-500 dark:text-gray-400 text-center mt-2">Pay once. Access forever.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- FAQ Section -->
+        <section class="py-16 bg-gray-50 dark:bg-gray-900">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-extrabold text-center text-gray-900 dark:text-white sm:text-4xl mb-10">
+                    Frequently Asked Questions
+                </h2>
+                
+                <div x-data="{ 
+                    activeAccordion: '', 
+                    setActiveAccordion(id) { 
+                        this.activeAccordion = (this.activeAccordion == id) ? '' : id 
+                    } 
+                }" class="relative w-full mx-auto overflow-hidden text-sm font-normal bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 divide-y divide-gray-200 dark:divide-gray-700 rounded-md">
+                    <div x-data="{ id: $id('accordion') }" class="cursor-pointer group">
+                        <button @click="setActiveAccordion(id)" class="flex items-center justify-between w-full p-4 text-left select-none group-hover:underline text-gray-900 dark:text-white">
+                            <span>What will I learn in the masterclass?</span>
+                            <svg class="w-4 h-4 duration-200 ease-out text-gray-500 dark:text-gray-400" :class="{ 'rotate-180': activeAccordion==id }" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+                        <div x-show="activeAccordion==id" x-collapse x-cloak>
+                            <div class="p-4 pt-0 opacity-70 text-gray-700 dark:text-gray-300">
+                                The masterclass covers everything from the science of habit formation to practical implementation strategies. You'll learn how to design your environment, create effective triggers, stack habits successfully, and build sustainable systems for long-term success.
+                            </div>
+                        </div>
+                    </div>
+                    <div x-data="{ id: $id('accordion') }" class="cursor-pointer group">
+                        <button @click="setActiveAccordion(id)" class="flex items-center justify-between w-full p-4 text-left select-none group-hover:underline text-gray-900 dark:text-white">
+                            <span>How long do I have access to the course?</span>
+                            <svg class="w-4 h-4 duration-200 ease-out text-gray-500 dark:text-gray-400" :class="{ 'rotate-180': activeAccordion==id }" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+                        <div x-show="activeAccordion==id" x-collapse x-cloak>
+                            <div class="p-4 pt-0 opacity-70 text-gray-700 dark:text-gray-300">
+                                You'll have lifetime access to the course materials. Pay once, access forever. We also provide updates to the course content as new research and techniques emerge.
+                            </div>
+                        </div>
+                    </div>
+                    <div x-data="{ id: $id('accordion') }" class="cursor-pointer group">
+                        <button @click="setActiveAccordion(id)" class="flex items-center justify-between w-full p-4 text-left select-none group-hover:underline text-gray-900 dark:text-white">
+                            <span>What's the difference between the Core and Full courses?</span>
+                            <svg class="w-4 h-4 duration-200 ease-out text-gray-500 dark:text-gray-400" :class="{ 'rotate-180': activeAccordion==id }" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+                        <div x-show="activeAccordion==id" x-collapse x-cloak>
+                            <div class="p-4 pt-0 opacity-70 text-gray-700 dark:text-gray-300">
+                                The Core Habit Theory course focuses on fundamental principles of habit formation and essential tracking methods. The Full Course includes everything in Core plus advanced topics like energy management, mindfulness integration, digital automation, and comprehensive accountability systems.
+                            </div>
+                        </div>
+                    </div>
+                    <div x-data="{ id: $id('accordion') }" class="cursor-pointer group">
+                        <button @click="setActiveAccordion(id)" class="flex items-center justify-between w-full p-4 text-left select-none group-hover:underline text-gray-900 dark:text-white">
+                            <span>Do I need to use The Habits Company app with the course?</span>
+                            <svg class="w-4 h-4 duration-200 ease-out text-gray-500 dark:text-gray-400" :class="{ 'rotate-180': activeAccordion==id }" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+                        <div x-show="activeAccordion==id" x-collapse x-cloak>
+                            <div class="p-4 pt-0 opacity-70 text-gray-700 dark:text-gray-300">
+                                While our free habit tracker is a perfect companion to the course, the principles and systems taught in the masterclass can be applied with any tracking method you prefer. We'll show you how to maximize results regardless of which tools you use.
+                            </div>
+                        </div>
+                    </div>
+                    <div x-data="{ id: $id('accordion') }" class="cursor-pointer group">
+                        <button @click="setActiveAccordion(id)" class="flex items-center justify-between w-full p-4 text-left select-none group-hover:underline text-gray-900 dark:text-white">
+                            <span>Will this help me if I've struggled to build habits before?</span>
+                            <svg class="w-4 h-4 duration-200 ease-out text-gray-500 dark:text-gray-400" :class="{ 'rotate-180': activeAccordion==id }" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+                        <div x-show="activeAccordion==id" x-collapse x-cloak>
+                            <div class="p-4 pt-0 opacity-70 text-gray-700 dark:text-gray-300">
+                                Absolutely! This course was specifically designed to address the common pitfalls people face when trying to build lasting habits. We focus on science-backed approaches that work even if you've failed multiple times before, with special attention to motivation, consistency, and overcoming obstacles.
+                            </div>
                         </div>
                     </div>
                 </div>
