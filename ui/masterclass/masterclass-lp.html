@@ -907,6 +907,16 @@
                             </div>
                         </div>
                     </div>
+                    <div x-data="{ id: $id('accordion') }" class="cursor-pointer group">
+                        <button @click="setActiveAccordion(id)" class="flex items-center justify-between w-full p-4 text-left select-none group-hover:underline text-gray-900 dark:text-white">
+                            <span class="text-lg font-medium">What is your refund policy?</span>
+                            <svg class="w-4 h-4 duration-200 ease-out text-gray-500 dark:text-gray-400" :class="{ 'rotate-180': activeAccordion==id }" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+                        <div x-show="activeAccordion==id" x-collapse x-cloak>
+                            <div class="p-4 pt-0 opacity-70 text-gray-700 dark:text-gray-300 text-base">
+                                We offer a 7-day money-back guarantee on the masterclass. If you're not satisfied with the content, you can request a full refund within 7 days of purchase, provided you've watched less than 10% of the masterclass content. This gives you enough time to explore the material while ensuring the policy isn't misused. Simple go to the settings page and click the refund button and it will be processed automatically. The refund will typically reach your bank account within 3-5 business days.
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
