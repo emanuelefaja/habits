@@ -223,6 +223,12 @@
                             } else {
                                 this.completedLessons++;
                                 
+                                // Play completion sound
+                                const completionSound = new Audio('https://res.cloudinary.com/ds8pgw1pf/video/upload/v1728571480/penguinui/component-assets/sounds/ding.mp3')
+                                completionSound.play().catch((error) => {
+                                    console.error('Error playing completion sound:', error)
+                                })
+                                
                                 // Check if completing this lesson completed the entire module
                                 if (data.moduleCompleted) {
                                     // Module was completed, show special celebration
