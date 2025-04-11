@@ -61,7 +61,11 @@
                     </div>
                     
                     <!-- Lessons list (visible when module is expanded) -->
-                    <div x-show="module.expanded" class="pl-6 mt-1 space-y-1">
+                    <div 
+                        x-show="module.expanded" 
+                        x-collapse.duration.300ms 
+                        class="pl-6 mt-1 space-y-1 overflow-hidden"
+                    >
                         <template x-for="lesson in module.lessons" :key="lesson.id">
                             <div 
                                 @click="navigateToLesson(module.slug, lesson.slug)"
