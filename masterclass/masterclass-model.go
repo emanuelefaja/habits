@@ -33,6 +33,7 @@ type Module struct {
 	Description string   // Brief module description
 	Emoji       string   // Visual indicator
 	Order       int      // Display order in the sidebar
+	Category    string   // Visual category for sidebar organization
 	Lessons     []Lesson // Lessons in this module
 }
 

@@ -429,6 +429,7 @@ func MasterclassModuleHandler(db *sql.DB, templates *template.Template) http.Han
 					"description": module.Description,
 					"emoji":       module.Emoji,
 					"order":       module.Order,
+					"category":    module.Category,
 					"lessons":     lessonResponses,
 					"completed":   moduleComplete,
 					"progress":    progress,

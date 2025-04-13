@@ -38,6 +38,7 @@ type ModuleResponse struct {
 	Description string           `json:"description"`
 	Emoji       string           `json:"emoji"`
 	Order       int              `json:"order"`
+	Category    string           `json:"category"`
 	Lessons     []LessonResponse `json:"lessons"`
 	Completed   bool             `json:"completed"`
 	Progress    float64          `json:"progress"`
@@ -174,6 +175,7 @@ func CourseStructureHandler(db *sql.DB) http.HandlerFunc {
 				Description: module.Description,
 				Emoji:       module.Emoji,
 				Order:       module.Order,
+				Category:    module.Category,
 				Lessons:     lessonResponses,
 				Completed:   moduleComplete,
 				Progress:    progress,
