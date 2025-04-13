@@ -10,13 +10,24 @@
     // Track expanded categories
     expandedCategories: {},
     
-    // Compute unique categories from modules
+    // Get uncategorized modules
+    getUncategorizedModules() {
+        if (!this.modules || !this.modules.modules) return [];
+        
+        return this.modules.modules.filter(module => 
+            !module.category || module.category === ''
+        );
+    },
+    
+    // Compute unique categories from modules (excluding empty categories)
     uniqueCategories() {
         if (!this.modules || !this.modules.modules) return [];
         
-        // Get unique category names
+        // Get unique category names, filtering out empty or null categories
         const categories = [...new Set(
-            this.modules.modules.map(module => module.category || 'Uncategorized')
+            this.modules.modules
+                .filter(module => module.category && module.category !== '')
+                .map(module => module.category)
         )];
         
         // Initialize expanded state for new categories
@@ -34,7 +45,7 @@
         if (!this.modules || !this.modules.modules) return [];
         
         return this.modules.modules.filter(module => 
-            (module.category || 'Uncategorized') === category
+            module.category === category
         );
     },
     
@@ -69,6 +80,74 @@
     <!-- Module and lesson list -->
     <div class="flex-1 overflow-y-auto">
         <div class="space-y-2 p-2">
+            <!-- Uncategorized modules (displayed at the top) -->
+            <template x-for="module in getUncategorizedModules()" :key="module.id">
+                <div class="rounded-md mb-4">
+                    <!-- Module header -->
+                    <div 
+                        @click="module.expanded = !module.expanded"
+                        class="flex justify-between items-center p-2 cursor-pointer bg-white dark:bg-gray-700 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600"
+                    >
+                        <div class="flex items-center">
+                            <span class="mr-2" x-text="module.emoji"></span>
+                            <span 
+                                class="font-medium text-sm" 
+                                :class="{
+                                    'text-gray-500 line-through': module.completed,
+                                    'text-gray-900 dark:text-white': !module.completed
+                                }"
+                                x-text="module.title"></span>
+                        </div>
+                        <div class="flex items-center">
+                            <span 
+                                x-show="module.completed" 
+                                class="mr-2 text-green-500"
+                                title="All lessons completed"
+                            >✅</span>
+                            <svg x-show="!module.expanded" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                            <svg x-show="module.expanded" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <!-- Lessons list (visible when module is expanded) -->
+                    <div 
+                        x-show="module.expanded" 
+                        x-collapse.duration.300ms 
+                        class="pl-6 mt-1 space-y-1 overflow-hidden"
+                    >
+                        <template x-for="lesson in module.lessons" :key="lesson.id">
+                            <div 
+                                @click="navigateToLesson(module.slug, lesson.slug)"
+                                @contextmenu.prevent="(() => {
+                                    contextMenuOpen = true;
+                                    contextMenuModuleSlug = module.slug;
+                                    contextMenuLessonSlug = lesson.slug;
+                                    contextMenuX = $event.clientX;
+                                    contextMenuY = $event.clientY;
+                                })()"
+                                class="flex items-center justify-between p-2 rounded cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700"
+                                :class="{ 
+                                    'bg-habit-color-green-tint-2': lesson.slug === lessonSlug && module.slug === moduleSlug,
+                                }"
+                            >
+                                <div class="flex items-center">
+                                    <span class="mr-2" x-text="lesson.emoji"></span>
+                                    <span 
+                                        class="text-sm" 
+                                        :class="{'text-gray-500': lesson.completed}"
+                                        x-text="lesson.title"></span>
+                                </div>
+                                <span x-show="lesson.completed" class="text-green-500">✅</span>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+            
             <!-- Dynamic Categories -->
             <template x-for="category in uniqueCategories()" :key="category">
                 <div>

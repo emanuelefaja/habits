@@ -3,6 +3,36 @@ package masterclass
 // MasterclassDefinition contains the entire structure of the masterclass
 var MasterclassDefinition = []Module{
 	{
+		ID:          "welcome",
+		Slug:        "welcome",
+		Title:       "Welcome",
+		Description: "Get started with your habit transformation journey",
+		Emoji:       "👋",
+		Order:       0,
+		Lessons: []Lesson{
+			{
+				ID:          "getting-started",
+				Slug:        "getting-started",
+				Title:       "Getting Started",
+				Emoji:       "🚀",
+				Type:        LessonTypeText,
+				ModuleSlug:  "welcome",
+				Order:       1,
+				Description: "Learn how to make the most of this masterclass",
+			},
+			{
+				ID:          "course-overview",
+				Slug:        "course-overview",
+				Title:       "Course Overview",
+				Emoji:       "🗺️",
+				Type:        LessonTypeVideo,
+				ModuleSlug:  "welcome",
+				Order:       2,
+				Description: "Preview what you'll learn in this masterclass",
+			},
+		},
+	},
+	{
 		ID:          "introduction",
 		Slug:        "introduction",
 		Title:       "Introduction to Habits",
