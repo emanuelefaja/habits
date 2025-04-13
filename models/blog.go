@@ -23,6 +23,7 @@ type BlogPost struct {
 	Emoji       string        `yaml:"emoji"`
 	Description string        `yaml:"description"` // Meta description for SEO and previews
 	Tags        []string      `yaml:"tags"`
+	Author      string        `yaml:"author"` // Author name (Manny or Mike)
 	Content     string        // Raw markdown content
 	HTML        template.HTML // Rendered HTML content
 }

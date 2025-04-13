@@ -24,6 +24,28 @@
             <time class="text-sm text-gray-500 dark:text-gray-400 mb-4 block">
                 {{ .Post.Date.Format "January 2, 2006" }}
             </time>
+            
+            <!-- Author information -->
+            {{ if .Post.Author }}
+            <div class="flex items-center mb-6">
+                {{ if eq .Post.Author "Manny" }}
+                <div class="w-12 h-16 rounded-lg overflow-hidden mr-3">
+                    <img src="/static/images/manny.png" alt="Manny" class="w-full h-full object-cover">
+                </div>
+                <div class="font-medium text-gray-900 dark:text-white">
+                    Manny
+                </div>
+                {{ else if eq .Post.Author "Mike" }}
+                <div class="w-12 h-16 rounded-lg overflow-hidden mr-3">
+                    <img src="/static/images/mike.png" alt="Mike" class="w-full h-full object-cover">
+                </div>
+                <div class="font-medium text-gray-900 dark:text-white">
+                    Mike
+                </div>
+                {{ end }}
+            </div>
+            {{ end }}
+            
             <!-- {{ if .Post.Tags }}
             <div class="flex gap-2">
                 {{ range .Post.Tags }}

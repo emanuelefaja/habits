@@ -5,6 +5,7 @@ date: 2025-03-17T09:00:00Z
 emoji: "📈"
 description: "Looking at habits from a first principles perspective."
 tags: ["building"]
+author: "Manny"
 ---
 
 Okay, so three months since I said [Hello World](/blog/hello) and introduced **habits**, a free, open-source habit tracker. 

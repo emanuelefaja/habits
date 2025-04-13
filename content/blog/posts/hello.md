@@ -5,6 +5,7 @@ date: 2024-12-16T09:00:00Z
 emoji: "👋"
 description: "Why I started a free, open source, minimalist habit tracker."
 tags: ["building"]
+author: "Manny"
 ---
 
 

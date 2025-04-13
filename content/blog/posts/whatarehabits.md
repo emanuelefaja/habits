@@ -5,6 +5,7 @@ date: 2024-12-27T09:00:00Z
 emoji: "🌱"
 description: "Looking at habits from a first principles perspective."
 tags: ["announcement"]
+author: "Manny"
 ---
 
 If I am building a habit tracker, it is logical to start by figuring out what habits are! 
