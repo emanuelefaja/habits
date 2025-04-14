@@ -1117,6 +1117,174 @@
         </div>
     </div>
 </div>
+<!-- Bonuses Content, But this needs proper spacing above-->
+<div>
+    <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+        <span class="text-3xl mr-3">🎁</span>
+        Bonuses
+    </h3>
+    
+    <p class="text-lg text-gray-600 dark:text-gray-400 mb-6">
+        Exclusive advanced material to complement your habit journey and extend your growth into related areas of personal development.
+    </p>
+    
+    <div x-data="{ 
+        activeModule: '', 
+        setActiveModule(id) { 
+            this.activeModule = (this.activeModule == id) ? '' : id 
+        } 
+    }" class="space-y-4">
+        <!-- Brain Chemistry Module -->
+        <div class="border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 overflow-hidden">
+            <div x-data="{ id: 'brainchemistry' }" class="cursor-pointer">
+                <button @click="setActiveModule(id)" class="flex items-center justify-between w-full p-6 text-left text-gray-900 dark:text-white">
+                    <div class="flex items-center">
+                        <span class="text-2xl mr-3">🧠</span>
+                        <div>
+                            <h4 class="text-xl font-semibold">Brain Chemistry & Decision Making</h4>
+                            <p class="text-gray-500 dark:text-gray-400 mt-1">Understand how your brain makes decisions and how to optimize cognitive performance</p>
+                        </div>
+                    </div>
+                    <svg class="w-5 h-5 transition-transform duration-200 ease-out text-gray-500 dark:text-gray-400" :class="{ 'rotate-180': activeModule=='brainchemistry' }" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div x-show="activeModule=='brainchemistry'" x-collapse x-cloak>
+                    <div class="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+                        <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                            <li class="px-6 py-4 flex items-start">
+                                <span class="text-xl mr-3 flex-shrink-0">🔬</span>
+                                <div class="flex-1">
+                                    <h5 class="text-base font-medium text-gray-900 dark:text-white">Neuroscience of Habits</h5>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Deep dive into how habits form neural pathways</p>
+                                </div>
+                                <span class="ml-3 flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                    </svg>
+                                    Video
+                                </span>
+                            </li>
+                            <li class="px-6 py-4 flex items-start">
+                                <span class="text-xl mr-3 flex-shrink-0">⚡</span>
+                                <div class="flex-1">
+                                    <h5 class="text-base font-medium text-gray-900 dark:text-white">Cognitive Biases & Decision Making</h5>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Identify and overcome cognitive biases that impact your decisions</p>
+                                </div>
+                                <span class="ml-3 flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                    </svg>
+                                    Video
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Public Speaking Module -->
+        <div class="border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 overflow-hidden">
+            <div x-data="{ id: 'publicspeaking' }" class="cursor-pointer">
+                <button @click="setActiveModule(id)" class="flex items-center justify-between w-full p-6 text-left text-gray-900 dark:text-white">
+                    <div class="flex items-center">
+                        <span class="text-2xl mr-3">🎤</span>
+                        <div>
+                            <h4 class="text-xl font-semibold">Public Speaking & Communication</h4>
+                            <p class="text-gray-500 dark:text-gray-400 mt-1">Master the art of conveying ideas clearly and confidently</p>
+                        </div>
+                    </div>
+                    <svg class="w-5 h-5 transition-transform duration-200 ease-out text-gray-500 dark:text-gray-400" :class="{ 'rotate-180': activeModule=='publicspeaking' }" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div x-show="activeModule=='publicspeaking'" x-collapse x-cloak>
+                    <div class="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+                        <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                            <li class="px-6 py-4 flex items-start">
+                                <span class="text-xl mr-3 flex-shrink-0">📣</span>
+                                <div class="flex-1">
+                                    <h5 class="text-base font-medium text-gray-900 dark:text-white">Overcoming Public Speaking Anxiety</h5>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Techniques to remain calm and confident while speaking</p>
+                                </div>
+                                <span class="ml-3 flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                    </svg>
+                                    Video
+                                </span>
+                            </li>
+                            <li class="px-6 py-4 flex items-start">
+                                <span class="text-xl mr-3 flex-shrink-0">🎯</span>
+                                <div class="flex-1">
+                                    <h5 class="text-base font-medium text-gray-900 dark:text-white">Storytelling For Impact</h5>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">How to use stories to communicate ideas effectively</p>
+                                </div>
+                                <span class="ml-3 flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    Text
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Financial Wellness Module -->
+        <div class="border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 overflow-hidden">
+            <div x-data="{ id: 'financialwellness' }" class="cursor-pointer">
+                <button @click="setActiveModule(id)" class="flex items-center justify-between w-full p-6 text-left text-gray-900 dark:text-white">
+                    <div class="flex items-center">
+                        <span class="text-2xl mr-3">💰</span>
+                        <div>
+                            <h4 class="text-xl font-semibold">Financial Wellness</h4>
+                            <p class="text-gray-500 dark:text-gray-400 mt-1">Build healthy money habits and financial intelligence</p>
+                        </div>
+                    </div>
+                    <svg class="w-5 h-5 transition-transform duration-200 ease-out text-gray-500 dark:text-gray-400" :class="{ 'rotate-180': activeModule=='financialwellness' }" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div x-show="activeModule=='financialwellness'" x-collapse x-cloak>
+                    <div class="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+                        <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                            <li class="px-6 py-4 flex items-start">
+                                <span class="text-xl mr-3 flex-shrink-0">📊</span>
+                                <div class="flex-1">
+                                    <h5 class="text-base font-medium text-gray-900 dark:text-white">Money Mindset</h5>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Transform your relationship with money</p>
+                                </div>
+                                <span class="ml-3 flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                    </svg>
+                                    Video
+                                </span>
+                            </li>
+                            <li class="px-6 py-4 flex items-start">
+                                <span class="text-xl mr-3 flex-shrink-0">📈</span>
+                                <div class="flex-1">
+                                    <h5 class="text-base font-medium text-gray-900 dark:text-white">Simple Investment Principles</h5>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400">Core concepts for sustainable wealth building</p>
+                                </div>
+                                <span class="ml-3 flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    Text
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
                 <div class="mt-12 text-center">
                     <a href="#pricing" onclick="smoothScroll('#pricing')" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-habit-color-green-core hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-habit-color-green-core">
                         View Course Options
@@ -1218,12 +1386,21 @@
                         
                         <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white">Foundations + 1 Sprint</h3>
                         <div class="mt-4 flex items-baseline">
+                            <span class="text-lg font-medium text-gray-500 dark:text-gray-400 line-through mr-2">$147</span>
                             <span class="text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white">$49</span>
                             <span class="ml-1 text-xl font-medium text-gray-500 dark:text-gray-400">USD</span>
                         </div>
                         <p class="mt-5 text-lg text-gray-500 dark:text-gray-400">Essential knowledge to build lasting habits and 1 habit sprint.</p>
                         
                         <ul class="mt-6 space-y-4 flex-1">
+                            <li class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <svg class="h-6 w-6 text-habit-color-green-core" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                <p class="ml-3 text-base text-gray-700 dark:text-gray-300"><strong>Everything in Habit Tracker</strong></p>
+                            </li>
                             <li class="flex items-start">
                                 <div class="flex-shrink-0">
                                     <svg class="h-6 w-6 text-habit-color-green-core" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1254,7 +1431,43 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                     </svg>
                                 </div>
-                                <p class="ml-3 text-base text-gray-700 dark:text-gray-300">1 Habit Sprint Included</p>
+                                <div class="relative group">
+                                    <div class="flex items-center cursor-pointer">
+                                        <p class="ml-3 text-base text-gray-700 dark:text-gray-300">1 Habit Sprint</p>
+                                        <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border-2 border-dashed border-habit-color-green-core bg-habit-color-green-tint-2 dark:bg-gray-800 text-habit-color-green-core">
+                                            See options
+                                        </span>
+                                    </div>
+                                    <div class="absolute left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-4 hidden group-hover:block z-10 border border-gray-200 dark:border-gray-700">
+                                        <div class="space-y-2">
+                                            <p class="text-sm font-medium text-gray-900 dark:text-white mb-2">Choose from:</p>
+                                            <div class="flex items-center text-sm text-gray-700 dark:text-gray-300">
+                                                <span class="text-xl mr-2">🏃</span>
+                                                <span>Morning Routine Sprint</span>
+                                            </div>
+                                            <div class="flex items-center text-sm text-gray-700 dark:text-gray-300">
+                                                <span class="text-xl mr-2">💪</span>
+                                                <span>Fitness Sprint</span>
+                                            </div>
+                                            <div class="flex items-center text-sm text-gray-700 dark:text-gray-300">
+                                                <span class="text-xl mr-2">📚</span>
+                                                <span>Reading Sprint</span>
+                                            </div>
+                                            <div class="flex items-center text-sm text-gray-700 dark:text-gray-300">
+                                                <span class="text-xl mr-2">🧘</span>
+                                                <span>Meditation Sprint</span>
+                                            </div>
+                                            <div class="flex items-center text-sm text-gray-700 dark:text-gray-300">
+                                                <span class="text-xl mr-2">📝</span>
+                                                <span>Journaling Sprint</span>
+                                            </div>
+                                            <div class="flex items-center text-sm text-gray-700 dark:text-gray-300">
+                                                <span class="text-xl mr-2">💤</span>
+                                                <span>Sleep Sprint</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </li>
                             <li class="flex items-start">
                                 <div class="flex-shrink-0">
@@ -1262,7 +1475,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                     </svg>
                                 </div>
-                                <p class="ml-3 text-base text-gray-700 dark:text-gray-300">ChatGPT Prompts for Habit Building</p>
+                                <p class="ml-3 text-base text-gray-700 dark:text-gray-300">Additional Habit Sprints: $49</p>
                             </li>
                             <li class="flex items-start">
                                 <div class="flex-shrink-0">
@@ -1286,6 +1499,7 @@
                     <div class="border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-8 bg-white dark:bg-gray-900 flex flex-col">
                         <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white">Entire Masterclass</h3>
                         <div class="mt-4 flex items-baseline">
+                            <span class="text-lg font-medium text-gray-500 dark:text-gray-400 line-through mr-2">$637</span>
                             <span class="text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white">$245</span>
                             <span class="ml-1 text-xl font-medium text-gray-500 dark:text-gray-400">USD</span>
                         </div>
