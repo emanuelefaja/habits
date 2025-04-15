@@ -1852,7 +1852,7 @@
                 
                 <!-- Guarantee Letter - now positioned inside pricing section -->
                 <div class="mt-16 max-w-3xl mx-auto border-dashed border-4 border-habit-color-green-core rounded-lg p-8 bg-habit-color-green-tint-2 dark:bg-gray-800">
-                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Our Personal Guarantee</h3>
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Our No Non-sense Personal Guarantee</h3>
                     
                     <div class="prose prose-lg max-w-none text-gray-600 dark:text-gray-300">
                         <p>Dear Habit Builder,</p>
@@ -1957,6 +1957,17 @@
                         <div x-show="activeAccordion==id" x-collapse x-cloak>
                             <div class="p-4 pt-0 opacity-70 text-gray-700 dark:text-gray-300 text-base">
                                 Absolutely! This course was specifically designed to address the common pitfalls people face when trying to build lasting habits. We focus on science-backed approaches that work even if you've failed multiple times before, with special attention to motivation, consistency, and overcoming obstacles.
+                            </div>
+                        </div>
+                    </div>
+                    <div x-data="{ id: $id('accordion') }" class="cursor-pointer group">
+                        <button @click="setActiveAccordion(id)" class="flex items-center justify-between w-full p-4 text-left select-none group-hover:underline text-gray-900 dark:text-white">
+                            <span class="text-lg font-medium">How do you handle payments and billing?</span>
+                            <svg class="w-4 h-4 duration-200 ease-out text-gray-500 dark:text-gray-400" :class="{ 'rotate-180': activeAccordion==id }" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+                        <div x-show="activeAccordion==id" x-collapse x-cloak>
+                            <div class="p-4 pt-0 opacity-70 text-gray-700 dark:text-gray-300 text-base">
+                                We use Paddle as our trusted payment processor. Paddle is a secure, global payment platform that handles all transactions and billing-related matters. They support multiple payment methods including credit cards, PayPal, and local payment options. Your payment information is securely processed and stored by Paddle, not by The Habits Company. For any billing-related questions, you can reach out to Paddle's 24/7 customer support or contact us directly.
                             </div>
                         </div>
                     </div>
