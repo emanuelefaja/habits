@@ -1840,9 +1840,9 @@
                         </div>
                         
                         <div class="mt-8">
-                            <a href="#" class="block w-full bg-habit-color-green-core border border-transparent rounded-md py-3 px-5 text-center text-white font-medium hover:bg-opacity-90 transition-colors duration-200">
-                                Coming Soon
-                            </a>
+                            <button id="masterclassCheckoutButton" class="block w-full bg-habit-color-green-core border border-transparent rounded-md py-3 px-5 text-center text-white font-medium hover:bg-opacity-90 transition-colors duration-200">
+                                Start Now
+                            </button>
                             <div class="text-sm text-gray-500 dark:text-gray-400 text-center mt-2">Pay once. Access forever.</div>
                         </div>
                     </div>
@@ -2028,6 +2028,22 @@
             }
         }).catch((error) => {
             console.error('Masterclass price preview error:', error);
+        });
+        
+        // Setup checkout button for Masterclass
+        document.getElementById('masterclassCheckoutButton').addEventListener('click', function() {
+            Paddle.Checkout.open({
+                settings: {
+                    displayMode: 'overlay',
+                    theme: 'light',
+                    locale: 'en',
+                    successUrl: window.location.origin + '/success'
+                },
+                items: [{
+                    priceId: 'pri_01jrzccsfd2dfbb557kce1g668',
+                    quantity: 1
+                }]
+            });
         });
         
         // Foundations Price - also used for Additional Sprint Price
