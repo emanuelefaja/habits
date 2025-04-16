@@ -1631,8 +1631,7 @@
                         <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white">Foundations + 1 Sprint</h3>
                         <div class="mt-4 flex items-baseline">
                             <span class="text-lg font-medium text-gray-500 dark:text-gray-400 line-through mr-2">$147</span>
-                            <span class="text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white">$49</span>
-                            <span class="ml-1 text-xl font-medium text-gray-500 dark:text-gray-400">USD</span>
+                            <span id="foundationsPrice" class="text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white">$49</span>
                         </div>
                         <p class="mt-5 text-lg text-gray-500 dark:text-gray-400">Essential knowledge to build lasting habits and 1 habit sprint.</p>
                         
@@ -1719,7 +1718,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                                     </svg>
                                 </div>
-                                <p class="ml-3 text-base text-gray-700 dark:text-gray-300">Additional Habit Sprints: $49</p>
+                                <p class="ml-3 text-base text-gray-700 dark:text-gray-300">Additional Habit Sprints: <span id="additionalSprintPrice">$49</span></p>
                             </li>
                             <li class="flex items-start">
                                 <div class="flex-shrink-0">
@@ -1744,8 +1743,7 @@
                         <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white">Entire Masterclass</h3>
                         <div class="mt-4 flex items-baseline">
                             <span class="text-lg font-medium text-gray-500 dark:text-gray-400 line-through mr-2">$637</span>
-                            <span class="text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white">$245</span>
-                            <span class="ml-1 text-xl font-medium text-gray-500 dark:text-gray-400">USD</span>
+                            <span id="masterclassPrice" class="text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white">$245</span>
                         </div>
                         <p class="mt-5 text-lg text-gray-500 dark:text-gray-400">Everything you need to build sustainable habits.</p>
                         
@@ -1988,6 +1986,7 @@
         {{ template "footer" . }}
     </div>
     
+    <script src="https://cdn.paddle.com/paddle/v2/paddle.js"></script>
     <script>
         function smoothScroll(target) {
             const element = document.querySelector(target);
@@ -1998,6 +1997,66 @@
                 });
             }
         }
+
+        Paddle.Environment.set("production");
+        Paddle.Initialize({
+            token: 'live_526feb342cc6ac20e8de55d0208',
+            pwCustomer: {}
+        });
+        
+        // Format price function to remove .00 decimal places
+        function formatPrice(paddlePrice) {
+            return paddlePrice.replace(/\.00($|\s)/, '$1');
+        }
+        
+        // Masterclass Price
+        Paddle.PricePreview({
+            items: [{
+                priceId: 'pri_01jrzccsfd2dfbb557kce1g668',
+                quantity: 1
+            }]
+        }).then((result) => {
+            const priceElement = document.getElementById('masterclassPrice');
+            if (priceElement) {
+                // Get the formatted price from Paddle
+                let formattedPrice = result.data.details.lineItems[0].formattedTotals.total;
+                
+                // Remove the decimal part if it's ".00"
+                formattedPrice = formatPrice(formattedPrice);
+                
+                priceElement.textContent = formattedPrice;
+            }
+        }).catch((error) => {
+            console.error('Masterclass price preview error:', error);
+        });
+        
+        // Foundations Price - also used for Additional Sprint Price
+        Paddle.PricePreview({
+            items: [{
+                priceId: 'pri_01jrzn9mekj4dnxsx39vd473v2',
+                quantity: 1
+            }]
+        }).then((result) => {
+            // Get the formatted price from Paddle
+            let formattedPrice = result.data.details.lineItems[0].formattedTotals.total;
+            
+            // Remove the decimal part if it's ".00"
+            formattedPrice = formatPrice(formattedPrice);
+            
+            // Update Foundations Price
+            const foundationsElement = document.getElementById('foundationsPrice');
+            if (foundationsElement) {
+                foundationsElement.textContent = formattedPrice;
+            }
+            
+            // Update Additional Sprint Price
+            const additionalSprintElement = document.getElementById('additionalSprintPrice');
+            if (additionalSprintElement) {
+                additionalSprintElement.textContent = formattedPrice;
+            }
+        }).catch((error) => {
+            console.error('Foundations price preview error:', error);
+        });
     </script>
 </body>
 </html> 
