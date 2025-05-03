@@ -503,19 +503,6 @@ func main() {
 		api.UpdateHabitNameHandler(db)(w, r)
 	}))))
 
-	// Changelog
-	http.Handle("/changelog", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		user, _ := getAuthenticatedUser(r, db)
-		data := struct {
-			User *models.User
-			Page string
-		}{
-			User: user,
-			Page: "changelog",
-		}
-		renderTemplate(w, templates, "changelog.html", data)
-	})))
-
 	// Commits API
 	http.Handle("/api/commits", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		commits, err := models.GetCommits(db)
@@ -745,6 +732,8 @@ func main() {
 
 		handleNotAllowed(w, http.MethodGet, http.MethodPost)
 	})))
+
+	// Changelog route is now in web/routes.go
 
 	port := os.Getenv("PORT")
 	if port == "" {

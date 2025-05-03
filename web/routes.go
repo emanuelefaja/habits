@@ -32,6 +32,7 @@ func SetupRoutes(db *sql.DB, templates *template.Template) {
 	http.Handle("/tracker", sessionMiddleware(TrackerHandler(db, templates)))
 	http.Handle("/masterclass", sessionMiddleware(MasterclassHandler(db, templates)))
 	http.Handle("/blog/", sessionMiddleware(BlogHandler(db, templates)))
+	http.Handle("/changelog", sessionMiddleware(ChangelogHandler(db, templates)))
 
 	// New routes for module and lesson pages
 	http.Handle("/masterclass/", sessionMiddleware(authMiddleware(MasterclassModuleHandler(db, templates))))

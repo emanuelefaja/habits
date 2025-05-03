@@ -638,6 +638,21 @@ func BlogHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
 	}
 }
 
+// ChangelogHandler handles the changelog page route
+func ChangelogHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user, _ := getAuthenticatedUser(r, db)
+		data := struct {
+			User *models.User
+			Page string
+		}{
+			User: user,
+			Page: "changelog",
+		}
+		renderTemplate(w, templates, "changelog.html", data)
+	}
+}
+
 // Helper functions for handlers
 func renderGuestHome(w http.ResponseWriter, templates *template.Template) {
 	if err := templates.ExecuteTemplate(w, "guest-home.html", nil); err != nil {
