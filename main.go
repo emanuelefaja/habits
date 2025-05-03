@@ -23,12 +23,6 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-// Helper variables
-var (
-	// Rate limiters
-	webUnsubscribeLimiter = middleware.NewRateLimiter(10, time.Hour) // 10 attempts per hour
-)
-
 func main() {
 	// Load environment variables
 	err := godotenv.Load()
