@@ -130,6 +130,18 @@ func RespondJSON(w http.ResponseWriter, payload interface{}) {
 	json.NewEncoder(w).Encode(payload)
 }
 
+// HealthCheckHandler handles requests to check if the application is healthy
+func HealthCheckHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if err := db.Ping(); err != nil {
+			w.WriteHeader(http.StatusServiceUnavailable)
+			RespondJSON(w, map[string]string{"status": "error", "message": "Database connection failed"})
+			return
+		}
+		RespondJSON(w, map[string]string{"status": "healthy"})
+	}
+}
+
 // ServeStaticFileWithContentType serves a static file with a specified content type
 func ServeStaticFileWithContentType(w http.ResponseWriter, r *http.Request, filePath, contentType string) {
 	w.Header().Set("Content-Type", contentType)

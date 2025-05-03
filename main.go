@@ -513,16 +513,6 @@ func main() {
 		respondJSON(w, commits)
 	})))
 
-	// Health Check
-	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		if err := db.Ping(); err != nil {
-			w.WriteHeader(http.StatusServiceUnavailable)
-			respondJSON(w, map[string]string{"status": "error", "message": "Database connection failed"})
-			return
-		}
-		respondJSON(w, map[string]string{"status": "healthy"})
-	})
-
 	http.Handle("/goals", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		user, _ := getAuthenticatedUser(r, db)
 		data := struct {
