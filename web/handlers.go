@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"math/rand"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -665,6 +666,54 @@ func RoadmapHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
 			Page: "roadmap",
 		}
 		renderTemplate(w, templates, "roadmap.html", data)
+	}
+}
+
+// RegisterHandler handles the registration page and form submission
+func RegisterHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			// Check if signups are allowed
+			allowSignups, err := models.GetSignupStatus(db)
+			if err != nil {
+				log.Printf("Error checking signup status: %v", err)
+				// Default to allowing signups if there's an error
+			} else if !allowSignups {
+				// Redirect to login page with a message
+				middleware.SetFlash(r, "Registration is currently disabled ❌")
+				http.Redirect(w, r, "/login", http.StatusSeeOther)
+				return
+			}
+
+			// Generate math problem for human verification
+			num1 := rand.Intn(20) + 1 // Random number between 1-20
+			num2 := rand.Intn(20) + 1 // Random number between 1-20
+			sum := num1 + num2
+
+			// Store in session
+			middleware.SetMathProblem(r, num1, num2, sum)
+
+			// Get a random quote
+			quote, err := models.GetRandomQuote()
+			if err != nil {
+				log.Printf("Error getting random quote: %v", err)
+				// Continue with default quote from the function
+			}
+
+			// Pass to template
+			data := map[string]interface{}{
+				"MathNum1": num1,
+				"MathNum2": num2,
+				"Quote":    quote,
+			}
+
+			renderTemplate(w, templates, "register.html", data)
+		case http.MethodPost:
+			api.RegisterHandler(db, templates)(w, r)
+		default:
+			HandleNotAllowed(w, http.MethodGet, http.MethodPost)
+		}
 	}
 }
 
