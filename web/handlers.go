@@ -595,6 +595,49 @@ func MasterclassAPIHandler(db *sql.DB) http.HandlerFunc {
 	}
 }
 
+// BlogHandler handles the blog pages
+func BlogHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		path := strings.TrimPrefix(r.URL.Path, "/blog")
+		blogService := models.GetBlogService()
+
+		user, _ := getAuthenticatedUser(r, db)
+
+		if path == "" || path == "/" {
+			posts := blogService.GetAllPosts()
+			data := struct {
+				User  *models.User
+				Posts []*models.BlogPost
+				Page  string
+			}{
+				User:  user,
+				Posts: posts,
+				Page:  "blog",
+			}
+			renderTemplate(w, templates, "blog.html", data)
+			return
+		}
+
+		slug := strings.TrimPrefix(path, "/")
+		post, exists := blogService.GetPost(slug)
+		if !exists {
+			http.NotFound(w, r)
+			return
+		}
+
+		data := struct {
+			User *models.User
+			Post *models.BlogPost
+			Page string
+		}{
+			User: user,
+			Post: post,
+			Page: "blog",
+		}
+		renderTemplate(w, templates, "post.html", data)
+	}
+}
+
 // Helper functions for handlers
 func renderGuestHome(w http.ResponseWriter, templates *template.Template) {
 	if err := templates.ExecuteTemplate(w, "guest-home.html", nil); err != nil {
