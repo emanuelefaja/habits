@@ -285,19 +285,6 @@ func main() {
 		}
 	}))))
 
-	// Roadmap (no auth required, but session loaded)
-	http.Handle("/roadmap", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		user, _ := getAuthenticatedUser(r, db)
-		data := struct {
-			User *models.User
-			Page string
-		}{
-			User: user,
-			Page: "roadmap",
-		}
-		renderTemplate(w, templates, "roadmap.html", data)
-	})))
-
 	// Digital Detox Course
 	http.Handle("/courses/digital-detox", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/courses/digital-detox" {
