@@ -50,5 +50,14 @@ func SetupRoutes(db *sql.DB, templates *template.Template) {
 	// Utility routes
 	http.HandleFunc("/health", HealthCheckHandler(db))
 
+	// User API routes
+	http.Handle("/api/user/profile", sessionMiddleware(authMiddleware(api.UpdateProfileHandler(db))))
+	http.Handle("/api/user/password", sessionMiddleware(authMiddleware(api.UpdatePasswordHandler(db))))
+	http.Handle("/api/user/delete", sessionMiddleware(authMiddleware(api.DeleteAccountHandler(db))))
+	http.Handle("/api/user/export", sessionMiddleware(authMiddleware(api.ExportDataHandler(db))))
+	http.Handle("/api/user/settings", sessionMiddleware(authMiddleware(api.UpdateSettingsHandler(db))))
+	http.Handle("/api/user/reset-data", sessionMiddleware(authMiddleware(api.ResetDataHandler(db))))
+	http.Handle("/api/user/notifications", sessionMiddleware(authMiddleware(api.UpdateNotificationPreferenceHandler(db))))
+
 	// Add more routes here as you refactor them
 }
