@@ -717,6 +717,74 @@ func RegisterHandler(db *sql.DB, templates *template.Template) http.HandlerFunc 
 	}
 }
 
+// ForgotPasswordHandler handles the forgot password page
+func ForgotPasswordHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			HandleNotAllowed(w, http.MethodGet)
+			return
+		}
+
+		// Get a random quote
+		quote, err := models.GetRandomQuote()
+		if err != nil {
+			log.Printf("Error getting random quote: %v", err)
+			// Continue with default quote from the function
+		}
+
+		data := TemplateData{
+			IsLoggedIn: middleware.IsAuthenticated(r),
+		}
+		if data.IsLoggedIn {
+			user, err := getAuthenticatedUser(r, db)
+			if err == nil {
+				data.Email = user.Email
+			}
+		}
+
+		// Add quote to the template data
+		templateData := map[string]interface{}{
+			"IsLoggedIn": data.IsLoggedIn,
+			"Email":      data.Email,
+			"Quote":      quote,
+		}
+
+		renderTemplate(w, templates, "forgot.html", templateData)
+	}
+}
+
+// ResetPasswordHandler handles the password reset page
+func ResetPasswordHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			HandleNotAllowed(w, http.MethodGet)
+			return
+		}
+
+		token := r.URL.Query().Get("token")
+		if token == "" {
+			http.Redirect(w, r, "/forgot", http.StatusSeeOther)
+			return
+		}
+
+		// Get a random quote
+		quote, err := models.GetRandomQuote()
+		if err != nil {
+			log.Printf("Error getting random quote: %v", err)
+			// Continue with default quote from the function
+		}
+
+		// Add quote to the template data
+		templateData := map[string]interface{}{
+			"Token": token,
+			"Flash": middleware.GetFlash(r),
+			"Quote": quote,
+		}
+
+		renderTemplate(w, templates, "reset.html", templateData)
+	}
+}
+
 // Helper functions for handlers
 func renderGuestHome(w http.ResponseWriter, templates *template.Template) {
 	if err := templates.ExecuteTemplate(w, "guest-home.html", nil); err != nil {
