@@ -36,6 +36,7 @@ func TemplateFuncMap() template.FuncMap {
 // LoadTemplates loads and parses all application templates
 func LoadTemplates() (*template.Template, error) {
 	t := template.New("").Funcs(TemplateFuncMap())
+	templateCount := 0
 
 	// Walk the ui directory
 	if err := filepath.Walk("ui", func(path string, info os.FileInfo, err error) error {
@@ -51,17 +52,15 @@ func LoadTemplates() (*template.Template, error) {
 				log.Printf("Warning: Error parsing template %s: %v", path, err)
 				return nil // Continue despite errors
 			}
+			templateCount++
 		}
 		return nil
 	}); err != nil {
 		return nil, err
 	}
 
-	// Log loaded templates
-	log.Printf("Total templates loaded: %d", len(t.Templates()))
-	for _, tmpl := range t.Templates() {
-		log.Printf("Loaded template: %s", tmpl.Name())
-	}
+	// Log a concise summary of loaded templates
+	log.Printf("✅ Loaded %d/%d templates successfully", templateCount, len(t.Templates()))
 
 	return t, nil
 }
