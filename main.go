@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"html/template"
 	"log"
@@ -637,8 +636,6 @@ func main() {
 		handleNotAllowed(w, http.MethodGet, http.MethodPost)
 	})))
 
-	// Changelog route is now in web/routes.go
-
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
@@ -647,22 +644,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
-// Helper functions
-
-func dict(values ...interface{}) (map[string]interface{}, error) {
-	if len(values)%2 != 0 {
-		return nil, errors.New("invalid dict call")
-	}
-	d := make(map[string]interface{}, len(values)/2)
-	for i := 0; i < len(values); i += 2 {
-		key, ok := values[i].(string)
-		if !ok {
-			return nil, errors.New("dict keys must be strings")
-		}
-		d[key] = values[i+1]
-	}
-	return d, nil
-}
+// Helper functions (This can be deleted once full main.go refactor is complete)
 
 func renderTemplate(w http.ResponseWriter, templates *template.Template, name string, data interface{}) {
 	// Use a buffer to render the template first
