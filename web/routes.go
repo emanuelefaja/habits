@@ -7,10 +7,11 @@ import (
 
 	"mad/api"
 	"mad/middleware"
+	"mad/models/email"
 )
 
 // SetupRoutes configures all application routes
-func SetupRoutes(db *sql.DB, templates *template.Template) {
+func SetupRoutes(db *sql.DB, templates *template.Template, emailService email.EmailService) {
 	// Common middleware
 	sessionMiddleware := middleware.SessionManager.LoadAndSave
 	authMiddleware := middleware.RequireAuth
@@ -60,6 +61,7 @@ func SetupRoutes(db *sql.DB, templates *template.Template) {
 	http.Handle("/api/user/settings", sessionMiddleware(authMiddleware(api.UpdateSettingsHandler(db))))
 	http.Handle("/api/user/reset-data", sessionMiddleware(authMiddleware(api.ResetDataHandler(db))))
 	http.Handle("/api/user/notifications", sessionMiddleware(authMiddleware(api.UpdateNotificationPreferenceHandler(db))))
+	http.Handle("/unsubscribe", sessionMiddleware(UnsubscribeHandler(db, emailService, templates)))
 
 	// Roadmap API routes
 	http.Handle("/api/roadmap/likes", sessionMiddleware(api.RoadmapLikesHandler(db)))
