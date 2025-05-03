@@ -427,25 +427,6 @@ func main() {
 		renderTemplate(w, templates, "habit.html", data)
 	}))))
 
-	// Roadmap API handlers
-	http.Handle("/api/roadmap/likes", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		switch r.Method {
-		case http.MethodGet:
-			api.GetRoadmapLikesHandler(db)(w, r)
-		case http.MethodPost:
-			api.ToggleRoadmapLikeHandler(db)(w, r)
-		default:
-			handleNotAllowed(w, http.MethodGet, http.MethodPost)
-		}
-	})))
-	http.Handle("/api/roadmap/ideas", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPost {
-			api.SubmitRoadmapIdeaHandler(db)(w, r)
-		} else {
-			handleNotAllowed(w, http.MethodPost)
-		}
-	})))
-
 	// Campaign API handlers
 	http.Handle("/api/campaigns/subscribe", middleware.SessionManager.LoadAndSave(http.HandlerFunc(api.SubscribeToCampaign)))
 	http.Handle("/api/campaigns/unsubscribe", middleware.SessionManager.LoadAndSave(http.HandlerFunc(api.UnsubscribeFromCampaign)))

@@ -60,5 +60,9 @@ func SetupRoutes(db *sql.DB, templates *template.Template) {
 	http.Handle("/api/user/reset-data", sessionMiddleware(authMiddleware(api.ResetDataHandler(db))))
 	http.Handle("/api/user/notifications", sessionMiddleware(authMiddleware(api.UpdateNotificationPreferenceHandler(db))))
 
+	// Roadmap API routes
+	http.Handle("/api/roadmap/likes", sessionMiddleware(api.RoadmapLikesHandler(db)))
+	http.Handle("/api/roadmap/ideas", sessionMiddleware(api.RoadmapIdeasHandler(db)))
+
 	// Add more routes here as you refactor them
 }

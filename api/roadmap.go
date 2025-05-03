@@ -178,3 +178,31 @@ func SubmitRoadmapIdeaHandler(db *sql.DB) http.HandlerFunc {
 		json.NewEncoder(w).Encode(map[string]bool{"success": true})
 	}
 }
+
+// RoadmapLikesHandler handles both GET and POST requests for roadmap likes
+func RoadmapLikesHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodGet:
+			GetRoadmapLikesHandler(db)(w, r)
+		case http.MethodPost:
+			ToggleRoadmapLikeHandler(db)(w, r)
+		default:
+			w.Header().Set("Allow", "GET, POST")
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		}
+	}
+}
+
+// RoadmapIdeasHandler handles requests for roadmap ideas (currently just POST)
+func RoadmapIdeasHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		switch r.Method {
+		case http.MethodPost:
+			SubmitRoadmapIdeaHandler(db)(w, r)
+		default:
+			w.Header().Set("Allow", "POST")
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		}
+	}
+}
