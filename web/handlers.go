@@ -223,38 +223,6 @@ func TermsHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
 	}
 }
 
-// PricingHandler handles the pricing page route
-func PricingHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// Get the user if logged in
-		user, _ := getAuthenticatedUser(r, db)
-		data := struct {
-			User *models.User
-			Page string
-		}{
-			User: user,
-			Page: "pricing",
-		}
-		renderTemplate(w, templates, "pricing.html", data)
-	}
-}
-
-// TrackerHandler handles the tracker page route
-func TrackerHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// Get the user if logged in
-		user, _ := getAuthenticatedUser(r, db)
-		data := struct {
-			User *models.User
-			Page string
-		}{
-			User: user,
-			Page: "tracker",
-		}
-		renderTemplate(w, templates, "tracker.html", data)
-	}
-}
-
 // MasterclassHandler handles the masterclass landing page route
 func MasterclassHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
