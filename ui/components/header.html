@@ -1,14 +1,14 @@
 {{ define "header" }}
-<div x-data="{ open: false }" class="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-4 sm:px-6 py-4 bg-white border-b border-gray-200 dark:border-gray-700 {{ if .User }}dark:bg-gray-800{{ end }}">
+<div x-data="{ open: false }" class="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-4 sm:px-6 py-2 bg-white border-b border-gray-200 dark:border-gray-700 {{ if .User }}dark:bg-gray-800{{ end }}">
 
     <!-- Left column: Logo -->
     <div class="flex items-center gap-4 flex-shrink-0">
         <h1 class="text-left tracking-tight text-gray-900 {{ if .User }}dark:text-white{{ end }}">
-            <a href="/" class="inline-flex items-center gap-2 hover:underline">
-                <img src="/brand/primary-logo-black.svg" alt="The Habits Company" class="h-auto w-20 sm:w-24">
+            <a href="/" class="inline-flex items-center hover:underline">
+                <img src="/brand/primary-logo-green.svg" alt="The Habits Company" class="h-auto w-20 sm:w-22">
             </a>
         </h1>
-        <a href="/changelog" class="inline-flex items-center rounded-full bg-[#2da44e] px-2 py-0.5 text-xs font-medium text-white hover:bg-[#2c974b] -mt-10 {{ if .User }}dark:bg-[#2da44e] dark:text-white dark:hover:bg-[#2c974b]{{ end }}">v0.3.5</a>
+        <!-- <a href="/changelog" class="inline-flex items-center rounded-full bg-[#2da44e] px-2 py-0.5 text-xs font-medium text-white hover:bg-[#2c974b] -mt-10 {{ if .User }}dark:bg-[#2da44e] dark:text-white dark:hover:bg-[#2c974b]{{ end }}">v0.3.5</a> -->
         {{ if and .User .User.IsAdmin }}
             <a href="/admin" class="rounded-md {{ if eq .Page "admin" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200{{ end }} px-3 sm:px-4 py-2 text-xs sm:text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
                 Adminland 🗄️
@@ -28,7 +28,7 @@
     <div class="hidden lg:flex lg:flex-1 lg:justify-between lg:items-center">
         <!-- Left spacer when user is logged in -->
         {{ if .User }}
-        <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-4 pl-6">
             <a href="/" 
                 class="rounded-md {{ if eq .Page "home" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
                 Habits 🏠
