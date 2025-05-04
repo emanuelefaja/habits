@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="min-h-full">
 <head>
     {{ template "head" . }}
     <title>Brand Guidelines | The Habits Company</title>
@@ -11,622 +11,623 @@
         }
     </style>
 </head>
-<body class="bg-gray-50 overflow-x-hidden">
+<body class="min-h-full bg-white dark:bg-gray-900">
     {{ template "header" . }}
-    
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 overflow-x-hidden w-full">
-        <div class="mb-12 px-2 sm:px-0">
-            <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-gray-900">Brand Guidelines</h1>
-            <p class="mt-2 sm:mt-4 text-lg sm:text-xl text-gray-500">The visual identity of The Habits Company</p>
+    <div class="min-h-full pt-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 overflow-x-hidden w-full">
+            <div class="mb-12 px-2 sm:px-0">
+                <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-gray-900">Brand Guidelines</h1>
+                <p class="mt-2 sm:mt-4 text-lg sm:text-xl text-gray-500">The visual identity of The Habits Company</p>
+            </div>
+            
+            <!-- Logo Section -->
+            <section class="mb-12 sm:mb-16 px-2 sm:px-0">
+                <h2 class="text-2xl font-bold mb-6 text-gray-900 border-b pb-2">Logo</h2>
+                <p class="mb-6 text-gray-700">Our logo is available in multiple formats (SVG, PNG, JPG) and color variations (green, black, white). Use the appropriate version for your background.</p>
+
+                <!-- Primary Logos -->
+                <h3 class="text-xl font-bold mb-4 text-gray-900">Primary Logos</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8">
+                    <div class="p-2 sm:p-3">
+                        <h4 class="text-lg font-semibold mb-3 text-gray-800">Green</h4>
+                        <div class="flex items-center justify-center p-5 rounded-lg bg-gray-50 mb-3 transition duration-200 hover:shadow-md">
+                            <img src="/brand/primary-logo-green.svg" alt="Primary Logo - Green" class="max-w-full max-h-[100px]">
+                        </div>
+                    </div>
+                    
+                    <div class="p-2 sm:p-3">
+                        <h4 class="text-lg font-semibold mb-3 text-gray-800">Black</h4>
+                        <div class="flex items-center justify-center p-5 rounded-lg bg-gray-50 mb-3 transition duration-200 hover:shadow-md">
+                            <img src="/brand/primary-logo-black.svg" alt="Primary Logo - Black" class="max-w-full max-h-[100px]">
+                        </div>
+                    </div>
+                    
+                    <div class="p-2 sm:p-3">
+                        <h4 class="text-lg font-semibold mb-3 text-gray-800">White</h4>
+                        <div class="flex items-center justify-center p-5 rounded-lg bg-gray-800 mb-3 transition duration-200 hover:shadow-md">
+                            <img src="/brand/primary-logo-white.svg" alt="Primary Logo - White" class="max-w-full max-h-[100px]">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Secondary Logos -->
+                <h3 class="text-xl font-bold mb-4 text-gray-900">Secondary Logos</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-8">
+                    <div class="p-2 sm:p-3">
+                        <h4 class="text-lg font-semibold mb-3 text-gray-800">Green</h4>
+                        <div class="flex items-center justify-center p-5 rounded-lg bg-gray-50 mb-3 transition duration-200 hover:shadow-md">
+                            <img src="/brand/secondary-logo-green.svg" alt="Secondary Logo - Green" class="max-w-full max-h-[100px]">
+                        </div>
+                    </div>
+                    
+                    <div class="p-2 sm:p-3">
+                        <h4 class="text-lg font-semibold mb-3 text-gray-800">Black</h4>
+                        <div class="flex items-center justify-center p-5 rounded-lg bg-gray-50 mb-3 transition duration-200 hover:shadow-md">
+                            <img src="/brand/secondary-logo-black.svg" alt="Secondary Logo - Black" class="max-w-full max-h-[100px]">
+                        </div>
+                    </div>
+                    
+                    <div class="p-2 sm:p-3">
+                        <h4 class="text-lg font-semibold mb-3 text-gray-800">White</h4>
+                        <div class="flex items-center justify-center p-5 rounded-lg bg-gray-800 mb-3 transition duration-200 hover:shadow-md">
+                            <img src="/brand/secondary-logo-white.svg" alt="Secondary Logo - White" class="max-w-full max-h-[100px]">
+                        </div>
+                    </div>
+
+                    <div class="p-2 sm:p-3">
+                        <h4 class="text-lg font-semibold mb-3 text-gray-800">White/Green</h4>
+                        <div class="flex items-center justify-center p-5 rounded-lg bg-[#2DA44E] mb-3 transition duration-200 hover:shadow-md">
+                            <img src="/brand/secondary-logo-white-green.svg" alt="Secondary Logo - White/Green" class="max-w-full max-h-[100px]">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
+                    <h3 class="text-lg font-semibold mb-3 text-gray-800">Logo Usage Guidelines</h3>
+                    <ul class="list-disc pl-6 text-gray-700 space-y-2">
+                        <li>Use the green logo on light backgrounds for primary branding.</li>
+                        <li>Use the white logo on dark or colored backgrounds.</li>
+                        <li>Maintain adequate spacing around the logo - at least the height of the "H" letter in all directions.</li>
+                        <li>Don't stretch, distort, or change the colors of the logo.</li>
+                        <li>Don't place the logo on busy backgrounds that reduce visibility.</li>
+                    </ul>
+                </div>
+                
+                <div class="flex justify-center">
+                    <a href="/brand/logos.zip" download class="inline-flex items-center rounded-md bg-[#2DA44E] px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#2c974b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2da44e]">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                        Download All Logos
+                    </a>
+                </div>
+            </section>
+            
+            <!-- Typography Section -->
+            <section class="mb-16">
+                <h2 class="text-2xl font-bold mb-6 text-gray-900 border-b pb-2">Typography</h2>
+                <p class="mb-6 text-gray-700">Our primary typeface is Inter, a versatile sans-serif font designed for excellent readability on screens.</p>
+                
+                <div class="bg-white rounded-lg shadow-sm p-4 sm:p-8 mb-8">
+                    <div class="space-y-4 font-sans">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-2 border-b">
+                            <span class="text-4xl font-black break-words">Inter Black (900)</span>
+                            <span class="text-gray-500">Use for main headlines</span>
+                        </div>
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-2 border-b">
+                            <span class="text-3xl font-bold">Inter Bold (700)</span>
+                            <span class="text-gray-500">Use for section headers</span>
+                        </div>
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-2 border-b">
+                            <span class="text-2xl font-semibold">Inter Semibold (600)</span>
+                            <span class="text-gray-500">Use for subheadings</span>
+                        </div>
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-2 border-b">
+                            <span class="text-xl font-medium">Inter Medium (500)</span>
+                            <span class="text-gray-500">Use for emphasized body text</span>
+                        </div>
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-2 border-b">
+                            <span class="text-lg font-normal">Inter Regular (400)</span>
+                            <span class="text-gray-500">Use for body text</span>
+                        </div>
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+                            <span class="text-base font-light">Inter Light (300)</span>
+                            <span class="text-gray-500">Use for captions and notes</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-lg font-semibold mb-3 text-gray-800">Typography Usage Guidelines</h3>
+                    <ul class="list-disc pl-6 text-gray-700 space-y-2">
+                        <li>Use appropriate font weights for hierarchy (heavier for headers, lighter for body)</li>
+                        <li>Maintain sufficient contrast against backgrounds for readability</li>
+                        <li>Line height should be 1.5x font size for optimal readability</li>
+                        <li>For large blocks of text, use left alignment for better readability</li>
+                        <li>Limit line length to approximately 60-80 characters for best readability</li>
+                    </ul>
+                </div>
+            </section>
+            
+            <!-- Color Palette -->
+            <section class="mb-16">
+                <h2 class="text-2xl font-bold mb-6 text-gray-900 border-b pb-2">Color Palette</h2>
+                <p class="mb-6 text-gray-700">Click on any color to copy its hex code to your clipboard.</p>
+                
+                <div class="space-y-12 mb-16">
+                    <!-- Green Palette -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">Green</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #2DA44E;" data-color="#2DA44E">Core</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#2DA44E</div>
+                                    <div>rgb(45, 164, 78)</div>
+                                    <div>hsl(137, 57%, 41%)</div>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #1B622F;" data-color="#1B622F">Shade</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#1B622F</div>
+                                    <div>rgb(27, 98, 47)</div>
+                                    <div>hsl(137, 57%, 25%)</div>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #81C895;" data-color="#81C895">Tint 1</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#81C895</div>
+                                    <div>rgb(129, 200, 149)</div>
+                                    <div>hsl(137, 39%, 65%)</div>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #DBFAE3;" data-color="#DBFAE3">Tint 2</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#DBFAE3</div>
+                                    <div>rgb(219, 250, 227)</div>
+                                    <div>hsl(135, 76%, 92%)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Blue Palette -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">Blue</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #1C4E65;" data-color="#1C4E65">Core</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#1C4E65</div>
+                                    <div>rgb(28, 78, 101)</div>
+                                    <div>hsl(199, 57%, 25%)</div>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #112F3D;" data-color="#112F3D">Shade</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#112F3D</div>
+                                    <div>rgb(17, 47, 61)</div>
+                                    <div>hsl(199, 56%, 15%)</div>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #7795A3;" data-color="#7795A3">Tint 1</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#7795A3</div>
+                                    <div>rgb(119, 149, 163)</div>
+                                    <div>hsl(199, 19%, 55%)</div>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #E8EDF0;" data-color="#E8EDF0">Tint 2</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#E8EDF0</div>
+                                    <div>rgb(232, 237, 240)</div>
+                                    <div>hsl(202, 21%, 93%)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Red Palette -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">Red</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #F05D49;" data-color="#F05D49">Core</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#F05D49</div>
+                                    <div>rgb(240, 93, 73)</div>
+                                    <div>hsl(7, 85, 61)</div>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #AB3B2C;" data-color="#AB3B2C">Shade</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#AB3B2C</div>
+                                    <div>rgb(171, 59, 44)</div>
+                                    <div>hsl(7, 59, 42)</div>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #F69E92;" data-color="#F69E92">Tint 1</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#F69E92</div>
+                                    <div>rgb(246, 158, 146)</div>
+                                    <div>hsl(7, 85, 77)</div>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #FFEAE7;" data-color="#FFEAE7">Tint 2</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#FFEAE7</div>
+                                    <div>rgb(255, 234, 231)</div>
+                                    <div>hsl(7, 100, 95)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Orange Palette -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">Orange</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #F4A258;" data-color="#F4A258">Core</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#F4A258</div>
+                                    <div>rgb(244, 162, 88)</div>
+                                    <div>hsl(28, 88%, 65%)</div>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #B35500;" data-color="#B35500">Shade</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#B35500</div>
+                                    <div>rgb(179, 85, 0)</div>
+                                    <div>hsl(28, 100%, 35%)</div>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #F8C79B;" data-color="#F8C79B">Tint 1</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#F8C79B</div>
+                                    <div>rgb(248, 199, 155)</div>
+                                    <div>hsl(28, 87%, 79%)</div>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #FFEEDD;" data-color="#FFEEDD">Tint 2</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#FFEEDD</div>
+                                    <div>rgb(255, 238, 221)</div>
+                                    <div>hsl(30, 100%, 93%)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Yellow Palette -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">Yellow</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #F9D86D;" data-color="#F9D86D">Core</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#F9D86D</div>
+                                    <div>rgb(249, 216, 109)</div>
+                                    <div>hsl(46, 92%, 70%)</div>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #E7B100;" data-color="#E7B100">Shade</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#E7B100</div>
+                                    <div>rgb(231, 177, 0)</div>
+                                    <div>hsl(46, 100%, 45%)</div>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #FBE8A7;" data-color="#FBE8A7">Tint 1</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#FBE8A7</div>
+                                    <div>rgb(251, 232, 167)</div>
+                                    <div>hsl(46, 91%, 82%)</div>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #FEF7E2;" data-color="#FEF7E2">Tint 2</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#FEF7E2</div>
+                                    <div>rgb(254, 247, 226)</div>
+                                    <div>hsl(45, 93%, 94%)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Mint Palette -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">Mint</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #96C3A4;" data-color="#96C3A4">Core</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#96C3A4</div>
+                                    <div>rgb(150, 195, 164)</div>
+                                    <div>hsl(139, 27%, 68%)</div>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #5A7562;" data-color="#5A7562">Shade</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#5A7562</div>
+                                    <div>rgb(90, 117, 98)</div>
+                                    <div>hsl(138, 13%, 41%)</div>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #C0DBC8;" data-color="#C0DBC8">Tint 1</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#C0DBC8</div>
+                                    <div>rgb(192, 219, 200)</div>
+                                    <div>hsl(138, 27%, 81%)</div>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #E8F7EC;" data-color="#E8F7EC">Tint 2</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#E8F7EC</div>
+                                    <div>rgb(232, 247, 236)</div>
+                                    <div>hsl(136, 48%, 94%)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Ivory Palette -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">Ivory</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #F0E7C8;" data-color="#F0E7C8">Core</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#F0E7C8</div>
+                                    <div>rgb(240, 231, 200)</div>
+                                    <div>hsl(47, 57%, 86%)</div>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #C6B67A;" data-color="#C6B67A">Shade</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#C6B67A</div>
+                                    <div>rgb(198, 182, 122)</div>
+                                    <div>hsl(47, 40%, 63%)</div>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #F6F1DE;" data-color="#F6F1DE">Tint 1</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#F6F1DE</div>
+                                    <div>rgb(246, 241, 222)</div>
+                                    <div>hsl(47, 57%, 92%)</div>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #FFFCF4;" data-color="#FFFCF4">Tint 2</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#FFFCF4</div>
+                                    <div>rgb(255, 252, 244)</div>
+                                    <div>hsl(44, 100%, 98%)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Text Colors -->
+                    <div>
+                        <h3 class="text-lg font-semibold mb-4 text-gray-800">Text</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #22293A;" data-color="#22293A">Dark</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#22293A</div>
+                                    <div>rgb(34, 41, 58)</div>
+                                    <div>hsl(222, 26%, 18%)</div>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #414651;" data-color="#414651">Medium</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#414651</div>
+                                    <div>rgb(65, 70, 81)</div>
+                                    <div>hsl(221, 11%, 29%)</div>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #898C93;" data-color="#898C93">Light</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#898C93</div>
+                                    <div>rgb(137, 140, 147)</div>
+                                    <div>hsl(222, 4%, 56%)</div>
+                                </div>
+                            </div>
+                            <div class="w-full">
+                                <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #E7E8E9;" data-color="#E7E8E9">Disabled</div>
+                                <div class="text-sm mt-1 text-gray-500 break-words">
+                                    <div>#E7E8E9</div>
+                                    <div>rgb(231, 232, 233)</div>
+                                    <div>hsl(210, 4%, 91%)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-lg font-semibold mb-3 text-gray-800">Color Usage Guidelines</h3>
+                    <ul class="list-disc pl-6 text-gray-700 space-y-2">
+                        <li>Use green as our primary brand color for important UI elements and calls to action.</li>
+                        <li>Use blue for secondary actions and information-based elements.</li>
+                        <li>Orange and yellow are accent colors - use sparingly for highlights and attention.</li>
+                        <li>Mint and ivory provide softer, complementary options for backgrounds and subtle elements.</li>
+                        <li>Use text colors appropriately: Dark for primary text, Medium for secondary text, Light for tertiary information, and Disabled for inactive elements.</li>
+                        <li class="break-words">Ensure sufficient contrast between text and background colors for accessibility.</li>
+                    </ul>
+                </div>
+            </section>
+            
+            <!-- Card Components Section -->
+            <section class="mb-16">
+                <h2 class="text-2xl font-bold mb-6 text-gray-900 border-b pb-2">Card Components</h2>
+                <p class="mb-6 text-gray-700">Cards are a core UI component used throughout our products for organizing content. We maintain consistent styling across card types to ensure brand cohesion.</p>
+                
+                <!-- Card Types -->
+                <h3 class="text-xl font-bold mb-6 text-gray-900">Card Types</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                    <!-- Standard Card -->
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4 text-gray-800">Standard Card</h4>
+                        <div class="text-sm text-gray-500 mb-4">
+                            Used for feature highlights, statistics, and general content blocks.
+                        </div>
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-4">
+                            <div class="text-3xl mb-2">⚡</div>
+                            <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">Fast</h3>
+                            <p class="text-gray-600 dark:text-gray-300">Everything loads in less than 100ms.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Stat Cards -->
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4 text-gray-800">Stat Cards</h4>
+                        <div class="text-sm text-gray-500 mb-4">
+                            Used for displaying metrics, statistics, and analytics data across the application.
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <!-- Total Done Card -->
+                            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
+                                <div class="p-5">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0">
+                                            <span class="text-2xl">✅</span>
+                                        </div>
+                                        <div class="ml-5 w-0 flex-1">
+                                            <dl>
+                                                <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Total Done</dt>
+                                                <dd class="text-3xl font-semibold text-gray-900 dark:text-white">52</dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Best Set Card -->
+                            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
+                                <div class="p-5 relative">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0">
+                                            <span class="text-2xl">🥇</span>
+                                        </div>
+                                        <div class="ml-5 w-0 flex-1">
+                                            <dl>
+                                                <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Best Set</dt>
+                                                <dd class="text-3xl font-semibold text-gray-900 dark:text-white">23</dd>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                    <div class="absolute bottom-2 right-3 text-xs text-gray-500">May 15, 2023</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                    <!-- Feature Card -->
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4 text-gray-800">Feature Card</h4>
+                        <div class="text-sm text-gray-500 mb-4">
+                            Used for showcasing product features, benefits, or habit types.
+                        </div>
+                        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 mb-4">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="text-3xl">💪</div>
+                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Card Label</span>
+                            </div>
+                            <h3 class="font-semibold text-gray-900 mb-2">Feature Title</h3>
+                            <p class="text-sm text-gray-500">Brief description of the feature or benefit.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Floating Card -->
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4 text-gray-800">Floating Card</h4>
+                        <div class="text-sm text-gray-500 mb-4">
+                            Used for decorative elements and visual interest in hero sections.
+                        </div>
+                        <div class="relative h-40 bg-gray-100 rounded-lg mb-4 overflow-hidden">
+                            <div class="absolute rounded-lg bg-white bg-opacity-80 px-4 py-2 flex items-center shadow-sm transform rotate-2" style="top: 20%; left: 15%; max-width: 200px;">
+                                <span class="text-xl mr-2">🧪</span>
+                                <span class="text-sm font-medium truncate">Core Habit Theory</span>
+                            </div>
+                            <div class="absolute rounded-lg bg-white bg-opacity-80 px-4 py-2 flex items-center shadow-sm transform -rotate-1" style="top: 60%; right: 15%; max-width: 200px;">
+                                <span class="text-xl mr-2">🏠</span>
+                                <span class="text-sm font-medium truncate">Environment Design</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Card Guidelines -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <h3 class="text-lg font-semibold mb-3 text-gray-800">Card Usage Guidelines</h3>
+                    <ul class="list-disc pl-6 text-gray-700 space-y-2">
+                        <li>Maintain consistent padding (p-6) across all standard cards</li>
+                        <li>Use rounded corners (rounded-lg) on all card elements</li>
+                        <li>Apply subtle shadows (shadow-sm) and borders (border border-gray-200) for depth</li>
+                        <li>Include appropriate spacing between card elements (mb-2 for titles, mb-3 for icons)</li>
+                        <li>Use hover states (hover:border-[#2da44e]) for interactive cards</li>
+                        <li>Keep content concise and focused within each card</li>
+                        <li>Use icons that align with our brand style and message</li>
+                        <li>Apply responsive design (grid grid-cols-1 md:grid-cols-X) for card layouts</li>
+                    </ul>
+                </div>
+            </section>
         </div>
         
-        <!-- Logo Section -->
-        <section class="mb-12 sm:mb-16 px-2 sm:px-0">
-            <h2 class="text-2xl font-bold mb-6 text-gray-900 border-b pb-2">Logo</h2>
-            <p class="mb-6 text-gray-700">Our logo is available in multiple formats (SVG, PNG, JPG) and color variations (green, black, white). Use the appropriate version for your background.</p>
-
-            <!-- Primary Logos -->
-            <h3 class="text-xl font-bold mb-4 text-gray-900">Primary Logos</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8">
-                <div class="p-2 sm:p-3">
-                    <h4 class="text-lg font-semibold mb-3 text-gray-800">Green</h4>
-                    <div class="flex items-center justify-center p-5 rounded-lg bg-gray-50 mb-3 transition duration-200 hover:shadow-md">
-                        <img src="/brand/primary-logo-green.svg" alt="Primary Logo - Green" class="max-w-full max-h-[100px]">
-                    </div>
-                </div>
-                
-                <div class="p-2 sm:p-3">
-                    <h4 class="text-lg font-semibold mb-3 text-gray-800">Black</h4>
-                    <div class="flex items-center justify-center p-5 rounded-lg bg-gray-50 mb-3 transition duration-200 hover:shadow-md">
-                        <img src="/brand/primary-logo-black.svg" alt="Primary Logo - Black" class="max-w-full max-h-[100px]">
-                    </div>
-                </div>
-                
-                <div class="p-2 sm:p-3">
-                    <h4 class="text-lg font-semibold mb-3 text-gray-800">White</h4>
-                    <div class="flex items-center justify-center p-5 rounded-lg bg-gray-800 mb-3 transition duration-200 hover:shadow-md">
-                        <img src="/brand/primary-logo-white.svg" alt="Primary Logo - White" class="max-w-full max-h-[100px]">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Secondary Logos -->
-            <h3 class="text-xl font-bold mb-4 text-gray-900">Secondary Logos</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-8">
-                <div class="p-2 sm:p-3">
-                    <h4 class="text-lg font-semibold mb-3 text-gray-800">Green</h4>
-                    <div class="flex items-center justify-center p-5 rounded-lg bg-gray-50 mb-3 transition duration-200 hover:shadow-md">
-                        <img src="/brand/secondary-logo-green.svg" alt="Secondary Logo - Green" class="max-w-full max-h-[100px]">
-                    </div>
-                </div>
-                
-                <div class="p-2 sm:p-3">
-                    <h4 class="text-lg font-semibold mb-3 text-gray-800">Black</h4>
-                    <div class="flex items-center justify-center p-5 rounded-lg bg-gray-50 mb-3 transition duration-200 hover:shadow-md">
-                        <img src="/brand/secondary-logo-black.svg" alt="Secondary Logo - Black" class="max-w-full max-h-[100px]">
-                    </div>
-                </div>
-                
-                <div class="p-2 sm:p-3">
-                    <h4 class="text-lg font-semibold mb-3 text-gray-800">White</h4>
-                    <div class="flex items-center justify-center p-5 rounded-lg bg-gray-800 mb-3 transition duration-200 hover:shadow-md">
-                        <img src="/brand/secondary-logo-white.svg" alt="Secondary Logo - White" class="max-w-full max-h-[100px]">
-                    </div>
-                </div>
-
-                <div class="p-2 sm:p-3">
-                    <h4 class="text-lg font-semibold mb-3 text-gray-800">White/Green</h4>
-                    <div class="flex items-center justify-center p-5 rounded-lg bg-[#2DA44E] mb-3 transition duration-200 hover:shadow-md">
-                        <img src="/brand/secondary-logo-white-green.svg" alt="Secondary Logo - White/Green" class="max-w-full max-h-[100px]">
-                    </div>
-                </div>
-            </div>
-            
-            <div class="bg-white p-6 rounded-lg shadow-sm mb-8">
-                <h3 class="text-lg font-semibold mb-3 text-gray-800">Logo Usage Guidelines</h3>
-                <ul class="list-disc pl-6 text-gray-700 space-y-2">
-                    <li>Use the green logo on light backgrounds for primary branding.</li>
-                    <li>Use the white logo on dark or colored backgrounds.</li>
-                    <li>Maintain adequate spacing around the logo - at least the height of the "H" letter in all directions.</li>
-                    <li>Don't stretch, distort, or change the colors of the logo.</li>
-                    <li>Don't place the logo on busy backgrounds that reduce visibility.</li>
-                </ul>
-            </div>
-            
-            <div class="flex justify-center">
-                <a href="/brand/logos.zip" download class="inline-flex items-center rounded-md bg-[#2DA44E] px-6 py-3 text-base font-semibold text-white shadow-sm hover:bg-[#2c974b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2da44e]">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
-                    Download All Logos
-                </a>
-            </div>
-        </section>
+        <!-- Toast for copy notification -->
+        <div id="toast-message" class="fixed bottom-5 right-5 bg-[#2DA44E] text-white px-5 py-2.5 rounded-lg shadow-lg z-50 hidden">
+            Color copied to clipboard!
+        </div>
         
-        <!-- Typography Section -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold mb-6 text-gray-900 border-b pb-2">Typography</h2>
-            <p class="mb-6 text-gray-700">Our primary typeface is Inter, a versatile sans-serif font designed for excellent readability on screens.</p>
-            
-            <div class="bg-white rounded-lg shadow-sm p-4 sm:p-8 mb-8">
-                <div class="space-y-4 font-sans">
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-2 border-b">
-                        <span class="text-4xl font-black break-words">Inter Black (900)</span>
-                        <span class="text-gray-500">Use for main headlines</span>
-                    </div>
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-2 border-b">
-                        <span class="text-3xl font-bold">Inter Bold (700)</span>
-                        <span class="text-gray-500">Use for section headers</span>
-                    </div>
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-2 border-b">
-                        <span class="text-2xl font-semibold">Inter Semibold (600)</span>
-                        <span class="text-gray-500">Use for subheadings</span>
-                    </div>
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-2 border-b">
-                        <span class="text-xl font-medium">Inter Medium (500)</span>
-                        <span class="text-gray-500">Use for emphasized body text</span>
-                    </div>
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-2 border-b">
-                        <span class="text-lg font-normal">Inter Regular (400)</span>
-                        <span class="text-gray-500">Use for body text</span>
-                    </div>
-                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-                        <span class="text-base font-light">Inter Light (300)</span>
-                        <span class="text-gray-500">Use for captions and notes</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="bg-white p-6 rounded-lg shadow-sm">
-                <h3 class="text-lg font-semibold mb-3 text-gray-800">Typography Usage Guidelines</h3>
-                <ul class="list-disc pl-6 text-gray-700 space-y-2">
-                    <li>Use appropriate font weights for hierarchy (heavier for headers, lighter for body)</li>
-                    <li>Maintain sufficient contrast against backgrounds for readability</li>
-                    <li>Line height should be 1.5x font size for optimal readability</li>
-                    <li>For large blocks of text, use left alignment for better readability</li>
-                    <li>Limit line length to approximately 60-80 characters for best readability</li>
-                </ul>
-            </div>
-        </section>
+        {{ template "footer" . }}
         
-        <!-- Color Palette -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold mb-6 text-gray-900 border-b pb-2">Color Palette</h2>
-            <p class="mb-6 text-gray-700">Click on any color to copy its hex code to your clipboard.</p>
-            
-            <div class="space-y-12 mb-16">
-                <!-- Green Palette -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-4 text-gray-800">Green</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #2DA44E;" data-color="#2DA44E">Core</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#2DA44E</div>
-                                <div>rgb(45, 164, 78)</div>
-                                <div>hsl(137, 57%, 41%)</div>
-                            </div>
-                        </div>
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #1B622F;" data-color="#1B622F">Shade</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#1B622F</div>
-                                <div>rgb(27, 98, 47)</div>
-                                <div>hsl(137, 57%, 25%)</div>
-                            </div>
-                        </div>
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #81C895;" data-color="#81C895">Tint 1</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#81C895</div>
-                                <div>rgb(129, 200, 149)</div>
-                                <div>hsl(137, 39%, 65%)</div>
-                            </div>
-                        </div>
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #DBFAE3;" data-color="#DBFAE3">Tint 2</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#DBFAE3</div>
-                                <div>rgb(219, 250, 227)</div>
-                                <div>hsl(135, 76%, 92%)</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <script>
+            // JavaScript for copying color codes to clipboard
+            document.addEventListener('DOMContentLoaded', function() {
+                const colorBlocks = document.querySelectorAll('[data-color]');
+                const toastMessage = document.getElementById('toast-message');
                 
-                <!-- Blue Palette -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-4 text-gray-800">Blue</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #1C4E65;" data-color="#1C4E65">Core</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#1C4E65</div>
-                                <div>rgb(28, 78, 101)</div>
-                                <div>hsl(199, 57%, 25%)</div>
-                            </div>
-                        </div>
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #112F3D;" data-color="#112F3D">Shade</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#112F3D</div>
-                                <div>rgb(17, 47, 61)</div>
-                                <div>hsl(199, 56%, 15%)</div>
-                            </div>
-                        </div>
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #7795A3;" data-color="#7795A3">Tint 1</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#7795A3</div>
-                                <div>rgb(119, 149, 163)</div>
-                                <div>hsl(199, 19%, 55%)</div>
-                            </div>
-                        </div>
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #E8EDF0;" data-color="#E8EDF0">Tint 2</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#E8EDF0</div>
-                                <div>rgb(232, 237, 240)</div>
-                                <div>hsl(202, 21%, 93%)</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Red Palette -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-4 text-gray-800">Red</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #F05D49;" data-color="#F05D49">Core</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#F05D49</div>
-                                <div>rgb(240, 93, 73)</div>
-                                <div>hsl(7, 85, 61)</div>
-                            </div>
-                        </div>
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #AB3B2C;" data-color="#AB3B2C">Shade</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#AB3B2C</div>
-                                <div>rgb(171, 59, 44)</div>
-                                <div>hsl(7, 59, 42)</div>
-                            </div>
-                        </div>
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #F69E92;" data-color="#F69E92">Tint 1</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#F69E92</div>
-                                <div>rgb(246, 158, 146)</div>
-                                <div>hsl(7, 85, 77)</div>
-                            </div>
-                        </div>
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #FFEAE7;" data-color="#FFEAE7">Tint 2</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#FFEAE7</div>
-                                <div>rgb(255, 234, 231)</div>
-                                <div>hsl(7, 100, 95)</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Orange Palette -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-4 text-gray-800">Orange</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #F4A258;" data-color="#F4A258">Core</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#F4A258</div>
-                                <div>rgb(244, 162, 88)</div>
-                                <div>hsl(28, 88%, 65%)</div>
-                            </div>
-                        </div>
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #B35500;" data-color="#B35500">Shade</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#B35500</div>
-                                <div>rgb(179, 85, 0)</div>
-                                <div>hsl(28, 100%, 35%)</div>
-                            </div>
-                        </div>
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #F8C79B;" data-color="#F8C79B">Tint 1</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#F8C79B</div>
-                                <div>rgb(248, 199, 155)</div>
-                                <div>hsl(28, 87%, 79%)</div>
-                            </div>
-                        </div>
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #FFEEDD;" data-color="#FFEEDD">Tint 2</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#FFEEDD</div>
-                                <div>rgb(255, 238, 221)</div>
-                                <div>hsl(30, 100%, 93%)</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Yellow Palette -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-4 text-gray-800">Yellow</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #F9D86D;" data-color="#F9D86D">Core</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#F9D86D</div>
-                                <div>rgb(249, 216, 109)</div>
-                                <div>hsl(46, 92%, 70%)</div>
-                            </div>
-                        </div>
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #E7B100;" data-color="#E7B100">Shade</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#E7B100</div>
-                                <div>rgb(231, 177, 0)</div>
-                                <div>hsl(46, 100%, 45%)</div>
-                            </div>
-                        </div>
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #FBE8A7;" data-color="#FBE8A7">Tint 1</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#FBE8A7</div>
-                                <div>rgb(251, 232, 167)</div>
-                                <div>hsl(46, 91%, 82%)</div>
-                            </div>
-                        </div>
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #FEF7E2;" data-color="#FEF7E2">Tint 2</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#FEF7E2</div>
-                                <div>rgb(254, 247, 226)</div>
-                                <div>hsl(45, 93%, 94%)</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Mint Palette -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-4 text-gray-800">Mint</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #96C3A4;" data-color="#96C3A4">Core</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#96C3A4</div>
-                                <div>rgb(150, 195, 164)</div>
-                                <div>hsl(139, 27%, 68%)</div>
-                            </div>
-                        </div>
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #5A7562;" data-color="#5A7562">Shade</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#5A7562</div>
-                                <div>rgb(90, 117, 98)</div>
-                                <div>hsl(138, 13%, 41%)</div>
-                            </div>
-                        </div>
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #C0DBC8;" data-color="#C0DBC8">Tint 1</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#C0DBC8</div>
-                                <div>rgb(192, 219, 200)</div>
-                                <div>hsl(138, 27%, 81%)</div>
-                            </div>
-                        </div>
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #E8F7EC;" data-color="#E8F7EC">Tint 2</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#E8F7EC</div>
-                                <div>rgb(232, 247, 236)</div>
-                                <div>hsl(136, 48%, 94%)</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Ivory Palette -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-4 text-gray-800">Ivory</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #F0E7C8;" data-color="#F0E7C8">Core</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#F0E7C8</div>
-                                <div>rgb(240, 231, 200)</div>
-                                <div>hsl(47, 57%, 86%)</div>
-                            </div>
-                        </div>
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #C6B67A;" data-color="#C6B67A">Shade</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#C6B67A</div>
-                                <div>rgb(198, 182, 122)</div>
-                                <div>hsl(47, 40%, 63%)</div>
-                            </div>
-                        </div>
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #F6F1DE;" data-color="#F6F1DE">Tint 1</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#F6F1DE</div>
-                                <div>rgb(246, 241, 222)</div>
-                                <div>hsl(47, 57%, 92%)</div>
-                            </div>
-                        </div>
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #FFFCF4;" data-color="#FFFCF4">Tint 2</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#FFFCF4</div>
-                                <div>rgb(255, 252, 244)</div>
-                                <div>hsl(44, 100%, 98%)</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Text Colors -->
-                <div>
-                    <h3 class="text-lg font-semibold mb-4 text-gray-800">Text</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #22293A;" data-color="#22293A">Dark</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#22293A</div>
-                                <div>rgb(34, 41, 58)</div>
-                                <div>hsl(222, 26%, 18%)</div>
-                            </div>
-                        </div>
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #414651;" data-color="#414651">Medium</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#414651</div>
-                                <div>rgb(65, 70, 81)</div>
-                                <div>hsl(221, 11%, 29%)</div>
-                            </div>
-                        </div>
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-white" style="background-color: #898C93;" data-color="#898C93">Light</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#898C93</div>
-                                <div>rgb(137, 140, 147)</div>
-                                <div>hsl(222, 4%, 56%)</div>
-                            </div>
-                        </div>
-                        <div class="w-full">
-                            <div class="w-full h-20 rounded-lg flex items-center justify-center mb-2.5 transition duration-200 cursor-pointer hover:scale-105 text-black" style="background-color: #E7E8E9;" data-color="#E7E8E9">Disabled</div>
-                            <div class="text-sm mt-1 text-gray-500 break-words">
-                                <div>#E7E8E9</div>
-                                <div>rgb(231, 232, 233)</div>
-                                <div>hsl(210, 4%, 91%)</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="bg-white p-6 rounded-lg shadow-sm">
-                <h3 class="text-lg font-semibold mb-3 text-gray-800">Color Usage Guidelines</h3>
-                <ul class="list-disc pl-6 text-gray-700 space-y-2">
-                    <li>Use green as our primary brand color for important UI elements and calls to action.</li>
-                    <li>Use blue for secondary actions and information-based elements.</li>
-                    <li>Orange and yellow are accent colors - use sparingly for highlights and attention.</li>
-                    <li>Mint and ivory provide softer, complementary options for backgrounds and subtle elements.</li>
-                    <li>Use text colors appropriately: Dark for primary text, Medium for secondary text, Light for tertiary information, and Disabled for inactive elements.</li>
-                    <li class="break-words">Ensure sufficient contrast between text and background colors for accessibility.</li>
-                </ul>
-            </div>
-        </section>
-        
-        <!-- Card Components Section -->
-        <section class="mb-16">
-            <h2 class="text-2xl font-bold mb-6 text-gray-900 border-b pb-2">Card Components</h2>
-            <p class="mb-6 text-gray-700">Cards are a core UI component used throughout our products for organizing content. We maintain consistent styling across card types to ensure brand cohesion.</p>
-            
-            <!-- Card Types -->
-            <h3 class="text-xl font-bold mb-6 text-gray-900">Card Types</h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                <!-- Standard Card -->
-                <div>
-                    <h4 class="text-lg font-semibold mb-4 text-gray-800">Standard Card</h4>
-                    <div class="text-sm text-gray-500 mb-4">
-                        Used for feature highlights, statistics, and general content blocks.
-                    </div>
-                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-4">
-                        <div class="text-3xl mb-2">⚡</div>
-                        <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">Fast</h3>
-                        <p class="text-gray-600 dark:text-gray-300">Everything loads in less than 100ms.</p>
-                    </div>
-                </div>
-                
-                <!-- Stat Cards -->
-                <div>
-                    <h4 class="text-lg font-semibold mb-4 text-gray-800">Stat Cards</h4>
-                    <div class="text-sm text-gray-500 mb-4">
-                        Used for displaying metrics, statistics, and analytics data across the application.
-                    </div>
-                    <div class="grid grid-cols-2 gap-4 mb-4">
-                        <!-- Total Done Card -->
-                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
-                            <div class="p-5">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0">
-                                        <span class="text-2xl">✅</span>
-                                    </div>
-                                    <div class="ml-5 w-0 flex-1">
-                                        <dl>
-                                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Total Done</dt>
-                                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white">52</dd>
-                                        </dl>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Best Set Card -->
-                        <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
-                            <div class="p-5 relative">
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0">
-                                        <span class="text-2xl">🥇</span>
-                                    </div>
-                                    <div class="ml-5 w-0 flex-1">
-                                        <dl>
-                                            <dt class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">Best Set</dt>
-                                            <dd class="text-3xl font-semibold text-gray-900 dark:text-white">23</dd>
-                                        </dl>
-                                    </div>
-                                </div>
-                                <div class="absolute bottom-2 right-3 text-xs text-gray-500">May 15, 2023</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                <!-- Feature Card -->
-                <div>
-                    <h4 class="text-lg font-semibold mb-4 text-gray-800">Feature Card</h4>
-                    <div class="text-sm text-gray-500 mb-4">
-                        Used for showcasing product features, benefits, or habit types.
-                    </div>
-                    <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200 mb-4">
-                        <div class="flex justify-between items-start mb-3">
-                            <div class="text-3xl">💪</div>
-                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Card Label</span>
-                        </div>
-                        <h3 class="font-semibold text-gray-900 mb-2">Feature Title</h3>
-                        <p class="text-sm text-gray-500">Brief description of the feature or benefit.</p>
-                    </div>
-                </div>
-                
-                <!-- Floating Card -->
-                <div>
-                    <h4 class="text-lg font-semibold mb-4 text-gray-800">Floating Card</h4>
-                    <div class="text-sm text-gray-500 mb-4">
-                        Used for decorative elements and visual interest in hero sections.
-                    </div>
-                    <div class="relative h-40 bg-gray-100 rounded-lg mb-4 overflow-hidden">
-                        <div class="absolute rounded-lg bg-white bg-opacity-80 px-4 py-2 flex items-center shadow-sm transform rotate-2" style="top: 20%; left: 15%; max-width: 200px;">
-                            <span class="text-xl mr-2">🧪</span>
-                            <span class="text-sm font-medium truncate">Core Habit Theory</span>
-                        </div>
-                        <div class="absolute rounded-lg bg-white bg-opacity-80 px-4 py-2 flex items-center shadow-sm transform -rotate-1" style="top: 60%; right: 15%; max-width: 200px;">
-                            <span class="text-xl mr-2">🏠</span>
-                            <span class="text-sm font-medium truncate">Environment Design</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Card Guidelines -->
-            <div class="bg-white p-6 rounded-lg shadow-sm">
-                <h3 class="text-lg font-semibold mb-3 text-gray-800">Card Usage Guidelines</h3>
-                <ul class="list-disc pl-6 text-gray-700 space-y-2">
-                    <li>Maintain consistent padding (p-6) across all standard cards</li>
-                    <li>Use rounded corners (rounded-lg) on all card elements</li>
-                    <li>Apply subtle shadows (shadow-sm) and borders (border border-gray-200) for depth</li>
-                    <li>Include appropriate spacing between card elements (mb-2 for titles, mb-3 for icons)</li>
-                    <li>Use hover states (hover:border-[#2da44e]) for interactive cards</li>
-                    <li>Keep content concise and focused within each card</li>
-                    <li>Use icons that align with our brand style and message</li>
-                    <li>Apply responsive design (grid grid-cols-1 md:grid-cols-X) for card layouts</li>
-                </ul>
-            </div>
-        </section>
-    </div>
-    
-    <!-- Toast for copy notification -->
-    <div id="toast-message" class="fixed bottom-5 right-5 bg-[#2DA44E] text-white px-5 py-2.5 rounded-lg shadow-lg z-50 hidden">
-        Color copied to clipboard!
-    </div>
-    
-    {{ template "footer" . }}
-    
-    <script>
-        // JavaScript for copying color codes to clipboard
-        document.addEventListener('DOMContentLoaded', function() {
-            const colorBlocks = document.querySelectorAll('[data-color]');
-            const toastMessage = document.getElementById('toast-message');
-            
-            colorBlocks.forEach(block => {
-                block.addEventListener('click', function() {
-                    const colorHex = this.getAttribute('data-color');
-                    navigator.clipboard.writeText(colorHex).then(() => {
-                        // Show toast
-                        toastMessage.classList.remove('hidden');
-                        setTimeout(() => {
-                            toastMessage.classList.add('hidden');
-                        }, 2000);
+                colorBlocks.forEach(block => {
+                    block.addEventListener('click', function() {
+                        const colorHex = this.getAttribute('data-color');
+                        navigator.clipboard.writeText(colorHex).then(() => {
+                            // Show toast
+                            toastMessage.classList.remove('hidden');
+                            setTimeout(() => {
+                                toastMessage.classList.add('hidden');
+                            }, 2000);
+                        });
                     });
                 });
             });
-        });
-    </script>
+        </script>
+    </div>
 </body>
 </html> 
