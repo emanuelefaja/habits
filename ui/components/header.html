@@ -1,6 +1,7 @@
 {{ define "header" }}
 <div x-data="{ open: false }" class="flex justify-between items-center px-4 sm:px-6 py-4 relative bg-white border-b border-gray-200 dark:border-gray-700 {{ if .User }}dark:bg-gray-800{{ end }}">
 
+    <!-- Left column: Logo -->
     <div class="flex items-center gap-4 flex-shrink-0">
         <h1 class="text-left tracking-tight text-gray-900 {{ if .User }}dark:text-white{{ end }}">
             <a href="/" class="inline-flex items-center gap-2 hover:underline">
@@ -24,8 +25,10 @@
     </button>
 
     <!-- Desktop menu -->
-    <div class="hidden lg:flex items-center space-x-4">
+    <div class="hidden lg:flex lg:flex-1 lg:justify-between lg:items-center">
+        <!-- Left spacer when user is logged in -->
         {{ if .User }}
+        <div class="flex items-center space-x-4">
             <a href="/" 
                 class="rounded-md {{ if eq .Page "home" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
                 Habits 🏠
@@ -40,7 +43,18 @@
                 class="rounded-md {{ if eq .Page "masterclass" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
                 Masterclass 🎓
             </a>
+        </div>
 
+        <!-- Middle - empty for user, navigation for guest -->
+        <div class="flex-1 flex justify-center mx-4">
+            <!-- Navigation links appear in the center for guest home page -->
+            {{ if eq .Page "guest-home" }}
+                <!-- This will be empty for logged in users -->
+            {{ end }}
+        </div>
+
+        <!-- Right - user dropdown for logged in users -->
+        <div>
             <!-- User Dropdown Menu -->
             <div x-data="{
                 dropdownOpen: false
@@ -98,7 +112,31 @@
                     </div>
                 </div>
             </div>
+        </div>
         {{ else }}
+        <!-- Three column layout for guest -->
+        <!-- Left column is empty -->
+        <div class="w-32"></div>
+        
+        <!-- Middle column - navigation links for guest home page -->
+        <div class="flex-1 flex justify-center">
+            {{ if eq .Page "guest-home" }}
+            <div class="flex items-center space-x-10">
+                <a href="#testimonials" class="text-gray-800 hover:text-[#2da44e] px-3 py-2 text font-medium">
+                    Reviews
+                </a>
+                <a href="#pricing" class="text-gray-800 hover:text-[#2da44e] px-3 py-2 text font-medium">
+                    Pricing
+                </a>
+                <a href="#faq" class="text-gray-800 hover:text-[#2da44e] px-3 py-2 text font-medium">
+                    FAQ
+                </a>
+            </div>
+            {{ end }}
+        </div>
+        
+        <!-- Right column - login/register buttons -->
+        <div class="flex items-center space-x-4">
             <a href="/login" 
                 class="rounded-md bg-white px-4 py-2 text-sm font-semibold text-[#2da44e] shadow-sm ring-1 ring-inset ring-[#2da44e] hover:bg-gray-50">
                 Sign in 🤙
@@ -108,17 +146,7 @@
                 class="rounded-md bg-[#2da44e] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#2c974b] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2da44e]">
                 Sign Up 👋
             </a>
-        {{ end }}
-        
-        {{ if not .User }}
-        <a href="https://github.com/emanuelefaja/habits" 
-           target="_blank" 
-           rel="noopener noreferrer" 
-           class="text-gray-700 hover:text-gray-900 {{ if .User }}dark:text-gray-400 dark:hover:text-white{{ end }} hover:animate-pulse"
-           aria-label="GitHub repository">
-            <img src="/static/github-mark.svg" alt="GitHub" class="w-6 h-6 {{ if .User }}dark:hidden{{ end }}">
-            <img src="/static/github-mark-white.svg" alt="GitHub" class="w-6 h-6 hidden {{ if .User }}dark:block{{ end }}">
-        </a>
+        </div>
         {{ end }}
     </div>
 
@@ -184,6 +212,23 @@
                 <img src="/static/github-mark-white.svg" alt="GitHub" class="w-6 h-6 hidden dark:block">
             </a>
         {{ else }}
+            {{ if eq .Page "guest-home" }}
+            <a href="#testimonials" 
+                class="rounded-md bg-gray-300 text-gray-800 hover:bg-gray-200 px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                Reviews
+            </a>
+            
+            <a href="#pricing" 
+                class="rounded-md bg-gray-300 text-gray-800 hover:bg-gray-200 px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                Pricing
+            </a>
+            
+            <a href="#faq" 
+                class="rounded-md bg-gray-300 text-gray-800 hover:bg-gray-200 px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                FAQ
+            </a>
+            {{ end }}
+            
             <a href="/login" 
                 class="rounded-md bg-white px-4 py-2 text-sm font-semibold text-[#2da44e] shadow-sm ring-1 ring-inset ring-[#2da44e] hover:bg-gray-50">
                 Sign in 👋

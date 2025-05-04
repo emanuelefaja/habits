@@ -31,7 +31,14 @@ func HomeHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
 
 		if !middleware.IsAuthenticated(r) {
 			// Guest handler
-			if err := templates.ExecuteTemplate(tw, "guest-home.html", nil); err != nil {
+			data := struct {
+				User *models.User
+				Page string
+			}{
+				User: nil,
+				Page: "guest-home",
+			}
+			if err := templates.ExecuteTemplate(tw, "guest-home.html", data); err != nil {
 				// Check if the error is due to a client disconnection
 				if strings.Contains(err.Error(), "write: broken pipe") ||
 					strings.Contains(err.Error(), "client disconnected") ||
@@ -40,6 +47,7 @@ func HomeHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
 					log.Printf("Client disconnected while rendering guest-home.html: %v", err)
 					return
 				}
+				log.Printf("Error rendering guest-home.html: %v", err)
 				http.Error(tw, "Internal Server Error", http.StatusInternalServerError)
 			}
 			return
@@ -73,10 +81,12 @@ func HomeHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
 			User       *models.User
 			HabitsJSON template.JS
 			Flash      string
+			Page       string
 		}{
 			User:       user,
 			HabitsJSON: template.JS(habitsJSON),
 			Flash:      middleware.GetFlash(r),
+			Page:       "home",
 		}
 		renderTemplate(tw, templates, "home.html", data)
 	}
@@ -755,7 +765,14 @@ func ResetPasswordHandler(db *sql.DB, templates *template.Template) http.Handler
 
 // Helper functions for handlers
 func renderGuestHome(w http.ResponseWriter, templates *template.Template) {
-	if err := templates.ExecuteTemplate(w, "guest-home.html", nil); err != nil {
+	data := struct {
+		User *models.User
+		Page string
+	}{
+		User: nil,
+		Page: "guest-home",
+	}
+	if err := templates.ExecuteTemplate(w, "guest-home.html", data); err != nil {
 		handleTemplateError(w, err, "guest-home.html")
 	}
 }
