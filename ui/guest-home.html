@@ -1,640 +1,378 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-gray-50 scroll-smooth">
+<html lang="en" class="min-h-full bg-gray-50 dark:bg-gray-900">
 {{ template "head" . }}
-<body class="h-full">
-    {{ template "header" . }}
-    
-    <!-- New hero section -->
-    <div class="h-screen bg-[#2da44e] relative">
-        <div class="absolute inset-0 flex flex-col items-center justify-center text-white px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h1 class="text-4xl sm:text-6xl font-black mb-6">Build better habits.</h1>
-                <p class="text-xl sm:text-2xl mb-4">The 100% Free and Open Source Habit Tracker.</p>
+<body class="bg-gray-50 dark:bg-gray-900">
+    <div class="min-h-full">
+
+        <!-- Hero section -->
+        <style>
+            @media (prefers-reduced-motion: no-preference) {
+              .float-slow {
+                animation: floatUpDown 6s ease-in-out infinite;
+              }
+              .float-medium {
+                animation: floatUpDown 4s ease-in-out infinite;
+              }
+              .float-fast {
+                animation: floatUpDown 3s ease-in-out infinite;
+              }
+              .float-reverse {
+                animation: floatDownUp 5s ease-in-out infinite;
+              }
+          
+              @keyframes floatUpDown {
+                0%, 100% {
+                  transform: translateY(0);
+                }
+                50% {
+                  transform: translateY(-8px);
+                }
+              }
+          
+              @keyframes floatDownUp {
+                0%, 100% {
+                  transform: translateY(0);
+                }
+                50% {
+                  transform: translateY(8px);
+                }
+              }
+            }
+          </style>
+          
+          <section class="bg-habit-color-green-core text-white flex items-center justify-center relative overflow-hidden" style="min-height: calc(100vh - 73px);">
+            <!-- Floating cards background - hidden on mobile, visible on medium screens and up -->
+            <div class="absolute inset-0 w-full h-full overflow-hidden pointer-events-none hidden md:block">
+              <div class="absolute float-slow rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform rotate-2" style="top: 15%; left: 10%; max-width: 200px;">
+                <span class="text-xl mr-2">🧪</span><span class="text-sm font-medium truncate">The Science of Habits</span>
+              </div>
+              <div class="absolute float-medium rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform -rotate-3" style="top: 45%; right: 10%; max-width: 200px;">
+                <span class="text-xl mr-2">📚</span><span class="text-sm font-medium truncate">Habit Stacking</span>
+              </div>
+              <div class="absolute float-reverse rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform rotate-1" style="top: 70%; left: 15%; max-width: 200px;">
+                <span class="text-xl mr-2">📊</span><span class="text-sm font-medium truncate">Habit Tracking Methods</span>
+              </div>
+              <div class="absolute float-fast rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform -rotate-1" style="top: 25%; left: 25%; max-width: 200px;">
+                <span class="text-xl mr-2">🏠</span><span class="text-sm font-medium truncate">Environment Design</span>
+              </div>
+              <div class="absolute float-slow rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform rotate-2" style="top: 60%; right: 25%; max-width: 200px;">
+                <span class="text-xl mr-2">⚡</span><span class="text-sm font-medium truncate">Energy Management</span>
+              </div>
+              <div class="absolute float-reverse rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform -rotate-2" style="top: 45%; left: 5%; max-width: 200px;">
+                <span class="text-xl mr-2">🎯</span><span class="text-sm font-medium truncate">The Goal Behind the Goal</span>
+              </div>
+              <div class="absolute float-medium rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform rotate-3" style="top: 75%; right: 5%; max-width: 200px;">
+                <span class="text-xl mr-2">🤖</span><span class="text-sm font-medium truncate">Automation & Leverage</span>
+              </div>
+              <div class="absolute float-fast rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform -rotate-1" style="top: 10%; right: 30%; max-width: 200px;">
+                <span class="text-xl mr-2">🧠</span><span class="text-sm font-medium truncate">What is Productivity?</span>
+              </div>
+              <div class="absolute float-slow rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform rotate-3" style="top: 5%; left: 35%; max-width: 200px;">
+                <span class="text-xl mr-2">🧘</span><span class="text-sm font-medium truncate">Mindfulness & Habits</span>
+              </div>
+              <div class="absolute float-reverse rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform -rotate-2" style="top: 85%; right: 8%; max-width: 200px;">
+                <span class="text-xl mr-2">🤝</span><span class="text-sm font-medium truncate">Accountability Systems</span>
+              </div>
+              <div class="absolute float-medium rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform rotate-1" style="top: 10%; right: 5%; max-width: 200px;">
+                <span class="text-xl mr-2">⏰</span><span class="text-sm font-medium truncate">Time Blocking</span>
+              </div>
+              <div class="absolute float-fast rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform -rotate-3" style="top: 90%; left: 8%; max-width: 200px;">
+                <span class="text-xl mr-2">📈</span><span class="text-sm font-medium truncate">Progress Visualization</span>
+              </div>
+              <div class="absolute float-slow rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform rotate-2" style="top: 20%; left: 80%; max-width: 200px;">
+                <span class="text-xl mr-2">🔔</span><span class="text-sm font-medium truncate">Habit Triggers</span>
+              </div>
+              <div class="absolute float-reverse rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform -rotate-1" style="top: 80%; right: 30%; max-width: 200px;">
+                <span class="text-xl mr-2">🔄</span><span class="text-sm font-medium truncate">Habit Iteration</span>
+              </div>
+              <div class="absolute float-medium rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform rotate-3" style="top: 25%; left: 65%; max-width: 200px;">
+                <span class="text-xl mr-2">💡</span><span class="text-sm font-medium truncate">Motivation Systems</span>
+              </div>
+              <div class="absolute float-fast rounded-lg bg-white bg-opacity-15 px-4 py-2 flex items-center shadow-sm transform -rotate-2" style="top: 90%; left: 30%; max-width: 200px;">
+                <span class="text-xl mr-2">📱</span><span class="text-sm font-medium truncate">Digital Habit Tools</span>
+              </div>
             </div>
-            <div class="hidden xl:block"> <!-- Hide on mobile/tablet -->
-                {{ template "demo-grid" . }}
-            </div>
-            <div class="flex space-x-4 mt-8">
-                <a href="/register" class="px-6 py-3 text-[#2da44e] bg-white rounded-md font-medium hover:bg-gray-100 transition-colors duration-200">
-                    Start Tracking Free →
-                </a>
-                <button 
+          
+            <!-- Main content -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 text-center relative z-10">
+              <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight">
+                Build any habit in 30 days.
+              </h1>
+              <p class="mt-6 text-xl sm:text-2xl max-w-3xl mx-auto font-medium">
+                A masterclass on creating lasting habits that transform your life.
+              </p>
+              <div class="mt-10">
+                <div class="flex space-x-4 justify-center">
+                  <button 
                     class="px-6 py-3 text-white bg-transparent border border-white rounded-md font-medium hover:bg-white hover:bg-opacity-10 transition-colors duration-200"
-                    onclick="smoothScroll('#second-hero')">
-                    Learn More ↓
-                </button>
+                    onclick="smoothScroll('#pricing')">
+                    View Pricing ↓
+                  </button>
+                </div>
+              </div>
             </div>
-        </div>
-    </div>
+          </section>
+          
 
-    <!-- How It Works Section -->
-    <div id="second-hero" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-        <div class="text-center mb-16">
-            <h2 class="text-3xl font-bold tracking-tight text-gray-900 mb-4">How habits Works</h2>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">A minimalist approach to building consistency in your life.</p>
-        </div>
+        <!-- Problem section -->
+        <section class="bg-white dark:bg-gray-800 py-20">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+              <h2 class="text-4xl sm:text-5xl font-black tracking-tight text-gray-900 dark:text-white mb-4">
+                88% of people who try new habits fail within two weeks.
+              </h2>
+              <p class="text-xl sm:text-2xl font-medium text-gray-700 dark:text-gray-300 mb-6">
+                We've all tried (and failed) at making or breaking new habits.
+              </p>
+              <p class="text-lg sm:text-xl text-gray-600 dark:text-gray-400 leading-relaxed">
+                You may have read books, tried apps, and felt the frustration of trying things but ultimately going back to your old ways.
+              </p>
+              <p class="mt-6 text-lg sm:text-xl text-gray-600 dark:text-gray-400 leading-relaxed">
+                It's not your fault.
+              </p>
+            </div>
+          </section>
+          
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div class="flex flex-col items-center text-center">
-                <div class="text-5xl mb-6">🎯</div>
-                <h3 class="text-2xl font-semibold text-gray-900 mb-3">Track Any Habit</h3>
-                <p class="text-gray-600">From simple yes/no tracking to detailed sets and reps, customize tracking to your exact needs.</p>
-            </div>
-            
-            <div class="flex flex-col items-center text-center">
-                <div class="text-5xl mb-6">📊</div>
-                <h3 class="text-2xl font-semibold text-gray-900 mb-3">Visualize Progress</h3>
-                <p class="text-gray-600">See your consistency with monthly grids, yearly heat maps, and detailed analytics.</p>
-            </div>
-            
-            <div class="flex flex-col items-center text-center">
-                <div class="text-5xl mb-6">🛠️</div>
-                <h3 class="text-2xl font-semibold text-gray-900 mb-3">Open & Free</h3>
-                <p class="text-gray-600">100% free forever. Open-source code means you can self-host or contribute improvements.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Example Section -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 bg-gray-50" x-data="{ activeTab: 'health' }">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold tracking-tight text-gray-900 mb-4">Track anything, your way.</h2>
-            <p class="text-xl text-gray-600">Browse popular habits by category</p>
-        </div>
-
-        <!-- Tab Navigation -->
-        <div class="flex justify-center space-x-4 mb-12">
-            <button 
-                @click="activeTab = 'health'"
-                :class="{ 'text-[#2da44e] border-[#2da44e]': activeTab === 'health' }"
-                class="px-4 py-2 border-b-2 font-medium transition-colors duration-200">
-                ❤️ Health
-            </button>
-            <button 
-                @click="activeTab = 'work'"
-                :class="{ 'text-[#2da44e] border-[#2da44e]': activeTab === 'work' }"
-                class="px-4 py-2 border-b-2 font-medium transition-colors duration-200">
-                💼 Work
-            </button>
-            <button 
-                @click="activeTab = 'mind'"
-                :class="{ 'text-[#2da44e] border-[#2da44e]': activeTab === 'mind' }"
-                class="px-4 py-2 border-b-2 font-medium transition-colors duration-200">
-                🧠 Mind
-            </button>
-            <button 
-                @click="activeTab = 'lifestyle'"
-                :class="{ 'text-[#2da44e] border-[#2da44e]': activeTab === 'lifestyle' }"
-                class="px-4 py-2 border-b-2 font-medium transition-colors duration-200">
-                🌟 Lifestyle
-            </button>
-        </div>
-
-        <!-- Health Tab -->
-        <div x-show="activeTab === 'health'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">💪</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Sets & Reps Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Pushups</h3>
-                <p class="text-sm text-gray-500">Build upper body strength with daily pushups.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">🏃‍♂️</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Running</h3>
-                <p class="text-sm text-gray-500">Track your daily running distance in kilometers.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">💧</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Water Intake</h3>
-                <p class="text-sm text-gray-500">Stay hydrated by tracking glasses of water.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">😴</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Sleep 8h</h3>
-                <p class="text-sm text-gray-500">Maintain healthy sleep schedule of 8 hours.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">⏰</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Fasting Hours</h3>
-                <p class="text-sm text-gray-500">Track your daily fasting window duration.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">🍬</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">No Sugar Day</h3>
-                <p class="text-sm text-gray-500">Track days without consuming added sugars.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">👣</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Steps Per Day</h3>
-                <p class="text-sm text-gray-500">Track your daily step count goal.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">🍽️</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Calorie Tracking</h3>
-                <p class="text-sm text-gray-500">Monitor your daily caloric intake.</p>
-            </div>
-        </div>
-
-        <!-- Work Tab -->
-        <div x-show="activeTab === 'work'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">📚</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Deep Work</h3>
-                <p class="text-sm text-gray-500">Track focused work hours without distractions.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">✍️</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Writing</h3>
-                <p class="text-sm text-gray-500">Track your daily writing word count.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">📧</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Inbox Zero</h3>
-                <p class="text-sm text-gray-500">Keep your inbox empty by managing your emails.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">👥</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Networking</h3>
-                <p class="text-sm text-gray-500">Connect with others through networking activities.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">🍅</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Pomodoros</h3>
-                <p class="text-sm text-gray-500">Track completed 25-minute focus sessions.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">🤝</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Client Outreach</h3>
-                <p class="text-sm text-gray-500">Track number of meaningful client interactions.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">⚖️</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Choice Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Work-Life Balance</h3>
-                <p class="text-sm text-gray-500">Rate your daily work-life balance feeling.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">✅</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Task Completion</h3>
-                <p class="text-sm text-gray-500">Track number of tasks completed daily.</p>
-            </div>
-        </div>
-
-        <!-- Mind Tab -->
-        <div x-show="activeTab === 'mind'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">🌅</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Early Rise</h3>
-                <p class="text-sm text-gray-500">Wake up early to start your day right.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">🎨</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Creative Time</h3>
-                <p class="text-sm text-gray-500">Allocate time for creative pursuits.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">🌱</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Nature Time</h3>
-                <p class="text-sm text-gray-500">Spend time in nature to recharge.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">🎯</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Goal Review</h3>
-                <p class="text-sm text-gray-500">Reflect on your progress towards your goals.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">✍️</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Journaling</h3>
-                <p class="text-sm text-gray-500">Track minutes spent in self-reflection.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">📱</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Digital Detox</h3>
-                <p class="text-sm text-gray-500">Take intentional breaks from screens.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">🧘</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Choice Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Stress Level</h3>
-                <p class="text-sm text-gray-500">Monitor your daily stress levels.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">🌙</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Evening Routine</h3>
-                <p class="text-sm text-gray-500">Follow a calming nighttime ritual.</p>
-            </div>
-        </div>
-
-        <!-- Lifestyle Tab -->
-        <div x-show="activeTab === 'lifestyle'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">🦮</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Walk the dog</h3>
-                <p class="text-sm text-gray-500">Take the dog for a nice long walk each day.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">🎨</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Creative Time</h3>
-                <p class="text-sm text-gray-500">Allocate time for creative pursuits.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">🌱</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Nature Time</h3>
-                <p class="text-sm text-gray-500">Spend time in nature to recharge.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">🎯</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Goal Review</h3>
-                <p class="text-sm text-gray-500">Reflect on your progress towards your goals.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">📈</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Choice Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Personal Growth</h3>
-                <p class="text-sm text-gray-500">Rate your daily self-improvement progress.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">👨‍👩‍👧‍👦</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Family Time</h3>
-                <p class="text-sm text-gray-500">Track quality hours spent with family.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">🍳</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">New Recipe</h3>
-                <p class="text-sm text-gray-500">Try cooking something new today.</p>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-3">
-                    <div class="text-3xl">🤝</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
-                </div>
-                <h3 class="font-semibold text-gray-900 mb-2">Social Connection</h3>
-                <p class="text-sm text-gray-500">Track meaningful social interactions.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- NEW: Habit Types Section -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-        <div class="text-center mb-16">
-            <h2 class="text-3xl font-bold tracking-tight text-gray-900 mb-4">Flexible Habit Types</h2>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">Track exactly what matters to you with custom habit types.</p>
-        </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div class="bg-white p-8 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="text-4xl">✓</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Binary Habit</span>
-                </div>
-                <h3 class="font-semibold text-xl text-gray-900 mb-3">Yes/No Tracking</h3>
-                <p class="text-gray-600">Simple binary tracking for habits you either complete or don't. Perfect for daily routines.</p>
-            </div>
+        <!-- Specific Problems Section -->
+        <section class="bg-gray-50 dark:bg-gray-900 py-20">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl sm:text-5xl font-black tracking-tight text-gray-900 dark:text-white mb-8 text-center">
+              Meet the three habit hijackers.
+            </h2>
+            <p class="text-xl text-gray-700 dark:text-gray-300 mb-12 text-center">
+              When you try to improve yourself, these bad guys often get in your way.
+            </p>
             
-            <div class="bg-white p-8 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="text-4xl">🔢</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Numeric Habit</span>
+            <div class="mt-12 space-y-8 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-8">
+              <!-- Tech Troll -->
+              <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-8 bg-white dark:bg-gray-900 flex flex-col relative">
+                <div class="w-full mb-6 overflow-hidden">
+                  <img src="/images/tech-troll.jpg" alt="Tech Troll" class="w-full h-auto object-cover rounded-md">
                 </div>
-                <h3 class="font-semibold text-xl text-gray-900 mb-3">Number Tracking</h3>
-                <p class="text-gray-600">Track quantities like pages read, steps taken, or glasses of water. Watch your metrics improve over time.</p>
-            </div>
-            
-            <div class="bg-white p-8 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="text-4xl">💪</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Sets & Reps Habit</span>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                  The <span class="text-black dark:text-white">Tech Troll</span>
+                </h3>
+                <p class="mt-3 text-lg text-gray-700 dark:text-gray-300">
+                  Social media, news, and streaming video steal hours of your day and zap your energy.
+                </p>
+              </div>
+              
+              <!-- Pleasure Pirate -->
+              <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-8 bg-white dark:bg-gray-900 flex flex-col relative">
+                <div class="w-full mb-6 overflow-hidden">
+                  <img src="/images/pleasure-pirate.jpg" alt="Pleasure Pirate" class="w-full h-auto object-cover rounded-md">
                 </div>
-                <h3 class="font-semibold text-xl text-gray-900 mb-3">Sets & Reps</h3>
-                <p class="text-gray-600">Perfect for exercise tracking. Log your sets, reps, and weights to see your strength progress.</p>
-            </div>
-            
-            <div class="bg-white p-8 rounded-lg shadow-sm border border-gray-200 hover:border-[#2da44e] transition-colors duration-200">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="text-4xl">🎯</div>
-                    <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">Choice Habit</span>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                  The <span class="text-black dark:text-white">Pleasure Pirate</span>
+                </h3>
+                <p class="mt-3 text-lg text-gray-700 dark:text-gray-300">
+                  Short-term pleasures sabotage your long-term goals (and make you feel bad about it).
+                </p>
+              </div>
+              
+              <!-- Couch Potato -->
+              <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-8 bg-white dark:bg-gray-900 flex flex-col relative">
+                <div class="w-full mb-6 overflow-hidden">
+                  <img src="/images/couch-potato.jpg" alt="Couch Potato" class="w-full h-auto object-cover rounded-md">
                 </div>
-                <h3 class="font-semibold text-xl text-gray-900 mb-3">Choice Selection</h3>
-                <p class="text-gray-600">Track habits with multiple options like mood tracking, energy levels, or custom categories.</p>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                  The <span class="text-black dark:text-white">Couch Potato</span>
+                </h3>
+                <p class="mt-3 text-lg text-gray-700 dark:text-gray-300">
+                  Taking action can be hard. Especially when you're stuck, procrastinate, or feel a lack of motivation.
+                </p>
+              </div>
             </div>
-        </div>
-    </div>
+          </div>
+        </section>
 
-    <!-- NEW: Data Visualization Section -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 bg-gray-50">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div>
-                <h2 class="text-3xl font-bold tracking-tight text-gray-900 mb-6">Visualize Your Progress</h2>
-                <p class="text-xl text-gray-600 mb-6">Data is only useful when you can understand it at a glance. habits gives you powerful visualization tools:</p>
-                
-                <ul class="space-y-4">
-                    <li class="flex items-start">
-                        <span class="text-[#2da44e] text-xl mr-3">✓</span>
-                        <span class="text-gray-700">Monthly calendar views to see your consistency</span>
-                    </li>
-                    <li class="flex items-start">
-                        <span class="text-[#2da44e] text-xl mr-3">✓</span>
-                        <span class="text-gray-700">Yearly heat maps to track long-term trends</span>
-                    </li>
-                    <li class="flex items-start">
-                        <span class="text-[#2da44e] text-xl mr-3">✓</span>
-                        <span class="text-gray-700">Detailed statistics for each habit</span>
-                    </li>
-                    <li class="flex items-start">
-                        <span class="text-[#2da44e] text-xl mr-3">✓</span>
-                        <span class="text-gray-700">Track your streaks and completion rates</span>
-                    </li>
-                    <li class="flex items-start">
-                        <span class="text-[#2da44e] text-xl mr-3">✓</span>
-                        <span class="text-gray-700">CSV export for your own analysis</span>
-                    </li>
-                </ul>
-                
-                <div class="mt-8">
-                    <a href="/register" class="inline-flex px-6 py-3 bg-[#2da44e] text-white rounded-md font-medium hover:bg-[#2c974b] transition-colors duration-200">
-                        Start Tracking Your Habits →
-                    </a>
+        <!-- Video Introduction Section -->
+        <section class="bg-habit-color-green-core text-white py-20">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl sm:text-5xl font-black tracking-tight mb-8 text-center">
+              The good news? <br> Change is easier than you think.
+            </h2>
+            <p class="text-xl mb-12 text-center">
+              Watch how our masterclass helps you build lasting habits that stick.
+            </p>
+            
+            <div class="flex justify-center">
+              <div class="w-full md:w-4/5 lg:w-3/4 xl:w-70 rounded-lg overflow-hidden shadow-xl">
+                <video 
+                  class="w-full rounded-lg" 
+                  controls
+                  preload="metadata"
+                  poster="/images/masterclass-poster.jpg">
+                  <!-- Video sources will be added here -->
+                  <source src="#" type="video/mp4">
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- How The Masterclass Helps Section -->
+        <section class="bg-white dark:bg-gray-800 py-20">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl sm:text-5xl font-black tracking-tight text-gray-900 dark:text-white mb-4 text-center">
+              What makes us different?
+            </h2>
+            <p class="text-xl text-gray-700 dark:text-gray-300 mb-12 text-center">
+              We believe in science, systems, and simplicity.
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <!-- Benefit 1 -->
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center mb-4">
+                  <span class="text-3xl mr-4">🧠</span>
+                  <h3 class="text-xl font-bold text-gray-900 dark:text-white">Change that sticks</h3>
                 </div>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Go from feeling stuck to building a new habit every month. Spend 12 months with us and you'll be a completely different person.                </p>
+              </div>
+              
+              <!-- Benefit 2 -->
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center mb-4">
+                  <span class="text-3xl mr-4">💼</span>
+                  <h3 class="text-xl font-bold text-gray-900 dark:text-white">Designed for busy people.</h3>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400">
+                  Discover how to structure your physical and digital spaces to make good habits inevitable and bad habits impossible.
+                </p>
+              </div>
+              
+              <!-- Benefit 3 -->
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center mb-4">
+                  <span class="text-3xl mr-4">⚡</span>
+                  <h3 class="text-xl font-bold text-gray-900 dark:text-white">Quick Wins</h3>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Every habit has it's tricks to making it easier. We give you the cheat codes. You get results fast.
+                </p>
+              </div>
+              
+              <!-- Benefit 4 -->
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center mb-4">
+                  <span class="text-3xl mr-4">📊</span>
+                  <h3 class="text-xl font-bold text-gray-900 dark:text-white">We make change fun.</h3>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400">
+                    Each course = one 30-day Habit Challenge. Daily actions, weekly goals, and a lot of celebration in between.
+                </p>
+              </div>
+              
+              <!-- Benefit 5 -->
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center mb-4">
+                  <span class="text-3xl mr-4">🔄</span>
+                  <h3 class="text-xl font-bold text-gray-900 dark:text-white">Habit Iteration</h3>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400">
+                  Learn the science-backed process for continuously refining your habits to match your changing life circumstances.
+                </p>
+              </div>
+              
+              <!-- Benefit 6 -->
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center mb-4">
+                  <span class="text-3xl mr-4">🤝</span>
+                  <h3 class="text-xl font-bold text-gray-900 dark:text-white">Accountability Systems</h3>
+                </div>
+                <p class="text-gray-600 dark:text-gray-400">
+                  Build sustainable accountability frameworks that keep you consistent long after motivation fades.
+                </p>
+              </div>
             </div>
             
-            <div class="bg-white rounded-lg shadow-lg border border-gray-200">
-                <img src="/static/images/stats.png" alt="Habit statistics visualization" class="w-full rounded-md">
-
-            </div>
-        </div>
-    </div>
-
-    <!-- NEW: Open Source Section -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold tracking-tight text-gray-900 mb-4">Why Open Source Matters</h2>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">We believe that tools for personal improvement should be accessible to everyone.</p>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <div class="text-3xl mb-4">🔒</div>
-                <h3 class="font-semibold text-xl text-gray-900 mb-3">Own Your Data</h3>
-                <p class="text-gray-600">Your habit data is yours. Self-host or use our hosted version, with the ability to export anytime.</p>
-            </div>
-            
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <div class="text-3xl mb-4">👀</div>
-                <h3 class="font-semibold text-xl text-gray-900 mb-3">Transparent Code</h3>
-                <p class="text-gray-600">Anyone can review our code. No hidden tracking, no data selling, and no dark patterns.</p>
-            </div>
-            
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <div class="text-3xl mb-4">🤝</div>
-                <h3 class="font-semibold text-xl text-gray-900 mb-3">Community Driven</h3>
-                <p class="text-gray-600">Contribute ideas, report bugs, or even add new features. We build this together.</p>
-            </div>
-        </div>
-        
-        <div class="mt-12 text-center">
-            <a href="https://github.com/emanuelefaja/habits" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2da44e]">
-                <svg class="h-5 w-5 mr-2" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" />
+            <div class="mt-12 text-center">
+              <a href="#pricing" onclick="smoothScroll('#pricing')" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-habit-color-green-core hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-habit-color-green-core">
+                See Course Options
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M16.707 10.293a1 1 0 010 1.414l-6 6a1 1 0 01-1.414 0l-6-6a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l4.293-4.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                 </svg>
-                View on GitHub
-            </a>
-        </div>
-    </div>
-
-    <!-- Stats Section -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 bg-gray-50">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold tracking-tight text-gray-900 mb-4">See Your Progress</h2>
-            <p class="text-xl text-gray-600">Powerful stats help you stay accountable</p>
-        </div>
+              </a>
+            </div>
+          </div>
+        </section>
         
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <!-- Left side heading -->
-            <div class="space-y-2">
-                <h2 class="text-3xl font-bold tracking-tight text-gray-900">Mindful action, daily.</h2>
-                <h2 class="text-3xl tracking-tight text-gray-900">Shapes the life we want to see.</h2>
-                <h2 class="text-3xl tracking-tight text-gray-900">Dreams no longer wait.</h2>
-            </div>
-
-            <!-- Right side stats grid -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                <!-- Stat Card -->
-                <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <span class="text-2xl">✅</span>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-semibold text-gray-900 truncate">Done</dt>
-                                    <dd class="text-3xl font-semibold text-gray-900">52</dd>
-                                </dl>
-                            </div>
+        <!-- Who is this course for section -->
+        <section class="py-16 bg-white dark:bg-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-4xl sm:text-5xl font-black tracking-tight text-center text-gray-900 dark:text-white mb-4">
+                    The method designed <br> for <span class="text-gray-400"><s>super</s></span>humans. 
+                </h2>
+                <p class="text-xl text-gray-700 dark:text-gray-300 mb-12 text-center">
+                    No need for extreme efforts, just consistency. 
+                  </p>
+                <div class="mt-12 space-y-8 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-8">
+                    <!-- Card 01 -->
+                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-8 bg-white dark:bg-gray-900 flex flex-col relative">
+                        <div class="w-full mb-6 overflow-hidden">
+                            <img src="/images/jugglingparent.jpg" alt="Entrepreneur" class="w-full h-auto object-cover rounded-md">
                         </div>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                            The <span class="text-black dark:text-white">entrepreneur or parent</span>
+                        </h3>
+                        <p class="mt-3 text-lg text-gray-700 dark:text-gray-300">
+                            who wants to make space for a healthier body and productive mind.
+                        </p>
                     </div>
-                </div>
-                <!-- Stat Card -->
-                <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <span class="text-2xl">❌</span>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-semibold text-gray-900 truncate">Missed</dt>
-                                    <dd class="text-3xl font-semibold text-gray-900">21</dd>
-                                </dl>
-                            </div>
+                    
+                    <!-- Card 02 -->
+                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-8 bg-white dark:bg-gray-900 flex flex-col relative">
+                        <div class="w-full mb-6 overflow-hidden">
+                            <img src="/images/studentlearning.jpg" alt="Learner" class="w-full h-auto object-cover rounded-md">
                         </div>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                            The <span class="text-black dark:text-white">learner or professional</span>
+                        </h3>
+                        <p class="mt-3 text-lg text-gray-700 dark:text-gray-300">
+                            who wants to constantly grow their self-improvement muscle.
+                        </p>
                     </div>
-                </div>
-                <!-- Stat Card -->
-                <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <span class="text-2xl">⏭️</span>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-semibold text-gray-900 truncate">Skipped</dt>
-                                    <dd class="text-3xl font-semibold text-gray-900">22</dd>
-                                </dl>
-                            </div>
+                    
+                    <!-- Card 03 -->
+                    <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-8 bg-white dark:bg-gray-900 flex flex-col relative">
+                        <div class="w-full mb-6 overflow-hidden">
+                            <img src="/images/girlmountain.jpg" alt="Version of you" class="w-full h-auto object-cover rounded-md">
                         </div>
-                    </div>
-                </div>
-                <!-- Stat Card -->
-                <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <span class="text-2xl">🔥</span>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-semibold text-gray-900 truncate">Streak</dt>
-                                    <dd class="text-3xl font-semibold text-gray-900">22</dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Days Tracked -->
-                <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <span class="text-2xl">🏆</span>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-semibold text-gray-900 truncate">Biggest Day</dt>
-                                    <dd class="text-3xl font-semibold text-gray-900">7</dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                 <!-- Days Tracked -->
-                 <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <span class="text-2xl">🗓️</span>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-semibold text-gray-900 truncate">Days Tracked</dt>
-                                    <dd class="text-3xl font-semibold text-gray-900">365</dd>
-                                </dl>
-                            </div>
-                        </div>
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white">
+                            The <span class="text-black dark:text-white">version of you</span>
+                        </h3>
+                        <p class="mt-3 text-lg text-gray-700 dark:text-gray-300">
+                            who feels stuck and is ready to take control of their life.
+                        </p>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <!-- Video Section -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl font-bold tracking-tight text-gray-900 mb-4">See habits in action</h2>
-            <p class="text-xl text-gray-600">Watch how easy it is to track your daily habits</p>
-        </div>
-        <div class="relative mx-auto max-w-4xl">
-            <video 
-                class="w-full rounded-lg shadow-xl"
-                controls
-                preload="auto">
-                <source src="/static/videos/v0.0.3.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        </div>
-    </div>
+    {{ template "testimonial-written" . }}
 
-    <!-- NEW: Call to Action Section -->
-    <div class="bg-[#2da44e] text-white py-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 class="text-3xl font-bold mb-6">Ready to build better habits?</h2>
-            <a href="/register" class="inline-block px-8 py-4 bg-white text-[#2da44e] rounded-md text-lg font-semibold hover:bg-gray-100 transition-colors duration-200">
-                Start Tracking Free →
-            </a>
-            <p class="mt-4 text-sm opacity-80">No credit card required. Free forever.</p>
-        </div>
-    </div>
-
+    {{ template "curriculum" . }}
+        
+    {{ template "pricingarea" . }}
+        
+    {{ template "faq" . }}
+        
     {{ template "footer" . }}
+    </div>
+    <script>
+        function smoothScroll(target) {
+            const element = document.querySelector(target);
+            if (element) {
+                window.scrollTo({
+                    top: element.offsetTop,
+                    behavior: 'smooth'
+                });
+            }
+        }
+    </script>
 </body>
-</html>
+</html> 
