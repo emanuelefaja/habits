@@ -1,0 +1,104 @@
+{{ define "challenge-selector-modal" }}
+<div 
+    x-show="challengeModalOpen" 
+    x-cloak
+    x-data="{
+        selectedChallenge: '',
+        challenges: [
+            { id: 'morning', emoji: '🏃', name: 'Morning Routine Challenge', desc: 'Build a powerful morning routine' },
+            { id: 'fitness', emoji: '💪', name: 'Fitness Challenge', desc: 'Get fit with daily exercise' },
+            { id: 'reading', emoji: '📚', name: 'Reading Challenge', desc: 'Read 20 pages every day' },
+            { id: 'meditation', emoji: '🧘', name: 'Meditation Challenge', desc: '10 mins daily meditation' },
+            { id: 'journaling', emoji: '📝', name: 'Journaling Challenge', desc: 'Write daily reflections' },
+            { id: 'sleep', emoji: '💤', name: 'Sleep Challenge', desc: '8 hours nightly quality sleep' },
+            { id: 'nutrition', emoji: '🥗', name: 'Nutrition Challenge', desc: 'Eat healthy every meal' },
+            { id: 'hydration', emoji: '💧', name: 'Hydration Challenge', desc: 'Drink 8 glasses of water daily' },
+            { id: 'nosocial', emoji: '🚫', name: 'No Social Media', desc: 'Digital detox challenge' },
+            { id: 'goals', emoji: '🎯', name: 'Goal Setting', desc: 'Set & review daily goals' },
+            { id: 'financial', emoji: '💸', name: 'Financial Fitness', desc: 'Track spending & save daily' },
+            { id: 'declutter', emoji: '🧹', name: 'Declutter Challenge', desc: 'Organize your space daily' }
+        ]
+    }"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+    @click="challengeModalOpen = false">
+
+    <div class="bg-white dark:bg-gray-900 rounded-lg p-0 w-full max-w-4xl flex flex-col max-h-[90vh]" 
+         @click.stop>
+        <!-- Header -->
+        <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                Choose Your 30-Day Habit Challenge
+            </h2>
+            <button @click="challengeModalOpen = false" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-y-auto p-6">
+            <p class="text-lg text-gray-600 dark:text-gray-400 mb-6">
+                Pick ONE challenge to start your transformation:
+            </p>
+            
+            <!-- Challenge Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <template x-for="challenge in challenges" :key="challenge.id">
+                    <button 
+                        @click="selectedChallenge = challenge.id"
+                        :class="{
+                            'ring-2 ring-habit-color-green-core bg-habit-color-green-tint-2 dark:bg-gray-800': selectedChallenge === challenge.id,
+                            'hover:border-gray-400 dark:hover:border-gray-600': selectedChallenge !== challenge.id
+                        }"
+                        class="p-6 border border-gray-200 dark:border-gray-700 rounded-lg text-left transition-all bg-white dark:bg-gray-900">
+                        <div class="text-3xl mb-3" x-text="challenge.emoji"></div>
+                        <h3 class="font-semibold text-gray-900 dark:text-white mb-2" x-text="challenge.name"></h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400" x-text="challenge.desc"></p>
+                    </button>
+                </template>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex justify-end space-x-4 px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+            <button 
+                @click="challengeModalOpen = false"
+                class="px-6 py-2 rounded-md bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors duration-200">
+                Cancel
+            </button>
+            <button
+                @click="
+                    if (selectedChallenge) {
+                        // For now, just close the modal
+                        // Later this will proceed to Paddle checkout with the selected challenge
+                        console.log('Selected challenge:', selectedChallenge);
+                        challengeModalOpen = false;
+                        
+                        // Show the Paddle checkout
+                        Paddle.Checkout.open({
+                            settings: {
+                                displayMode: 'overlay',
+                                theme: 'light',
+                                locale: 'en',
+                                successUrl: window.location.origin + '/success'
+                            },
+                            items: [{
+                                priceId: 'pri_01jrzn9mekj4dnxsx39vd473v2',
+                                quantity: 1
+                            }]
+                        });
+                    }
+                "
+                :disabled="!selectedChallenge"
+                class="px-6 py-2 rounded-md text-white transition-colors duration-200"
+                :class="{
+                    'opacity-50 cursor-not-allowed bg-gray-400': !selectedChallenge,
+                    'bg-habit-color-green-core hover:bg-opacity-90': selectedChallenge
+                }">
+                Continue →
+            </button>
+        </div>
+    </div>
+</div>
+{{ end }}

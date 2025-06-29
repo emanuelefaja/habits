@@ -1,9 +1,26 @@
 {{define "pricingarea"}}
 <!-- Pricing Section -->
-<section id="pricing" class="py-16 bg-white dark:bg-gray-800 scroll-mt-20">
+<section id="pricing" class="py-16 bg-white dark:bg-gray-800 scroll-mt-20" x-data="{ 
+    challengeModalOpen: false,
+    selectedChallenge: '',
+    challenges: [
+        { id: 'morning', emoji: '🏃', name: 'Morning Routine Challenge', desc: 'Build a powerful morning routine' },
+        { id: 'fitness', emoji: '💪', name: 'Fitness Challenge', desc: 'Get fit with daily exercise' },
+        { id: 'reading', emoji: '📚', name: 'Reading Challenge', desc: 'Read 20 pages every day' },
+        { id: 'meditation', emoji: '🧘', name: 'Meditation Challenge', desc: '10 mins daily meditation' },
+        { id: 'journaling', emoji: '📝', name: 'Journaling Challenge', desc: 'Write daily reflections' },
+        { id: 'sleep', emoji: '💤', name: 'Sleep Challenge', desc: '8 hours nightly quality sleep' },
+        { id: 'nutrition', emoji: '🥗', name: 'Nutrition Challenge', desc: 'Eat healthy every meal' },
+        { id: 'hydration', emoji: '💧', name: 'Hydration Challenge', desc: 'Drink 8 glasses of water daily' },
+        { id: 'nosocial', emoji: '🚫', name: 'No Social Media', desc: 'Digital detox challenge' },
+        { id: 'goals', emoji: '🎯', name: 'Goal Setting', desc: 'Set & review daily goals' },
+        { id: 'financial', emoji: '💸', name: 'Financial Fitness', desc: 'Track spending & save daily' },
+        { id: 'declutter', emoji: '🧹', name: 'Declutter Challenge', desc: 'Organize your space daily' }
+    ]
+}">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 class="text-4xl sm:text-5xl font-black tracking-tight text-center text-gray-900 dark:text-white mb-4">
-            Change starts today
+            Start with a month. Stay for a lifetime.
         </h2>
         <p class="mt-4 max-w-2xl mx-auto text-center text-xl text-gray-500 dark:text-gray-300">
             Select the option that best fits your goals and commitment level
@@ -12,12 +29,12 @@
         <div class="mt-12 space-y-8 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-8">
             <!-- Starter Package Plan -->
             <div class="border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-8 bg-white dark:bg-gray-900 flex flex-col">
-                <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white">Starter Package</h3>
+                <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white">1 Habit Challenge</h3>
                 <div class="mt-4 flex items-baseline">
                     <span class="text-lg font-medium text-gray-500 dark:text-gray-400 line-through mr-2">$147</span>
                     <span id="foundationsPrice" class="text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white">$49</span>
                 </div>
-                <p class="mt-5 text-lg text-gray-500 dark:text-gray-400">Essential knowledge to build lasting habits and 1 habit challenge.</p>
+                <p class="mt-5 text-lg text-gray-500 dark:text-gray-400">Choose one habit. Make it happen.</p>
                 
                 <ul class="mt-6 space-y-4 flex-1">
                     <li class="flex items-start">
@@ -115,7 +132,7 @@
                 </ul>
                 
                 <div class="mt-8">
-                    <button id="foundationsCheckoutButton" class="block w-full bg-habit-color-green-core border border-transparent rounded-md py-3 px-5 text-center text-white font-medium hover:bg-opacity-90 transition-colors duration-200">
+                    <button @click="challengeModalOpen = true" class="block w-full bg-habit-color-green-core border border-transparent rounded-md py-3 px-5 text-center text-white font-medium hover:bg-opacity-90 transition-colors duration-200">
                         Start Now
                     </button>
                     <div class="text-sm text-gray-500 dark:text-gray-400 text-center mt-2">Pay once. Access forever.</div>
@@ -130,12 +147,12 @@
                     </span>
                 </div>
                 
-                <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white">Lifelong Learner</h3>
+                <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white">Full Access</h3>
                 <div class="mt-4 flex items-baseline">
                     <span class="text-lg font-medium text-gray-500 dark:text-gray-400 line-through mr-2">$637</span>
                     <span id="masterclassPrice" class="text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white">$245</span>
                 </div>
-                <p class="mt-5 text-lg text-gray-500 dark:text-gray-400">Everything you need to build sustainable habits.</p>
+                <p class="mt-5 text-lg text-gray-500 dark:text-gray-400">All habit challenges. Full transformation.</p>
                 
                 <ul class="mt-6 space-y-4 flex-1">
                     <li class="flex items-start">
@@ -239,12 +256,12 @@
             
             <!-- Ultimate Plan -->
             <div class="border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm p-8 bg-white dark:bg-gray-900 flex flex-col">
-                <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white">1 on 1 Personal Coaching</h3>
+                <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white">1:1 Coaching Support</h3>
                 <div class="mt-4 flex items-baseline">
                     <span class="text-lg font-medium text-gray-500 dark:text-gray-400 line-through mr-2">$1,997</span>
                     <span class="text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white">$999</span>
                 </div>
-                <p class="mt-5 text-lg text-gray-500 dark:text-gray-400">The complete transformation package with personalized support.</p>
+                <p class="mt-5 text-lg text-gray-500 dark:text-gray-400">Get extra coaching from Mike (be warned, Manny says he's nerdy)</p>
                 
                 <ul class="mt-6 space-y-4 flex-1">
                     <li class="flex items-start">
@@ -293,20 +310,23 @@
                 <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Our No Non-sense Personal Guarantee</h3>
 
                 <div class="prose prose-lg max-w-none text-gray-600 dark:text-gray-300">
-                    <p>Dear Habit Builder,</p>
+                    <p>Dear Future Habit Hacker,</p>
 
                     <p>We're Manny & Mike, the founders of The Habits Company.</p>
-                    <p>Between us, we've spent years applying behaviour change science at organizations like the United Nations and Google, where we've seen firsthand how the right systems can transform individuals and organizations.</p>
+                    
+                    <p>Between us, we've spent years applying behavior change science at organizations like Nike, Coca-Cola, the United Nations, various governments, and Google [x]. We've seen firsthand how behavioral science can change organizations, communities, and entire populations.</p>
 
-                    <p><b>We stand behind this masterclass 100%. If you don't find it valuable within 7 days, we'll refund your purchase in full. No questions asked.</b> </p>
+                    <p>But in all our work, it's helping everyday people, we find the most rewarding. Through our courses, we've seen busy professionals recover from burnout, young people discover a new level of confidence, and parents struggling with depression to find their spark again. New habits can change lives.</p>
 
-                    <p>We're confident in the transformative power of these techniques because we've used them ourselves and seen the results.</p>
+                    <p><b>This leads to our commitment: We're dedicated to helping you, help yourself.</b></p>
 
-                    <p>This isn't just another course. It's the exact system we've developed through years of professional experience and personal experimentation. The same approach that's helped countless others bridge the gap between who they are and who they dream of becoming.</p>
+                    <p><b>We're so confident in the transformative power of our 30-Day Habit Challenges, that if you don't find value in your purchase within 7 days, we'll give you 100% of your money back, no questions asked.</b></p>
 
-                    <p>We're in this together. Your success is our success.</p>
+                    <p>All of our Challenges are written by us (sorry AI!) and tested by the people we love. Best part is, we're just getting started. We're continually improving our original challenges and have new ones coming in the pipeline. We keep getting better, so you do too.</p>
 
-                    <p>Sincerely,</p>
+                    <p>All we ask is, once you sign up, consider getting started as soon as you sign up (even if one 5-minute lesson). We find the people who get the best results, are the ones who take first steps immediately. Momentum matters.</p>
+
+                    <p>We're in this together. Let's make it happen.</p>
 
                     <div class="mt-6 flex items-center justify-center sm:justify-start space-x-12">
                         <div class="flex flex-col items-center">
@@ -324,6 +344,91 @@
                         </div>
                     </div>
     </div>
+
+    <!-- Challenge Selector Modal -->
+    <div 
+        x-show="challengeModalOpen" 
+        x-cloak
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+        @click="challengeModalOpen = false">
+
+        <div class="bg-white dark:bg-gray-900 rounded-lg p-0 w-full max-w-4xl flex flex-col max-h-[90vh]" 
+             @click.stop>
+            <!-- Header -->
+            <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                    Choose Your 30-Day Habit Challenge
+                </h2>
+                <button @click="challengeModalOpen = false" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1 overflow-y-auto p-6">
+                <p class="text-lg text-gray-600 dark:text-gray-400 mb-6">
+                    Pick ONE challenge to start your transformation:
+                </p>
+                
+                <!-- Challenge Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <template x-for="challenge in challenges" :key="challenge.id">
+                        <button 
+                            @click="selectedChallenge = challenge.id"
+                            :class="{
+                                'ring-2 ring-habit-color-green-core bg-habit-color-green-tint-2 dark:bg-gray-800': selectedChallenge === challenge.id,
+                                'hover:border-gray-400 dark:hover:border-gray-600': selectedChallenge !== challenge.id
+                            }"
+                            class="p-6 border border-gray-200 dark:border-gray-700 rounded-lg text-left transition-all bg-white dark:bg-gray-900">
+                            <div class="text-3xl mb-3" x-text="challenge.emoji"></div>
+                            <h3 class="font-semibold text-gray-900 dark:text-white mb-2" x-text="challenge.name"></h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400" x-text="challenge.desc"></p>
+                        </button>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="flex justify-end space-x-4 px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+                <button 
+                    @click="challengeModalOpen = false"
+                    class="px-6 py-2 rounded-md bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors duration-200">
+                    Cancel
+                </button>
+                <button
+                    @click="
+                        if (selectedChallenge) {
+                            console.log('Selected challenge:', selectedChallenge);
+                            challengeModalOpen = false;
+                            
+                            Paddle.Checkout.open({
+                                settings: {
+                                    displayMode: 'overlay',
+                                    theme: 'light',
+                                    locale: 'en',
+                                    successUrl: window.location.origin + '/success'
+                                },
+                                items: [{
+                                    priceId: 'pri_01jrzn9mekj4dnxsx39vd473v2',
+                                    quantity: 1
+                                }]
+                            });
+                        }
+                    "
+                    :disabled="!selectedChallenge"
+                    class="px-6 py-2 rounded-md text-white transition-colors duration-200"
+                    :class="{
+                        'opacity-50 cursor-not-allowed bg-gray-400': !selectedChallenge,
+                        'bg-habit-color-green-core hover:bg-opacity-90': selectedChallenge
+                    }">
+                    Continue →
+                </button>
+            </div>
+        </div>
+    </div>
+
 </section>
 
 <!-- Paddle Script -->
@@ -403,25 +508,98 @@
         console.error('Foundations price preview error:', error);
     });
 
-    // Add this new event listener at the bottom of the script section:
-    document.getElementById('foundationsCheckoutButton').addEventListener('click', function() {
-        Paddle.Checkout.open({
-            settings: {
-                displayMode: 'overlay',
-                theme: 'light',
-                locale: 'en',
-                successUrl: window.location.origin + '/success'
-            },
-            items: [{
-                priceId: 'pri_01jrzn9mekj4dnxsx39vd473v2',
-                quantity: 1
-            }]
-        });
-    });
 
     // Add this new event listener at the bottom of the script section:
     document.getElementById('ultimateCheckoutButton').addEventListener('click', function() {
         alert('Ultimate tier coming soon! Please contact us for early access.');
     });
 </script>
+
+<!-- Challenge Selector Modal -->
+<div 
+    x-show="challengeModalOpen" 
+    x-cloak
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+    @click="challengeModalOpen = false">
+
+    <div class="bg-white dark:bg-gray-900 rounded-lg p-0 w-full max-w-4xl flex flex-col max-h-[90vh]" 
+         @click.stop>
+        <!-- Header -->
+        <div class="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                Choose Your 30-Day Habit Challenge
+            </h2>
+            <button @click="challengeModalOpen = false" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-y-auto p-6">
+            <p class="text-lg text-gray-600 dark:text-gray-400 mb-6">
+                Pick ONE challenge to start your transformation:
+            </p>
+            
+            <!-- Challenge Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <template x-for="challenge in challenges" :key="challenge.id">
+                    <button 
+                        @click="selectedChallenge = challenge.id"
+                        :class="{
+                            'ring-2 ring-habit-color-green-core bg-habit-color-green-tint-2 dark:bg-gray-800': selectedChallenge === challenge.id,
+                            'hover:border-gray-400 dark:hover:border-gray-600': selectedChallenge !== challenge.id
+                        }"
+                        class="p-6 border border-gray-200 dark:border-gray-700 rounded-lg text-left transition-all bg-white dark:bg-gray-900">
+                        <div class="text-3xl mb-3" x-text="challenge.emoji"></div>
+                        <h3 class="font-semibold text-gray-900 dark:text-white mb-2" x-text="challenge.name"></h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400" x-text="challenge.desc"></p>
+                    </button>
+                </template>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex justify-end space-x-4 px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+            <button 
+                @click="challengeModalOpen = false"
+                class="px-6 py-2 rounded-md bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-400 dark:hover:bg-gray-600 transition-colors duration-200">
+                Cancel
+            </button>
+            <button
+                @click="
+                    if (selectedChallenge) {
+                        // For now, just close the modal
+                        // Later this will proceed to Paddle checkout with the selected challenge
+                        console.log('Selected challenge:', selectedChallenge);
+                        challengeModalOpen = false;
+                        
+                        // Show the Paddle checkout
+                        Paddle.Checkout.open({
+                            settings: {
+                                displayMode: 'overlay',
+                                theme: 'light',
+                                locale: 'en',
+                                successUrl: window.location.origin + '/success'
+                            },
+                            items: [{
+                                priceId: 'pri_01jrzn9mekj4dnxsx39vd473v2',
+                                quantity: 1
+                            }]
+                        });
+                    }
+                "
+                :disabled="!selectedChallenge"
+                class="px-6 py-2 rounded-md text-white transition-colors duration-200"
+                :class="{
+                    'opacity-50 cursor-not-allowed bg-gray-400': !selectedChallenge,
+                    'bg-habit-color-green-core hover:bg-opacity-90': selectedChallenge
+                }">
+                Continue →
+            </button>
+        </div>
+    </div>
+</div>
+
 {{end}} 

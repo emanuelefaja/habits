@@ -99,14 +99,14 @@
                 Build any habit in 30 days.
               </h1>
               <p class="mt-6 text-xl sm:text-2xl max-w-3xl mx-auto font-medium">
-                A masterclass on creating lasting habits that transform your life.
+                Start a 30-day habit challenge to transform your life.
               </p>
               <div class="mt-10">
                 <div class="flex space-x-4 justify-center">
                   <button 
                     class="px-6 py-3 text-white bg-transparent border border-white rounded-md font-medium hover:bg-white hover:bg-opacity-10 transition-colors duration-200"
-                    onclick="smoothScroll('#pricing')">
-                    View Pricing ↓
+                    onclick="smoothScroll('#problem')">
+                    Learn More ↓
                   </button>
                 </div>
               </div>
@@ -115,7 +115,7 @@
           
 
         <!-- Problem section -->
-        <section class="bg-white dark:bg-gray-800 py-20">
+        <section id="problem" class="bg-white dark:bg-gray-800 py-20">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
               <h2 class="text-4xl sm:text-5xl font-black tracking-tight text-gray-900 dark:text-white mb-4">
                 88% of people who try new habits fail within two weeks.
@@ -129,6 +129,9 @@
               <p class="mt-6 text-lg sm:text-xl text-gray-600 dark:text-gray-400 leading-relaxed">
                 It's not your fault.
               </p>
+              <p class="mt-6 text-lg sm:text-xl text-gray-600 dark:text-gray-400 leading-relaxed">
+                Our caveman brains can be pretty bad at change.
+              </p>
             </div>
           </section>
           
@@ -138,11 +141,8 @@
         <section class="bg-gray-50 dark:bg-gray-900 py-20">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-4xl sm:text-5xl font-black tracking-tight text-gray-900 dark:text-white mb-8 text-center">
-              Meet the three habit hijackers.
+              Here's the three reasons why:
             </h2>
-            <p class="text-xl text-gray-700 dark:text-gray-300 mb-12 text-center">
-              When you try to improve yourself, these bad guys often get in your way.
-            </p>
             
             <div class="mt-12 space-y-8 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-8">
               <!-- Tech Troll -->
@@ -151,10 +151,10 @@
                   <img src="/images/tech-troll.jpg" alt="Tech Troll" class="w-full h-auto object-cover rounded-md">
                 </div>
                 <h3 class="text-xl font-bold text-gray-900 dark:text-white">
-                  The <span class="text-black dark:text-white">Tech Troll</span>
+                  They run out of gas
                 </h3>
                 <p class="mt-3 text-lg text-gray-700 dark:text-gray-300">
-                  Social media, news, and streaming video steal hours of your day and zap your energy.
+                  You start off strong but find yourself losing motivation after a couple weeks.
                 </p>
               </div>
               
@@ -164,10 +164,10 @@
                   <img src="/images/pleasure-pirate.jpg" alt="Pleasure Pirate" class="w-full h-auto object-cover rounded-md">
                 </div>
                 <h3 class="text-xl font-bold text-gray-900 dark:text-white">
-                  The <span class="text-black dark:text-white">Pleasure Pirate</span>
+                  They're hard on yourself
                 </h3>
                 <p class="mt-3 text-lg text-gray-700 dark:text-gray-300">
-                  Short-term pleasures sabotage your long-term goals (and make you feel bad about it).
+                  After you miss a couple days, you beat yourself up. Do it again and you fall down a valley of "I can't do this" despair.
                 </p>
               </div>
               
@@ -177,10 +177,10 @@
                   <img src="/images/couch-potato.jpg" alt="Couch Potato" class="w-full h-auto object-cover rounded-md">
                 </div>
                 <h3 class="text-xl font-bold text-gray-900 dark:text-white">
-                  The <span class="text-black dark:text-white">Couch Potato</span>
+                  They don't have the tools
                 </h3>
                 <p class="mt-3 text-lg text-gray-700 dark:text-gray-300">
-                  Taking action can be hard. Especially when you're stuck, procrastinate, or feel a lack of motivation.
+                  Without knowing the tricks to make change easier, you're climbing up a steep hot hill when you could be cruising down it.
                 </p>
               </div>
             </div>
@@ -191,23 +191,36 @@
         <section class="bg-habit-color-green-core text-white py-20">
           <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-4xl sm:text-5xl font-black tracking-tight mb-8 text-center">
-              The good news? <br> Change is easier than you think.
+              Meet Mike, Your Challenge Master
             </h2>
             <p class="text-xl mb-12 text-center">
-              Watch how our masterclass helps you build lasting habits that stick.
+              (He hates when Manny calls him that, but he can't code, so tough cookies)
             </p>
             
             <div class="flex justify-center">
-              <div class="w-full md:w-4/5 lg:w-3/4 xl:w-70 rounded-lg overflow-hidden shadow-xl">
-                <video 
-                  class="w-full rounded-lg" 
-                  controls
-                  preload="metadata"
-                  poster="/images/masterclass-poster.jpg">
-                  <!-- Video sources will be added here -->
-                  <source src="#" type="video/mp4">
-                  Your browser does not support the video tag.
-                </video>
+              <div class="w-full md:w-4/5 lg:w-3/4 xl:w-70 rounded-2xl overflow-hidden shadow-xl relative group cursor-pointer">
+                <img 
+                  src="/static/mike.png" 
+                  alt="Mike - Challenge Master"
+                  class="w-full rounded-2xl transition-all duration-300 group-hover:brightness-75">
+                
+                <!-- Hover overlay with buttons -->
+                <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div class="flex space-x-6">
+                    <button class="bg-white text-gray-900 px-6 py-3 rounded-lg font-semibold shadow-lg hover:bg-gray-100 transition-colors duration-200 w-48">
+                      <div class="text-center">
+                        <div>Intro</div>
+                        <div class="text-sm text-gray-600">(2mins)</div>
+                      </div>
+                    </button>
+                    <button class="bg-habit-color-green-core text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:bg-opacity-90 transition-colors duration-200 w-48">
+                      <div class="text-center">
+                        <div>Free Lesson</div>
+                        <div class="text-sm opacity-80">(7 mins)</div>
+                      </div>
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -308,7 +321,7 @@
                     The method designed <br> for <span class="text-gray-400"><s>super</s></span>humans. 
                 </h2>
                 <p class="text-xl text-gray-700 dark:text-gray-300 mb-12 text-center">
-                    No need for extreme efforts, just consistency. 
+                  Our 30-Day Habit Challenges are made for:
                   </p>
                 <div class="mt-12 space-y-8 lg:space-y-0 lg:grid lg:grid-cols-3 lg:gap-8">
                     <!-- Card 01 -->

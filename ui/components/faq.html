@@ -69,6 +69,17 @@
             </div>
             <div x-data="{ id: $id('accordion') }" class="cursor-pointer group">
                 <button @click="setActiveAccordion(id)" class="flex items-center justify-between w-full p-4 text-left select-none group-hover:underline text-gray-900 dark:text-white">
+                    <span class="text-lg font-medium">Can I start a habit challenge in the middle of a month?</span>
+                    <svg class="w-4 h-4 duration-200 ease-out text-gray-500 dark:text-gray-400" :class="{ 'rotate-180': activeAccordion==id }" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div x-show="activeAccordion==id" x-collapse x-cloak>
+                    <div class="p-4 pt-0 opacity-70 text-gray-700 dark:text-gray-300 text-base">
+                        Absolutely! Any time is the perfect time to start building a positive habit. As the saying goes, "The best time to plant a tree was 20 years ago. The second best time is now." Don't wait for the "perfect" Monday or the beginning of the month—start today and let momentum carry you forward. Our 30-day challenges are designed to be flexible and can begin whenever you're ready to commit.
+                    </div>
+                </div>
+            </div>
+            <div x-data="{ id: $id('accordion') }" class="cursor-pointer group">
+                <button @click="setActiveAccordion(id)" class="flex items-center justify-between w-full p-4 text-left select-none group-hover:underline text-gray-900 dark:text-white">
                     <span class="text-lg font-medium">How do you handle payments and billing?</span>
                     <svg class="w-4 h-4 duration-200 ease-out text-gray-500 dark:text-gray-400" :class="{ 'rotate-180': activeAccordion==id }" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </button>

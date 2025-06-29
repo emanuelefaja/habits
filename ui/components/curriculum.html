@@ -80,15 +80,15 @@
             </div>
         </div>
         
-        <!-- Foundations Modules -->
+        <!-- Habit Challenges -->
         <div class="mb-12">
             <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
-                <span class="text-3xl mr-3">🎓</span>
-                Habit Masterclass
+                <span class="text-3xl mr-3">⚡️</span>
+                30-Day Habit Challenges
             </h3>
             
             <p class="text-lg text-gray-600 dark:text-gray-400 mb-6">
-                Master the core principles and science behind effective habit formation that will serve as the foundation for your transformation.
+                Actionable transformation plans with detailed playbooks and habit-specific science to help you implement lasting change.
             </p>
             
             <div x-data="{ 
@@ -297,15 +297,16 @@
             </div>
         </div>
         
-        <!-- Habit Challenges -->
-        <div>
+        
+        <!-- Foundations Modules -->
+        <div class="mb-12">
             <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
-                <span class="text-3xl mr-3">⚡️</span>
-                30-Day Habit Challenges
+                <span class="text-3xl mr-3">🎓</span>
+                Habit Masterclass (Free with every purchase)
             </h3>
             
             <p class="text-lg text-gray-600 dark:text-gray-400 mb-6">
-                Actionable transformation plans with detailed playbooks and habit-specific science to help you implement lasting change.
+                Master the core principles and science behind effective habit formation that will serve as the foundation for your transformation.
             </p>
             
             <div x-data="{ 
@@ -784,174 +785,175 @@
 </div>
 </div>
 </div>
-<!-- Bonuses Content, But this needs proper spacing above-->
-<div>
-<h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
-<span class="text-3xl mr-3">🎁</span>
-Bonuses
-</h3>
+        
+        <!-- Bonuses Section -->
+        <div class="mt-16">
+            <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
+                <span class="text-3xl mr-3">🎁</span>
+                Bonuses (free with every purchase)
+            </h3>
+            
+            <p class="text-lg text-gray-600 dark:text-gray-400 mb-6">
+                Exclusive advanced material to complement your habit journey and extend your growth into related areas of personal development.
+            </p>
 
-<p class="text-lg text-gray-600 dark:text-gray-400 mb-6">
-Exclusive advanced material to complement your habit journey and extend your growth into related areas of personal development.
-</p>
-
-<div x-data="{ 
-activeModule: '', 
-setActiveModule(id) { 
-    this.activeModule = (this.activeModule == id) ? '' : id 
-} 
-}" class="space-y-4">
-<!-- Brain Chemistry Module -->
-<div class="border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 overflow-hidden">
-    <div x-data="{ id: 'brainchemistry' }" class="cursor-pointer">
-        <button @click="setActiveModule(id)" class="flex items-center justify-between w-full p-6 text-left text-gray-900 dark:text-white">
-            <div class="flex items-center">
-                <span class="text-2xl mr-3">🧠</span>
-                <div>
-                    <h4 class="text-xl font-semibold">Brain Chemistry & Decision Making</h4>
-                    <p class="text-gray-500 dark:text-gray-400 mt-1">Understand how your brain makes decisions and how to optimize cognitive performance</p>
+            <div x-data="{ 
+                activeModule: '', 
+                setActiveModule(id) { 
+                    this.activeModule = (this.activeModule == id) ? '' : id 
+                } 
+            }" class="space-y-4">
+                <!-- Quit Phone Addiction Module -->
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 overflow-hidden">
+                    <div x-data="{ id: 'phoneaddiction' }" class="cursor-pointer">
+                        <button @click="setActiveModule(id)" class="flex items-center justify-between w-full p-6 text-left text-gray-900 dark:text-white">
+                            <div class="flex items-center">
+                                <span class="text-2xl mr-3">📱</span>
+                                <div>
+                                    <h4 class="text-xl font-semibold">Quit Phone Addiction 5-Day Mini-Challenge</h4>
+                                    <p class="text-gray-500 dark:text-gray-400 mt-1">Make time for new habits and reclaim up to 25 hours a week by breaking free from social media, news, and other draining phone apps</p>
+                                </div>
+                            </div>
+                            <svg class="w-5 h-5 transition-transform duration-200 ease-out text-gray-500 dark:text-gray-400" :class="{ 'rotate-180': activeModule=='phoneaddiction' }" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        <div x-show="activeModule=='phoneaddiction'" x-collapse x-cloak>
+                            <div class="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+                                <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                                    <li class="px-6 py-4 flex items-start">
+                                        <span class="text-xl mr-3 flex-shrink-0">📊</span>
+                                        <div class="flex-1">
+                                            <h5 class="text-base font-medium text-gray-900 dark:text-white">Digital Wellness Assessment</h5>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Analyze your current phone usage patterns</p>
+                                        </div>
+                                        <span class="ml-3 flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                            Text
+                                        </span>
+                                    </li>
+                                    <li class="px-6 py-4 flex items-start">
+                                        <span class="text-xl mr-3 flex-shrink-0">🔧</span>
+                                        <div class="flex-1">
+                                            <h5 class="text-base font-medium text-gray-900 dark:text-white">Phone Environment Design</h5>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Configure your device to support healthy habits</p>
+                                        </div>
+                                        <span class="ml-3 flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                            </svg>
+                                            Video
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Valley of Despair Module -->
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 overflow-hidden">
+                    <div x-data="{ id: 'valleyofdespair' }" class="cursor-pointer">
+                        <button @click="setActiveModule(id)" class="flex items-center justify-between w-full p-6 text-left text-gray-900 dark:text-white">
+                            <div class="flex items-center">
+                                <span class="text-2xl mr-3">🗡️</span>
+                                <div>
+                                    <h4 class="text-xl font-semibold">Surviving the Valley of Despair</h4>
+                                    <p class="text-gray-500 dark:text-gray-400 mt-1">Overcoming the mind games that sabotage your habits</p>
+                                </div>
+                            </div>
+                            <svg class="w-5 h-5 transition-transform duration-200 ease-out text-gray-500 dark:text-gray-400" :class="{ 'rotate-180': activeModule=='valleyofdespair' }" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        <div x-show="activeModule=='valleyofdespair'" x-collapse x-cloak>
+                            <div class="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+                                <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                                    <li class="px-6 py-4 flex items-start">
+                                        <span class="text-xl mr-3 flex-shrink-0">🧠</span>
+                                        <div class="flex-1">
+                                            <h5 class="text-base font-medium text-gray-900 dark:text-white">The Psychology of Giving Up</h5>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Understanding why we abandon habits when progress stalls</p>
+                                        </div>
+                                        <span class="ml-3 flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                            Text
+                                        </span>
+                                    </li>
+                                    <li class="px-6 py-4 flex items-start">
+                                        <span class="text-xl mr-3 flex-shrink-0">💪</span>
+                                        <div class="flex-1">
+                                            <h5 class="text-base font-medium text-gray-900 dark:text-white">Mental Resilience Strategies</h5>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Tools to push through difficult periods</p>
+                                        </div>
+                                        <span class="ml-3 flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                            </svg>
+                                            Video
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Travel Buddy Module -->
+                <div class="border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 overflow-hidden">
+                    <div x-data="{ id: 'travelbuddy' }" class="cursor-pointer">
+                        <button @click="setActiveModule(id)" class="flex items-center justify-between w-full p-6 text-left text-gray-900 dark:text-white">
+                            <div class="flex items-center">
+                                <span class="text-2xl mr-3">✈️</span>
+                                <div>
+                                    <h4 class="text-xl font-semibold">Travel Buddy Playbook & The (Not Ryan) Gosling Effect</h4>
+                                    <p class="text-gray-500 dark:text-gray-400 mt-1">How travel can be your best habit friend instead of your worst habit enemy</p>
+                                </div>
+                            </div>
+                            <svg class="w-5 h-5 transition-transform duration-200 ease-out text-gray-500 dark:text-gray-400" :class="{ 'rotate-180': activeModule=='travelbuddy' }" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        <div x-show="activeModule=='travelbuddy'" x-collapse x-cloak>
+                            <div class="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+                                <ul class="divide-y divide-gray-200 dark:divide-gray-700">
+                                    <li class="px-6 py-4 flex items-start">
+                                        <span class="text-xl mr-3 flex-shrink-0">🎒</span>
+                                        <div class="flex-1">
+                                            <h5 class="text-base font-medium text-gray-900 dark:text-white">Portable Habit Systems</h5>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Maintaining routines across different environments</p>
+                                        </div>
+                                        <span class="ml-3 flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                            Text
+                                        </span>
+                                    </li>
+                                    <li class="px-6 py-4 flex items-start">
+                                        <span class="text-xl mr-3 flex-shrink-0">🌍</span>
+                                        <div class="flex-1">
+                                            <h5 class="text-base font-medium text-gray-900 dark:text-white">The Gosling Effect</h5>
+                                            <p class="text-sm text-gray-500 dark:text-gray-400">Using travel as a catalyst for positive change</p>
+                                        </div>
+                                        <span class="ml-3 flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                            </svg>
+                                            Video
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <svg class="w-5 h-5 transition-transform duration-200 ease-out text-gray-500 dark:text-gray-400" :class="{ 'rotate-180': activeModule=='brainchemistry' }" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-        </button>
-        <div x-show="activeModule=='brainchemistry'" x-collapse x-cloak>
-            <div class="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-                <ul class="divide-y divide-gray-200 dark:divide-gray-700">
-                    <li class="px-6 py-4 flex items-start">
-                        <span class="text-xl mr-3 flex-shrink-0">🔬</span>
-                        <div class="flex-1">
-                            <h5 class="text-base font-medium text-gray-900 dark:text-white">Neuroscience of Habits</h5>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Deep dive into how habits form neural pathways</p>
-                        </div>
-                        <span class="ml-3 flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                            </svg>
-                            Video
-                        </span>
-                    </li>
-                    <li class="px-6 py-4 flex items-start">
-                        <span class="text-xl mr-3 flex-shrink-0">⚡</span>
-                        <div class="flex-1">
-                            <h5 class="text-base font-medium text-gray-900 dark:text-white">Cognitive Biases & Decision Making</h5>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Identify and overcome cognitive biases that impact your decisions</p>
-                        </div>
-                        <span class="ml-3 flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                            </svg>
-                            Video
-                        </span>
-                    </li>
-                </ul>
-            </div>
         </div>
-    </div>
-</div>
-
-<!-- Public Speaking Module -->
-<div class="border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 overflow-hidden">
-    <div x-data="{ id: 'publicspeaking' }" class="cursor-pointer">
-        <button @click="setActiveModule(id)" class="flex items-center justify-between w-full p-6 text-left text-gray-900 dark:text-white">
-            <div class="flex items-center">
-                <span class="text-2xl mr-3">🎤</span>
-                <div>
-                    <h4 class="text-xl font-semibold">Public Speaking & Communication</h4>
-                    <p class="text-gray-500 dark:text-gray-400 mt-1">Master the art of conveying ideas clearly and confidently</p>
-                </div>
-            </div>
-            <svg class="w-5 h-5 transition-transform duration-200 ease-out text-gray-500 dark:text-gray-400" :class="{ 'rotate-180': activeModule=='publicspeaking' }" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-        </button>
-        <div x-show="activeModule=='publicspeaking'" x-collapse x-cloak>
-            <div class="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-                <ul class="divide-y divide-gray-200 dark:divide-gray-700">
-                    <li class="px-6 py-4 flex items-start">
-                        <span class="text-xl mr-3 flex-shrink-0">📣</span>
-                        <div class="flex-1">
-                            <h5 class="text-base font-medium text-gray-900 dark:text-white">Overcoming Public Speaking Anxiety</h5>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Techniques to remain calm and confident while speaking</p>
-                        </div>
-                        <span class="ml-3 flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                            </svg>
-                            Video
-                        </span>
-                    </li>
-                    <li class="px-6 py-4 flex items-start">
-                        <span class="text-xl mr-3 flex-shrink-0">🎯</span>
-                        <div class="flex-1">
-                            <h5 class="text-base font-medium text-gray-900 dark:text-white">Storytelling For Impact</h5>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">How to use stories to communicate ideas effectively</p>
-                        </div>
-                        <span class="ml-3 flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            Text
-                        </span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Financial Wellness Module -->
-<div class="border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 overflow-hidden">
-    <div x-data="{ id: 'financialwellness' }" class="cursor-pointer">
-        <button @click="setActiveModule(id)" class="flex items-center justify-between w-full p-6 text-left text-gray-900 dark:text-white">
-            <div class="flex items-center">
-                <span class="text-2xl mr-3">💰</span>
-                <div>
-                    <h4 class="text-xl font-semibold">Financial Wellness</h4>
-                    <p class="text-gray-500 dark:text-gray-400 mt-1">Build healthy money habits and financial intelligence</p>
-                </div>
-            </div>
-            <svg class="w-5 h-5 transition-transform duration-200 ease-out text-gray-500 dark:text-gray-400" :class="{ 'rotate-180': activeModule=='financialwellness' }" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-        </button>
-        <div x-show="activeModule=='financialwellness'" x-collapse x-cloak>
-            <div class="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
-                <ul class="divide-y divide-gray-200 dark:divide-gray-700">
-                    <li class="px-6 py-4 flex items-start">
-                        <span class="text-xl mr-3 flex-shrink-0">📊</span>
-                        <div class="flex-1">
-                            <h5 class="text-base font-medium text-gray-900 dark:text-white">Money Mindset</h5>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Transform your relationship with money</p>
-                        </div>
-                        <span class="ml-3 flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                            </svg>
-                            Video
-                        </span>
-                    </li>
-                    <li class="px-6 py-4 flex items-start">
-                        <span class="text-xl mr-3 flex-shrink-0">📈</span>
-                        <div class="flex-1">
-                            <h5 class="text-base font-medium text-gray-900 dark:text-white">Simple Investment Principles</h5>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">Core concepts for sustainable wealth building</p>
-                        </div>
-                        <span class="ml-3 flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            Text
-                        </span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-</div>
-</div>
         <div class="mt-12 text-center">
             <a href="#pricing" onclick="smoothScroll('#pricing')" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-habit-color-green-core hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-habit-color-green-core">
                 View Course Options
