@@ -51,7 +51,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>
                         </div>
-                        <p class="ml-3 text-base text-gray-700 dark:text-gray-300">Foundations of Habit Building</p>
+                        <p class="ml-3 text-base text-gray-700 dark:text-gray-300">Masterclass of Habit Building</p>
                     </li>
                     <li class="flex items-start">
                         <div class="flex-shrink-0">
@@ -161,7 +161,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                             </svg>
                         </div>
-                        <p class="ml-3 text-base text-gray-700 dark:text-gray-300"><strong>Everything in Foundations</strong></p>
+                        <p class="ml-3 text-base text-gray-700 dark:text-gray-300"><strong>Everything in Masterclass</strong></p>
                     </li>
                     <li class="flex items-start">
                         <div class="flex-shrink-0">
@@ -480,7 +480,7 @@
         });
     });
     
-    // Foundations Price - also used for Additional Challenge Price
+    // Masterclass Price - also used for Additional Challenge Price
     Paddle.PricePreview({
         items: [{
             priceId: 'pri_01jrzn9mekj4dnxsx39vd473v2',
@@ -493,7 +493,7 @@
         // Remove the decimal part if it's ".00"
         formattedPrice = formatPrice(formattedPrice);
         
-        // Update Foundations Price
+        // Update Masterclass Price
         const foundationsElement = document.getElementById('foundationsPrice');
         if (foundationsElement) {
             foundationsElement.textContent = formattedPrice;
@@ -505,7 +505,7 @@
             additionalChallengeElement.textContent = formattedPrice;
         }
     }).catch((error) => {
-        console.error('Foundations price preview error:', error);
+        console.error('Masterclass price preview error:', error);
     });
 
 

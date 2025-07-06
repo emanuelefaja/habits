@@ -39,7 +39,7 @@ var MasterclassDefinition = []Module{
 		Description: "Learn the fundamentals of habit formation and why habits are so powerful",
 		Emoji:       "🚀",
 		Order:       1,
-		Category:    "Foundations",
+		Category:    "Masterclass",
 		Lessons: []Lesson{
 			{
 				ID:          "why-habits-matter",
@@ -80,7 +80,7 @@ var MasterclassDefinition = []Module{
 		Description: "Master the core principles behind effective habit building",
 		Emoji:       "🏗️",
 		Order:       2,
-		Category:    "Foundations",
+		Category:    "Masterclass",
 		Lessons: []Lesson{
 			{
 				ID:          "four-laws",
@@ -121,7 +121,7 @@ var MasterclassDefinition = []Module{
 		Description: "Create effective systems to support your habit goals",
 		Emoji:       "⚙️",
 		Order:       3,
-		Category:    "Foundations",
+		Category:    "Masterclass",
 		Lessons: []Lesson{
 			{
 				ID:          "environment-design",
@@ -162,7 +162,7 @@ var MasterclassDefinition = []Module{
 		Description: "Optimize your output while maintaining balance and focus",
 		Emoji:       "📈",
 		Order:       4,
-		Category:    "Sprints",
+		Category:    "Challenges",
 		Lessons: []Lesson{
 			{
 				ID:          "defining-productivity",
