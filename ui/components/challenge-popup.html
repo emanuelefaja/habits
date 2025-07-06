@@ -1,0 +1,85 @@
+{{ define "challenge-popup" }}
+<!-- Challenge Popup Badge -->
+<div id="challenge-popup" class="hidden md:block fixed bottom-6 right-6 z-50 transform translate-y-full opacity-0 transition-all duration-500 ease-out pointer-events-none">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 p-6 max-w-sm">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg font-bold text-gray-900 dark:text-white">
+        Are you ready to change your life?
+      </h3>
+      <button id="close-popup" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+        </svg>
+      </button>
+    </div>
+    <button 
+      id="start-challenge" 
+      class="w-full bg-habit-color-green-core text-white px-4 py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-colors duration-200 shadow-lg">
+      Start now
+    </button>
+  </div>
+</div>
+
+<style>
+  .challenge-popup-show {
+    transform: translateY(0) !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const popup = document.getElementById('challenge-popup');
+    const startButton = document.getElementById('start-challenge');
+    const closeButton = document.getElementById('close-popup');
+    const triggerSection = document.getElementById('problem');
+    let popupShown = false;
+    let popupClosed = false;
+
+    // Scroll event listener
+    function handleScroll() {
+      if (popupShown || popupClosed || !triggerSection) return;
+      
+      const rect = triggerSection.getBoundingClientRect();
+      const triggerPoint = window.innerHeight * 0.8; // Show when section is 80% visible
+      
+      if (rect.top <= triggerPoint) {
+        showPopup();
+      }
+    }
+
+    // Show popup with animation
+    function showPopup() {
+      if (popupShown || popupClosed) return;
+      popupShown = true;
+      popup.classList.add('challenge-popup-show');
+    }
+
+    // Hide popup with animation
+    function hidePopup() {
+      popup.classList.remove('challenge-popup-show');
+      popupClosed = true;
+    }
+
+    // Event listeners
+    window.addEventListener('scroll', handleScroll);
+    
+    startButton.addEventListener('click', function() {
+      smoothScroll('#pricing');
+      hidePopup();
+    });
+    
+    closeButton.addEventListener('click', function() {
+      hidePopup();
+    });
+
+    // Auto-hide after 30 seconds if still visible
+    setTimeout(function() {
+      if (popupShown && !popupClosed) {
+        hidePopup();
+      }
+    }, 30000);
+  });
+</script>
+{{ end }}
