@@ -30,6 +30,7 @@ func SetupRoutes(db *sql.DB, templates *template.Template, emailService email.Em
 	http.Handle("/about", sessionMiddleware(AboutHandler(db, templates)))
 	http.Handle("/privacy", sessionMiddleware(PrivacyHandler(db, templates)))
 	http.Handle("/terms", sessionMiddleware(TermsHandler(db, templates)))
+	http.Handle("/phone-addiction", sessionMiddleware(PhoneAddictionHandler(db, templates)))
 	http.Handle("/masterclass", sessionMiddleware(MasterclassHandler(db, templates)))
 	http.Handle("/blog/", sessionMiddleware(BlogHandler(db, templates)))
 	http.Handle("/changelog", sessionMiddleware(ChangelogHandler(db, templates)))

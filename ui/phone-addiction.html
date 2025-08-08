@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en" class="min-h-full bg-gray-50 dark:bg-gray-900">
+{{ template "head" . }}
+<body class="bg-gray-50 dark:bg-gray-900">
+    {{ template "header" . }}
+    <div class="min-h-full pt-16">
+        <!-- Hero section -->
+        <style>
+            @media (prefers-reduced-motion: no-preference) {
+              .float-slow {
+                animation: floatUpDown 6s ease-in-out infinite;
+              }
+              .float-medium {
+                animation: floatUpDown 4s ease-in-out infinite;
+              }
+              .float-fast {
+                animation: floatUpDown 3s ease-in-out infinite;
+              }
+              .float-reverse {
+                animation: floatDownUp 5s ease-in-out infinite;
+              }
+          
+              @keyframes floatUpDown {
+                0%, 100% {
+                  transform: translateY(0);
+                }
+                50% {
+                  transform: translateY(-8px);
+                }
+              }
+          
+              @keyframes floatDownUp {
+                0%, 100% {
+                  transform: translateY(0);
+                }
+                50% {
+                  transform: translateY(8px);
+                }
+              }
+            }
+          </style>
+          
+          <section class="bg-habit-color-green-core text-white flex items-center justify-center relative overflow-hidden" style="min-height: calc(100vh - 73px);">
+            <!-- Background video -->
+            <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover opacity-50">
+              <source src="/static/backgroundvideo.mp4" type="video/mp4">
+            </video>
+            
+            <!-- Overlay to ensure text readability -->
+            <div class="absolute inset-0 bg-habit-color-green-core bg-opacity-30"></div>
+            
+          
+            <!-- Main content -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 text-center relative z-10">
+              <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight">
+                Break your phone addiction in 10 days.
+              </h1>
+              <p class="mt-6 text-xl sm:text-2xl max-w-3xl mx-auto font-medium">
+                Reclaim 1-4 hours of your day with our science-backed challenge.
+              </p>
+              <div class="mt-10">
+                <div class="flex space-x-4 justify-center">
+                  <button 
+                    class="px-6 py-3 text-white bg-transparent border border-white rounded-md font-medium hover:bg-white hover:bg-opacity-10 transition-colors duration-200"
+                    onclick="smoothScroll('#problem')">
+                    Learn More ↓
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+          
+
+        <!-- Problem section -->
+        <section id="problem" class="bg-white dark:bg-gray-800 py-20">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+              <h2 class="text-4xl sm:text-5xl font-black tracking-tight text-gray-900 dark:text-white mb-4">
+                Is scrolling the first thing you do when you wake up?
+              </h2>
+              <p class="text-xl sm:text-2xl font-medium text-gray-700 dark:text-gray-300 mb-6">
+                You're not alone. 89% of people say the same thing.
+              </p>
+              <p class="text-lg sm:text-xl text-gray-600 dark:text-gray-400 leading-relaxed">
+                Even worse, the average person loses 1 to 4 hours daily to their phone.
+              </p>
+              <p class="mt-6 text-lg sm:text-xl text-gray-600 dark:text-gray-400 leading-relaxed">
+                That's not just a time suck; it's an addiction that causes a serious drain on your focus, relationships, fitness, mental health, and your sleep.
+              </p>
+            </div>
+          </section>
+          
+        
+        
+        <!-- Why It's Hard Section -->
+        <section class="bg-gray-50 dark:bg-gray-900 py-20">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl sm:text-5xl font-black tracking-tight text-gray-900 dark:text-white mb-8 text-center">
+              Ever wonder why it's so hard to put the phone down?
+            </h2>
+            <p class="text-xl text-gray-700 dark:text-gray-300 mb-4 text-center max-w-4xl mx-auto">
+              It's not your fault.
+            </p>
+            <p class="text-lg text-gray-600 dark:text-gray-400 mb-12 text-center max-w-4xl mx-auto">
+              Social media and news platforms are brilliantly engineered to exploit our ancient "caveman brains." They hit all our primal reward triggers with an endless buffet of likes, alerts, and "OMG, did you see that kitten?" content.
+            </p>
+            <p class="text-lg text-gray-600 dark:text-gray-400 mb-12 text-center max-w-4xl mx-auto font-semibold">
+              It's a vicious cycle designed to keep you hooked, because your attention is their product.
+            </p>
+            <p class="text-xl text-gray-700 dark:text-gray-300 mb-12 text-center max-w-4xl mx-auto">
+              But here's the good news: breaking phone addiction is also incredibly easy (if you fight science with science).
+            </p>
+          </div>
+        </section>
+
+        <!-- What You'll Learn Section -->
+        <section class="bg-habit-color-green-core bg-opacity-90 text-white py-20">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl sm:text-5xl font-black tracking-tight mb-4 text-center">
+              Ready to take back your life?
+            </h2>
+            <p class="text-xl mb-12 text-center max-w-4xl mx-auto">
+              Our 10-Day Break Phone Addiction Challenge is a quick and easy online course that helps you reclaim your time.
+            </p>
+            
+            <h3 class="text-2xl font-bold mb-8 text-center">Here's What You'll Learn & What You'll Gain:</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <!-- Benefit 1 -->
+              <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6 border border-white border-opacity-20">
+                <div class="flex items-center mb-4">
+                  <span class="text-3xl mr-4">🧠</span>
+                  <h4 class="text-xl font-bold">Outsmart the Tech Giants</h4>
+                </div>
+                <p>
+                  Learn the manipulative tactics of apps and how to defuse their power over your attention.
+                </p>
+              </div>
+              
+              <!-- Benefit 2 -->
+              <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6 border border-white border-opacity-20">
+                <div class="flex items-center mb-4">
+                  <span class="text-3xl mr-4">🌅</span>
+                  <h4 class="text-xl font-bold">Build New, Joyful Routines</h4>
+                </div>
+                <p>
+                  Replace old habits with invigorating morning and evening rituals that boost your energy and clarity.
+                </p>
+              </div>
+              
+              <!-- Benefit 3 -->
+              <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6 border border-white border-opacity-20">
+                <div class="flex items-center mb-4">
+                  <span class="text-3xl mr-4">🏃</span>
+                  <h4 class="text-xl font-bold">Take a 24-Hour Digital Detox</h4>
+                </div>
+                <p>
+                  Go on adventure to reset your mind and rediscover the world around you.
+                </p>
+              </div>
+              
+              <!-- Benefit 4 -->
+              <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6 border border-white border-opacity-20">
+                <div class="flex items-center mb-4">
+                  <span class="text-3xl mr-4">🎯</span>
+                  <h4 class="text-xl font-bold">Boost Your Focus & Productivity</h4>
+                </div>
+                <p>
+                  Experience sharper concentration and get more done, without constant digital interruptions.
+                </p>
+              </div>
+              
+              <!-- Benefit 5 -->
+              <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6 border border-white border-opacity-20">
+                <div class="flex items-center mb-4">
+                  <span class="text-3xl mr-4">💤</span>
+                  <h4 class="text-xl font-bold">Improve Your Sleep & Well-being</h4>
+                </div>
+                <p>
+                  While we start with the mornings the strategies will also impact the nights. No more late-night scrolling and gain a more restful sleep and a calmer mind.
+                </p>
+              </div>
+              
+              <!-- Benefit 6 -->
+              <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-lg p-6 border border-white border-opacity-20">
+                <div class="flex items-center mb-4">
+                  <span class="text-3xl mr-4">⏰</span>
+                  <h4 class="text-xl font-bold">Reclaim 1-4 Hours a Day</h4>
+                </div>
+                <p>
+                  Imagine what you'll do with that newfound time for yourself, your passions, and your loved ones!
+                </p>
+              </div>
+            </div>
+            
+            <p class="mt-12 text-xl text-center max-w-4xl mx-auto">
+              Imagine what you could do with those stolen hours: finally get in shape, connect deeper with loved ones, launch that side hustle, or simply enjoy a quiet, guilt-free start to your day.
+            </p>
+          </div>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section class="bg-white dark:bg-gray-800 py-20">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl sm:text-5xl font-black tracking-tight text-gray-900 dark:text-white mb-4 text-center">
+              Don't just take our word for it.
+            </h2>
+            <p class="text-xl text-gray-700 dark:text-gray-300 mb-12 text-center">
+              See how our 10-Day Break Phone Addiction Challenge has changed lives:
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <!-- Testimonial 1 -->
+              <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                <p class="text-gray-600 dark:text-gray-400 italic mb-4">
+                  "My mornings used to be a blur of doomscrolling. Now, I have time for a walk and feel genuinely ready for the day!"
+                </p>
+                <p class="text-sm font-semibold text-gray-900 dark:text-white">– Sarah J.</p>
+              </div>
+              
+              <!-- Testimonial 2 -->
+              <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                <p class="text-gray-600 dark:text-gray-400 italic mb-4">
+                  "I thought I'd never break the habit, but this course showed me simple steps that actually work. I'm calmer and more productive than ever."
+                </p>
+                <p class="text-sm font-semibold text-gray-900 dark:text-white">– Mike L.</p>
+              </div>
+              
+              <!-- Testimonial 3 -->
+              <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+                <p class="text-gray-600 dark:text-gray-400 italic mb-4">
+                  "The strategies are so practical. I've gained hours back in my day, and my relationships are stronger because I'm actually present."
+                </p>
+                <p class="text-sm font-semibold text-gray-900 dark:text-white">– Emily W.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Guarantee Section -->
+        <section class="bg-habit-color-green-core bg-opacity-90 text-white py-20">
+          <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-4xl sm:text-5xl font-black tracking-tight mb-8">
+              100% Satisfaction Guarantee
+            </h2>
+            <p class="text-xl mb-6">
+              We're so confident you'll love our online course that we offer a 100% satisfaction guarantee.
+            </p>
+            <p class="text-lg">
+              Try the course for 10 days, and if you're not happy with the results, we'll give you a full refund. No questions asked.
+            </p>
+            <div class="mt-10">
+              <a href="#pricing" onclick="smoothScroll('#pricing')" class="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-md shadow-sm text-habit-color-green-core bg-white hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white">
+                Start Your 10-Day Challenge
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M10.293 16.707a1 1 0 010-1.414l-6-6a1 1 0 011.414 0l6 6a1 1 0 010 1.414z" clip-rule="evenodd" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </section>
+
+    {{ template "curriculum" . }}
+        
+    {{ template "pricingarea" . }}
+        
+    {{ template "faq" . }}
+        
+    {{ template "footer" . }}
+    
+    {{ template "challenge-popup" . }}
+    </div>
+    <script>
+        function smoothScroll(target) {
+            const element = document.querySelector(target);
+            if (element) {
+                window.scrollTo({
+                    top: element.offsetTop,
+                    behavior: 'smooth'
+                });
+            }
+        }
+    </script>
+</body>
+</html>

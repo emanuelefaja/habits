@@ -233,6 +233,22 @@ func TermsHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
 	}
 }
 
+// PhoneAddictionHandler handles the phone addiction page route
+func PhoneAddictionHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// Get the user if logged in
+		user, _ := getAuthenticatedUser(r, db)
+		data := struct {
+			User *models.User
+			Page string
+		}{
+			User: user,
+			Page: "phone-addiction",
+		}
+		renderTemplate(w, templates, "phone-addiction.html", data)
+	}
+}
+
 // MasterclassHandler handles the masterclass landing page route
 func MasterclassHandler(db *sql.DB, templates *template.Template) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
