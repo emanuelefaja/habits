@@ -2,7 +2,6 @@ package models
 
 import (
 	"database/sql"
-	"fmt"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -246,113 +245,6 @@ func InitDB(db *sql.DB) error {
 		return err
 	}
 
-	// Create email_subscriptions table
-	_, err = db.Exec(`
-	CREATE TABLE IF NOT EXISTS email_subscriptions (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		user_id INTEGER NULL REFERENCES users(id) ON DELETE CASCADE,
-		email TEXT NOT NULL,
-		campaign_id TEXT NOT NULL,
-		token TEXT NOT NULL,
-		subscribed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		status TEXT NOT NULL CHECK (status IN ('active', 'unsubscribed')) DEFAULT 'active',
-		last_email_sent INTEGER DEFAULT 0,
-		unsubscribed_at TIMESTAMP NULL,
-		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		UNIQUE(email, campaign_id)
-	)`)
-	if err != nil {
-		return fmt.Errorf("error creating email_subscriptions table: %w", err)
-	}
-
-	// Create email_sends table
-	_, err = db.Exec(`
-	CREATE TABLE IF NOT EXISTS email_sends (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		subscription_id INTEGER NOT NULL REFERENCES email_subscriptions(id) ON DELETE CASCADE,
-		email_number INTEGER NOT NULL,
-		template_name TEXT NOT NULL,
-		subject TEXT NOT NULL,
-		status TEXT NOT NULL CHECK (status IN ('success', 'failed', 'retry')),
-		sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		error_message TEXT,
-		retry_count INTEGER DEFAULT 0,
-		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-	)`)
-	if err != nil {
-		return fmt.Errorf("error creating email_sends table: %w", err)
-	}
-
-	// Create indexes for email campaign tables
-	_, err = db.Exec(`
-	CREATE INDEX IF NOT EXISTS idx_email_subscriptions_user_id ON email_subscriptions(user_id);
-	CREATE INDEX IF NOT EXISTS idx_email_subscriptions_email ON email_subscriptions(email);
-	CREATE INDEX IF NOT EXISTS idx_email_subscriptions_campaign_id ON email_subscriptions(campaign_id);
-	CREATE INDEX IF NOT EXISTS idx_email_subscriptions_status ON email_subscriptions(status);
-	CREATE INDEX IF NOT EXISTS idx_email_sends_subscription_id ON email_sends(subscription_id);
-	CREATE INDEX IF NOT EXISTS idx_email_sends_status ON email_sends(status);
-	CREATE INDEX IF NOT EXISTS idx_email_sends_sent_at ON email_sends(sent_at);
-	`)
-	if err != nil {
-		return fmt.Errorf("error creating email campaign indexes: %w", err)
-	}
-
-	// Create user_lesson_completion table
-	_, err = db.Exec(`
-		CREATE TABLE IF NOT EXISTS user_lesson_completion (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			user_id INTEGER NOT NULL,
-			lesson_id TEXT NOT NULL,
-			module_id TEXT NOT NULL,
-			completed BOOLEAN NOT NULL DEFAULT FALSE,
-			completed_at TIMESTAMP,
-			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-			rating INTEGER CHECK (rating IS NULL OR (rating >= 1 AND rating <= 5)),
-			rating_submitted_at TIMESTAMP,
-			FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
-			UNIQUE(user_id, lesson_id)
-		)
-	`)
-	if err != nil {
-		return fmt.Errorf("error creating user_lesson_completion table: %w", err)
-	}
-
-	// Create indexes for user_lesson_completion
-	_, err = db.Exec(`
-		CREATE INDEX IF NOT EXISTS idx_user_lesson_completion_user_id ON user_lesson_completion(user_id);
-		CREATE INDEX IF NOT EXISTS idx_user_lesson_completion_lesson_id ON user_lesson_completion(lesson_id)
-	`)
-	if err != nil {
-		return fmt.Errorf("error creating user_lesson_completion indexes: %w", err)
-	}
-
-	// Create user_course_access table
-	_, err = db.Exec(`
-		CREATE TABLE IF NOT EXISTS user_course_access (
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			user_id INTEGER NOT NULL,
-			course_id TEXT NOT NULL,
-			purchased_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-			purchase_price REAL,
-			status TEXT NOT NULL CHECK(status IN ('active', 'refunded', 'expired')) DEFAULT 'active',
-			FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
-			UNIQUE(user_id, course_id)
-		)
-	`)
-	if err != nil {
-		return fmt.Errorf("error creating user_course_access table: %w", err)
-	}
-
-	// Create indexes for user_course_access
-	_, err = db.Exec(`
-		CREATE INDEX IF NOT EXISTS idx_user_course_access_user_id ON user_course_access(user_id);
-		CREATE INDEX IF NOT EXISTS idx_user_course_access_course_id ON user_course_access(course_id)
-	`)
-	if err != nil {
-		return fmt.Errorf("error creating user_course_access indexes: %w", err)
-	}
-
 	return nil
 }
 
@@ -421,50 +313,6 @@ func MigrateDB(db *sql.DB) error {
 		_, err = db.Exec(`
 			ALTER TABLE users 
 			ADD COLUMN notification_enabled BOOLEAN NOT NULL DEFAULT true
-		`)
-		if err != nil {
-			return err
-		}
-	}
-
-	// Check if rating column exists in user_lesson_completion table
-	err = db.QueryRow(`
-		SELECT COUNT(*) > 0 
-		FROM pragma_table_info('user_lesson_completion') 
-		WHERE name = 'rating'
-	`).Scan(&columnExists)
-
-	if err != nil {
-		return err
-	}
-
-	// Add rating column if it doesn't exist
-	if !columnExists {
-		_, err = db.Exec(`
-			ALTER TABLE user_lesson_completion 
-			ADD COLUMN rating INTEGER CHECK (rating IS NULL OR (rating >= 1 AND rating <= 5))
-		`)
-		if err != nil {
-			return err
-		}
-	}
-
-	// Check if rating_submitted_at column exists
-	err = db.QueryRow(`
-		SELECT COUNT(*) > 0 
-		FROM pragma_table_info('user_lesson_completion') 
-		WHERE name = 'rating_submitted_at'
-	`).Scan(&columnExists)
-
-	if err != nil {
-		return err
-	}
-
-	// Add rating_submitted_at column if it doesn't exist
-	if !columnExists {
-		_, err = db.Exec(`
-			ALTER TABLE user_lesson_completion 
-			ADD COLUMN rating_submitted_at TIMESTAMP
 		`)
 		if err != nil {
 			return err

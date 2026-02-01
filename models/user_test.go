@@ -52,10 +52,6 @@ func (m *MockEmailService) SendSimpleEmail(to, subject, content string) error {
 	return nil
 }
 
-func (m *MockEmailService) GetCampaignManager() *email.CampaignManager {
-	return email.NewCampaignManager(nil, m)
-}
-
 // setupTestDB creates an in-memory SQLite database for testing
 func setupTestDB(t *testing.T) *sql.DB {
 	db, err := sql.Open("sqlite3", ":memory:")

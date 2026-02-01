@@ -94,11 +94,6 @@ func (s *TestEmailService) GetEmailStats() map[string]int {
 	return s.emailsSent
 }
 
-// GetCampaignManager returns the campaign manager from the base service
-func (s *TestEmailService) GetCampaignManager() *email.CampaignManager {
-	return s.baseService.GetCampaignManager()
-}
-
 func main() {
 	fmt.Println("⏰ Scheduler Simulation Tester")
 	fmt.Println("=============================")

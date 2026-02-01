@@ -30,17 +30,11 @@ func SetupRoutes(db *sql.DB, templates *template.Template, emailService email.Em
 	http.Handle("/about", sessionMiddleware(AboutHandler(db, templates)))
 	http.Handle("/privacy", sessionMiddleware(PrivacyHandler(db, templates)))
 	http.Handle("/terms", sessionMiddleware(TermsHandler(db, templates)))
-	http.Handle("/phone-addiction", sessionMiddleware(PhoneAddictionHandler(db, templates)))
-	http.Handle("/masterclass", sessionMiddleware(MasterclassHandler(db, templates)))
 	http.Handle("/blog/", sessionMiddleware(BlogHandler(db, templates)))
 	http.Handle("/changelog", sessionMiddleware(ChangelogHandler(db, templates)))
 	http.Handle("/roadmap", sessionMiddleware(RoadmapHandler(db, templates)))
 	http.Handle("/forgot", sessionMiddleware(ForgotPasswordHandler(db, templates)))
 	http.Handle("/reset", sessionMiddleware(ResetPasswordHandler(db, templates)))
-
-	// New routes for module and lesson pages
-	http.Handle("/masterclass/", sessionMiddleware(authMiddleware(MasterclassModuleHandler(db, templates))))
-	http.Handle("/masterclass/api/", sessionMiddleware(authMiddleware(MasterclassAPIHandler(db))))
 
 	// Admin routes
 	http.Handle("/admin", sessionMiddleware(adminMiddleware(AdminDashboardHandler(db, templates))))
@@ -62,7 +56,6 @@ func SetupRoutes(db *sql.DB, templates *template.Template, emailService email.Em
 	http.Handle("/api/user/settings", sessionMiddleware(authMiddleware(api.UpdateSettingsHandler(db))))
 	http.Handle("/api/user/reset-data", sessionMiddleware(authMiddleware(api.ResetDataHandler(db))))
 	http.Handle("/api/user/notifications", sessionMiddleware(authMiddleware(api.UpdateNotificationPreferenceHandler(db))))
-	http.Handle("/unsubscribe", sessionMiddleware(UnsubscribeHandler(db, emailService, templates)))
 
 	// Password reset API routes
 	http.Handle("/api/forgot-password", sessionMiddleware(api.ForgotPasswordHandler(db)))

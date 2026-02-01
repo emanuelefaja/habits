@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"html/template"
 	"log"
-	"math/rand"
 	"net/http"
 	"os"
 	"strconv"
@@ -86,16 +85,6 @@ func main() {
 	// Pass the email service to the API handlers
 	api.InitEmailService(emailService)
 
-	// Initialize campaign manager
-	if emailService != nil {
-		campaignManager := email.NewCampaignManager(db, emailService)
-
-		// Set the campaign manager in the email service if it's the SMTP implementation
-		if smtpService, ok := emailService.(*email.SMTPEmailService); ok {
-			smtpService.SetCampaignManager(campaignManager)
-		}
-	}
-
 	// Initialize and start the scheduler for email notifications
 	scheduler := models.NewScheduler(db, emailService)
 	if err := scheduler.Start(); err != nil {
@@ -164,112 +153,6 @@ func main() {
 		}
 	}))))
 
-	// Digital Detox Course
-	http.Handle("/courses/digital-detox", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/courses/digital-detox" {
-			http.NotFound(w, r)
-			return
-		}
-
-		// Create random numbers for math verification
-		num1 := rand.Intn(20) + 1 // Random number between 1-20
-		num2 := rand.Intn(20) + 1 // Random number between 1-20
-
-		// Default data map
-		data := map[string]interface{}{
-			"IsAuthenticated": middleware.IsAuthenticated(r),
-			"IsSubscribed":    false,
-			"UserEmail":       "",
-			"UserFirstName":   "",
-			"CSRFToken":       middleware.GetCSRFToken(r),
-			"MathNum1":        num1,
-			"MathNum2":        num2,
-		}
-
-		// Add user data if logged in
-		if data["IsAuthenticated"].(bool) {
-			user, err := getAuthenticatedUser(r, db)
-			if err == nil && user != nil {
-				data["User"] = user
-				data["UserEmail"] = user.Email
-				data["UserFirstName"] = user.FirstName
-
-				// Check if the user is already subscribed to the Digital Detox campaign
-				svc, ok := emailService.(email.EmailService)
-				if ok && svc != nil {
-					campaignManager := svc.GetCampaignManager()
-					if campaignManager != nil {
-						subscriptions, err := campaignManager.GetUserSubscriptions(int(user.ID))
-						if err == nil {
-							// Check if user is subscribed to the Digital Detox campaign
-							for _, subscription := range subscriptions {
-								if subscription.CampaignID == "digital-detox" && subscription.Status == "active" {
-									data["IsSubscribed"] = true
-									break
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		renderTemplate(w, templates, "digital-detox.html", data)
-	})))
-
-	// Phone Addiction Course
-	http.Handle("/courses/phone-addiction", middleware.SessionManager.LoadAndSave(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/courses/phone-addiction" {
-			http.NotFound(w, r)
-			return
-		}
-
-		// Create random numbers for math verification
-		num1 := rand.Intn(20) + 1 // Random number between 1-20
-		num2 := rand.Intn(20) + 1 // Random number between 1-20
-
-		// Default data map
-		data := map[string]interface{}{
-			"IsAuthenticated": middleware.IsAuthenticated(r),
-			"IsSubscribed":    false,
-			"UserEmail":       "",
-			"UserFirstName":   "",
-			"CSRFToken":       middleware.GetCSRFToken(r),
-			"MathNum1":        num1,
-			"MathNum2":        num2,
-		}
-
-		// Add user data if logged in
-		if data["IsAuthenticated"].(bool) {
-			user, err := getAuthenticatedUser(r, db)
-			if err == nil && user != nil {
-				data["User"] = user
-				data["UserEmail"] = user.Email
-				data["UserFirstName"] = user.FirstName
-
-				// Check if the user is already subscribed to the Phone Addiction campaign
-				svc, ok := emailService.(email.EmailService)
-				if ok && svc != nil {
-					campaignManager := svc.GetCampaignManager()
-					if campaignManager != nil {
-						subscriptions, err := campaignManager.GetUserSubscriptions(int(user.ID))
-						if err == nil {
-							// Check if user is subscribed to the Phone Addiction campaign
-							for _, subscription := range subscriptions {
-								if subscription.CampaignID == "phone-addiction" && subscription.Status == "active" {
-									data["IsSubscribed"] = true
-									break
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		renderTemplate(w, templates, "phone-addiction.html", data)
-	})))
-
 	// Habit View
 	http.Handle("/habit/", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		habitID, err := strconv.Atoi(strings.TrimPrefix(r.URL.Path, "/habit/"))
@@ -305,12 +188,6 @@ func main() {
 		}
 		renderTemplate(w, templates, "habit.html", data)
 	}))))
-
-	// Campaign API handlers
-	http.Handle("/api/campaigns/subscribe", middleware.SessionManager.LoadAndSave(http.HandlerFunc(api.SubscribeToCampaign)))
-	http.Handle("/api/campaigns/unsubscribe", middleware.SessionManager.LoadAndSave(http.HandlerFunc(api.UnsubscribeFromCampaign)))
-	http.Handle("/api/campaigns/subscriptions", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(api.GetSubscriptions))))
-	http.Handle("/api/campaigns/preferences", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(api.UpdateSubscriptionPreferences))))
 
 	// Habit Logs Deletion
 	http.Handle("/api/habits/logs/delete", middleware.SessionManager.LoadAndSave(middleware.RequireAuth(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
