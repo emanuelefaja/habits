@@ -34,14 +34,9 @@
                 Habits 🏠
             </a>
 
-            <a href="/goals" 
+            <a href="/goals"
                 class="rounded-md {{ if eq .Page "goals" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
                 Goals 🎯
-            </a>
-
-            <a href="/masterclass" 
-                class="rounded-md {{ if eq .Page "masterclass" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
-                Masterclass 🎓
             </a>
         </div>
 
@@ -120,19 +115,6 @@
         
         <!-- Middle column - navigation links for guest home page -->
         <div class="flex-1 flex justify-center">
-            {{ if eq .Page "guest-home" }}
-            <div class="flex items-center space-x-10">
-                <a href="#testimonials" class="text-gray-800 hover:text-[#2da44e] px-3 py-2 text font-medium">
-                    Reviews
-                </a>
-                <a href="#pricing" class="text-gray-800 hover:text-[#2da44e] px-3 py-2 text font-medium">
-                    Pricing
-                </a>
-                <a href="#faq" class="text-gray-800 hover:text-[#2da44e] px-3 py-2 text font-medium">
-                    FAQ
-                </a>
-            </div>
-            {{ end }}
         </div>
         
         <!-- Right column - login/register buttons -->
@@ -168,14 +150,9 @@
                 Habits 🏠
             </a>
 
-            <a href="/goals" 
+            <a href="/goals"
                 class="rounded-md {{ if eq .Page "goals" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
                 Goals 🎯
-            </a>
-
-            <a href="/masterclass" 
-                class="rounded-md {{ if eq .Page "masterclass" }}bg-[#2da44e] text-white hover:bg-[#2c974b]{{ else }}bg-gray-300 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600{{ end }} px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
-                Masterclass 🎓
             </a>
 
             <a href="/pricing" 
@@ -212,22 +189,6 @@
                 <img src="/static/github-mark-white.svg" alt="GitHub" class="w-6 h-6 hidden dark:block">
             </a>
         {{ else }}
-            {{ if eq .Page "guest-home" }}
-            <a href="#testimonials" 
-                class="rounded-md bg-gray-300 text-gray-800 hover:bg-gray-200 px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
-                Reviews
-            </a>
-            
-            <a href="#pricing" 
-                class="rounded-md bg-gray-300 text-gray-800 hover:bg-gray-200 px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
-                Pricing
-            </a>
-            
-            <a href="#faq" 
-                class="rounded-md bg-gray-300 text-gray-800 hover:bg-gray-200 px-4 py-2 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
-                FAQ
-            </a>
-            {{ end }}
             
             <a href="/login" 
                 class="rounded-md bg-white px-4 py-2 text-sm font-semibold text-[#2da44e] shadow-sm ring-1 ring-inset ring-[#2da44e] hover:bg-gray-50">
